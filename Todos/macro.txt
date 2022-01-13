@@ -1,0 +1,12 @@
+Macros:
+- Macro interpreter and editor:
+runs on the source code file once, 
+every time we encounter "macro" #some_name and end.
+the use of the macro should apear straight after 
+the macro decleration. 
+
+as soon as we encounter the use of the macro variable we replace 
+it with the macro content we just saved. 
+we run on the source file while create a copy
+of the source file content in different file that will contain
+the same source code but without macros variables,.
