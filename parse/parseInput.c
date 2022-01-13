@@ -66,7 +66,6 @@ int main()
 
             if (state == ignore)
             {
-                c;
 
                 switch (c)
                 {
