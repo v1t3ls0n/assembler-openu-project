@@ -1,50 +1,22 @@
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
+#include "parse.h"
 
-typedef enum
-{
-    ignore,
-    parse,
-    error
-} State;
-
-typedef enum
-{
-    comma,
-    space,
-    newLine,
-    macro,
-    array,
-    label,
-    character,
-    number,
-
-} Expect;
-typedef enum
-{
-    label,
-    number,
-    macro,
-    array,
-    instruction,
-    dataInstuction,
-    command,
-    comma,
-    any
-} Parse;
 int main()
 {
+}
+
+void parseLine()
+{
+
     char str[50] = "        XYZ:  .data 7,-57,+17";
     int c = NULL;
     int i = 0, j = 0;
+    int spaces = 0;
     char line[81];
     char token[81];
-
     State state = ignore;
     Parse parse = any;
     Expect expect = any;
+
     while ((c = getchar()) != EOF)
     {
         if (c == '\n')
@@ -131,6 +103,7 @@ int main()
             }
             state = parse;
             token[j++] = (char)c;
+            spaces = 0;
         }
         else if (isspace(c) && state == parse)
         {
@@ -139,12 +112,28 @@ int main()
             expect = any;
             memset(token, 0, j);
             state = ignore;
+            spaces = 1;
         }
         else if (isspace(c) && state == ignore)
         {
+            spaces++;
             /*
             do nothing
             */
         }
     }
+}
+
+int getFunctCode()
+{
+    return 0;
+}
+
+int getOpcode()
+{
+    return 0;
+}
+
+void updateDataTable()
+{
 }
