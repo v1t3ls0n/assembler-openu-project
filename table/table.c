@@ -3,14 +3,16 @@
 int main()
 {
     Attributes att;
-    Item *current;
-    current = install("LIST", Symbol);
+
     att.code = 1;
     att.entry = 1;
-    setSymbolData(current, 104, att);
+    setSymbolData(install("GDS", Symbol), 104, att);
+    setSymbolData(install("ABC", Symbol), 108, att);
+    setSymbolData(install("GEDH", Symbol), 113, att);
     printSymbolTable();
 
     /*
+        Item *current;
     Item *p;
     p = (Item *)malloc(sizeof(Item *));
     Attribute att[] = {code, entry};
@@ -67,10 +69,10 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     int nameLength = strlen(name);
-
     if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
     {
         np = (Item *)malloc(sizeof(Item *));
+        np->name = (char *)malloc(nameLength * sizeof(char));
         memcpy(np->name, name, nameLength);
         np->name[nameLength] = '\0';
         if (np == NULL || np->name == NULL)
