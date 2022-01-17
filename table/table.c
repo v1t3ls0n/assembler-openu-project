@@ -6,13 +6,13 @@ int main()
 
     att.code = 1;
     att.entry = 1;
-    setSymbolData(install("GDS", Symbol), 104, att);
+    setSymbolData(install("GDS", Symbol), 100, att);
     att.code = att.entry = att.external = att.data = 0;
     att.external = 1;
-    setSymbolData(install("ABC", Symbol), 108, att);
+    setSymbolData(install("ABC", Symbol), 104, att);
     att.code = att.entry = att.external = att.data = 0;
     att.entry = 1;
-    setSymbolData(install("GEDH", Symbol), 113, att);
+    setSymbolData(install("GEDH", Symbol), 140, att);
     printSymbolTable();
 
     return 0;
@@ -121,8 +121,8 @@ void setSymbolData(Item *symbol, unsigned value, Attributes attrs)
     unsigned offset;
     /* calculate base and offset from value*/
     /*meanwhile I will put some generic values in those variables*/
-    base = 96;
-    offset = 4;
+    offset = value % 16;
+    base = value - offset;
     symbol->val.s.value = value;
     symbol->val.s.base = base;
     symbol->val.s.offset = offset;
