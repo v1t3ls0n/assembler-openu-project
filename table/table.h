@@ -5,10 +5,10 @@
 
 typedef struct
 {
-    unsigned int external : 1;
     unsigned int code : 1;
-    unsigned int entry : 1;
     unsigned int data : 1;
+    unsigned int entry : 1;
+    unsigned int external : 1;
 } Attributes;
 
 typedef enum
@@ -52,3 +52,4 @@ void printSymbolTable();
 void printSymbolItem(Item *item);
 void setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 void setMacroData(Item *macro, char *code);
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);

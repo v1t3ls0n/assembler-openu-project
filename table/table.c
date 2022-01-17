@@ -2,17 +2,10 @@
 
 int main()
 {
-    Attributes att;
 
-    att.code = 1;
-    att.entry = 1;
-    setSymbolData(install("GDS", Symbol), 100, att);
-    att.code = att.entry = att.external = att.data = 0;
-    att.external = 1;
-    setSymbolData(install("ABC", Symbol), 104, att);
-    att.code = att.entry = att.external = att.data = 0;
-    att.entry = 1;
-    setSymbolData(install("GEDH", Symbol), 140, att);
+    addSymbol("GDGDS", 100, 1, 0, 1, 0);
+    addSymbol("ABC", 108, 0, 1, 0, 0);
+    addSymbol("GDGD", 112, 0, 0, 0, 1);
     printSymbolTable();
 
     return 0;
@@ -61,7 +54,9 @@ Item *install(char *name, ItemType type)
         else
             macros[hashval] = np;
     }
-    /* Key name already exist inside table, yield Error of duplicate values in symbol/macro table*/
+    /* Key name already exist inside table, yield Error of duplicate values in symbol/macro table,
+    if it is an entry or an external do not yield error
+    */
     else
     {
         printf("Key name already exist inside table!\n");
@@ -114,12 +109,20 @@ void printSymbolItem(Item *item)
         printSymbolItem(item->next);
 }
 
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+{
+    Attributes att;
+    att.data = isData ? 1 : 0;
+    att.code = isCode ? 1 : 0;
+    att.entry = isEntry ? 1 : 0;
+    att.external = isExternal ? 1 : 0;
+    setSymbolData(install(name, Symbol), value, att);
+}
+
 void setSymbolData(Item *symbol, unsigned value, Attributes attrs)
 {
     unsigned base;
     unsigned offset;
-    /* calculate base and offset from value*/
-    /*meanwhile I will put some generic values in those variables*/
     offset = value % 16;
     base = value - offset;
     symbol->val.s.value = value;
