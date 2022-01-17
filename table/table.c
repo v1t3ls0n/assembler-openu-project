@@ -7,39 +7,13 @@ int main()
     att.code = 1;
     att.entry = 1;
     setSymbolData(install("GDS", Symbol), 104, att);
+    att.code = att.entry = att.external = att.data = 0;
+    att.external = 1;
     setSymbolData(install("ABC", Symbol), 108, att);
+    att.code = att.entry = att.external = att.data = 0;
+    att.entry = 1;
     setSymbolData(install("GEDH", Symbol), 113, att);
     printSymbolTable();
-
-    /*
-        Item *current;
-    Item *p;
-    p = (Item *)malloc(sizeof(Item *));
-    Attribute att[] = {code, entry};
-    p = install("LIST", Symbol);
-
-    p = install("LIST", Symbol);
-    if (p == NULL)
-        printf("duplicate symbol!\n");
-    else
-    {
-        att[0] = data;
-        att[1] = entry;
-        setSymbolData(p, 100, att);
-    }
-
-    p = install("MAIN", Symbol);
-    if (p == NULL)
-        printf("duplicate symbol!\n");
-    else
-    {
-        att[0] = code;
-        att[1] = entry;
-        setSymbolData(p, 104, att);
-    }
-
-    printSymbolTable();
-    */
 
     return 0;
 }
