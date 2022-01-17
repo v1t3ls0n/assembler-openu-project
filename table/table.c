@@ -1,8 +1,5 @@
 #include "table.h"
 
-static Item *symbols[HASHSIZE];
-static Item *macros[HASHSIZE];
-
 int main()
 {
     return 0;

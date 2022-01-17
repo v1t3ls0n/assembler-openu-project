@@ -41,3 +41,6 @@ typedef struct
         MacroData m;
     } val;
 } Item;
+
+static Item *symbols[HASHSIZE];
+static Item *macros[HASHSIZE];
