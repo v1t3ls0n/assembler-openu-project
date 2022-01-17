@@ -31,7 +31,6 @@ Item *lookup(char *s, ItemType type)
 {
 
     Item *np;
-    printf("inside lookup, s:%s\n", s);
     for (np = (type == Symbol ? symbols[hash(s)] : macros[hash(s)]); np != NULL; np = np->next)
         if (strcmp(s, np->name) == 0)
             return np;
