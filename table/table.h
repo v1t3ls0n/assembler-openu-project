@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #define HASHSIZE 101
-typedef enum
+typedef struct
 {
-    external,
-    code,
-    entry,
-    data
-} Attribute;
+    unsigned int external : 1;
+    unsigned int code : 1;
+    unsigned int entry : 1;
+    unsigned int data : 1;
+} Attributes;
 
 typedef enum
 {
@@ -27,7 +27,7 @@ typedef struct
     unsigned value;
     unsigned base;
     unsigned offset;
-    Attribute *attrs;
+    Attributes attrs;
 } SymbolData;
 
 typedef struct
@@ -49,5 +49,5 @@ Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-void setSymbolData(Item *symbol, unsigned value, Attribute *attrs);
+void setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 void setMacroData(Item *macro, char *code);

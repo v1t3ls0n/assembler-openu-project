@@ -2,12 +2,11 @@
 
 int main()
 {
-    Attribute att[] = {code, entry};
-    char *s = "LIST";
+    Attributes att;
     Item *current;
-    current = install(s, Symbol);
-    att[0] = code;
-    att[1] = entry;
+    current = install("LIST", Symbol);
+    att.code = 1;
+    att.entry = 1;
     setSymbolData(current, 104, att);
     printSymbolTable();
 
@@ -111,67 +110,50 @@ void printSymbolTable()
 
 void printSymbolItem(Item *item)
 {
-    int j = 0;
     printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
-    while (j < 2)
+    if ((item->val.s.attrs.code || item->val.s.attrs.data) && (item->val.s.attrs.entry || item->val.s.attrs.external))
     {
-        switch (item->val.s.attrs[j])
-        {
-        case code:
+        if (item->val.s.attrs.code)
             printf("code,");
-            break;
-        case data:
+        else
             printf("data,");
-            break;
-        case entry:
-            printf("entry,");
-            break;
-        case external:
-            printf("external,");
-            break;
-        default:
-            break;
-        }
-        j++;
+
+        if (item->val.s.attrs.entry)
+            printf("entry");
+        else
+            printf("external");
     }
-    /*
-
-
-        printf("\n%s\t%d\t%d\t%d\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
-    printf("\n%s\t%u\t%u\t%u\t", item.name, item.val.s.value, item.val.s.base, item.val.s.offset);
-
-    Attribute *attrs = item->val.s.attrs;
-
-
-
-        */
+    else
+    {
+        if (item->val.s.attrs.code)
+            printf("code");
+        else if (item->val.s.attrs.data)
+            printf("data");
+        else if (item->val.s.attrs.entry)
+            printf("entry");
+        else
+            printf("external");
+    }
 
     if (item->next != NULL)
         printSymbolItem(item->next);
 }
 
-void setSymbolData(Item *symbol, unsigned value, Attribute *attrs)
+void setSymbolData(Item *symbol, unsigned value, Attributes attrs)
 {
     unsigned base;
     unsigned offset;
-    int attrsCount, i = 0;
-
     /* calculate base and offset from value*/
-    /* calculate attrs array size save to attrsCount*/
     /*meanwhile I will put some generic values in those variables*/
     base = 96;
     offset = 4;
-    attrsCount = 2;
     symbol->val.s.value = value;
     symbol->val.s.base = base;
     symbol->val.s.offset = offset;
-    symbol->val.s.attrs = (Attribute *)malloc(attrsCount * sizeof(Attribute *));
-
-    for (i = 0; i < attrsCount; i++)
-    {
-        /* malloc size for symbol->attrs array*/
-        symbol->val.s.attrs[i] = attrs[i];
-    }
+    symbol->val.s.attrs.code = attrs.code;
+    symbol->val.s.attrs.entry = attrs.entry;
+    symbol->val.s.attrs.external = attrs.external;
+    symbol->val.s.attrs.data = attrs.data;
 }
 
 void setMacroData(Item *macro, char *code)
