@@ -5,8 +5,9 @@ static Item *macros[HASHSIZE];
 
 int main()
 {
-    return 1;
+    return 0;
 }
+
 unsigned hash(char *s)
 {
     unsigned hashval;

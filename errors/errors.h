@@ -1,0 +1,5 @@
+typedef enum
+{
+    dupMacro,
+
+} Error;

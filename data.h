@@ -4,6 +4,13 @@
 
 typedef enum
 {
+    Absolute,
+    Rellocateable,
+    External
+} AddrType;
+
+typedef enum
+{
     r0,
     r1,
     r2,

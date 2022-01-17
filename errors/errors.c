@@ -1,8 +1,5 @@
-typedef enum
-{
-    dupMacro,
-
-} Error;
+#include <stdio.h>
+#include "errors.h"
 
 void updateErrorLog(Error err);
 {
