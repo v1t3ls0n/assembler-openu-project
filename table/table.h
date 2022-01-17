@@ -28,19 +28,26 @@ typedef struct
     unsigned base;
     unsigned offset;
     Attribute *attrs;
-
 } SymbolData;
 
 typedef struct
 {
     char *name;
-    void *next;
     union
     {
         SymbolData s;
         MacroData m;
     } val;
+    void *next;
 } Item;
 
 static Item *symbols[HASHSIZE];
 static Item *macros[HASHSIZE];
+
+unsigned hash(char *s);
+Item *lookup(char *s, ItemType type);
+Item *install(char *name, ItemType type);
+void printSymbolTable();
+void printSymbolItem(Item *item);
+void setSymbolData(Item *symbol, unsigned value, Attribute *attrs);
+void setMacroData(Item *macro, char *code);
