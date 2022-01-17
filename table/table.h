@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define HASHSIZE 101
+
 typedef struct
 {
     unsigned int external : 1;
