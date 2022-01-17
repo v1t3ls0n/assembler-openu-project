@@ -57,7 +57,7 @@ void setSymbolData(Item *symbol, unsigned value, Attribute *attrs)
     /*meanwhile I will put some generic values in those variables*/
     base = 96;
     offset = 4;
-    attrsCount = 5;
+    attrsCount = 2;
 
     symbol->val.s.base = base;
     symbol->val.s.offset = offset;
