@@ -47,11 +47,7 @@ typedef struct
     unsigned int desAddr;
 } secondWord;
 
-typedef struct
-{
-    unsigned int base;
-    unsigned int offset
-} operandAddr;
+
 
 union struct
 {

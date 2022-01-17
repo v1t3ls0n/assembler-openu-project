@@ -1,9 +1,43 @@
 #include "instructions.h"
 
-int main()
+Instruction *getInstructionByName(char *s)
 {
-    printf("\nSource Addresing Methods:\n0:%d 1:%d 2:%d 3:%d", instructionsTable[0].src.immediate, instructionsTable[0].src.direct, instructionsTable[0].src.index, instructionsTable[0].src.reg);
-    printf("\nDestination Addresing Methods:\n0:%d 1:%d 2:%d 3:%d", instructionsTable[0].des.immediate, instructionsTable[0].des.direct, instructionsTable[0].des.index, instructionsTable[0].des.reg);
+    int i = 0;
+    while (i < INST_SIZE)
+    {
+        if (strcmp(instructions[i]->keyword, s) == 0)
+            return instructions[i];
+        i++;
+    }
+    return NULL;
+}
 
-    return 0;
+Bool isLabelNameLegal(char *s)
+{
+    int i = 0;
+    char regsName[] = {
+        "r0",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11",
+        "r12",
+        "r13",
+        "r14",
+        "r15",
+    };
+
+    while (i < 16)
+    {
+        if ((strcmp(regsName[i], s) == 0) || (strcmp(instructions[i]->keyword, s) == 0))
+            return False;
+        i++:
+    }
+    return True;
 }

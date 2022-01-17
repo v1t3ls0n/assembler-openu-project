@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define INST_SIZE 16
+
+typedef enum
+{
+    False,
+    True
+} Bool;
 
 typedef struct
 {
@@ -19,7 +26,7 @@ typedef struct
     Addr des;
 } Instruction;
 
-const Instruction instructionsTable[16] = {
+const Instruction instructions[INST_SIZE] = {
     {0, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {1, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
     {2, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
@@ -37,3 +44,6 @@ const Instruction instructionsTable[16] = {
     {14, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {15, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
+
+Instruction *getInstructionByName(char *s);
+Bool isLabelNameLegal(char *s);
