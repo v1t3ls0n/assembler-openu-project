@@ -45,5 +45,22 @@ const Instruction instructions[INST_SIZE] = {
     {15, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
 
+const char regsName[] = {
+    "r0",
+    "r2",
+    "r3",
+    "r4",
+    "r5",
+    "r6",
+    "r7",
+    "r8",
+    "r9",
+    "r10",
+    "r11",
+    "r12",
+    "r13",
+    "r14",
+    "r15",
+};
 Instruction *getInstructionByName(char *s);
 Bool isLabelNameLegal(char *s);
