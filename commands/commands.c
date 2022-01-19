@@ -15,12 +15,13 @@ Command *getCommandByName(char *s)
 
 char *getFirstWord(Command *cmd)
 {
-    return strcat(hexToBin((char *)A), hexToBin((char *)cmd->opMachineCodeHex));
+    return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(cmd->opMachineCodeHex)));
 }
 
 Bool isLabelNameLegal(char *s)
 {
     int i = 0;
+    const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
     int length = (int)(sizeof(regs) / sizeof(regs[0]));
 
     /* if label name does not start with a alphabet letter */
@@ -39,11 +40,19 @@ Bool isLabelNameLegal(char *s)
     }
     return True;
 }
-
+char *decToHex(int num)
+{
+    int i = num, size = 0;
+    char *hex;
+    for (size = 0; i > 0; i = i / 16)
+        size++;
+    hex = (char *)calloc(size, sizeof(char));
+    sprintf(hex, "%x", num);
+    return hex;
+}
 char *hexToBin(char *hex)
 {
-    /* Jumping over the first 0x characters */
-    int i = 2, size = (strlen(hex) - 2) * 4;
+    int i = 0, size = strlen(hex) * 4;
     char *binaryStr = (char *)calloc(size + 1, sizeof(char *));
     while (hex[i])
     {
@@ -113,10 +122,47 @@ char *hexToBin(char *hex)
     return binaryStr;
 }
 
+void printObjectFile(Word obj[], unsigned int ICF, unsigned int DCF)
+{
+    int i;
+    printf("              %d   %d\n", ICF, DCF);
+    for (i = 0; i < (DCF + ICF); i++) /*  */
+        printf("%04d A%x-B%x-C%x-D%x-E%x\n", 100 + i, obj[i].POS_A, obj[i].POS_B, obj[i].POS_C, obj[i].POS_D, obj[i].POS_E);
+}
+
+void printBinaryFile(Word obj[], unsigned int ICF, unsigned int DCF)
+{
+    int i;
+    for (i = 0; i < (DCF + ICF); i++)
+    {
+        printf("%04d ", 100 + i);
+        printf("%s", hexToBin(decToHex(obj[i].POS_A)));
+        printf("%s", hexToBin(decToHex(obj[i].POS_B)));
+        printf("%s", hexToBin(decToHex(obj[i].POS_C)));
+        printf("%s", hexToBin(decToHex(obj[i].POS_D)));
+        printf("%s\n", hexToBin(decToHex(obj[i].POS_E)));
+    }
+}
+
 int main()
 {
-    isLabelNameLegal("r0");
-    printf("%s", getFirstWord(getCommandByName("add")));
+    long size = sizeof(commands) / 16;
+    Word machineCodeObj[] = {
+        {0x2, 0x1, 0x3, 0xF, 0x1},
+        {0x4, 0x2, 0x3, 0x9, 0x1},
+        {0x7, 0x8, 0x6, 0xD, 0x1},
+        {0x3, 0x1, 0x5, 0xE, 0x1},
+        {0x2, 0x4, 0x3, 0xC, 0x1},
+        {0x4, 0x0, 0x3, 0xC, 0x3},
+        {0x4, 0x0, 0x3, 0xB, 0x7},
+        {0x4, 0x0, 0x3, 0xE, 0x2},
+        {0x4, 0x0, 0x3, 0xA, 0x6},
+    };
+
+    printf("commands size v1:%ld\n", size);
+    size = sizeof(Word);
+    printObjectFile(machineCodeObj, 6, 3);
+    printBinaryFile(machineCodeObj, 6, 3);
 
     return 0;
 }
