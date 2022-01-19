@@ -13,7 +13,7 @@ Command *getCommandByName(char *s)
     return NULL;
 }
 
-char *getFirstWordByCommand(Command *cmd)
+char *getFirstWord(Command *cmd)
 {
     return strcat(hexToBin((char *)A), hexToBin((char *)cmd->opMachineCodeHex));
 }
@@ -116,7 +116,7 @@ char *hexToBin(char *hex)
 int main()
 {
     isLabelNameLegal("r0");
-    printf("%s", getFirstWordByCommand(getCommandByName("add")));
+    printf("%s", getFirstWord(getCommandByName("add")));
 
     return 0;
 }

@@ -72,7 +72,7 @@ Command commands[] = {
     {"0x4000", 0, 14, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {"0x8000", 0, 15, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-char *getFirstWordByCommand(Command *cmd);
+char *getFirstWord(Command *cmd);
 Command *getCommandByName(char *s);
 Bool isLabelNameLegal(char *s);
 char *hexToBin(char *hex);
