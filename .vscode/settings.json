@@ -3,6 +3,7 @@
     "files.associations": {
         "string.h": "c",
         "output.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "table.h": "c"
     }
 }

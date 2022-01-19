@@ -2,6 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 #define HASHSIZE 101
+typedef struct
+{
+    unsigned int immediate : 1;
+    unsigned int direct : 1;
+    unsigned int index : 1;
+    unsigned int reg : 1;
+} AddrMethodsOptions;
+
+typedef const struct
+{
+    unsigned int opMachineCodeHex;
+    unsigned int opcode : 4;
+    unsigned int funct : 4;
+    char keyword[4];
+    AddrMethodsOptions src;
+    AddrMethodsOptions des;
+} Command;
 
 typedef struct
 {
@@ -42,9 +59,6 @@ typedef struct
     void *next;
 } Item;
 
-static Item *symbols[HASHSIZE];
-static Item *macros[HASHSIZE];
-
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
@@ -53,3 +67,5 @@ void printSymbolItem(Item *item);
 void setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 void setMacroData(Item *macro, char *code);
 void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+Command *getCommandByName(char *s);
+char *getFirstWord(Command *cmd);

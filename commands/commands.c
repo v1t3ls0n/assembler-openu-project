@@ -1,23 +1,25 @@
 #include "commands.h"
+extern Command commands[];
+int main();
 
-Command *getCommandByName(char *s)
-{
-    int i = 0;
-    int length = (int)(sizeof(commands) / sizeof(commands[0]));
-    while (i < length)
-    {
-        if (strcmp(commands[i].keyword, s) == 0)
-            return &commands[i];
-        i++;
-    }
-    return NULL;
-}
-
-char *getFirstWord(Command *cmd)
+char *getFirstEncodedWord(Command *cmd)
 {
     return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(cmd->opMachineCodeHex)));
 }
-
+EncodedWord *encodeIntNum(int num)
+{
+    char *buf;
+    EncodedWord *newWord;
+    newWord = (EncodedWord *)malloc(1 * sizeof(EncodedWord *));
+    buf = decToHex(num);
+    newWord->POS_A = buf[0] ? hex2int(buf[0]) : '0';
+    newWord->POS_B = buf[1] ? hex2int(buf[1]) : '0';
+    newWord->POS_C = buf[2] ? hex2int(buf[2]) : '0';
+    newWord->POS_D = buf[3] ? hex2int(buf[3]) : '0';
+    newWord->POS_E = buf[4] ? hex2int(buf[4]) : '0';
+    free(buf);
+    return newWord;
+}
 Bool isLabelNameLegal(char *s)
 {
     int i = 0;
@@ -121,33 +123,41 @@ char *hexToBin(char *hex)
     strcat(binaryStr, "\0");
     return binaryStr;
 }
-
-void printObjectFile(Word obj[], unsigned int ICF, unsigned int DCF)
+int hex2int(char ch)
+{
+    if (ch >= '0' && ch <= '9')
+        return ch - '0';
+    if (ch >= 'A' && ch <= 'F')
+        return ch - 'A' + 10;
+    if (ch >= 'a' && ch <= 'f')
+        return ch - 'a' + 10;
+    return -1;
+}
+void printObjectFile(EncodedWord words[], unsigned int ICF, unsigned int DCF)
 {
     int i;
     printf("              %d   %d\n", ICF, DCF);
     for (i = 0; i < (DCF + ICF); i++) /*  */
-        printf("%04d A%x-B%x-C%x-D%x-E%x\n", 100 + i, obj[i].POS_A, obj[i].POS_B, obj[i].POS_C, obj[i].POS_D, obj[i].POS_E);
+        printf("%04d A%x-B%x-C%x-D%x-E%x\n", 100 + i, words[i].POS_A, words[i].POS_B, words[i].POS_C, words[i].POS_D, words[i].POS_E);
 }
-
-void printBinaryFile(Word obj[], unsigned int ICF, unsigned int DCF)
+void printBinaryFile(EncodedWord words[], unsigned int ICF, unsigned int DCF)
 {
     int i;
     for (i = 0; i < (DCF + ICF); i++)
     {
         printf("%04d ", 100 + i);
-        printf("%s", hexToBin(decToHex(obj[i].POS_A)));
-        printf("%s", hexToBin(decToHex(obj[i].POS_B)));
-        printf("%s", hexToBin(decToHex(obj[i].POS_C)));
-        printf("%s", hexToBin(decToHex(obj[i].POS_D)));
-        printf("%s\n", hexToBin(decToHex(obj[i].POS_E)));
+        printf("%s", hexToBin(decToHex(words[i].POS_A)));
+        printf("%s", hexToBin(decToHex(words[i].POS_B)));
+        printf("%s", hexToBin(decToHex(words[i].POS_C)));
+        printf("%s", hexToBin(decToHex(words[i].POS_D)));
+        printf("%s\n", hexToBin(decToHex(words[i].POS_E)));
     }
 }
 
 int main()
 {
-    long size = sizeof(commands) / 16;
-    Word machineCodeObj[] = {
+    EncodedWord *singleWord;
+    EncodedWord machineCodeObj[] = {
         {0x2, 0x1, 0x3, 0xF, 0x1},
         {0x4, 0x2, 0x3, 0x9, 0x1},
         {0x7, 0x8, 0x6, 0xD, 0x1},
@@ -159,8 +169,13 @@ int main()
         {0x4, 0x0, 0x3, 0xA, 0x6},
     };
 
-    printf("commands size v1:%ld\n", size);
-    size = sizeof(Word);
+    singleWord = encodeIntNum(3);
+    addSymbol("GDGDS", 100, 1, 0, 1, 0);
+    addSymbol("ABC", 108, 0, 1, 0, 0);
+    addSymbol("GDGD", 112, 0, 0, 0, 1);
+    printSymbolTable();
+    printObjectFile(singleWord, 1, 0);
+
     printObjectFile(machineCodeObj, 6, 3);
     printBinaryFile(machineCodeObj, 6, 3);
 
