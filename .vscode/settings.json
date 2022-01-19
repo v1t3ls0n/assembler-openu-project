@@ -4,6 +4,8 @@
         "string.h": "c",
         "output.h": "c",
         "stdio.h": "c",
-        "table.h": "c"
+        "table.h": "c",
+        "commands.h": "c",
+        "encode.h": "c"
     }
 }
