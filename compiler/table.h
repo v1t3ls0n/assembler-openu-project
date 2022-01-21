@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "flags.h"
+#define CMD_AND_REGS_SIZE 16
 #define RAM_MEMORY_SIZE 8192
 #define MAX_LABEL_LEN 31
 #define HASHSIZE RAM_MEMORY_SIZE / MAX_LABEL_LEN

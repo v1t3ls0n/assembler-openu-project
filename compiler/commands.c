@@ -26,8 +26,8 @@ Command *getCommandByName(char *s);
 Command *getCommandByName(char *s)
 {
     int i = 0;
-    int length = (int)(sizeof(commands) / sizeof(commands[0]));
-    while (i < length)
+
+    while (i < CMD_AND_REGS_SIZE)
     {
         if (strcmp(commands[i].keyword, s) == 0)
             return &commands[i];
@@ -40,7 +40,6 @@ void verifyLabelNaming(char *s)
 {
     int i = 0;
     const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
-    int length = (int)(sizeof(regs) / sizeof(regs[0]));
     int labelLength = strlen(s);
 
     /* if label name does not start with a alphabet letter */
@@ -61,7 +60,7 @@ void verifyLabelNaming(char *s)
     {
         if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
         {
-            while (i < length && globalState != collectErrors)
+            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
             {
                 if ((strcmp(regs[i], s) == 0))
                 {
@@ -74,7 +73,7 @@ void verifyLabelNaming(char *s)
 
         else if ((labelLength >= 3 && labelLength <= 4))
         {
-            while (i < length && globalState != collectErrors)
+            while (i < CMD_AND_REGS_SIZE /*  */ && globalState != collectErrors)
             {
                 if ((strcmp(commands[i].keyword, s) == 0))
                 {
