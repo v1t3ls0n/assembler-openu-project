@@ -138,5 +138,5 @@ void printSymbolItem(Item *item);
 void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 void updateSymbol(char *name, int newValue);
 Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
-Flag getMacroCodeValue(char *s);
+char *getMacroCodeValue(char *s);
 void addMacro(char *name, char *code);

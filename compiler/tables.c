@@ -15,7 +15,7 @@ void printSymbolItem(Item *item);
 void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 void updateSymbol(char *name, int newValue);
 Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
-Flag getMacroCodeValue(char *s);
+char *getMacroCodeValue(char *s);
 void addMacro(char *name, char *code);
 void verifyLabelNaming(char *s);
 
@@ -165,16 +165,18 @@ void updateSymbol(char *name, int newValue)
     }
 }
 
-Flag getMacroCodeValue(char *s)
+char *getMacroCodeValue(char *s)
 {
-    Flag result;
-    result.item = lookup(s, Macro);
-    if (result.item)
-        result.text = strdup(result.item->val.m.code);
+    char macrosCode = lookup(s, Macro);
+    if (macrosCode != NULL)
+        return strdup(result.item->val.m.code);
     else
-        result.err = macroDoesNotExist;
+    {
+        globalState = collectErrors;
+        currentError = macroDoesNotExist;
+    }
 
-    return result;
+    return NULL;
 }
 
 void addMacro(char *name, char *code)
