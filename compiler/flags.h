@@ -22,6 +22,7 @@ typedef enum
     wrongInstructionSyntaxMissinQuotes,
     illegalApearenceOfCharactersOnLine,
     maxLineLengthExceeded,
+    none,
     noErrors
 } Error;
 

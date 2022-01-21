@@ -57,6 +57,6 @@ Bool yieldError(Error err, int lineNumber)
         break;
     }
     printf("\n");
-
+    currentError = none;
     return False;
 }
