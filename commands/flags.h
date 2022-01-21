@@ -34,7 +34,18 @@ typedef enum
     parseStringArguments,
     parseCommandArguments,
     inError
+} ParseMode;
 
+typedef enum
+{
+    firstRun,
+    secondRun,
+    handleMacros,
+    writeFiles,
+    collectErrors,
+    stopProgram,
+    endProgram,
+    startProgram
 } State;
 
 typedef enum

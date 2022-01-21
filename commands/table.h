@@ -127,6 +127,7 @@ typedef union
     Item *item;
     char *text;
 } Flag;
+
 Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
