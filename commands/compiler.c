@@ -1,7 +1,7 @@
 
 #include "data.h"
-
 State globalState = startProgram;
+Error currentError = noErrors;
 
 int main()
 {

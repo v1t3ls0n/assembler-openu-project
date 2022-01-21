@@ -3,18 +3,21 @@
 Item *symbols[HASHSIZE];
 Item *macros[HASHSIZE];
 
-extern Flag verifyLabelNaming(char *s);
-Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+extern State globalState;
+extern Error currentError;
+
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
-Flag install(char *name, ItemType type);
+Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-Flag updateSymbol(char *name, int newValue);
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+void updateSymbol(char *name, int newValue);
 Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 Flag getMacroCodeValue(char *s);
-Flag addMacro(char *name, char *code);
+void addMacro(char *name, char *code);
+void verifyLabelNaming(char *s);
 
 unsigned hash(char *s)
 {
@@ -35,36 +38,44 @@ Item *lookup(char *s, ItemType type)
     return NULL;
 }
 
-Flag install(char *name, ItemType type)
+Item *install(char *name, ItemType type)
 {
     unsigned hashval;
-    Flag np;
+    Item *np;
     int nameLength = strlen(name);
-    if ((np.item = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
+    verifyLabelNaming(name);
+    if (globalState == collectErrors)
+        NULL;
+    if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
     {
-        np.item = (Item *)malloc(sizeof(Item *));
-        np.item->name = (char *)malloc(nameLength * sizeof(char));
-        memcpy(np.item->name, name, nameLength);
-        np.item->name[nameLength] = '\0';
-        if (np.item == NULL || np.item->name == NULL)
+        np = (Item *)malloc(sizeof(Item *));
+        np->name = (char *)malloc(nameLength * sizeof(char));
+        memcpy(np->name, name, nameLength);
+        np->name[nameLength] = '\0';
+        if (np == NULL || np->name == NULL)
         {
             printf("Memory allocation failed\n");
-            np.err = memoryAllocationFailure;
-            return np;
+            globalState = collectErrors;
+            currentError = memoryAllocationFailure;
+            return NULL;
         }
-        np.item->next = (Item *)malloc(sizeof(Item *));
+        np->next = (Item *)malloc(sizeof(Item *));
         hashval = hash(name);
-        np.item->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
+        np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)
-            symbols[hashval] = np.item;
+            symbols[hashval] = np;
         else
-            macros[hashval] = np.item;
+            macros[hashval] = np;
     }
     /* Key name already exist inside table, yield Error of duplicate values in symbol/macro table,
     if it is an entry or an external do not yield error
     */
     else
-        np.err = type == Macro ? illegalMacroNameAlreadyInUse : illegalSymbolNameAlreadyInUse;
+    {
+        globalState = collectErrors;
+        currentError = type == Macro ? illegalMacroNameAlreadyInUse : illegalSymbolNameAlreadyInUse;
+        return NULL;
+    }
 
     return np;
 }
@@ -113,52 +124,45 @@ void printSymbolItem(Item *item)
         printSymbolItem(item->next);
 }
 
-Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     Item *p;
     unsigned base;
     unsigned offset;
-    Flag result = verifyLabelNaming(name);
-    if (result.err)
-        return result;
-    result = install(name, Symbol);
-    if (!result.item)
-        return result;
-
-    p = result.item;
-    offset = value % 16;
-    base = value - offset;
-    p->val.s.value = value;
-    p->val.s.base = base;
-    p->val.s.offset = offset;
-    p->val.s.attrs.code = isCode ? 1 : 0;
-    p->val.s.attrs.entry = isEntry ? 1 : 0;
-    p->val.s.attrs.external = isExternal ? 1 : 0;
-    p->val.s.attrs.data = isData ? 1 : 0;
-
-    return result;
+    p = install(name, Symbol);
+    if (globalState != collectErrors)
+    {
+        offset = value % 16;
+        base = value - offset;
+        p->val.s.value = value;
+        p->val.s.base = base;
+        p->val.s.offset = offset;
+        p->val.s.attrs.code = isCode ? 1 : 0;
+        p->val.s.attrs.entry = isEntry ? 1 : 0;
+        p->val.s.attrs.external = isExternal ? 1 : 0;
+        p->val.s.attrs.data = isData ? 1 : 0;
+    }
 }
 
-Flag updateSymbol(char *name, int newValue)
+void updateSymbol(char *name, int newValue)
 {
-    Item *p;
-    Flag result;
+    Item *p = lookup(name, Symbol);
     unsigned base;
     unsigned offset;
-    p = lookup(name, Symbol);
-    if (p)
+
+    if (p != NULL)
     {
         offset = newValue % 16;
         base = newValue - offset;
         p->val.s.offset = offset;
         p->val.s.base = base;
         p->val.s.value = newValue;
-        result.state = True;
     }
     else
-        result.err = symbolDoesNotExist;
-
-    return result;
+    {
+        globalState = collectErrors;
+        currentError = symbolDoesNotExist;
+    }
 }
 
 Flag getMacroCodeValue(char *s)
@@ -173,10 +177,9 @@ Flag getMacroCodeValue(char *s)
     return result;
 }
 
-Flag addMacro(char *name, char *code)
+void addMacro(char *name, char *code)
 {
-    Flag result = install(name, Macro);
-    if (result.item)
-        result.item->val.m.code = strdup(code);
-    return result;
+    Item *item = install(name, Macro);
+    if (globalState != collectErrors)
+        item->val.m.code = strdup(code);
 }

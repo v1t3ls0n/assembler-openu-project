@@ -128,14 +128,14 @@ typedef union
     char *text;
 } Flag;
 
-Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
-Flag install(char *name, ItemType type);
+Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-Flag updateSymbol(char *name, int newValue);
+void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+void updateSymbol(char *name, int newValue);
 Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 Flag getMacroCodeValue(char *s);
-Flag addMacro(char *name, char *code);
+void addMacro(char *name, char *code);

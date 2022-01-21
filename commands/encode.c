@@ -1,4 +1,7 @@
 #include "data.h"
+
+extern State globalState;
+extern Error currentError;
 extern Command commands[];
 void printObjectFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);

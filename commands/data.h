@@ -2,7 +2,7 @@
 
 /* In commands.c: */
 Command *getCommandByName(char *s);
-Flag verifyLabelNaming(char *s);
+void verifyLabelNaming(char *s);
 
 /* In encode.c: */
 extern void printObjectFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);

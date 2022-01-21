@@ -21,7 +21,8 @@ typedef enum
     wrongInstructionSyntaxExtraCommas,
     wrongInstructionSyntaxMissinQuotes,
     illegalApearenceOfCharactersOnLine,
-    maxLineLengthExceeded
+    maxLineLengthExceeded,
+    noErrors
 } Error;
 
 typedef enum
@@ -33,7 +34,7 @@ typedef enum
     parseDataArguments,
     parseStringArguments,
     parseCommandArguments,
-    inError
+    inComment
 } ParseMode;
 
 typedef enum

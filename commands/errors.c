@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "flags.h"
 
+extern State globalState;
+extern Error currentError;
 Bool yieldError(Error err, int lineNumber);
 
 Bool yieldError(Error err, int lineNumber)

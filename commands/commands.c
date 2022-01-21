@@ -1,4 +1,7 @@
-#include "data.h"
+#include "table.h"
+
+extern State globalState;
+extern Error currentError;
 Command commands[] = {
     {0x0001, 0, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, 1, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
@@ -17,7 +20,7 @@ Command commands[] = {
     {0x4000, 0, 14, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, 15, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-Flag verifyLabelNaming(char *s);
+void verifyLabelNaming(char *s);
 Command *getCommandByName(char *s);
 
 Command *getCommandByName(char *s)
@@ -33,35 +36,63 @@ Command *getCommandByName(char *s)
     return NULL; /*  */
 }
 
-Flag verifyLabelNaming(char *s)
+void verifyLabelNaming(char *s)
 {
     int i = 0;
     const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
     int length = (int)(sizeof(regs) / sizeof(regs[0]));
-    Flag result;
-    result.boolean = True;
+    int labelLength = strlen(s);
 
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
     {
-        result.err = illegalLabelNameUseOfCharacters;
-        return result;
+        globalState = collectErrors;
+        currentError = illegalLabelNameUseOfCharacters;
+        return;
     }
 
     /* maximum label name length is 31 characters */
     if (strlen(s) > MAX_LABEL_LEN)
     {
-        result.err = illegalLabelNameLength;
-        return result;
+        globalState = collectErrors;
+        currentError = illegalLabelNameLength;
     }
-    while (i < length)
+    if (globalState != collectErrors && strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
     {
-        if ((strcmp(regs[i], s) == 0) || (strcmp(commands[i].keyword, s) == 0))
+        while (i < length && globalState != collectErrors)
         {
-            result.err = illegalLabelNameUseOfSavedKeywords;
-            return result;
+            if ((strcmp(regs[i], s) == 0))
+            {
+                currentError = illegalLabelNameUseOfSavedKeywords;
+                globalState = collectErrors;
+            }
+            i++;
         }
-        i++;
     }
-    return result;
+
+    else if ((labelLength >= 3 && labelLength <= 4))
+    {
+        while (i < length)
+        {
+            if ((strcmp(commands[i].keyword, s) == 0))
+            {
+                currentError = illegalLabelNameUseOfSavedKeywords;
+                globalState = collectErrors;
+            }
+            i++;
+        }
+    }
+    else if (globalState != collectErrors)
+    {
+
+        while (i < labelLength && globalState != collectErrors)
+        {
+            if (!isdigit(s[i]))
+            {
+                currentError = illegalLabelNameUseOfCharacters;
+                globalState = collectErrors;
+            }
+            i++;
+        }
+    }
 }
