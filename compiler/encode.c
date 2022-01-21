@@ -1,5 +1,4 @@
 #include "data.h"
-
 extern State globalState;
 extern Error currentError;
 extern Command commands[];
@@ -8,7 +7,6 @@ void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
 EncodedWord *encodeIntNum(int num);
 char *generateFirstWordEncodedToBinary(Command *cmd);
 EncodedWord *generateFirstWordEncodedHex(Command *cmd);
-
 char *generateFirstWordEncodedToBinary(Command *cmd)
 {
     return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(cmd->opMachineCodeHex)));
