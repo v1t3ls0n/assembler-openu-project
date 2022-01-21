@@ -6,6 +6,7 @@
         "stdio.h": "c",
         "table.h": "c",
         "commands.h": "c",
-        "encode.h": "c"
+        "encode.h": "c",
+        "flags.h": "c"
     }
 }
