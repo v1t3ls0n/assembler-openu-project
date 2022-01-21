@@ -1,5 +1,4 @@
 #include "data.h"
-
 Command commands[] = {
     {0x0001, 0, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, 1, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
@@ -18,7 +17,9 @@ Command commands[] = {
     {0x4000, 0, 14, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, 15, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-Bool isLabelNameLegal(char *s);
+Flag isLabelNameLegal(char *s);
+Command *getCommandByName(char *s);
+
 Command *getCommandByName(char *s)
 {
     int i = 0;
@@ -32,27 +33,37 @@ Command *getCommandByName(char *s)
     return NULL; /*  */
 }
 
-Bool isLabelNameLegal(char *s)
+Flag isLabelNameLegal(char *s)
 {
     int i = 0;
     const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
     int length = (int)(sizeof(regs) / sizeof(regs[0]));
+    Flag result;
+    result.boolean = True;
 
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
-        return False;
+    {
+        result.err = illegalLabelNameUseOfCharacters;
+        return result;
+    }
 
     /* maximum label name length is 31 characters */
     if (strlen(s) > MAX_LABEL_LEN)
-        return False;
-
+    {
+        result.err = illegalLabelNameLength;
+        return result;
+    }
     while (i < length)
     {
         if ((strcmp(regs[i], s) == 0) || (strcmp(commands[i].keyword, s) == 0))
-            return False;
+        {
+            result.err = illegalLabelNameUseOfSavedKeywords;
+            return result;
+        }
         i++;
     }
-    return True;
+    return result;
 }
 
 int main()

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "flags.h"
 #define RAM_MEMORY_SIZE 8192
 #define MAX_LABEL_LEN 31
 #define HASHSIZE RAM_MEMORY_SIZE / MAX_LABEL_LEN
@@ -52,12 +53,6 @@ typedef struct
     unsigned int desAddr : 2;
 } secondWordState;
 
-typedef enum
-{
-    False,
-    True
-} Bool;
-
 typedef struct
 {
     unsigned int immediate : 1;
@@ -97,6 +92,16 @@ typedef struct
 
 typedef struct
 {
+    /* indexes numbers of the positions inside the original file
+    this attitude will make this program use less space and so it is more effiecient memorywise.
+    */
+    int start;
+    int end;
+
+} MacroDataV2;
+
+typedef struct
+{
 
     unsigned value;
     unsigned base;
@@ -114,12 +119,22 @@ typedef struct
     } val;
     void *next;
 } Item;
-
+typedef union
+{
+    Bool boolean;
+    Error err;
+    State state;
+    Item *item;
+    char *text;
+} Flag;
+Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
-Item *install(char *name, ItemType type);
+Flag install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-void setSymbolData(Item *symbol, unsigned value, Attributes attrs);
-void setMacroData(Item *macro, char *code);
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+Flag updateSymbol(char *name, int newValue);
+Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
+Flag getMacroCodeValue(char *s);
+Flag addMacro(char *name, char *code);
