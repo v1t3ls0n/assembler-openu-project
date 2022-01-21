@@ -57,42 +57,45 @@ void verifyLabelNaming(char *s)
         globalState = collectErrors;
         currentError = illegalLabelNameLength;
     }
-    if (globalState != collectErrors && strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+    if (globalState != collectErrors)
     {
-        while (i < length && globalState != collectErrors)
+        if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
         {
-            if ((strcmp(regs[i], s) == 0))
+            while (i < length && globalState != collectErrors)
             {
-                currentError = illegalLabelNameUseOfSavedKeywords;
-                globalState = collectErrors;
+                if ((strcmp(regs[i], s) == 0))
+                {
+                    currentError = illegalLabelNameUseOfSavedKeywords;
+                    globalState = collectErrors;
+                }
+                i++;
             }
-            i++;
         }
-    }
 
-    else if ((labelLength >= 3 && labelLength <= 4))
-    {
-        while (i < length)
+        else if ((labelLength >= 3 && labelLength <= 4))
         {
-            if ((strcmp(commands[i].keyword, s) == 0))
+            while (i < length && globalState != collectErrors)
             {
-                currentError = illegalLabelNameUseOfSavedKeywords;
-                globalState = collectErrors;
+                if ((strcmp(commands[i].keyword, s) == 0))
+                {
+                    currentError = illegalLabelNameUseOfSavedKeywords;
+                    globalState = collectErrors;
+                }
+                i++;
             }
-            i++;
         }
-    }
-    else if (globalState != collectErrors)
-    {
-
-        while (i < labelLength && globalState != collectErrors)
+        else
         {
-            if (!isdigit(s[i]))
+
+            while (i < labelLength && globalState != collectErrors)
             {
-                currentError = illegalLabelNameUseOfCharacters;
-                globalState = collectErrors;
+                if (!isdigit(s[i]))
+                {
+                    currentError = illegalLabelNameUseOfCharacters;
+                    globalState = collectErrors;
+                }
+                i++;
             }
-            i++;
         }
     }
 }
