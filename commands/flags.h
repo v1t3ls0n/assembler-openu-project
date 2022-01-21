@@ -28,13 +28,20 @@ typedef enum
 typedef enum
 {
     ignoreBlanks,
+    newLine,
     parseToken,
     skipLine,
     insideCommentLine,
     parseDataArguments,
     parseStringArguments,
     parseCommandArguments,
-    inComment
+    inComment,
+    expectNewline,
+    expectNumber,
+    expectComma,
+    expectBlank,
+    expectStartingDoubleQuote,
+    expectEndingDoubleQuote
 } ParseMode;
 
 typedef enum
