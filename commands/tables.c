@@ -118,7 +118,7 @@ Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     Item *p;
     unsigned base;
     unsigned offset;
-    Flag result = isLabelNameLegal(name);
+    Flag result = verifyLabelNaming(name);
     if (result.err)
         return result;
     result = install(name, Symbol);
