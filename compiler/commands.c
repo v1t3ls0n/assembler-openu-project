@@ -20,7 +20,6 @@ Command commands[] = {
     {0x4000, 0, 14, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, 15, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-void verifyLabelNaming(char *s);
 Command *getCommandByName(char *s);
 
 Command *getCommandByName(char *s)
@@ -34,67 +33,4 @@ Command *getCommandByName(char *s)
         i++;
     }
     return NULL; /*  */
-}
-
-void verifyLabelNaming(char *s)
-{
-    int i = 0;
-    const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
-    int labelLength = strlen(s);
-
-    /* if label name does not start with a alphabet letter */
-    if (isalpha(s[0]) == 0)
-    {
-        globalState = collectErrors;
-        currentError = illegalLabelNameUseOfCharacters;
-        return;
-    }
-
-    /* maximum label name length is 31 characters */
-    if (strlen(s) > MAX_LABEL_LEN)
-    {
-        globalState = collectErrors;
-        currentError = illegalLabelNameLength;
-    }
-    if (globalState != collectErrors)
-    {
-        if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
-        {
-            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
-            {
-                if ((strcmp(regs[i], s) == 0))
-                {
-                    currentError = illegalLabelNameUseOfSavedKeywords;
-                    globalState = collectErrors;
-                }
-                i++;
-            }
-        }
-
-        else if ((labelLength >= 3 && labelLength <= 4))
-        {
-            while (i < CMD_AND_REGS_SIZE /*  */ && globalState != collectErrors)
-            {
-                if ((strcmp(commands[i].keyword, s) == 0))
-                {
-                    currentError = illegalLabelNameUseOfSavedKeywords;
-                    globalState = collectErrors;
-                }
-                i++;
-            }
-        }
-        else
-        {
-
-            while (i < labelLength && globalState != collectErrors)
-            {
-                if (!isdigit(s[i]))
-                {
-                    currentError = illegalLabelNameUseOfCharacters;
-                    globalState = collectErrors;
-                }
-                i++;
-            }
-        }
-    }
 }

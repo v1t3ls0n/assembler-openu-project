@@ -3,6 +3,7 @@
 Item *symbols[HASHSIZE];
 Item *macros[HASHSIZE];
 
+extern Command commands[];
 extern State globalState;
 extern Error currentError;
 
@@ -16,6 +17,7 @@ void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
 void updateSymbol(char *name, int newValue);
 char *getMacroCodeValue(char *s);
 void addMacro(char *name, char *code);
+void verifyLabelNaming(char *s);
 void verifyLabelNaming(char *s);
 
 unsigned hash(char *s)
@@ -182,4 +184,67 @@ void addMacro(char *name, char *code)
     Item *item = install(name, Macro);
     if (globalState != collectErrors)
         item->val.m.code = strdup(code);
+}
+
+void verifyLabelNaming(char *s)
+{
+    int i = 0;
+    const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
+    int labelLength = strlen(s);
+
+    /* if label name does not start with a alphabet letter */
+    if (isalpha(s[0]) == 0)
+    {
+        globalState = collectErrors;
+        currentError = illegalLabelNameUseOfCharacters;
+        return;
+    }
+
+    /* maximum label name length is 31 characters */
+    if (strlen(s) > MAX_LABEL_LEN)
+    {
+        globalState = collectErrors;
+        currentError = illegalLabelNameLength;
+    }
+    if (globalState != collectErrors)
+    {
+        if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+        {
+            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
+            {
+                if ((strcmp(regs[i], s) == 0))
+                {
+                    currentError = illegalLabelNameUseOfSavedKeywords;
+                    globalState = collectErrors;
+                }
+                i++;
+            }
+        }
+
+        else if ((labelLength >= 3 && labelLength <= 4))
+        {
+            while (i < CMD_AND_REGS_SIZE /*  */ && globalState != collectErrors)
+            {
+                if ((strcmp(commands[i].keyword, s) == 0))
+                {
+                    currentError = illegalLabelNameUseOfSavedKeywords;
+                    globalState = collectErrors;
+                }
+                i++;
+            }
+        }
+        else
+        {
+
+            while (i < labelLength && globalState != collectErrors)
+            {
+                if (!isalnum(s[i]))
+                {
+                    currentError = illegalLabelNameUseOfCharacters;
+                    globalState = collectErrors;
+                }
+                i++;
+            }
+        }
+    }
 }
