@@ -14,7 +14,6 @@ void printSymbolTable();
 void printSymbolItem(Item *item);
 void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 void updateSymbol(char *name, int newValue);
-Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 char *getMacroCodeValue(char *s);
 void addMacro(char *name, char *code);
 void verifyLabelNaming(char *s);
@@ -54,7 +53,6 @@ Item *install(char *name, ItemType type)
         np->name[nameLength] = '\0';
         if (np == NULL || np->name == NULL)
         {
-            printf("Memory allocation failed\n");
             globalState = collectErrors;
             currentError = memoryAllocationFailure;
             return NULL;
@@ -167,9 +165,9 @@ void updateSymbol(char *name, int newValue)
 
 char *getMacroCodeValue(char *s)
 {
-    char macrosCode = lookup(s, Macro);
-    if (macrosCode != NULL)
-        return strdup(result.item->val.m.code);
+    Item *result = lookup(s, Macro);
+    if (result != NULL)
+        return strdup(result->val.m.code);
     else
     {
         globalState = collectErrors;
