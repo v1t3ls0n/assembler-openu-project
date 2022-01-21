@@ -3,7 +3,7 @@
 Item *symbols[HASHSIZE];
 Item *macros[HASHSIZE];
 
-extern Flag isLabelNameLegal(char *s);
+extern Flag verifyLabelNaming(char *s);
 Flag addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);

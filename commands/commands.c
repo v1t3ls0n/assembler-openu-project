@@ -17,7 +17,7 @@ Command commands[] = {
     {0x4000, 0, 14, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, 15, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-Flag isLabelNameLegal(char *s);
+Flag verifyLabelNaming(char *s);
 Command *getCommandByName(char *s);
 
 Command *getCommandByName(char *s)
@@ -33,7 +33,7 @@ Command *getCommandByName(char *s)
     return NULL; /*  */
 }
 
-Flag isLabelNameLegal(char *s)
+Flag verifyLabelNaming(char *s)
 {
     int i = 0;
     const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
