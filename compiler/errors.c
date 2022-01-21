@@ -9,7 +9,7 @@ Bool yieldError(Error err, int lineNumber)
 {
     printf("Error!! occured on line %d:\n", lineNumber);
 
-    switch (err)
+    switch (currentError)
     {
     case memoryAllocationFailure:
         printf("memory allocation failed");
