@@ -103,6 +103,8 @@ int evalToken(char *token, ParseState state)
 
         if (isLabel(token))
             return parseLabel;
+        else if (isInstruction(token))
+            return parseInstruction;
 
         else if (isCommand(token))
             return parseCommand;
