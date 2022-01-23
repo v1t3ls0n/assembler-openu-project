@@ -12,6 +12,7 @@ typedef enum
     illegalMacroNameUseOfCharacters,
     illegalLabelNameUseOfCharacters,
     illegalLabelNameUseOfSavedKeywords,
+    illegalLabelUseExpectedCommandOrInstruction,
     illegalLabelNameLength,
     illegalMacroNameLength,
     illegalSymbolNameAlreadyInUse,
@@ -22,28 +23,10 @@ typedef enum
     wrongInstructionSyntaxMissinQuotes,
     illegalApearenceOfCharactersOnLine,
     maxLineLengthExceeded,
+    emptyLabelDecleration,
     none,
     noErrors
 } Error;
-
-typedef enum
-{
-    ignoreBlanks,
-    newLine,
-    parseToken,
-    skipLine,
-    insideCommentLine,
-    parseDataArguments,
-    parseStringArguments,
-    parseCommandArguments,
-    inComment,
-    expectNewline,
-    expectNumber,
-    expectComma,
-    expectBlank,
-    expectStartingDoubleQuote,
-    expectEndingDoubleQuote
-} ParseMode;
 
 typedef enum
 {
@@ -59,6 +42,8 @@ typedef enum
 
 typedef enum
 {
-    False,
-    True
+    False = 0,
+    True = 1
 } Bool;
+
+void yieldError(Error err, int lineNumber);

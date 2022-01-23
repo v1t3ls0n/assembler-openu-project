@@ -15,15 +15,25 @@ extern EncodedWord *generateFirstWordEncodedHex(Command *cmd);
 extern char *decToHex(int num);
 extern char *hexToBin(char *hex);
 extern int hex2int(char ch);
+extern char *dec2Bin2sComplement(int n);
+
 /* In table.c: */
-/*
+
 extern void printSymbolTable();
 extern void printSymbolItem(Item *item);
 extern void setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 extern void setMacroData(Item *macro, char *code);
-extern void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-*/
+extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+
 /* In verify.c: */
 
 /* In errors.c */
-extern Bool yieldError(Error err, int lineNumber);
+extern void yieldError(Error err, int lineNumber);
+
+/*
+extern void parseSingleLine(char *line);
+ */
+/* in memory.c */
+extern int writeToMemory(EncodedWord value, ItemType type);
+extern void updateSymbolTableFinalValues();
+extern void updateDataEntry(Item *p);

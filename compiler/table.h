@@ -14,10 +14,7 @@
 #define DIRECT_ADRR 0x01
 #define INDEX_ADDR 0x10
 #define REGISTER_DIRECT_ADDR 0x11
-#define DATA ".data"
-#define STRING ".string"
-#define ENTRY ".entry"
-#define EXTERNAL ".external"
+
 #define R0 "r0"
 #define R1 "r1"
 #define R2 "r2"
@@ -37,12 +34,19 @@
 
 typedef struct
 {
-    unsigned int POS_A : 4;
-    unsigned int POS_B : 4;
-    unsigned int POS_C : 4;
-    unsigned int POS_D : 4;
-    unsigned int POS_E : 4;
+    unsigned int _A : 4;
+    unsigned int _B : 4;
+    unsigned int _C : 4;
+    unsigned int _D : 4;
+    unsigned int _E : 4;
 } EncodedWord;
+
+typedef struct
+{
+    unsigned address;
+    EncodedWord value;
+    void *next;
+} Word;
 
 typedef struct
 {
@@ -64,13 +68,31 @@ typedef struct
 
 typedef const struct
 {
-    unsigned int opMachineCodeHex;
-    unsigned int opcode : 4;
+    unsigned int op;
     unsigned int funct : 4;
     char keyword[4];
     AddrMethodsOptions src;
     AddrMethodsOptions des;
 } Command;
+
+Command commands[] = {
+    {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
+    {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0004, 11, "sub", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0010, 0, "lea", {0, 1, 1, 0}, {0, 1, 1, 1}},
+    {0x0020, 10, "clr", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 11, "not", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 12, "inc", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 13, "dec", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0200, 10, "jmp", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x0200, 11, "bne", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x0200, 12, "jsr", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x1000, 0, "red", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x2000, 0, "prn", {0, 0, 0, 0}, {1, 1, 1, 1}},
+    {0x4000, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
+    {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
+};
 
 typedef struct
 {
@@ -86,20 +108,16 @@ typedef enum
     Symbol
 } ItemType;
 
+typedef enum
+{
+    Code,
+    Data
+} DataType;
+
 typedef struct
 {
     char *code;
 } MacroData;
-
-typedef struct
-{
-    /* indexes numbers of the positions inside the original file
-    this attitude will make this program use less space and so it is more effiecient memorywise.
-    */
-    int start;
-    int end;
-
-} MacroDataV2;
 
 typedef struct
 {
@@ -120,23 +138,54 @@ typedef struct
     } val;
     void *next;
 } Item;
-typedef union
-{
-    Bool boolean;
-    Error err;
-    State state;
-    Item *item;
-    char *text;
-} Flag;
 
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 void updateSymbol(char *name, int newValue);
-Flag setSymbolData(Item *symbol, unsigned value, Attributes attrs);
 char *getMacroCodeValue(char *s);
 void addMacro(char *name, char *code);
+void verifyLabelNaming(char *s);
+
+/*
+const struct
+{
+    unsigned int op;
+    unsigned int funct : 4;
+    char keyword[4];
+    AddrMethodsOptions src;
+    AddrMethodsOptions des;
+} cmds[] = {
+    {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
+    {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0004, 11, "sub", {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {0x0010, 0, "lea", {0, 1, 1, 0}, {0, 1, 1, 1}},
+    {0x0020, 10, "clr", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 11, "not", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 12, "inc", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0020, 13, "dec", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x0200, 10, "jmp", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x0200, 11, "bne", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x0200, 12, "jsr", {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {0x1000, 0, "red", {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {0x2000, 0, "prn", {0, 0, 0, 0}, {1, 1, 1, 1}},
+    {0x4000, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
+    {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
+};
+
+ */
+
+/*
+     indexes numbers of the positions inside the original file
+    this attitude will make this program use less space and so it is more effiecient memorywise.
+typedef struct
+{
+int start;
+int end;
+}
+MacroDataV2;
+*/

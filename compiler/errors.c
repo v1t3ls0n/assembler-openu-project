@@ -1,15 +1,10 @@
 #include <stdio.h>
 #include "flags.h"
-
-extern State globalState;
-extern Error currentError;
-Bool yieldError(Error err, int lineNumber);
-
-Bool yieldError(Error err, int lineNumber)
+void yieldError(Error err, int lineNumber)
 {
     printf("Error!! occured on line %d:\n", lineNumber);
 
-    switch (currentError)
+    switch (err)
     {
     case memoryAllocationFailure:
         printf("memory allocation failed");
@@ -57,6 +52,4 @@ Bool yieldError(Error err, int lineNumber)
         break;
     }
     printf("\n");
-    currentError = none;
-    return False;
 }

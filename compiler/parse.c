@@ -1,147 +1,220 @@
 #include "table.h"
-void evalToken(char *s);
-int getFunctCode();
-int getOpcode();
-void parseLine();
-void updateDataTable();
+extern Error currentError;
+extern Command *getCommandByName(char *s);
+extern EncodedWord *generateFirstWordEncodedHex(Command *cmd);
+extern int writeToMemory(EncodedWord value, DataType type);
+#define DATA ".data"
+#define STRING ".string"
+#define ENTRY ".entry"
+#define EXTERNAL ".external"
 
-/* static ParseMode parseState = ignoreBlanks;*/
-
-void parseSingleLine()
+typedef enum
 {
-    /*
-        char strForTesting[50] = "        XYZ:  .data 7,-57,+17             ";
-        int c = NULL;
-        int i = 0, j = 0;
-        int spaces = 0;
-        char line[81];
-        char token[MAX_LABEL_LENGTH];
-        */
-}
+    skipLine,
+    newLine,
+    parseLabel,
+    parseInstruction,
+    parseCommand,
+    printError,
 
-int getFunctCode()
+    parseDataVariable,
+    parseStringVariable,
+    parseEntryVariable,
+    parseExternalVariable,
+
+    parseSourceOperand,
+    parseDestinationOperand,
+
+    expectNewline,
+    expectNumber,
+    expectComma,
+    expectBlank,
+    expectQuotes
+
+} ParseState;
+
+int evalToken(char *token, ParseState state);
+int handleCommand(char *cmdName, char *operands);
+int handleInstruction(char *instruction, char *params);
+int handleLabel(char *labelName, char *nextToken);
+
+int isLabel(char *s);
+int isCommand(char *s);
+int isInstruction(char *s);
+int parseSingleLine(char *line)
 {
-    return 0;
-}
+    int n;
+    char token[MAX_LABEL_LEN + 1] = {0};
+    char *p = line;
+    ParseState state = newLine;
 
-int getOpcode()
-{
-    return 0;
-}
-
-void updateDataTable()
-{
-}
-
-void evalToken(char *s)
-{
-}
-
-/*
-
-    State state = ignore;
-    Parse parse = any;
-    Expect expect = any;
-
-    while ((c = getchar()) != EOF)
+    while (*p)
     {
-        if (c == '\n')
+        sscanf(p, "%s %n", token, &n);
+
+        state = evalToken(token, state);
+        switch (state)
         {
-            if (state == ignore)
-            {
-
-                build Words from line
-
-
-switch (state == parse)
-{
-}
-}
-
-if (!isspace(c))
-{
-
-    if (state == ignore)
-    {
-
-        switch (c)
+        case parseLabel:
         {
-
-        case '.':
-        {
-            parse = instruction;
-            expect = character;
+            state = handleLabel(token, p + n);
+            break;
         }
 
-        case '+':
+        case parseInstruction:
         {
-            parse = number;
-            expect = number;
+            handleInstruction(token, p + n);
+            break;
         }
-        case '-':
+
+        case parseCommand:
         {
-            parse = number;
-            expect = number;
+            handleCommand(token, p + n);
+            break;
         }
+        case printError:
+            return 0;
+        case skipLine:
+            return 1;
 
         default:
             break;
         }
+
+        p += n;
     }
 
-    else if (state == parse)
+    return 1;
+}
+
+int evalToken(char *token, ParseState state)
+{
+
+    switch (state)
     {
+    case skipLine:
+        return state;
+    case printError:
+        return state;
+    case newLine:
+    {
+        if (token[0] == ';')
+            return skipLine;
 
-        switch (expect)
+        if (isLabel(token))
+            return parseLabel;
+
+        else if (isCommand(token))
+            return parseCommand;
+
+        else
         {
-
-            label,
-                number,
-                macro,
-                array,
-                instruction,
-                dataInstuction,
-                command,
-                comma,
-                any
-
-                case comma:
-            {
-            }
-
-        case number:
-        {
-        }
-
-        case character:
-        {
-        }
-
-        case instruction:
-        {
-        }
-
-        default:
-            break;
+            currentError = undefinedCommand;
+            return printError;
         }
     }
-    state = parse;
-    token[j++] = (char)c;
-    spaces = 0;
-}
-else if (isspace(c) && state == parse)
-{
+    }
 
-    j = 0;
-    expect = any;
-    memset(token, 0, j);
-    state = ignore;
-    spaces = 1;
-}
-else if (isspace(c) && state == ignore)
-{
-    spaces++;
-}
+    return 1;
 }
 
-*/
+int handleCommand(char *cmdName, char *operands)
+{
+    Command *cmd = getCommandByName(cmdName);
+    writeToMemory(*generateFirstWordEncodedHex(cmd), Code);
+    return 1;
+}
+
+int handleInstruction(char *instruction, char *params)
+{
+
+    if (strcmp(instruction, DATA) == 0)
+    {
+        printf("Data instruction. params:%s\n", params);
+    }
+    if (strcmp(instruction, STRING) == 0)
+    {
+        printf("String instruction. params:%s\n", params);
+    }
+    if (strcmp(instruction, ENTRY) == 0)
+    {
+        printf("Entry instruction. params:%s\n", params);
+    }
+    if (strcmp(instruction, EXTERNAL) == 0)
+    {
+        printf("External instruction. params:%s\n", params);
+    }
+
+    return 1;
+}
+
+int handleLabel(char *labelName, char *nextToken)
+{
+    EncodedWord word = {0, 0, 0, 0, 0};
+    int val;
+    if (isInstruction(nextToken))
+    {
+        val = writeToMemory(word, Code);
+        addSymbol(labelName, val, 0, 1, 0, 0);
+        return parseInstruction;
+    }
+
+    else if (isCommand(nextToken))
+    {
+        val = writeToMemory(*generateFirstWordEncodedHex(getCommandByName(nextToken)), Code);
+        addSymbol(labelName, val, 1, 0, 0, 0);
+
+        handleCommand(labelName, nextToken);
+
+        return parseCommand;
+    }
+
+    else
+    {
+        currentError = illegalLabelUseExpectedCommandOrInstruction;
+        return printError;
+    }
+
+    return 1;
+}
+
+int isCommand(char *s)
+{
+    int i = 0;
+    const char *cmds[] = {
+        "mov",
+        "cmp",
+        "add",
+        "sub",
+        "lea",
+        "clr",
+        "not",
+        "inc",
+        "dec",
+        "jmp",
+        "bne",
+        "jsr",
+        "red",
+        "prn",
+        "rts",
+        "stop",
+        NULL};
+
+    while (cmds[i] != NULL)
+    {
+        if (strcmp(s, *cmds) == 0)
+            return 1;
+        i++;
+    }
+    return 0;
+}
+
+int isLabel(char *s)
+{
+    int len = strlen(s);
+    return s[len] == ':' ? 1 : 0;
+}
+int isInstruction(char *s)
+{
+    return !strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL);
+}

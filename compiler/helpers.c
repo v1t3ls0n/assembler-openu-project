@@ -2,10 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include "flags.h"
+#define BINARY_WIDTH 16
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
+char *dec2Bin2sComplement(int n);
 
 char *decToHex(int num)
 {
@@ -16,6 +18,52 @@ char *decToHex(int num)
     hex = (char *)calloc(size, sizeof(char));
     sprintf(hex, "%x", num);
     return hex;
+}
+
+char *dec2Bin2sComplement(int n)
+{
+
+    int i = 0, j, num;
+    char bin[BINARY_WIDTH] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, carry = '0';
+    printf("n:%d\n", n);
+    num = n < 0 ? -n : n;
+    num = abs(n);
+    printf("%d as binary:(before flip):\n", num);
+
+    for (i = 0; num > 0; i++)
+    {
+        if (i == BINARY_WIDTH)
+            break;
+        bin[i] = num % 2;
+        num = num / 2;
+
+        printf("%d", bin[i]);
+    }
+    for (j = 0; j < BINARY_WIDTH; j++)
+    {
+        if (j > 0 && j % 4 == 0)
+            printf(" ");
+    }
+    printf("%d", bin[i]);
+
+    for (i = BINARY_WIDTH - 1; i >= 0; i--)
+    {
+        bin[i] = bin[i] == 0 ? 1 : 0;
+        if (bin[i] == 1 && carry == 1)
+            bin[i] = 0;
+
+        else if (bin[i] == 0 && carry == 1)
+        {
+            bin[i] = 1;
+            carry = 0;
+        }
+    }
+
+    printf("\nafter flipping :\n");
+    for (i = 0; i < BINARY_WIDTH; i++)
+        printf("%d", bin[i]);
+    printf("\n");
+    return "";
 }
 
 char *hexToBin(char *hex)

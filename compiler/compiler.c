@@ -2,11 +2,30 @@
 #include "data.h"
 State globalState = startProgram;
 Error currentError = noErrors;
+extern int parseSingleLine(char *line);
+extern void yieldError(Error err, int lineNumber);
 
 int main()
 {
-    EncodedWord *singleWord[16];
+    int lineNumber = 2;
+
+    if (!parseSingleLine(";token1 token2 ,,,"))
+    {
+        globalState = collectErrors;
+        yieldError(currentError, lineNumber);
+        currentError = none;
+    }
+
     /*
+    dec2Bin2sComplement(-17);
+
+
+     */
+
+    /*
+        EncodedWord *singleWord[16];
+
+
         EncodedWord machineCodeObj[] = {
             {0x2, 0x1, 0x3, 0xF, 0x1},
             {0x4, 0x2, 0x3, 0x9, 0x1},
@@ -18,13 +37,7 @@ int main()
             {0x4, 0x0, 0x3, 0xE, 0x2},
             {0x4, 0x0, 0x3, 0xA, 0x6},
         };
-     */
-    /*
-    singleWord = encodeIntNum(3);
-
-     */
-
-    singleWord[0] = generateFirstWordEncodedHex(getCommandByName("mov"));
+   singleWord[0] = generateFirstWordEncodedHex(getCommandByName("mov"));
     singleWord[1] = generateFirstWordEncodedHex(getCommandByName("cmp"));
     singleWord[2] = generateFirstWordEncodedHex(getCommandByName("add"));
     singleWord[3] = generateFirstWordEncodedHex(getCommandByName("sub"));
@@ -40,17 +53,23 @@ int main()
     singleWord[13] = generateFirstWordEncodedHex(getCommandByName("prn"));
     singleWord[14] = generateFirstWordEncodedHex(getCommandByName("rts"));
     singleWord[15] = generateFirstWordEncodedHex(getCommandByName("stop"));
-    printf("add:\n");
     printObjectFile(singleWord, 16, 0);
+    printf("add:\n");
     addSymbol("GDGDS", 100, 1, 0, 1, 0);
     addSymbol("ABC", 108, 0, 1, 0, 0);
     addSymbol("GDGD", 112, 0, 0, 0, 1);
     printSymbolTable();
-    /*
-    printObjectFile(singleWord, 1, 0);
-    printBinaryFile(machineCodeObj, 6, 3);
 
-    printObjectFile(machineCodeObj, 6, 3);
+
+
+
+
+
+
+   printObjectFile(singleWord, 1, 0);
+   printBinaryFile(machineCodeObj, 6, 3);
+
+   printObjectFile(machineCodeObj, 6, 3);
 */
     return 0;
 }

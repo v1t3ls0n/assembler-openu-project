@@ -1,24 +1,9 @@
 #include "table.h"
-
 Item *symbols[HASHSIZE];
 Item *macros[HASHSIZE];
-
 extern Command commands[];
 extern State globalState;
 extern Error currentError;
-
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-unsigned hash(char *s);
-Item *lookup(char *s, ItemType type);
-Item *install(char *name, ItemType type);
-void printSymbolTable();
-void printSymbolItem(Item *item);
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-void updateSymbol(char *name, int newValue);
-char *getMacroCodeValue(char *s);
-void addMacro(char *name, char *code);
-void verifyLabelNaming(char *s);
-void verifyLabelNaming(char *s);
 
 unsigned hash(char *s)
 {
@@ -59,6 +44,7 @@ Item *install(char *name, ItemType type)
             currentError = memoryAllocationFailure;
             return NULL;
         }
+
         np->next = (Item *)malloc(sizeof(Item *));
         hashval = hash(name);
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
@@ -124,7 +110,7 @@ void printSymbolItem(Item *item)
         printSymbolItem(item->next);
 }
 
-void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     Item *p;
     unsigned base;
@@ -141,7 +127,9 @@ void addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
         p->val.s.attrs.entry = isEntry ? 1 : 0;
         p->val.s.attrs.external = isExternal ? 1 : 0;
         p->val.s.attrs.data = isData ? 1 : 0;
+        return p;
     }
+    return NULL;
 }
 
 void updateSymbol(char *name, int newValue)
