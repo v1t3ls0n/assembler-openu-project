@@ -1,6 +1,11 @@
 #include "data.h"
-
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
+/* Shared global State variables*/
+extern State globalState;
+extern Error currentError;
+extern Item *symbols[HASHSIZE];
+extern Item *macros[HASHSIZE];
+/* Complex Struct Constant Variables: */
+extern Command commands[];
 
 unsigned hash(char *s)
 {

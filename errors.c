@@ -1,6 +1,5 @@
 
 #include "data.h"
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
 
 void yieldError(Error err, int lineNumber)
 {

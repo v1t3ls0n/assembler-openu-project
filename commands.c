@@ -1,5 +1,6 @@
 #include "data.h"
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
+/* Complex Struct Constant Variables: */
+extern Command commands[];
 
 Command *getCommandByName(char *s)
 {
@@ -11,5 +12,5 @@ Command *getCommandByName(char *s)
             return &commands[i];
         i++;
     }
-    return NULL; /*  */
+    return NULL;
 }

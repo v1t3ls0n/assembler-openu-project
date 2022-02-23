@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "lib.h": "c",
+        "functions.h": "c",
+        "data.h": "c",
+        "variables.h": "c"
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "C:\\Program Files\\Git\\home\\guyvi\\compiler-openu\\compiler",
+            "binaryPath": "C:\\Program Files\\Git\\home\\guyvi\\compiler-openu\\compiler\\errors",
+            "binaryArgs": []
+        }
+    ],
+    "cmake.sourceDirectory": "${workspaceFolder}/.",
+    "cmake.configureOnOpen": true
+}

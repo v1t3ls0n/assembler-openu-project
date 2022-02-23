@@ -1,4 +1,12 @@
+
 #include "data.h"
+/* Shared global State variables*/
+extern State globalState;
+extern Error currentError;
+extern Item *symbols[HASHSIZE];
+extern Item *macros[HASHSIZE];
+/* Complex Struct Constant Variables: */
+extern Command commands[];
 
 unsigned static IC = 0;
 unsigned static DC = 0;
@@ -7,12 +15,6 @@ unsigned static DCF = 101;
 
 Word *_data;
 Word *_code;
-
-int main()
-{
-    printf("Inside memory.c main function");
-    return 0;
-}
 
 int writeToMemory(EncodedWord value, DataType type)
 {

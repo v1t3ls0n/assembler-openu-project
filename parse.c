@@ -1,26 +1,23 @@
 #include "data.h"
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
+/* Shared global State variables*/
+extern State globalState;
+extern Error currentError;
+extern Item *symbols[HASHSIZE];
+extern Item *macros[HASHSIZE];
+/* Complex Struct Constant Variables: */
+extern Command commands[];
 
-/*
-// errors:
+extern Command *getCommandByName(char *s);
+extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 
-Starting build...
-C:\Users\guyvi\dev\msys64\mingw64\bin\gcc.exe -fdiagnostics-color=always -g C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\parse.c -o C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\parse.exe
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cc60rEk1.o: in function `handleCommand':
-C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:85: undefined reference to `getCommandByName'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:86: undefined reference to `generateFirstWordEncodedHex'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:86: undefined reference to `writeToMemory'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cc60rEk1.o: in function `handleLabel':
-C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:119: undefined reference to `writeToMemory'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:120: undefined reference to `addSymbol'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `getCommandByName'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `generateFirstWordEncodedHex'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `writeToMemory'
-C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:127: undefined reference to `addSymbol'
-collect2.exe: error: ld returned 1 exit status
-
-Build finished with error(s).
-*/
+int parseSingleLine(char *line);
+int evalToken(char *token, ParseState state);
+int handleCommand(char *cmdName, char *operands);
+int handleInstruction(char *instruction, char *params);
+int handleLabel(char *labelName, char *nextToken);
+int isLabel(char *s);
+int isCommand(char *s);
+int isInstruction(char *s);
 
 int parseSingleLine(char *line)
 {
@@ -95,7 +92,42 @@ int evalToken(char *token, ParseState state)
             currentError = undefinedCommand;
             return printError;
         }
+
+        break;
     }
+
+    case parseLabel:
+        break;
+    case parseInstruction:
+        break;
+    case parseCommand:
+        break;
+
+    case parseDataVariable:
+        break;
+    case parseStringVariable:
+        break;
+    case parseEntryVariable:
+        break;
+    case parseExternalVariable:
+        break;
+
+    case parseSourceOperand:
+        break;
+    case parseDestinationOperand:
+        break;
+    case expectNewline:
+        break;
+    case expectNumber:
+        break;
+    case expectComma:
+        break;
+    case expectBlank:
+        break;
+    case expectQuotes:
+        break;
+    default:
+        break;
     }
 
     return 1;

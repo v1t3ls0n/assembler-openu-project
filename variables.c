@@ -1,7 +1,4 @@
-#include "flags.h"
-#include "complex_typedef.h"
-#include "constants.h"
-
+#include "data.h"
 /* Shared global State variables*/
 State globalState = startProgram;
 Error currentError = noErrors;
