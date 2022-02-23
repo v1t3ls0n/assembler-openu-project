@@ -1,12 +1,26 @@
 #include "data.h"
+void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
 
-// extern Command *getCommandByName(char *s);
-// extern EncodedWord *generateFirstWordEncodedHex(Command *cmd);
-// extern int writeToMemory(EncodedWord value, DataType type);
-#define DATA ".data"
-#define STRING ".string"
-#define ENTRY ".entry"
-#define EXTERNAL ".external"
+/*
+// errors:
+
+Starting build...
+C:\Users\guyvi\dev\msys64\mingw64\bin\gcc.exe -fdiagnostics-color=always -g C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\parse.c -o C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\parse.exe
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cc60rEk1.o: in function `handleCommand':
+C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:85: undefined reference to `getCommandByName'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:86: undefined reference to `generateFirstWordEncodedHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:86: undefined reference to `writeToMemory'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cc60rEk1.o: in function `handleLabel':
+C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:119: undefined reference to `writeToMemory'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:120: undefined reference to `addSymbol'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `getCommandByName'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `generateFirstWordEncodedHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:126: undefined reference to `writeToMemory'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/parse.c:127: undefined reference to `addSymbol'
+collect2.exe: error: ld returned 1 exit status
+
+Build finished with error(s).
+*/
 
 int parseSingleLine(char *line)
 {

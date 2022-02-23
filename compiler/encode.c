@@ -1,10 +1,35 @@
 #include "data.h"
 
-void printObjectFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
-void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
-EncodedWord *encodeIntNum(int num);
-char *generateFirstWordEncodedToBinary(Command *cmd);
-EncodedWord *generateFirstWordEncodedHex(Command *cmd);
+/*
+Errors:
+C:\Users\guyvi\dev\msys64\mingw64\bin\gcc.exe -fdiagnostics-color=always -g C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\encode.c -o C:\Users\guyvi\dev\msys64\home\guyvi\compiler-openu\compiler\encode.exe
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cccYPwLb.o: in function `generateFirstWordEncodedToBinary':
+C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:6: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:6: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:6: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:6: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cccYPwLb.o: in function `encodeIntNum':
+C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:27: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:28: undefined reference to `hex2int'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:29: undefined reference to `hex2int'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:30: undefined reference to `hex2int'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:31: undefined reference to `hex2int'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:32: undefined reference to `hex2int'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:\Users\guyvi\AppData\Local\Temp\cccYPwLb.o: in function `printBinaryFile':
+C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:51: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:51: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:52: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:52: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:53: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:53: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:54: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:54: undefined reference to `hexToBin'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:55: undefined reference to `decToHex'
+C:/Users/guyvi/dev/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/11.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: C:/Users/guyvi/dev/msys64/home/guyvi/compiler-openu/compiler/encode.c:55: undefined reference to `hexToBin'
+collect2.exe: error: ld returned 1 exit status
+
+*/
+void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
 
 char *generateFirstWordEncodedToBinary(Command *cmd)
 {

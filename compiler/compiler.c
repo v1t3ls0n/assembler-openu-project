@@ -4,13 +4,15 @@
 int main()
 {
     int lineNumber = 2;
+    printf("\n\n\n\n\n\nCompiler.c Main Function\n\n\n\n\n\n");
 
-    if (!parseSingleLine(";token1 token2 ,,,"))
-    {
-        globalState = collectErrors;
-        yieldError(currentError, lineNumber);
-        currentError = none;
-    }
+    // Errors in parse.c:
+    //  if (!parseSingleLine(";token1 token2 ,,,"))
+    //  {
+    //      globalState = collectErrors;
+    //      yieldError(currentError, lineNumber);
+    //      currentError = none;
+    //  }
 
     /*
     dec2Bin2sComplement(-17);

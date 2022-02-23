@@ -7,9 +7,6 @@ unsigned static DCF = 101;
 
 Word *_data;
 Word *_code;
-int writeToMemory(EncodedWord value, DataType type);
-void updateSymbolTableFinalValues();
-void updateDataEntry(Item *p);
 
 int main()
 {

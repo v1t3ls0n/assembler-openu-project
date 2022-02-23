@@ -1,5 +1,5 @@
 #include "data.h"
-// void main(){}
+void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
 
 Command *getCommandByName(char *s)
 {
