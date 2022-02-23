@@ -1,5 +1,6 @@
-.vscode/settings.json
-compiler/.vscode/c_cpp_properties.json
+.vscode/*.json
+.vscode/c_cpp_properties.json
+compiler/.vscode/*.json
 compiler/.vscode/launch.json
 compiler/.vscode/tasks.json
 .vscode/settings.json

@@ -1,4 +1,0 @@
-Helper Functions:
-- Decimal To Binary conversion Function
-
-
