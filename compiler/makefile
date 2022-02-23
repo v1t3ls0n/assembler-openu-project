@@ -1,6 +1,6 @@
 
-all:  data.h table.h compiler.c helpers.c encode.c tables.c commands.c parse.c
-	gcc -ansi -Wall -pedantic data.h errors.c tables.c commands.c helpers.c encode.c parse.c compiler.c -o compiler -lm
+all:  data.h errors.c helpers.c commands.c tables.c encode.c memory.c parse.c compiler.c
+	gcc -ansi -Wall -pedantic data.h data.h errors.c helpers.c commands.c tables.c encode.c memory.c parse.c compiler.c -o compiler -lm
 
 # clean:
 # 	rm *.o all

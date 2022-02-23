@@ -1,13 +1,11 @@
-#include "table.h"
-Item *symbols[HASHSIZE];
-Item *macros[HASHSIZE];
-extern Command commands[];
-extern State globalState;
-extern Error currentError;
+// void main(){}
+
+#include "data.h"
 
 unsigned hash(char *s)
 {
-    unsigned hashval;
+    unsigned hashval = 1;
+
     for (hashval = 0; *s != '\0'; s++)
         hashval = *s + 31 * hashval;
 
@@ -193,6 +191,7 @@ void verifyLabelNaming(char *s)
     {
         globalState = collectErrors;
         currentError = illegalLabelNameLength;
+        return;
     }
     if (globalState != collectErrors)
     {
@@ -211,12 +210,13 @@ void verifyLabelNaming(char *s)
 
         else if ((labelLength >= 3 && labelLength <= 4))
         {
-            while (i < CMD_AND_REGS_SIZE /*  */ && globalState != collectErrors)
+            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
             {
                 if ((strcmp(commands[i].keyword, s) == 0))
                 {
                     currentError = illegalLabelNameUseOfSavedKeywords;
                     globalState = collectErrors;
+                    return;
                 }
                 i++;
             }
@@ -230,6 +230,7 @@ void verifyLabelNaming(char *s)
                 {
                     currentError = illegalLabelNameUseOfCharacters;
                     globalState = collectErrors;
+                    return;
                 }
                 i++;
             }

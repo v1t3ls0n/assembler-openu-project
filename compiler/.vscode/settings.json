@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "flags.h": "c",
-        "stdio.h": "c"
+        // "flags.h": "c",
+        // "stdio.h": "c"
     }
 }

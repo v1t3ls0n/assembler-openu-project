@@ -1,9 +1,5 @@
 
 #include "data.h"
-State globalState = startProgram;
-Error currentError = noErrors;
-extern int parseSingleLine(char *line);
-extern void yieldError(Error err, int lineNumber);
 
 int main()
 {

@@ -1,13 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include "flags.h"
-#define BINARY_WIDTH 16
-char *decToHex(int num);
-char *hexToBin(char *hex);
-int hex2int(char ch);
-char *dec2Bin2sComplement(int n);
+// int main()
+// {
+//     printf("Inside helpers.c main function");
+//     return 0;
+// }
+// compiled succesfully
+
+#include "data.h"
 
 char *decToHex(int num)
 {
@@ -19,7 +17,6 @@ char *decToHex(int num)
     sprintf(hex, "%x", num);
     return hex;
 }
-
 char *dec2Bin2sComplement(int n)
 {
 
@@ -65,7 +62,6 @@ char *dec2Bin2sComplement(int n)
     printf("\n");
     return "";
 }
-
 char *hexToBin(char *hex)
 {
     int i = 0, size = strlen(hex) * 4;

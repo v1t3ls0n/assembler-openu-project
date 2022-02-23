@@ -1,8 +1,5 @@
-#include "table.h"
+#include "data.h"
 
-extern Item *symbols[HASHSIZE];
-extern State globalState;
-extern Error currentError;
 unsigned static IC = 0;
 unsigned static DC = 0;
 unsigned static ICF = 100;
@@ -13,6 +10,12 @@ Word *_code;
 int writeToMemory(EncodedWord value, DataType type);
 void updateSymbolTableFinalValues();
 void updateDataEntry(Item *p);
+
+int main()
+{
+    printf("Inside memory.c main function");
+    return 0;
+}
 
 int writeToMemory(EncodedWord value, DataType type)
 {

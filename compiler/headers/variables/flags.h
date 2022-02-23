@@ -42,8 +42,31 @@ typedef enum
 
 typedef enum
 {
+    skipLine,
+    newLine,
+    parseLabel,
+    parseInstruction,
+    parseCommand,
+    printError,
+
+    parseDataVariable,
+    parseStringVariable,
+    parseEntryVariable,
+    parseExternalVariable,
+
+    parseSourceOperand,
+    parseDestinationOperand,
+
+    expectNewline,
+    expectNumber,
+    expectComma,
+    expectBlank,
+    expectQuotes
+
+} ParseState;
+
+typedef enum
+{
     False = 0,
     True = 1
 } Bool;
-
-void yieldError(Error err, int lineNumber);

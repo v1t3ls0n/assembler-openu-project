@@ -1,8 +1,5 @@
-#include "table.h"
-
-extern State globalState;
-extern Error currentError;
-extern Command commands[];
+#include "data.h"
+// void main(){}
 
 Command *getCommandByName(char *s)
 {

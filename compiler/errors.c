@@ -1,5 +1,12 @@
-#include <stdio.h>
-#include "flags.h"
+// int main()
+// {
+//     printf("Inside errors.c main");
+//     return 0;
+// }
+// compiled succesfully
+
+#include "data.h"
+
 void yieldError(Error err, int lineNumber)
 {
     printf("Error!! occured on line %d:\n", lineNumber);

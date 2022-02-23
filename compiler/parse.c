@@ -1,46 +1,13 @@
-#include "table.h"
-extern Error currentError;
-extern Command *getCommandByName(char *s);
-extern EncodedWord *generateFirstWordEncodedHex(Command *cmd);
-extern int writeToMemory(EncodedWord value, DataType type);
+#include "data.h"
+
+// extern Command *getCommandByName(char *s);
+// extern EncodedWord *generateFirstWordEncodedHex(Command *cmd);
+// extern int writeToMemory(EncodedWord value, DataType type);
 #define DATA ".data"
 #define STRING ".string"
 #define ENTRY ".entry"
 #define EXTERNAL ".external"
 
-typedef enum
-{
-    skipLine,
-    newLine,
-    parseLabel,
-    parseInstruction,
-    parseCommand,
-    printError,
-
-    parseDataVariable,
-    parseStringVariable,
-    parseEntryVariable,
-    parseExternalVariable,
-
-    parseSourceOperand,
-    parseDestinationOperand,
-
-    expectNewline,
-    expectNumber,
-    expectComma,
-    expectBlank,
-    expectQuotes
-
-} ParseState;
-
-int evalToken(char *token, ParseState state);
-int handleCommand(char *cmdName, char *operands);
-int handleInstruction(char *instruction, char *params);
-int handleLabel(char *labelName, char *nextToken);
-
-int isLabel(char *s);
-int isCommand(char *s);
-int isInstruction(char *s);
 int parseSingleLine(char *line)
 {
     int n;
