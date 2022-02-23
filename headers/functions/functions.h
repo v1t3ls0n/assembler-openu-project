@@ -9,10 +9,12 @@ void yieldError(Error err, int lineNumber);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-/* --------------------------------------------In commands.c: ----------------------------------------------------*/
+/* --------------------------------------------In Operations.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-Command *getCommandByName(char *s);
+Operation *getOperationByName(char *s);
+Operation *getOperationByIndex(unsigned int i);
+int getOpIndex(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -24,6 +26,8 @@ Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
+Item *findOrAddSymbol(char *name, ItemType type);
+Item *findSymbol(char *name, ItemType type);
 Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 void updateSymbol(char *name, int newValue);
 char *getMacroCodeValue(char *s);
@@ -37,8 +41,8 @@ void verifyLabelNaming(char *s);
 void printObjectFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
 EncodedWord *encodeIntNum(int num);
-char *generateFirstWordEncodedToBinary(Command *cmd);
-EncodedWord *generateFirstWordEncodedHex(Command *cmd);
+char *generateFirstWordEncodedToBinary(Operation *op);
+EncodedWord *generateFirstWordEncodedHex(Operation *op);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -47,20 +51,21 @@ EncodedWord *generateFirstWordEncodedHex(Command *cmd);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-char *dec2Bin2sComplement(int n);
+EncodedWord *dec2Bin2sComplement(int n);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In parse.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int parseSingleLine(char *line);
-int evalToken(char *token, ParseState state);
-int handleCommand(char *cmdName, char *operands);
-int handleInstruction(char *instruction, char *params);
-int handleLabel(char *labelName, char *nextToken);
+int parseSingleLine(char *line, int lineNumber);
+int handleState(char *token, ParseState state);
+int handleOperation(Operation *op, char *operands, char *line);
+int handleInstruction(int type, char *labelName, char *nextTokens);
+int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);
-int isCommand(char *s);
+int isOperation(char *s);
 int isInstruction(char *s);
+char *getInstructionName(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/

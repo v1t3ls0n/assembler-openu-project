@@ -6,7 +6,7 @@ extern Error currentError;
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
-extern Command commands[];
+extern Operation operations[OP_SIZE];
 
 unsigned static IC = 0;
 unsigned static DC = 0;

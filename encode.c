@@ -1,20 +1,20 @@
 #include "data.h"
 /* Shared global State variables*/
-
+extern Operation operations[OP_SIZE];
 extern char *decToHex(int num);
 extern char *hexToBin(char *hex);
 extern void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
 
-char *generateFirstWordEncodedToBinary(Command *cmd)
+char *generateFirstWordEncodedToBinary(Operation *operation)
 {
-    return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(cmd->op)));
+    return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(operation->op)));
 }
 
-EncodedWord *generateFirstWordEncodedHex(Command *cmd)
+EncodedWord *generateFirstWordEncodedHex(Operation *operation)
 {
     char *buf = (char *)calloc(6, sizeof(char));
     EncodedWord *newWord = (EncodedWord *)malloc(1 * sizeof(EncodedWord *));
-    sprintf(buf, "%x", (A | cmd->op));
+    sprintf(buf, "%x", (A | operation->op));
     newWord->_A = buf[0];
     newWord->_B = buf[1];
     newWord->_C = buf[2];

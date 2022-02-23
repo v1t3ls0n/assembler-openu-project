@@ -5,53 +5,54 @@ extern Error currentError;
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
-extern Command commands[];
-
-extern Command *getCommandByName(char *s);
+extern Operation operations[OP_SIZE];
+extern Operation *getOperationByName(char *s);
 extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+extern Item *findOrAddSymbol(char *name, ItemType);
+extern Item *findSymbol(char *name, ItemType type);
 
-int parseSingleLine(char *line);
-int evalToken(char *token, ParseState state);
-int handleCommand(char *cmdName, char *operands);
-int handleInstruction(char *instruction, char *params);
-int handleLabel(char *labelName, char *nextToken);
-int isLabel(char *s);
-int isCommand(char *s);
-int isInstruction(char *s);
-
-int parseSingleLine(char *line)
+int parseSingleLine(char *line, int lineNumber)
 {
-    int n;
-    char token[MAX_LABEL_LEN + 1] = {0};
-    char *p = line;
     ParseState state = newLine;
+    int n = 0;
 
+    /*char token[MAX_LABEL_LEN + 1] = {0};*/
+    char *token = (char *)calloc(MAX_LABEL_LEN + 1, sizeof(char));
+
+    char *p = line;
+
+    printf("\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n\n", line, lineNumber);
     while (*p)
     {
         sscanf(p, "%s %n", token, &n);
+        state = handleState(token, state);
 
-        state = evalToken(token, state);
         switch (state)
         {
         case parseLabel:
         {
-            state = handleLabel(token, p + n);
+            /* cleaning the label token from the last : character as we should do before we try to add it to the symbol table*/
+            token[strlen(token) - 1] = '\0';
+            handleLabel(token, p + n, line);
+
             break;
         }
 
         case parseInstruction:
-        {
-            handleInstruction(token, p + n);
+            handleInstruction(isInstruction(token), token + n, line);
             break;
-        }
 
-        case parseCommand:
+        case parseOperation:
         {
-            handleCommand(token, p + n);
+            handleOperation(getOperationByName(token), token + n, line);
             break;
         }
         case printError:
-            return 0;
+        {
+            globalState = collectErrors;
+            yieldError(currentError, lineNumber);
+            return False;
+        }
         case skipLine:
             return 1;
 
@@ -65,42 +66,164 @@ int parseSingleLine(char *line)
     return 1;
 }
 
-int evalToken(char *token, ParseState state)
+int handleState(char *token, ParseState state)
 {
-
     switch (state)
     {
     case skipLine:
-        return state;
-    case printError:
-        return state;
+        break;
     case newLine:
     {
         if (token[0] == ';')
             return skipLine;
 
-        if (isLabel(token))
+        else if (isLabel(token))
             return parseLabel;
+
         else if (isInstruction(token))
             return parseInstruction;
 
-        else if (isCommand(token))
-            return parseCommand;
+        else if (isOperation(token))
+            return parseOperation;
 
         else
         {
-            currentError = undefinedCommand;
+            currentError = undefinedOperation;
             return printError;
         }
 
         break;
     }
+        /*
 
+    case parseInstruction:
+        handleInstruction() break;
+    case parseOperation:
+        break;
+*/
+    default:
+        break;
+    }
+
+    return True;
+}
+
+int handleOperation(Operation *op, char *operands, char *line)
+{
+
+    printf("inside handleOperation:\nOperation Name:%s Operands:%s line:%s\n", op->keyword, operands, line);
+
+    return 1;
+}
+
+int handleInstruction(int type, char *label, char *nextTokens)
+{
+    EncodedWord newWord = {0, 0, 0, 0, 0};
+    Item *p = findSymbol(label, Symbol);
+    int memoryAddress = writeToMemory(newWord, Data);
+
+    printf("inside handle Instruction, instruction type:%d labelName:%s nextTokens:%s\n", type, label, nextTokens);
+
+    if (p == NULL)
+    {
+        p = addSymbol(label, memoryAddress, 0, 0, 0, 0);
+        if (type == _TYPE_DATA || type == _TYPE_STRING)
+            p->val.s.attrs.data = 1;
+        else if (type == _TYPE_ENTRY)
+            p->val.s.attrs.entry = 1;
+        else if (type == _TYPE_EXTERNAL)
+            p->val.s.attrs.external = 1;
+    }
+
+    else
+    {
+
+        if (((type == _TYPE_DATA || type == _TYPE_STRING) && p->val.s.attrs.code) || ((type == _TYPE_ENTRY) && p->val.s.attrs.external) || (type == _TYPE_EXTERNAL && p->val.s.attrs.entry))
+        {
+            currentError = symbolCannotBeBothCurrentTypeAndRequestedType;
+            return printError;
+        }
+        if (type == _TYPE_DATA || type == _TYPE_STRING)
+            p->val.s.attrs.data = 1;
+        else if (type == _TYPE_ENTRY)
+            p->val.s.attrs.entry = 1;
+        else if (type == _TYPE_EXTERNAL)
+            p->val.s.attrs.external = 1;
+    }
+
+    return True;
+}
+
+int handleLabel(char *labelName, char *nextToken, char *line)
+{
+    int opIndex = -1;
+    int instruction = -1;
+    int memoryAddress = -1;
+    printf("inside handleLabel:\nLabel Name:%s nextToken:%s line:%s\n", labelName, nextToken, line);
+
+    if ((instruction = isInstruction(nextToken)))
+        return handleInstruction(getOpIndex(nextToken), labelName, nextToken + strlen(nextToken));
+
+    else if ((opIndex = isOperation(nextToken)) != -1)
+    {
+        memoryAddress = writeToMemory(*generateFirstWordEncodedHex(getOperationByIndex(opIndex)), Code);
+        if ((addSymbol(labelName, memoryAddress, 1, 0, 0, 0)) != NULL)
+            return handleOperation(getOperationByIndex(opIndex), nextToken, line);
+        else
+            return printError;
+    }
+    else
+    {
+        currentError = illegalLabelUseExpectedOperationOrInstruction;
+        return printError;
+    }
+}
+
+int isOperation(char *s)
+{
+    int opIndex = getOpIndex(s);
+    printf("inside is operation, token:%s op index:%d\n", s, opIndex);
+    return opIndex != -1 ? opIndex : -1;
+}
+
+int isLabel(char *s)
+{
+    int len = strlen(s);
+    return s[len - 1] == ':' ? True : False;
+}
+
+int isInstruction(char *s)
+{
+    if (!strcmp(s, DATA))
+        return _TYPE_DATA;
+    if (!strcmp(s, STRING))
+        return _TYPE_STRING;
+    if (!strcmp(s, ENTRY))
+        return _TYPE_ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return _TYPE_EXTERNAL;
+    return False;
+}
+
+char *getInstructionName(char *s)
+{
+    if (!strcmp(s, DATA))
+        return DATA;
+    if (!strcmp(s, STRING))
+        return STRING;
+    if (!strcmp(s, ENTRY))
+        return ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return EXTERNAL;
+    return 0;
+}
+
+/*
     case parseLabel:
         break;
     case parseInstruction:
         break;
-    case parseCommand:
+    case parseOperation:
         break;
 
     case parseDataVariable:
@@ -126,110 +249,4 @@ int evalToken(char *token, ParseState state)
         break;
     case expectQuotes:
         break;
-    default:
-        break;
-    }
-
-    return 1;
-}
-
-int handleCommand(char *cmdName, char *operands)
-{
-    Command *cmd = getCommandByName(cmdName);
-    writeToMemory(*generateFirstWordEncodedHex(cmd), Code);
-    return 1;
-}
-
-int handleInstruction(char *instruction, char *params)
-{
-
-    if (strcmp(instruction, DATA) == 0)
-    {
-        printf("Data instruction. params:%s\n", params);
-    }
-    if (strcmp(instruction, STRING) == 0)
-    {
-        printf("String instruction. params:%s\n", params);
-    }
-    if (strcmp(instruction, ENTRY) == 0)
-    {
-        printf("Entry instruction. params:%s\n", params);
-    }
-    if (strcmp(instruction, EXTERNAL) == 0)
-    {
-        printf("External instruction. params:%s\n", params);
-    }
-
-    return 1;
-}
-
-int handleLabel(char *labelName, char *nextToken)
-{
-    EncodedWord word = {0, 0, 0, 0, 0};
-    int val;
-    if (isInstruction(nextToken))
-    {
-        val = writeToMemory(word, Code);
-        addSymbol(labelName, val, 0, 1, 0, 0);
-        return parseInstruction;
-    }
-
-    else if (isCommand(nextToken))
-    {
-        val = writeToMemory(*generateFirstWordEncodedHex(getCommandByName(nextToken)), Code);
-        addSymbol(labelName, val, 1, 0, 0, 0);
-
-        handleCommand(labelName, nextToken);
-
-        return parseCommand;
-    }
-
-    else
-    {
-        currentError = illegalLabelUseExpectedCommandOrInstruction;
-        return printError;
-    }
-
-    return 1;
-}
-
-int isCommand(char *s)
-{
-    int i = 0;
-    const char *cmds[] = {
-        "mov",
-        "cmp",
-        "add",
-        "sub",
-        "lea",
-        "clr",
-        "not",
-        "inc",
-        "dec",
-        "jmp",
-        "bne",
-        "jsr",
-        "red",
-        "prn",
-        "rts",
-        "stop",
-        NULL};
-
-    while (cmds[i] != NULL)
-    {
-        if (strcmp(s, *cmds) == 0)
-            return 1;
-        i++;
-    }
-    return 0;
-}
-
-int isLabel(char *s)
-{
-    int len = strlen(s);
-    return s[len] == ':' ? 1 : 0;
-}
-int isInstruction(char *s)
-{
-    return !strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL);
-}
+        */

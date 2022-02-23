@@ -5,26 +5,54 @@ extern Error currentError;
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
-extern Command commands[];
+extern Operation operations[OP_SIZE];
+extern EncodedWord *dec2Bin2sComplement(int n);
 
 int main()
 {
+    int lineNumber = 1;
+    if (!parseSingleLine("x: .data 3", lineNumber))
+    {
+        globalState = collectErrors;
+        yieldError(currentError, lineNumber);
+        currentError = none;
+    }
 
-    printf("\n\n\n\n\n\nCompiler.c Main Function\n\n\n\n\n\n");
+    /*
+    EncodedWord *singleWord[16];
+
+        int lineNumber = 2;
+        if (!parseSingleLine("x:          mov 3, r1", lineNumber))
+        {
+            globalState = collectErrors;
+            yieldError(currentError, lineNumber);
+            currentError = none;
+        }
+
+            printf("add:\n");
+    addSymbol("GDGDS", 100, 1, 0, 1, 0);
+    addSymbol("ABC", 108, 0, 1, 0, 0);
+    addSymbol("GDGD", 112, 0, 0, 0, 1);
+    printSymbolTable();
+
+    singleWord[0] = dec2Bin2sComplement(-1);
+    singleWord[1] = dec2Bin2sComplement(-7);
+    singleWord[2] = dec2Bin2sComplement(-5);
+    printObjectFile(singleWord, 16, 0);
+    printf("add:\n");
+    addSymbol("GDGDS", 100, 1, 0, 1, 0);
+    addSymbol("ABC", 108, 0, 1, 0, 0);
+    addSymbol("GDGD", 112, 0, 0, 0, 1);
+    printSymbolTable();
+
+     */
 
     return 0;
 }
 /*
 
 Errors in parse.c:
-    int lineNumber = 2;
 
-    if (!parseSingleLine(";token1 token2 ,,,"))
-    {
-        globalState = collectErrors;
-        yieldError(currentError, lineNumber);
-        currentError = none;
-    }
 
 */
 
@@ -49,22 +77,22 @@ dec2Bin2sComplement(-17);
         {0x4, 0x0, 0x3, 0xE, 0x2},
         {0x4, 0x0, 0x3, 0xA, 0x6},
     };
-singleWord[0] = generateFirstWordEncodedHex(getCommandByName("mov"));
-singleWord[1] = generateFirstWordEncodedHex(getCommandByName("cmp"));
-singleWord[2] = generateFirstWordEncodedHex(getCommandByName("add"));
-singleWord[3] = generateFirstWordEncodedHex(getCommandByName("sub"));
-singleWord[4] = generateFirstWordEncodedHex(getCommandByName("lea"));
-singleWord[5] = generateFirstWordEncodedHex(getCommandByName("clr"));
-singleWord[6] = generateFirstWordEncodedHex(getCommandByName("not"));
-singleWord[7] = generateFirstWordEncodedHex(getCommandByName("inc"));
-singleWord[8] = generateFirstWordEncodedHex(getCommandByName("dec"));
-singleWord[9] = generateFirstWordEncodedHex(getCommandByName("jmp"));
-singleWord[10] = generateFirstWordEncodedHex(getCommandByName("bne"));
-singleWord[11] = generateFirstWordEncodedHex(getCommandByName("jsr"));
-singleWord[12] = generateFirstWordEncodedHex(getCommandByName("red"));
-singleWord[13] = generateFirstWordEncodedHex(getCommandByName("prn"));
-singleWord[14] = generateFirstWordEncodedHex(getCommandByName("rts"));
-singleWord[15] = generateFirstWordEncodedHex(getCommandByName("stop"));
+singleWord[0] = generateFirstWordEncodedHex(getOperationByName("mov"));
+singleWord[1] = generateFirstWordEncodedHex(getOperationByName("cmp"));
+singleWord[2] = generateFirstWordEncodedHex(getOperationByName("add"));
+singleWord[3] = generateFirstWordEncodedHex(getOperationByName("sub"));
+singleWord[4] = generateFirstWordEncodedHex(getOperationByName("lea"));
+singleWord[5] = generateFirstWordEncodedHex(getOperationByName("clr"));
+singleWord[6] = generateFirstWordEncodedHex(getOperationByName("not"));
+singleWord[7] = generateFirstWordEncodedHex(getOperationByName("inc"));
+singleWord[8] = generateFirstWordEncodedHex(getOperationByName("dec"));
+singleWord[9] = generateFirstWordEncodedHex(getOperationByName("jmp"));
+singleWord[10] = generateFirstWordEncodedHex(getOperationByName("bne"));
+singleWord[11] = generateFirstWordEncodedHex(getOperationByName("jsr"));
+singleWord[12] = generateFirstWordEncodedHex(getOperationByName("red"));
+singleWord[13] = generateFirstWordEncodedHex(getOperationByName("prn"));
+singleWord[14] = generateFirstWordEncodedHex(getOperationByName("rts"));
+singleWord[15] = generateFirstWordEncodedHex(getOperationByName("stop"));
 printObjectFile(singleWord, 16, 0);
 printf("add:\n");
 addSymbol("GDGDS", 100, 1, 0, 1, 0);

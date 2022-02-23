@@ -10,8 +10,8 @@ void yieldError(Error err, int lineNumber)
     case memoryAllocationFailure:
         printf("memory allocation failed");
         break;
-    case undefinedCommand:
-        printf("undefined command name");
+    case undefinedOperation:
+        printf("undefined Operationname");
         break;
     case undefinedInstruction:
         break;
