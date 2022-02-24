@@ -10,10 +10,15 @@ typedef struct
 
 typedef struct
 {
-    unsigned address;
-    EncodedWord value;
-    void *next;
+    EncodedWord *value = NULL;
+    void *next = NULL;
 } Word;
+
+typedef struct
+{
+    Word *head = NULL;
+    Word *tail = NULL;
+} MemoryStack;
 
 typedef struct
 {

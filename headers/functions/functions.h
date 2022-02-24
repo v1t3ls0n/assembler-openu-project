@@ -66,10 +66,17 @@ int isLabel(char *s);
 int isOperation(char *s);
 int isInstruction(char *s);
 char *getInstructionName(char *s);
+int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand);
+void updateMemoryCounters();
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int writeToMemory(EncodedWord value, DataType type);
+void writeIntoDataStack(Word *word);
+int writeToMemory(Word *word, DataType type);
+int writeToMemory(Word *word, DataType type);
 void updateSymbolTableFinalValues();
 void updateDataEntry(Item *p);
+void increaseDataCounter(int amount);
+void inceaseInstructionCounter(int amount);
+void resetCounters();

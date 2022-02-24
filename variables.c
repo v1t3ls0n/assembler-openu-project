@@ -2,7 +2,7 @@
 #include "data.h"
 /* Shared global State variables*/
 
-State globalState = startProgram;
+State globalState = firstRun;
 Error currentError = noErrors;
 Item *symbols[HASHSIZE] = {0};
 Item *macros[HASHSIZE] = {0};

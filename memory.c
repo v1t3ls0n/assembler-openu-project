@@ -1,5 +1,6 @@
 
 #include "data.h"
+#define MEMORY_START 100
 /* Shared global State variables*/
 extern State globalState;
 extern Error currentError;
@@ -8,45 +9,57 @@ extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 
-unsigned static IC = 0;
-unsigned static DC = 0;
-unsigned static ICF = 100;
-unsigned static DCF = 101;
+unsigned static IC = MEMORY_START;
+unsigned static DC = MEMORY_START + 1;
+unsigned static ICF = IC;
+unsigned static DCF = DC;
 
-Word *_data;
-Word *_code;
+MemoryStack *codeMemoryStack, *dataMemoryStack;
 
-int writeToMemory(EncodedWord value, DataType type)
+int writeToMemory(Word *word, DataType type)
 {
-    Word *newEntry = (Word *)malloc(sizeof(Word *));
-    unsigned address = type == Code ? IC : DCF;
 
-    if (!newEntry || (DC + IC > 8191))
+    if (DC + IC > 8191)
     {
         globalState = collectErrors;
         currentError = memoryAllocationFailure;
-        return 0;
+        return False;
     }
 
-    newEntry->value = value;
-    newEntry->next = NULL;
+    if (DataType == Code)
+        writeIntoCodeStack(word);
 
-    if (type == Code)
+    else
+        writeIntoDataStack(word);
+
+    return True;
+}
+
+void writeIntoCodeStack(Word *word)
+{
+
+    if (codeMemoryStack->head == NULL)
     {
-        newEntry->address = IC;
-        _code->next = newEntry;
-        IC++;
-        ICF += IC;
+        codeMemoryStack->head = word;
+        codeMemoryStack->tail = word;
     }
-    else if (type == Data)
-    {
-        newEntry->address = DC;
-        _data->next = newEntry;
-        DC++;
-        DCF = ICF + DC;
-    }
+    else
+        codeMemoryStack->tail = word;
 
-    return address;
+    IC++;
+}
+
+void writeIntoDataStack(Word *word)
+{
+    if (dataMemoryStack->head == NULL)
+    {
+        dataMemoryStack->head = word;
+        dataMemoryStack->tail = word;
+    }
+    else
+        dataMemoryStack->tail = word;
+
+    DC++;
 }
 
 void updateSymbolTableFinalValues()
@@ -75,4 +88,18 @@ void updateDataEntry(Item *p)
 
     if (p->next != NULL)
         updateDataEntry(p->next);
+}
+
+void increaseDataCounter(int amount)
+{
+    DC += amount;
+}
+void inceaseInstructionCounter(int amount)
+{
+    ICF = IC += amount;
+}
+
+void resetCounters()
+{
+    IC = MEMORY_START;
 }

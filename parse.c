@@ -118,9 +118,12 @@ int handleOperation(Operation *op, char *operands, char *line)
 
 int handleInstruction(int type, char *label, char *nextTokens)
 {
+
     EncodedWord newWord = {0, 0, 0, 0, 0};
     Item *p = findSymbol(label, Symbol);
-    int memoryAddress = writeToMemory(newWord, Data);
+    int memoryAddress;
+    if (type != _TYPE_ENTRY && type != _TYPE_EXTERNAL)
+        memoryAddress = writeToMemory(newWord, Data);
 
     printf("inside handle Instruction, instruction type:%d labelName:%s nextTokens:%s\n", type, label, nextTokens);
 
@@ -217,6 +220,13 @@ char *getInstructionName(char *s)
         return EXTERNAL;
     return 0;
 }
+
+int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand)
+{
+
+    return 0;
+}
+void updateMemoryCounters() {}
 
 /*
     case parseLabel:
