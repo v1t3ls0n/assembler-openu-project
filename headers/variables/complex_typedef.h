@@ -1,4 +1,13 @@
+#include "constants.h"
 
+typedef struct
+{
+    unsigned int on : 1;
+} Bit;
+typedef struct
+{
+    Bit digit[20];
+} BinaryWord;
 typedef struct
 {
     unsigned int _A : 4;
@@ -6,18 +15,22 @@ typedef struct
     unsigned int _C : 4;
     unsigned int _D : 4;
     unsigned int _E : 4;
-} EncodedWord;
+} HexWord;
 
 typedef struct
 {
-    EncodedWord *value = NULL;
-    void *next = NULL;
+    union
+    {
+        HexWord *hex;
+        BinaryWord *binary;
+    } value;
+    void *next;
 } Word;
 
 typedef struct
 {
-    Word *head = NULL;
-    Word *tail = NULL;
+    Word *head;
+    Word *tail;
 } MemoryStack;
 
 typedef struct

@@ -17,6 +17,7 @@ typedef enum
     illegalMacroNameLength,
     illegalSymbolNameAlreadyInUse,
     symbolCannotBeBothCurrentTypeAndRequestedType,
+    labelNameAlreadyInUseInsideSymbolTable,
     illegalMacroNameAlreadyInUse,
     wrongArgumentTypeNotAnInteger,
     wrongInstructionSyntaxMissinCommas,

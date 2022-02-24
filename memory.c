@@ -11,8 +11,8 @@ extern Operation operations[OP_SIZE];
 
 unsigned static IC = MEMORY_START;
 unsigned static DC = MEMORY_START + 1;
-unsigned static ICF = IC;
-unsigned static DCF = DC;
+unsigned static ICF = MEMORY_START;
+unsigned static DCF = MEMORY_START + 1;
 
 MemoryStack *codeMemoryStack, *dataMemoryStack;
 
@@ -26,7 +26,7 @@ int writeToMemory(Word *word, DataType type)
         return False;
     }
 
-    if (DataType == Code)
+    if (type == Code)
         writeIntoCodeStack(word);
 
     else

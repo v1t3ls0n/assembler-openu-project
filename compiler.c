@@ -6,7 +6,7 @@ extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-extern EncodedWord *dec2Bin2sComplement(int n);
+extern HexWord *dec2Bin2sComplement(int n);
 
 int main()
 {
@@ -19,7 +19,7 @@ int main()
     }
 
     /*
-    EncodedWord *singleWord[16];
+    HexWord *singleWord[16];
 
         int lineNumber = 2;
         if (!parseSingleLine("x:          mov 3, r1", lineNumber))
@@ -63,10 +63,10 @@ dec2Bin2sComplement(-17);
  */
 
 /*
-    EncodedWord *singleWord[16];
+    HexWord *singleWord[16];
 
 
-    EncodedWord machineCodeObj[] = {
+    HexWord machineCodeObj[] = {
         {0x2, 0x1, 0x3, 0xF, 0x1},
         {0x4, 0x2, 0x3, 0x9, 0x1},
         {0x7, 0x8, 0x6, 0xD, 0x1},

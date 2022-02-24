@@ -1,5 +1,5 @@
 #include "data.h"
-extern EncodedWord *encodeIntNum(int num);
+extern HexWord *encodeIntNum(int num);
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -11,7 +11,7 @@ char *decToHex(int num)
     return hex;
 }
 
-EncodedWord *dec2Bin2sComplement(int n)
+HexWord *dec2Bin2sComplement(int n)
 {
     /*
     Function converts decimal integer to binary/hex representation in a 2'Complement
@@ -20,7 +20,7 @@ EncodedWord *dec2Bin2sComplement(int n)
     1 - taking the absolute value of the number argument (n)
     2 - doing a NOT bitwise operation on all bits
     3 - adding 1 to the result
-    4 - saving it as a string of chracers and as EncodedWord Typedef struct variable
+    4 - saving it as a string of chracers and as HexWord Typedef struct variable
     */
     unsigned char result = 0;
     result = n;

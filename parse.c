@@ -11,6 +11,8 @@ extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, 
 extern Item *findOrAddSymbol(char *name, ItemType);
 extern Item *findSymbol(char *name, ItemType type);
 
+Bit binaryWord[BINARY_WORD_SIZE] = {0};
+
 int parseSingleLine(char *line, int lineNumber)
 {
     ParseState state = newLine;
@@ -119,7 +121,7 @@ int handleOperation(Operation *op, char *operands, char *line)
 int handleInstruction(int type, char *label, char *nextTokens)
 {
 
-    EncodedWord newWord = {0, 0, 0, 0, 0};
+    Word *newWord = NULL;
     Item *p = findSymbol(label, Symbol);
     int memoryAddress;
     if (type != _TYPE_ENTRY && type != _TYPE_EXTERNAL)
@@ -169,17 +171,16 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
     else if ((opIndex = isOperation(nextToken)) != -1)
     {
-        memoryAddress = writeToMemory(*generateFirstWordEncodedHex(getOperationByIndex(opIndex)), Code);
+        Word *new = NULL;
+        new->value.hex = generateFirstWordEncodedHex(getOperationByIndex(opIndex));
+        memoryAddress = writeToMemory(new, Code);
         if ((addSymbol(labelName, memoryAddress, 1, 0, 0, 0)) != NULL)
             return handleOperation(getOperationByIndex(opIndex), nextToken, line);
-        else
-            return printError;
     }
     else
-    {
         currentError = illegalLabelUseExpectedOperationOrInstruction;
-        return printError;
-    }
+
+    return printError;
 }
 
 int isOperation(char *s)

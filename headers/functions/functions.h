@@ -38,11 +38,11 @@ void verifyLabelNaming(char *s);
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void printObjectFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
-void printBinaryFile(EncodedWord *words[], unsigned int ICF, unsigned int DCF);
-EncodedWord *encodeIntNum(int num);
+void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
+void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
+HexWord *encodeIntNum(int num);
 char *generateFirstWordEncodedToBinary(Operation *op);
-EncodedWord *generateFirstWordEncodedHex(Operation *op);
+HexWord *generateFirstWordEncodedHex(Operation *op);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -51,7 +51,7 @@ EncodedWord *generateFirstWordEncodedHex(Operation *op);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-EncodedWord *dec2Bin2sComplement(int n);
+HexWord *dec2Bin2sComplement(int n);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -73,7 +73,7 @@ void updateMemoryCounters();
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 void writeIntoDataStack(Word *word);
-int writeToMemory(Word *word, DataType type);
+void writeIntoCodeStack(Word *word);
 int writeToMemory(Word *word, DataType type);
 void updateSymbolTableFinalValues();
 void updateDataEntry(Item *p);
