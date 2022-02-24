@@ -17,26 +17,29 @@ int parseSingleLine(char *line, int lineNumber)
 {
     ParseState state = newLine;
     int n = 0;
+    char token[MAX_LABEL_LEN + 1] = {0};
 
-    /*char token[MAX_LABEL_LEN + 1] = {0};*/
+    /*
     char *token = (char *)calloc(MAX_LABEL_LEN + 1, sizeof(char));
+    */
 
     char *p = line;
 
     printf("\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n\n", line, lineNumber);
-    while (*p)
+    while (*p != '\0')
     {
+        p += n;
+        printf("line 31 - while loop\n");
         sscanf(p, "%s %n", token, &n);
+        printf("sscaf result:\np:%s\ntoken:%s\nn:%d\n", p, token, n);
+
         state = handleState(token, state);
 
         switch (state)
         {
         case parseLabel:
         {
-            /* cleaning the label token from the last : character as we should do before we try to add it to the symbol table*/
-            token[strlen(token) - 1] = '\0';
             handleLabel(token, p + n, line);
-
             break;
         }
 
@@ -61,8 +64,6 @@ int parseSingleLine(char *line, int lineNumber)
         default:
             break;
         }
-
-        p += n;
     }
 
     return 1;
@@ -176,6 +177,12 @@ int handleLabel(char *labelName, char *nextToken, char *line)
         memoryAddress = writeToMemory(new, Code);
         if ((addSymbol(labelName, memoryAddress, 1, 0, 0, 0)) != NULL)
             return handleOperation(getOperationByIndex(opIndex), nextToken, line);
+        /*
+
+
+
+
+          */
     }
     else
         currentError = illegalLabelUseExpectedOperationOrInstruction;
@@ -228,36 +235,3 @@ int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand)
     return 0;
 }
 void updateMemoryCounters() {}
-
-/*
-    case parseLabel:
-        break;
-    case parseInstruction:
-        break;
-    case parseOperation:
-        break;
-
-    case parseDataVariable:
-        break;
-    case parseStringVariable:
-        break;
-    case parseEntryVariable:
-        break;
-    case parseExternalVariable:
-        break;
-
-    case parseSourceOperand:
-        break;
-    case parseDestinationOperand:
-        break;
-    case expectNewline:
-        break;
-    case expectNumber:
-        break;
-    case expectComma:
-        break;
-    case expectBlank:
-        break;
-    case expectQuotes:
-        break;
-        */

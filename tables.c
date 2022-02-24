@@ -32,6 +32,14 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     int nameLength = strlen(name);
+    /*
+
+           cleaning the label token from the last :
+           character as we should do before we try to add it to the
+           symbol table.
+
+    */
+    name[strlen(name) - 1] = '\0';
     verifyLabelNaming(name);
     if (globalState == collectErrors)
         NULL;

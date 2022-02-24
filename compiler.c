@@ -11,7 +11,7 @@ extern HexWord *dec2Bin2sComplement(int n);
 int main()
 {
     int lineNumber = 1;
-    if (!parseSingleLine("x: .data 3", lineNumber))
+    if (!parseSingleLine("x:            .data          3        ", lineNumber))
     {
         globalState = collectErrors;
         yieldError(currentError, lineNumber);
