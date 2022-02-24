@@ -101,5 +101,7 @@ void inceaseInstructionCounter(int amount)
 
 void resetCounters()
 {
+    ICF = IC;
+    DCF = ICF + 1;
     IC = MEMORY_START;
 }
