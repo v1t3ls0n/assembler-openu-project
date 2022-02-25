@@ -1,6 +1,5 @@
 
 #include "data.h"
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
 
 void yieldError(Error err, int lineNumber)
 {
@@ -11,8 +10,8 @@ void yieldError(Error err, int lineNumber)
     case memoryAllocationFailure:
         printf("memory allocation failed");
         break;
-    case undefinedCommand:
-        printf("undefined command name");
+    case undefinedOperation:
+        printf("undefined Operationname");
         break;
     case undefinedInstruction:
         break;

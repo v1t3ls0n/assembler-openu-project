@@ -2,7 +2,7 @@
 typedef enum
 {
     memoryAllocationFailure,
-    undefinedCommand,
+    undefinedOperation,
     undefinedInstruction,
     tooMuchArgumentsPassed,
     notEnoughArgumentsPassed,
@@ -12,10 +12,12 @@ typedef enum
     illegalMacroNameUseOfCharacters,
     illegalLabelNameUseOfCharacters,
     illegalLabelNameUseOfSavedKeywords,
-    illegalLabelUseExpectedCommandOrInstruction,
+    illegalLabelUseExpectedOperationOrInstruction,
     illegalLabelNameLength,
     illegalMacroNameLength,
     illegalSymbolNameAlreadyInUse,
+    symbolCannotBeBothCurrentTypeAndRequestedType,
+    labelNameAlreadyInUseInsideSymbolTable,
     illegalMacroNameAlreadyInUse,
     wrongArgumentTypeNotAnInteger,
     wrongInstructionSyntaxMissinCommas,
@@ -46,7 +48,7 @@ typedef enum
     newLine,
     parseLabel,
     parseInstruction,
-    parseCommand,
+    parseOperation,
     printError,
 
     parseDataVariable,

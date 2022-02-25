@@ -1,8 +1,10 @@
 
-#define BINARY_WIDTH 16
-#define CMD_AND_REGS_SIZE 16
+#define BINARY_WORD_SIZE 20
+#define REGS_SIZE 16
+#define OP_SIZE 16
 #define RAM_MEMORY_SIZE 8192
 #define MAX_LABEL_LEN 31
+#define MAX_LINE_LEN 81
 #define HASHSIZE RAM_MEMORY_SIZE / MAX_LABEL_LEN
 #define A 0x40000
 #define R 0x20000
@@ -33,3 +35,8 @@
 #define STRING ".string"
 #define ENTRY ".entry"
 #define EXTERNAL ".external"
+
+#define _TYPE_DATA -11
+#define _TYPE_STRING -22
+#define _TYPE_ENTRY -33
+#define _TYPE_EXTERNAL -44

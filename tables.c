@@ -1,6 +1,11 @@
 #include "data.h"
-
-void main() { printf("\n\n\n\n\n\nTest somefile.c (in fake main function)\n\n\n\n\n\n"); }
+/* Shared global State variables*/
+extern State globalState;
+extern Error currentError;
+extern Item *symbols[HASHSIZE];
+extern Item *macros[HASHSIZE];
+/* Complex Struct Constant Variables: */
+extern Operation operations[OP_SIZE];
 
 unsigned hash(char *s)
 {
@@ -27,6 +32,8 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     int nameLength = strlen(name);
+    name[strlen(name) - 1] = '\0'; /*cleaning the label token from the last : character as we should do before we try to add it to the symbol table.     */
+
     verifyLabelNaming(name);
     if (globalState == collectErrors)
         NULL;
@@ -67,6 +74,7 @@ Item *install(char *name, ItemType type)
 void printSymbolTable()
 {
     int i = 0;
+    printf("\n\t\t ~ SYMBOL TABLE ~ \n");
     printf("name\tvalue\tbase\toffset\tattributes");
     while (i < HASHSIZE)
     {
@@ -74,7 +82,7 @@ void printSymbolTable()
             printSymbolItem(symbols[i]);
         i++;
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 void printSymbolItem(Item *item)
@@ -125,11 +133,27 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
         p->val.s.attrs.entry = isEntry ? 1 : 0;
         p->val.s.attrs.external = isExternal ? 1 : 0;
         p->val.s.attrs.data = isData ? 1 : 0;
+        printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
+        printSymbolTable();
         return p;
     }
+
     return NULL;
 }
 
+Item *findOrAddSymbol(char *name, ItemType type)
+{
+    Item *p = lookup(name, type);
+    if (p != NULL)
+        return p;
+    else
+        return install(name, type);
+}
+
+Item *findSymbol(char *name, ItemType type)
+{
+    return lookup(name, type);
+}
 void updateSymbol(char *name, int newValue)
 {
     Item *p = lookup(name, Symbol);
@@ -197,7 +221,7 @@ void verifyLabelNaming(char *s)
     {
         if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
         {
-            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
+            while (i < REGS_SIZE && globalState != collectErrors)
             {
                 if ((strcmp(regs[i], s) == 0))
                 {
@@ -210,9 +234,9 @@ void verifyLabelNaming(char *s)
 
         else if ((labelLength >= 3 && labelLength <= 4))
         {
-            while (i < CMD_AND_REGS_SIZE && globalState != collectErrors)
+            while (i < OP_SIZE && globalState != collectErrors)
             {
-                if ((strcmp(commands[i].keyword, s) == 0))
+                if ((strcmp(operations[i].keyword, s) == 0))
                 {
                     currentError = illegalLabelNameUseOfSavedKeywords;
                     globalState = collectErrors;

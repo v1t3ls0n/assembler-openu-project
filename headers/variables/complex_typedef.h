@@ -1,3 +1,13 @@
+#include "constants.h"
+
+typedef struct
+{
+    unsigned int on : 1;
+} Bit;
+typedef struct
+{
+    Bit digit[20];
+} BinaryWord;
 typedef struct
 {
     unsigned int _A : 4;
@@ -5,14 +15,23 @@ typedef struct
     unsigned int _C : 4;
     unsigned int _D : 4;
     unsigned int _E : 4;
-} EncodedWord;
+} HexWord;
 
 typedef struct
 {
-    unsigned address;
-    EncodedWord value;
+    union
+    {
+        HexWord *hex;
+        BinaryWord *binary;
+    } value;
     void *next;
 } Word;
+
+typedef struct
+{
+    Word *head;
+    Word *tail;
+} MemoryStack;
 
 typedef struct
 {
@@ -32,14 +51,14 @@ typedef struct
     unsigned int reg : 1;
 } AddrMethodsOptions;
 
-typedef const struct
+typedef struct
 {
-    unsigned int op;
-    unsigned int funct : 4;
-    char keyword[4];
-    AddrMethodsOptions src;
-    AddrMethodsOptions des;
-} Command;
+    const unsigned int op;
+    const unsigned int funct : 4;
+    const char keyword[4];
+    const AddrMethodsOptions src;
+    const AddrMethodsOptions des;
+} Operation;
 
 typedef struct
 {
