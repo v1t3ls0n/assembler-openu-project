@@ -17,34 +17,27 @@ int parseSingleLine(char *line, int lineNumber)
 {
     ParseState state = newLine;
     int n = 0;
-    char token[MAX_LABEL_LEN + 1] = {0};
-
-    /*
-    char *token = (char *)calloc(MAX_LABEL_LEN + 1, sizeof(char));
-    */
-
-    char *p = line;
+    char *p = calloc(strlen(line + 1), sizeof(char *));
+    char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
+    memcpy(p, line, strlen(line));
+    token = strtok(p, " \t \n");
 
     printf("\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n\n", line, lineNumber);
-    while (*p != '\0')
+
+    while (token != NULL)
     {
-        p += n;
-        printf("line 31 - while loop\n");
-        sscanf(p, "%s %n", token, &n);
-        printf("sscaf result:\np:%s\ntoken:%s\nn:%d\n", p, token, n);
 
-        state = handleState(token, state);
-
+        state = handleState(token, p, state);
         switch (state)
         {
         case parseLabel:
         {
-            handleLabel(token, p + n, line);
+            handleLabel(token, strtok(NULL, " \t \n"), line);
             break;
         }
 
         case parseInstruction:
-            handleInstruction(isInstruction(token), token + n, line);
+            handleInstruction(getInstructionType(token), token, line);
             break;
 
         case parseOperation:
@@ -64,12 +57,14 @@ int parseSingleLine(char *line, int lineNumber)
         default:
             break;
         }
+
+        token = strtok(NULL, " \t \n");
     }
 
     return 1;
 }
 
-int handleState(char *token, ParseState state)
+int handleState(char *token, char *line, ParseState state)
 {
     switch (state)
     {
@@ -81,9 +76,11 @@ int handleState(char *token, ParseState state)
             return skipLine;
 
         else if (isLabel(token))
+        {
             return parseLabel;
+        }
 
-        else if (isInstruction(token))
+        else if (getInstructionType(token))
             return parseInstruction;
 
         else if (isOperation(token))
@@ -97,13 +94,7 @@ int handleState(char *token, ParseState state)
 
         break;
     }
-        /*
 
-    case parseInstruction:
-        handleInstruction() break;
-    case parseOperation:
-        break;
-*/
     default:
         break;
     }
@@ -114,18 +105,18 @@ int handleState(char *token, ParseState state)
 int handleOperation(Operation *op, char *operands, char *line)
 {
 
-    printf("inside handleOperation:\nOperation Name:%s Operands:%s line:%s\n", op->keyword, operands, line);
+    printf("inside handleOperation\noperands:%s\n", operands);
 
     return 1;
 }
 
 int handleInstruction(int type, char *label, char *nextTokens)
 {
-
+    int memoryAddress;
     Word *newWord = NULL;
     Item *p = findSymbol(label, Symbol);
-    int memoryAddress;
-    if (type != _TYPE_ENTRY && type != _TYPE_EXTERNAL)
+
+    if (type == _TYPE_DATA || type != _TYPE_STRING)
         memoryAddress = writeToMemory(newWord, Data);
 
     printf("inside handle Instruction, instruction type:%d labelName:%s nextTokens:%s\n", type, label, nextTokens);
@@ -165,24 +156,22 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     int opIndex = -1;
     int instruction = -1;
     int memoryAddress = -1;
-    printf("inside handleLabel:\nLabel Name:%s nextToken:%s line:%s\n", labelName, nextToken, line);
 
-    if ((instruction = isInstruction(nextToken)))
-        return handleInstruction(getOpIndex(nextToken), labelName, nextToken + strlen(nextToken));
-
-    else if ((opIndex = isOperation(nextToken)) != -1)
+    printf("inside handle Label, lable Name:%s nextToken:%s\n", labelName, nextToken);
+    if ((instruction = getInstructionType(nextToken)))
     {
-        Word *new = NULL;
+        printf("line 162, inside handleLabel\n");
+        /*
+                return handleInstruction(instruction, labelName, nextToken + strlen(nextToken)); */
+    }
+
+    else if (getOpIndex(nextToken) != -1)
+    {
+        Word *new = calloc(1, sizeof(Word *));
         new->value.hex = generateFirstWordEncodedHex(getOperationByIndex(opIndex));
         memoryAddress = writeToMemory(new, Code);
         if ((addSymbol(labelName, memoryAddress, 1, 0, 0, 0)) != NULL)
             return handleOperation(getOperationByIndex(opIndex), nextToken, line);
-        /*
-
-
-
-
-          */
     }
     else
         currentError = illegalLabelUseExpectedOperationOrInstruction;
@@ -192,18 +181,21 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
 int isOperation(char *s)
 {
-    int opIndex = getOpIndex(s);
-    printf("inside is operation, token:%s op index:%d\n", s, opIndex);
+    int opIndex = -1;
+    opIndex = getOpIndex(s);
+    printf("inside is operation op index:%d\n", opIndex);
     return opIndex != -1 ? opIndex : -1;
 }
 
 int isLabel(char *s)
 {
     int len = strlen(s);
+    if (len < 1)
+        return False;
     return s[len - 1] == ':' ? True : False;
 }
 
-int isInstruction(char *s)
+int getInstructionType(char *s)
 {
     if (!strcmp(s, DATA))
         return _TYPE_DATA;

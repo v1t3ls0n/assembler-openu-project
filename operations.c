@@ -16,15 +16,12 @@ Operation *getOperationByIndex(unsigned int i)
 int getOpIndex(char *s)
 {
     int i = 0;
-    printf("inside getOpIndex, s:%s\n", s);
     while (i < OP_SIZE)
     {
-        printf("inside getOpIndex While loop, i:%d\n", i);
 
         if (strcmp(operations[i].keyword, s) == 0)
             return i;
         i++;
     }
-    printf("inside getOpIndex end of function line 28\n");
     return -1;
 }

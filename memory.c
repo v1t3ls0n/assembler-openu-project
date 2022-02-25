@@ -32,7 +32,7 @@ int writeToMemory(Word *word, DataType type)
     else
         writeIntoDataStack(word);
 
-    return True;
+    return type == Code ? IC : DC;
 }
 
 void writeIntoCodeStack(Word *word)

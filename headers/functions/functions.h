@@ -58,13 +58,13 @@ HexWord *dec2Bin2sComplement(int n);
 /* --------------------------------------------In parse.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 int parseSingleLine(char *line, int lineNumber);
-int handleState(char *token, ParseState state);
+int handleState(char *token, char *line, ParseState state);
 int handleOperation(Operation *op, char *operands, char *line);
 int handleInstruction(int type, char *labelName, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);
 int isOperation(char *s);
-int isInstruction(char *s);
+int getInstructionType(char *s);
 char *getInstructionName(char *s);
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand);
 void updateMemoryCounters();
