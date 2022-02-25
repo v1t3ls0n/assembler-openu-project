@@ -18,7 +18,10 @@ int main()
         currentError = none;
     }
 
-    /*
+    return 0;
+}
+
+/*
     HexWord *singleWord[16];
 
         int lineNumber = 2;
@@ -46,9 +49,6 @@ int main()
     printSymbolTable();
 
      */
-
-    return 0;
-}
 /*
 
 Errors in parse.c:
