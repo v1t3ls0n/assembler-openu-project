@@ -36,7 +36,7 @@ Item *install(char *name, ItemType type)
 
     verifyLabelNaming(name);
     if (globalState == collectErrors)
-        NULL;
+        return NULL;
     if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
     {
         np = (Item *)malloc(sizeof(Item *));
