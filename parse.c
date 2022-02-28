@@ -11,7 +11,26 @@ extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, 
 extern Item *findOrAddSymbol(char *name, ItemType);
 extern Item *findSymbol(char *name, ItemType type);
 
+extern void increaseDataCounter(int amount);
+extern void inceaseInstructionCounter(int amount);
+
 Bit binaryWord[BINARY_WORD_SIZE] = {0};
+
+/*
+                  IC -> 10
+DC = Data Counter IC = Instruction counter
+1 - comment -> skip
+2 -> empty -> skip
+3 -> error in line -> print specific error, change globalState to collect error, skip line
+4 -> label or instruction -> check next token -> ? x: .data 3,3,5,67,7 DC
+A) label is data/string/entry/external -> addSymbol(x, DC)
+-> if(globalState == firstRun) upadteDataCounter(someWordAmount)
+-> if(globalState == secondRun)writeToMemory(value=3,Data)
+B) label is operation -> addSymbol(labelName, IC) ->
+-> if(globalState == firstRun) upadteOperationCounter(someWordAmount)
+-> if(globalState == secondRun) writeToMemory(word,Code) for each word of operation
+
+*/
 
 int parseSingleLine(char *line, int lineNumber)
 {
@@ -220,10 +239,11 @@ char *getInstructionName(char *s)
         return EXTERNAL;
     return 0;
 }
-
+/*
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand)
 {
 
     return 0;
 }
 void updateMemoryCounters() {}
+*/

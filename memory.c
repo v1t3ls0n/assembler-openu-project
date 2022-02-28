@@ -10,9 +10,9 @@ extern Item *macros[HASHSIZE];
 extern Operation operations[OP_SIZE];
 
 unsigned static IC = MEMORY_START;
-unsigned static DC = MEMORY_START + 1;
-unsigned static ICF = MEMORY_START;
-unsigned static DCF = MEMORY_START + 1;
+unsigned static DC = 0;
+unsigned static ICF = 0;
+unsigned static DCF = 0;
 
 MemoryStack *codeMemoryStack, *dataMemoryStack;
 
@@ -44,7 +44,10 @@ void writeIntoCodeStack(Word *word)
         codeMemoryStack->tail = word;
     }
     else
+    {
         codeMemoryStack->tail = word;
+        codeMemoryStack->tail->next = NULL;
+    }
 
     IC++;
 }
@@ -57,7 +60,10 @@ void writeIntoDataStack(Word *word)
         dataMemoryStack->tail = word;
     }
     else
+    {
         dataMemoryStack->tail = word;
+        dataMemoryStack->tail->next = NULL;
+    }
 
     DC++;
 }
@@ -92,7 +98,7 @@ void updateDataEntry(Item *p)
 
 void increaseDataCounter(int amount)
 {
-    DC += amount;
+    DCF = DC += amount;
 }
 void inceaseInstructionCounter(int amount)
 {
@@ -101,7 +107,9 @@ void inceaseInstructionCounter(int amount)
 
 void resetCounters()
 {
+
     ICF = IC;
-    DCF = ICF + 1;
+    DCF = ICF + DC;
+    DC = IC + 1;
     IC = MEMORY_START;
 }
