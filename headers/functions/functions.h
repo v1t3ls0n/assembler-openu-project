@@ -29,10 +29,12 @@ void printSymbolItem(Item *item);
 Item *findOrAddSymbol(char *name, ItemType type);
 Item *findSymbol(char *name, ItemType type);
 Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-void updateSymbol(char *name, int newValue);
+Item *updateSymbolAddressValue(char *name, int newValue);
+Item *updateSymbolAttribute(char *name, int attribute);
 char *getMacroCodeValue(char *s);
-void addMacro(char *name, char *code);
-void verifyLabelNaming(char *s);
+Item *addMacro(char *name, char *code);
+Bool verifyLabelNaming(char *s);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -66,6 +68,7 @@ int isLabel(char *s);
 int isOperation(char *s);
 int getInstructionType(char *s);
 char *getInstructionName(char *s);
+char *getInstructionNameByType(int type);
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand);
 void updateMemoryCounters();
 /*---------------------------------------------------------------------------------------------------------------*/

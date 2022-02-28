@@ -11,13 +11,17 @@ extern HexWord *dec2Bin2sComplement(int n);
 int main()
 {
     int lineNumber = 1;
-    if (!parseSingleLine("x:            .data          3        ", lineNumber))
-    {
-        globalState = collectErrors;
-        yieldError(currentError, lineNumber);
-        currentError = none;
-    }
-
+    parseSingleLine("x:            .data          3        ", ++lineNumber);
+    parseSingleLine("y:            .data          5,,56,        ", ++lineNumber);
+    parseSingleLine("str:            .string          \"abcd\"        ", ++lineNumber);
+    /*
+        parseSingleLine(";", ++lineNumber);
+        parseSingleLine("                   ", ++lineNumber);
+        parseSingleLine("mov x,r2", ++lineNumber);
+        parseSingleLine(".entry k", ++lineNumber);
+        parseSingleLine("k:            .data         1,2,3       ", ++lineNumber);
+        parseSingleLine("sababa:            .string    \"abcd\"       ", ++lineNumber);
+    */
     return 0;
 }
 
