@@ -2,20 +2,20 @@
 /* Shared global State variables*/
 extern State globalState;
 extern Error currentError;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
+
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
 extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Item *findOrAddSymbol(char *name, ItemType);
 extern Item *findSymbol(char *name, ItemType type);
-
+extern Item *updateSymbolAttribute(char *name, int type);
+extern Item *updateSymbolAddressValue(char *name, int newValue);
 extern void increaseDataCounter(int amount);
 extern void inceaseInstructionCounter(int amount);
-extern Item *updateSymbolAttribute(char *name, int type);
-Bit binaryWord[BINARY_WORD_SIZE] = {0};
-
+extern unsigned getDC();
+extern unsigned getIC();
+void addNumberToMemory(int number);
 /*
                   IC -> 10
 DC = Data Counter IC = Instruction counter
@@ -43,7 +43,7 @@ int parseSingleLine(char *line, int lineNumber)
 
     printf("\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n\n", line, lineNumber);
 
-    while (token != NULL)
+    while (token != NULL && state != lineParsedSuccessfully)
     {
         if (state == newLine)
             state = handleState(token, p, state);
@@ -69,13 +69,9 @@ int parseSingleLine(char *line, int lineNumber)
         {
             globalState = collectErrors;
             yieldError(currentError, lineNumber);
-            return False;
         }
         case skipLine:
-            return True;
-
-        case True:
-            return True;
+            state = lineParsedSuccessfully;
 
         default:
             break;
@@ -83,8 +79,9 @@ int parseSingleLine(char *line, int lineNumber)
 
         token = strtok(NULL, " \t \n");
     }
-
-    return True;
+    free(p);
+    free(token);
+    return state == lineParsedSuccessfully ? True : False;
 }
 
 int handleState(char *token, char *line, ParseState state)
@@ -133,47 +130,20 @@ int handleOperation(Operation *op, char *operands, char *line)
 int handleInstruction(int type, char *label, char *nextTokens)
 {
 
-    Item *p = findOrAddSymbol(label, Symbol);
     printf("inside handle Instruction\ntype:%s\nlabelName:%s\nvalue:%s\n", getInstructionNameByType(type), label, nextTokens);
 
-    if (p == NULL)
+    if (findOrAddSymbol(label, Symbol) == NULL || updateSymbolAttribute(label, type) == NULL)
         return printError;
 
     if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
-        return updateSymbolAttribute(label, type) != NULL ? True : printError;
+        return lineParsedSuccessfully;
+    if (type == _TYPE_CODE && updateSymbolAddressValue(label, getIC()) != NULL)
+        return lineParsedSuccessfully;
 
-    else
-    {
-        if (type == _TYPE_DATA)
-        {
-            int number;
-            char *str = calloc(strlen(nextTokens), sizeof(char *));
-            while ((sscanf(nextTokens, "%d%s", &number, str)) > 0)
-            {
+    if ((type == _TYPE_DATA || type == _TYPE_STRING) && updateSymbolAddressValue(label, getDC()) != NULL)
+        return type == _TYPE_DATA ? handleInstructionDataArgs(nextTokens) : handleInstructionStringArgs(nextTokens);
 
-                printf("token:%s\ninteger number is:%d\n", str, number);
-            }
-
-            /*
-            Word *newWord = NULL;
-            memoryAddress = writeToMemory(newWord, Data);*/
-        }
-        else if (type == _TYPE_STRING)
-        {
-        }
-    }
-    /*
-        if (type == _TYPE_DATA || type == _TYPE_STRING)
-            {
-                    int memoryAddress;
-    Word *newWord = NULL;
-                memoryAddress = writeToMemory(newWord, Data);
-                }
-
-    printf("inside handle Instruction\ntype:%s\nlabelName:%s\nvalue:%s\n", getInstructionNameByType(type), label, nextTokens);
-
-    */
-    return True;
+    return printError;
 }
 
 int handleLabel(char *labelName, char *nextToken, char *line)
@@ -202,7 +172,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
         else if (getOpIndex(nextToken) != -1)
         {
             Word *new = calloc(1, sizeof(Word *));
-            new->value.hex = generateFirstWordEncodedHex(getOperationByIndex(opIndex));
+            new->value->hex = generateFirstWordEncodedHex(getOperationByIndex(opIndex));
             memoryAddress = writeToMemory(new, Code);
             if ((addSymbol(labelName, memoryAddress, 1, 0, 0, 0)) != NULL)
                 return handleOperation(getOperationByIndex(opIndex), nextToken, line);
@@ -282,11 +252,49 @@ char *getInstructionNameByType(int type)
     return "NOT AN INSTRUCTION!";
 }
 
-/*
+int handleInstructionDataArgs(char *token)
+{
+
+    int number = 0;
+
+    printf("Inside handleInstructionDataArgs\n");
+
+    while (token)
+    {
+        if (!isdigit(token[0]))
+        {
+            currentError = illegalApearenceOfCharactersOnLine;
+            return printError;
+        }
+
+        sscanf(token, "%d", &number);
+        /*   printf("token:%s number:%d\n", token, number);
+           addNumberToMemory(number);
+           */
+        if (token[strlen(token) - 1] != ',')
+        {
+            token = strtok(NULL, " \t \n");
+            if (token != NULL && (token[0] != ',' || strlen(token) > 1))
+            {
+                currentError = expectedSingleCommaCharacter;
+                return printError;
+            }
+        }
+
+        token = strtok(NULL, " \t \n");
+    }
+
+    return lineParsedSuccessfully;
+}
+
+int handleInstructionStringArgs(char *tokens)
+{
+    printf("Inside handleInstructionStringArgs, tokens:%s\n", tokens);
+
+    return lineParsedSuccessfully;
+}
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand)
 {
 
     return 0;
 }
-void updateMemoryCounters() {}
-*/

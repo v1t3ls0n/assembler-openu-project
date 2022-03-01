@@ -42,9 +42,11 @@ Bool verifyLabelNaming(char *s);
 
 void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
-HexWord *encodeIntNum(int num);
+HexWord *convertNumToHexWord(int num);
+BinaryWord *convertNumberToBinaryWord(int num);
 char *generateFirstWordEncodedToBinary(Operation *op);
 HexWord *generateFirstWordEncodedHex(Operation *op);
+Word *convertNumberToWord(int n, EncodingFormat format);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -53,7 +55,7 @@ HexWord *generateFirstWordEncodedHex(Operation *op);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-HexWord *dec2Bin2sComplement(int n);
+unsigned char dec2Bin2sComplement(int n);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -70,7 +72,8 @@ int getInstructionType(char *s);
 char *getInstructionName(char *s);
 char *getInstructionNameByType(int type);
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand);
-void updateMemoryCounters();
+int handleInstructionDataArgs(char *tokens);
+int handleInstructionStringArgs(char *tokens);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
@@ -83,3 +86,7 @@ void updateDataEntry(Item *p);
 void increaseDataCounter(int amount);
 void inceaseInstructionCounter(int amount);
 void resetCounters();
+unsigned getDC();
+unsigned getIC();
+void printMemoryStacks(EncodingFormat format);
+void addNumberToMemory(int number);

@@ -4,10 +4,12 @@ typedef struct
 {
     unsigned int on : 1;
 } Bit;
+
 typedef struct
 {
-    Bit digit[20];
+    Bit digit[BINARY_WORD_SIZE];
 } BinaryWord;
+
 typedef struct
 {
     unsigned int _A : 4;
@@ -23,7 +25,7 @@ typedef struct
     {
         HexWord *hex;
         BinaryWord *binary;
-    } value;
+    } * value;
     void *next;
 } Word;
 

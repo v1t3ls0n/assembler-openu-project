@@ -170,6 +170,8 @@ Item *updateSymbolAddressValue(char *name, int newValue)
         p->val.s.offset = offset;
         p->val.s.base = base;
         p->val.s.value = newValue;
+        printf("updated adrress values for \"%s\" successfully to the symbol table!:)\n", name);
+        printSymbolTable();
     }
     else
         currentError = symbolDoesNotExist;
@@ -198,6 +200,8 @@ Item *updateSymbolAttribute(char *name, int type)
                 p->val.s.attrs.external = 1;
             else if (type == _TYPE_CODE)
                 p->val.s.attrs.code = 1;
+            printf("updated \"%s\" attributes successfully to the symbol table!:)\n", name);
+            printSymbolTable();
         }
     }
     else

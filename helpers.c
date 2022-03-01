@@ -1,5 +1,5 @@
 #include "data.h"
-extern HexWord *encodeIntNum(int num);
+extern HexWord *convertNumToHexWord(int num);
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -11,7 +11,7 @@ char *decToHex(int num)
     return hex;
 }
 
-HexWord *dec2Bin2sComplement(int n)
+unsigned char dec2Bin2sComplement(int n)
 {
     /*
     Function converts decimal integer to binary/hex representation in a 2'Complement
@@ -26,7 +26,7 @@ HexWord *dec2Bin2sComplement(int n)
     result = n;
     result = ~result;
     result++;
-    return encodeIntNum(result);
+    return result;
 }
 
 char *hexToBin(char *hex)

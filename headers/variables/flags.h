@@ -27,7 +27,11 @@ typedef enum
     maxLineLengthExceeded,
     emptyLabelDecleration,
     none,
-    noErrors
+    noErrors,
+    expectedIntegerNumber,
+    expectedSingleCommaCharacter,
+    expectedBlank,
+    expectedQuotes
 } Error;
 
 typedef enum
@@ -50,6 +54,9 @@ typedef enum
     parseInstruction,
     parseOperation,
     printError,
+    returnFalse,
+    lineParsedSuccessfully,
+    parsingLine,
 
     parseDataVariable,
     parseStringVariable,
@@ -59,14 +66,15 @@ typedef enum
     parseSourceOperand,
     parseDestinationOperand,
 
-    expectNewline,
-    expectNumber,
-    expectComma,
-    expectBlank,
-    expectQuotes
+    expectNewline
 
 } ParseState;
 
+typedef enum
+{
+    Binary,
+    Hexadecimal
+} EncodingFormat;
 typedef enum
 {
     False = 0,
