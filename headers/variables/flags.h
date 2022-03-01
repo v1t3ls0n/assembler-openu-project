@@ -24,6 +24,7 @@ typedef enum
     wrongInstructionSyntaxExtraCommas,
     wrongInstructionSyntaxMissinQuotes,
     illegalApearenceOfCharactersOnLine,
+    illegalApearenceOfExtraCharactersOnLine,
     maxLineLengthExceeded,
     emptyLabelDecleration,
     none,
@@ -31,6 +32,7 @@ typedef enum
     expectedIntegerNumber,
     expectedSingleCommaCharacter,
     expectedBlank,
+
     expectedQuotes
 } Error;
 
