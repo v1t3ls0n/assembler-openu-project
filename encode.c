@@ -66,7 +66,7 @@ HexWord *convertNumToHexWord(int num)
 
     printf("inside convertNumToHexWord, buf:%s\n", buf);
 
-    while (i < strlen(buf))
+    while (i < 5)
     {
         if (i == 0)
             newHex->_A = i < strlen(buf) ? hex2int(buf[i]) : 0;

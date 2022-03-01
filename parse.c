@@ -129,18 +129,15 @@ int handleOperation(Operation *op, char *operands, char *line)
 
 int handleInstruction(int type, char *label, char *nextTokens)
 {
-
     printf("inside handle Instruction\ntype:%s\nlabelName:%s\nvalue:%s\n", getInstructionNameByType(type), label, nextTokens);
 
-    if (findOrAddSymbol(label, Symbol) == NULL || updateSymbolAttribute(label, type) == NULL)
+    if (!findOrAddSymbol(label, Symbol) || !updateSymbolAttribute(label, type))
         return printError;
 
     if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         return lineParsedSuccessfully;
-    if (type == _TYPE_CODE && updateSymbolAddressValue(label, getIC()) != NULL)
-        return lineParsedSuccessfully;
 
-    if ((type == _TYPE_DATA || type == _TYPE_STRING) && updateSymbolAddressValue(label, getDC()) != NULL)
+    else if ((type == _TYPE_DATA || type == _TYPE_STRING) && updateSymbolAddressValue(label, getDC()))
         return type == _TYPE_DATA ? handleInstructionDataArgs(nextTokens) : handleInstructionStringArgs(nextTokens);
 
     return printError;
@@ -256,9 +253,8 @@ int handleInstructionDataArgs(char *token)
 {
 
     int number = 0;
-
+    int counter = 0;
     printf("Inside handleInstructionDataArgs\n");
-
     while (token)
     {
         if (!isdigit(token[0]))
@@ -268,9 +264,12 @@ int handleInstructionDataArgs(char *token)
         }
 
         sscanf(token, "%d", &number);
-        /*   printf("token:%s number:%d\n", token, number);
-           addNumberToMemory(number);
-           */
+
+        if (globalState == secondRun)
+            addNumberToMemory(number);
+        else
+            counter++;
+
         if (token[strlen(token) - 1] != ',')
         {
             token = strtok(NULL, " \t \n");
@@ -284,12 +283,13 @@ int handleInstructionDataArgs(char *token)
         token = strtok(NULL, " \t \n");
     }
 
+    increaseDataCounter(counter);
     return lineParsedSuccessfully;
 }
 
-int handleInstructionStringArgs(char *tokens)
+int handleInstructionStringArgs(char *token)
 {
-    printf("Inside handleInstructionStringArgs, tokens:%s\n", tokens);
+    printf("Inside handleInstructionStringArgs, tokens:%s\n", token);
 
     return lineParsedSuccessfully;
 }
