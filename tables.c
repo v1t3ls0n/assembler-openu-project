@@ -32,11 +32,10 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     int nameLength = strlen(name);
-    name[strlen(name) - 1] = '\0'; /*cleaning the label token from the last : character as we should do before we try to add it to the symbol table.     */
+    if (!verifyLabelNaming(name))
 
-    verifyLabelNaming(name);
-    if (globalState == collectErrors)
-        NULL;
+        return NULL;
+
     if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
     {
         np = (Item *)malloc(sizeof(Item *));
@@ -45,7 +44,6 @@ Item *install(char *name, ItemType type)
         np->name[nameLength] = '\0';
         if (np == NULL || np->name == NULL)
         {
-            globalState = collectErrors;
             currentError = memoryAllocationFailure;
             return NULL;
         }
@@ -63,7 +61,6 @@ Item *install(char *name, ItemType type)
     */
     else
     {
-        globalState = collectErrors;
         currentError = type == Macro ? illegalMacroNameAlreadyInUse : illegalSymbolNameAlreadyInUse;
         return NULL;
     }
@@ -88,28 +85,34 @@ void printSymbolTable()
 void printSymbolItem(Item *item)
 {
     printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
-    if ((item->val.s.attrs.code || item->val.s.attrs.data) && (item->val.s.attrs.entry || item->val.s.attrs.external))
-    {
-        if (item->val.s.attrs.code)
-            printf("code,");
-        else
-            printf("data,");
+    if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
+        printf("   ");
 
-        if (item->val.s.attrs.entry)
-            printf("entry");
-        else
-            printf("external");
-    }
     else
     {
-        if (item->val.s.attrs.code)
-            printf("code");
-        else if (item->val.s.attrs.data)
-            printf("data");
-        else if (item->val.s.attrs.entry)
-            printf("entry");
+        if ((item->val.s.attrs.code || item->val.s.attrs.data) && (item->val.s.attrs.entry || item->val.s.attrs.external))
+        {
+            if (item->val.s.attrs.code)
+                printf("code,");
+            else
+                printf("data,");
+
+            if (item->val.s.attrs.entry)
+                printf("entry");
+            else
+                printf("external");
+        }
         else
-            printf("external");
+        {
+            if (item->val.s.attrs.code)
+                printf("code");
+            else if (item->val.s.attrs.data)
+                printf("data");
+            else if (item->val.s.attrs.entry)
+                printf("entry");
+            else
+                printf("external");
+        }
     }
 
     if (item->next != NULL)
@@ -122,7 +125,7 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
     unsigned base;
     unsigned offset;
     p = install(name, Symbol);
-    if (globalState != collectErrors)
+    if (p != NULL)
     {
         offset = value % 16;
         base = value - offset;
@@ -135,10 +138,9 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
         p->val.s.attrs.data = isData ? 1 : 0;
         printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
         printSymbolTable();
-        return p;
     }
 
-    return NULL;
+    return p;
 }
 
 Item *findOrAddSymbol(char *name, ItemType type)
@@ -147,16 +149,17 @@ Item *findOrAddSymbol(char *name, ItemType type)
     if (p != NULL)
         return p;
     else
-        return install(name, type);
+        return addSymbol(name, 0, 0, 0, 0, 0);
 }
 
 Item *findSymbol(char *name, ItemType type)
 {
     return lookup(name, type);
 }
-void updateSymbol(char *name, int newValue)
+
+Item *updateSymbolAddressValue(char *name, int newValue)
 {
-    Item *p = lookup(name, Symbol);
+    Item *p = findSymbol(name, Symbol);
     unsigned base;
     unsigned offset;
 
@@ -167,12 +170,44 @@ void updateSymbol(char *name, int newValue)
         p->val.s.offset = offset;
         p->val.s.base = base;
         p->val.s.value = newValue;
+        printf("updated adrress values for \"%s\" successfully to the symbol table!:)\n", name);
+        printSymbolTable();
     }
     else
-    {
-        globalState = collectErrors;
         currentError = symbolDoesNotExist;
+
+    return p;
+}
+
+Item *updateSymbolAttribute(char *name, int type)
+{
+    Item *p = findSymbol(name, Symbol);
+
+    if (p != NULL)
+    {
+        if (((type == _TYPE_DATA || type == _TYPE_STRING) && p->val.s.attrs.code) || (type == _TYPE_CODE && p->val.s.attrs.data) || ((type == _TYPE_ENTRY) && p->val.s.attrs.external) || (type == _TYPE_EXTERNAL && p->val.s.attrs.entry))
+        {
+            currentError = symbolCannotBeBothCurrentTypeAndRequestedType;
+            return NULL;
+        }
+        else
+        {
+            if (type == _TYPE_DATA || type == _TYPE_STRING)
+                p->val.s.attrs.data = 1;
+            else if (type == _TYPE_ENTRY)
+                p->val.s.attrs.entry = 1;
+            else if (type == _TYPE_EXTERNAL)
+                p->val.s.attrs.external = 1;
+            else if (type == _TYPE_CODE)
+                p->val.s.attrs.code = 1;
+            printf("updated \"%s\" attributes successfully to the symbol table!:)\n", name);
+            printSymbolTable();
+        }
     }
+    else
+        currentError = symbolDoesNotExist;
+
+    return p;
 }
 
 char *getMacroCodeValue(char *s)
@@ -181,22 +216,21 @@ char *getMacroCodeValue(char *s)
     if (result != NULL)
         return strdup(result->val.m.code);
     else
-    {
-        globalState = collectErrors;
         currentError = macroDoesNotExist;
-    }
 
     return NULL;
 }
 
-void addMacro(char *name, char *code)
+Item *addMacro(char *name, char *code)
 {
     Item *item = install(name, Macro);
-    if (globalState != collectErrors)
+    if (item != NULL)
         item->val.m.code = strdup(code);
+
+    return item;
 }
 
-void verifyLabelNaming(char *s)
+Bool verifyLabelNaming(char *s)
 {
     int i = 0;
     const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
@@ -205,59 +239,56 @@ void verifyLabelNaming(char *s)
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
     {
-        globalState = collectErrors;
         currentError = illegalLabelNameUseOfCharacters;
-        return;
+        return False;
     }
 
     /* maximum label name length is 31 characters */
     if (strlen(s) > MAX_LABEL_LEN)
     {
-        globalState = collectErrors;
         currentError = illegalLabelNameLength;
-        return;
+        return False;
     }
-    if (globalState != collectErrors)
+
+    if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
     {
-        if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+        while (i < REGS_SIZE)
         {
-            while (i < REGS_SIZE && globalState != collectErrors)
+            if ((strcmp(regs[i], s) == 0))
             {
-                if ((strcmp(regs[i], s) == 0))
-                {
-                    currentError = illegalLabelNameUseOfSavedKeywords;
-                    globalState = collectErrors;
-                }
-                i++;
+                currentError = illegalLabelNameUseOfSavedKeywords;
+                return False;
             }
-        }
-
-        else if ((labelLength >= 3 && labelLength <= 4))
-        {
-            while (i < OP_SIZE && globalState != collectErrors)
-            {
-                if ((strcmp(operations[i].keyword, s) == 0))
-                {
-                    currentError = illegalLabelNameUseOfSavedKeywords;
-                    globalState = collectErrors;
-                    return;
-                }
-                i++;
-            }
-        }
-        else
-        {
-
-            while (i < labelLength && globalState != collectErrors)
-            {
-                if (!isalnum(s[i]))
-                {
-                    currentError = illegalLabelNameUseOfCharacters;
-                    globalState = collectErrors;
-                    return;
-                }
-                i++;
-            }
+            i++;
         }
     }
+
+    else if ((labelLength >= 3 && labelLength <= 4))
+    {
+        while (i < OP_SIZE)
+        {
+            if ((strcmp(operations[i].keyword, s) == 0))
+            {
+                currentError = illegalLabelNameUseOfSavedKeywords;
+                return False;
+            }
+            i++;
+        }
+    }
+    else
+    {
+
+        while (i < labelLength)
+        {
+            if (!isalnum(s[i]))
+            {
+                currentError = illegalLabelNameUseOfCharacters;
+
+                return False;
+            }
+            i++;
+        }
+    }
+
+    return True;
 }

@@ -4,6 +4,7 @@ extern Operation operations[OP_SIZE];
 extern char *decToHex(int num);
 extern char *hexToBin(char *hex);
 extern void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
+extern unsigned char dec2Bin2sComplement(int n);
 
 char *generateFirstWordEncodedToBinary(Operation *operation)
 {
@@ -24,19 +25,63 @@ HexWord *generateFirstWordEncodedHex(Operation *operation)
     return newWord;
 }
 
-HexWord *encodeIntNum(int num)
+Word *convertNumberToWord(int n, EncodingFormat format)
 {
-    char *buf;
-    HexWord *newWord;
-    newWord = (HexWord *)malloc(1 * sizeof(HexWord *));
-    buf = decToHex(num);
-    newWord->_A = buf[0] ? hex2int(buf[0]) : '0';
-    newWord->_B = buf[1] ? hex2int(buf[1]) : '0';
-    newWord->_C = buf[2] ? hex2int(buf[2]) : '0';
-    newWord->_D = buf[3] ? hex2int(buf[3]) : '0';
-    newWord->_E = buf[4] ? hex2int(buf[4]) : '0';
+    Word *w = (Word *)malloc(sizeof(Word *));
+    if (n < 0)
+        n = dec2Bin2sComplement(n);
+
+    if (format == Binary)
+        w->value->binary = convertNumberToBinaryWord(n);
+    if (format == Hexadecimal)
+        w->value->hex = convertNumToHexWord(n);
+
+    w->next = NULL;
+
+    printf("inside convert number to word last line\n");
+    return w;
+}
+
+BinaryWord *convertNumberToBinaryWord(int num)
+{
+    BinaryWord *newBinary = (BinaryWord *)malloc(sizeof(BinaryWord *));
+    char *buf = hexToBin(decToHex(num));
+    int i = BINARY_WORD_SIZE - 1;
+    int j = strlen(buf);
+    printf("inside convertNumberToBinaryWord, binary is:%s\n", buf);
+    while (j > 0)
+    {
+        newBinary->digit[i].on = buf[j] == '1' ? 1 : 0;
+        j--;
+        i++;
+    }
     free(buf);
-    return newWord;
+    return newBinary;
+}
+HexWord *convertNumToHexWord(int num)
+{
+    int i = 0;
+    char *buf = decToHex(num);
+    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord *));
+
+    printf("inside convertNumToHexWord, buf:%s\n", buf);
+
+    while (i < 5)
+    {
+        if (i == 0)
+            newHex->_A = i < strlen(buf) ? hex2int(buf[i]) : 0;
+        if (i == 1)
+            newHex->_B = i < strlen(buf) ? hex2int(buf[i]) : 0;
+        if (i == 2)
+            newHex->_C = i < strlen(buf) ? hex2int(buf[i]) : 0;
+        if (i == 3)
+            newHex->_D = i < strlen(buf) ? hex2int(buf[i]) : 0;
+        if (i == 4)
+            newHex->_E = i < strlen(buf) ? hex2int(buf[i]) : 0;
+        i++;
+    }
+    free(buf);
+    return newHex;
 }
 
 void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF)

@@ -40,3 +40,4 @@
 #define _TYPE_STRING -22
 #define _TYPE_ENTRY -33
 #define _TYPE_EXTERNAL -44
+#define _TYPE_CODE -55

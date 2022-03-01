@@ -8,16 +8,27 @@ extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
+extern Word *convertNumberToWord(int n, EncodingFormat format);
 
 unsigned static IC = MEMORY_START;
-unsigned static DC = MEMORY_START + 1;
-unsigned static ICF = MEMORY_START;
-unsigned static DCF = MEMORY_START + 1;
+unsigned static DC = 0;
+unsigned static ICF = 0;
+unsigned static DCF = 0;
 
-MemoryStack *codeMemoryStack, *dataMemoryStack;
+MemoryStack *codeMemoryStack;
+MemoryStack *dataMemoryStack;
+
+void addNumberToMemory(int number)
+{
+    Word *new;
+    printf("inside addNumberToMemory\n");
+    new = convertNumberToWord(number, Binary);
+    writeToMemory(new, Data);
+}
 
 int writeToMemory(Word *word, DataType type)
 {
+    printf("inside writeToMemory\n");
 
     if (DC + IC > 8191)
     {
@@ -38,26 +49,40 @@ int writeToMemory(Word *word, DataType type)
 void writeIntoCodeStack(Word *word)
 {
 
-    if (codeMemoryStack->head == NULL)
+    if (codeMemoryStack == NULL)
     {
+        codeMemoryStack = calloc(1, sizeof(MemoryStack *));
         codeMemoryStack->head = word;
         codeMemoryStack->tail = word;
     }
     else
+    {
+        codeMemoryStack->tail->next = word;
         codeMemoryStack->tail = word;
+    }
 
     IC++;
 }
 
 void writeIntoDataStack(Word *word)
 {
-    if (dataMemoryStack->head == NULL)
+    printf("inside write into data stack\n");
+    if (dataMemoryStack == NULL)
     {
+        printf("in line 71\n");
+
+        dataMemoryStack->head = calloc(1, sizeof(Word *));
+        dataMemoryStack->tail = calloc(1, sizeof(Word *));
+
         dataMemoryStack->head = word;
         dataMemoryStack->tail = word;
     }
     else
+    {
+        dataMemoryStack->tail->next = calloc(1, sizeof(Word *));
+        dataMemoryStack->tail->next = &word;
         dataMemoryStack->tail = word;
+    }
 
     DC++;
 }
@@ -90,18 +115,44 @@ void updateDataEntry(Item *p)
         updateDataEntry(p->next);
 }
 
+unsigned getDC() { return DC; }
+unsigned getIC() { return IC; }
+
 void increaseDataCounter(int amount)
 {
-    DC += amount;
+    DCF = DC += amount;
 }
 void inceaseInstructionCounter(int amount)
 {
     ICF = IC += amount;
 }
 
+void printMemoryStacks(EncodingFormat format)
+{
+
+    Word *dataImgP = dataMemoryStack->head;
+
+    if (format == Binary)
+    {
+        int i = 0;
+        printf("Data Image Binary:\n");
+        while (dataImgP != NULL)
+        {
+            while (i < BINARY_WORD_SIZE)
+            {
+                printf("%c", dataImgP->value->binary->digit[i].on ? '1' : '0');
+            }
+            printf("\n");
+            dataImgP = dataImgP->next;
+        }
+    }
+}
+
 void resetCounters()
 {
+
     ICF = IC;
-    DCF = ICF + 1;
+    DCF = ICF + DC;
+    DC = IC + 1;
     IC = MEMORY_START;
 }

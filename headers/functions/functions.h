@@ -29,10 +29,12 @@ void printSymbolItem(Item *item);
 Item *findOrAddSymbol(char *name, ItemType type);
 Item *findSymbol(char *name, ItemType type);
 Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-void updateSymbol(char *name, int newValue);
+Item *updateSymbolAddressValue(char *name, int newValue);
+Item *updateSymbolAttribute(char *name, int attribute);
 char *getMacroCodeValue(char *s);
-void addMacro(char *name, char *code);
-void verifyLabelNaming(char *s);
+Item *addMacro(char *name, char *code);
+Bool verifyLabelNaming(char *s);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -40,9 +42,11 @@ void verifyLabelNaming(char *s);
 
 void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
-HexWord *encodeIntNum(int num);
+HexWord *convertNumToHexWord(int num);
+BinaryWord *convertNumberToBinaryWord(int num);
 char *generateFirstWordEncodedToBinary(Operation *op);
 HexWord *generateFirstWordEncodedHex(Operation *op);
+Word *convertNumberToWord(int n, EncodingFormat format);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -51,7 +55,7 @@ HexWord *generateFirstWordEncodedHex(Operation *op);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-HexWord *dec2Bin2sComplement(int n);
+unsigned char dec2Bin2sComplement(int n);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -66,8 +70,10 @@ int isLabel(char *s);
 int isOperation(char *s);
 int getInstructionType(char *s);
 char *getInstructionName(char *s);
+char *getInstructionNameByType(int type);
 int calcLineMemoryUsage(Operation *op, char *srcOperand, char *desOperand);
-void updateMemoryCounters();
+int handleInstructionDataArgs(char *tokens);
+int handleInstructionStringArgs(char *tokens);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
@@ -80,3 +86,7 @@ void updateDataEntry(Item *p);
 void increaseDataCounter(int amount);
 void inceaseInstructionCounter(int amount);
 void resetCounters();
+unsigned getDC();
+unsigned getIC();
+void printMemoryStacks(EncodingFormat format);
+void addNumberToMemory(int number);
