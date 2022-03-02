@@ -27,7 +27,7 @@ void parseSingleLine(char *line)
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
 
-    printf("\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n\n", line, currentLine);
+    printf("\n\n\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n", line, currentLine);
 
     while (token != NULL && state != lineParsedSuccessfully)
     {

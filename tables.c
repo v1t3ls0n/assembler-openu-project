@@ -139,6 +139,11 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
 
     if (p != NULL)
     {
+        if (!p->val.s.attrs.entry)
+            printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
+        else
+            printf("updated label entry with the name \"%s\" successfully to the symbol table!:)\n", name);
+
         offset = value % 16;
         base = value - offset;
         p->val.s.value = value;
@@ -148,11 +153,6 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
         p->val.s.attrs.entry = isEntry ? 1 : 0;
         p->val.s.attrs.external = isExternal ? 1 : 0;
         p->val.s.attrs.data = isData ? 1 : 0;
-
-        if (!p->val.s.attrs.entry)
-            printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
-        else
-            printf("updated label entry with the name \"%s\" successfully to the symbol table!:)\n", name);
 
         /* printSymbolTable();
          */
