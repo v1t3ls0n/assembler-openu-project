@@ -17,29 +17,53 @@ extern unsigned getDC();
 extern unsigned getIC();
 extern void addNumberToMemory(int number);
 
-void parseExpandedSourceFile(FILE *fp, char *filename)
+int parseExpandedSourceFile(FILE *fp, char *filename)
 {
+    int c = 0;
+    int i = 0;
+    char line[MAX_LINE_LEN + 1] = {0};
+    ParseState state = newLine;
+    while (((c = fgetc(fp)) != EOF) && globalState != collectErrors)
+    {
+
+        if (i >= MAX_LINE_LEN - 1 && c != '\n')
+        {
+            globalState = collectErrors;
+            return yieldError(maxLineLengthExceeded);
+        }
+
+        if (!isspace(c))
+            line[i++] = c;
+
+        if (c == '\n')
+        {
+            state = parseSingleLine(line, state);
+            memset(line, '\0', i);
+            i = 0;
+        }
+    }
+
+    return True;
 }
 
-void parseSingleLine(char *line)
+int parseSingleLine(char *line, ParseState state)
 {
-    ParseState state = newLine;
+
     int n = 0;
     char *p = calloc(strlen(line + 1), sizeof(char *));
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
-
+    if (state == newLine)
+        state = handleState(token, p, state);
     printf("\n\n\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n", line, currentLine);
-
-    while (token != NULL && state != lineParsedSuccessfully)
+    while (token != NULL)
     {
-        if (state == newLine)
-            state = handleState(token, p, state);
 
         switch (state)
         {
         case lineParsedSuccessfully:
+            state = True;
             break;
         case parseLabel:
         {
@@ -70,11 +94,14 @@ void parseSingleLine(char *line)
         }
 
         case Err:
+        {
             globalState = collectErrors;
+            state = Err;
             break;
+        }
 
         case skipLine:
-            state = lineParsedSuccessfully;
+            state = True;
 
         default:
             break;
@@ -85,7 +112,7 @@ void parseSingleLine(char *line)
     currentLine++;
     free(p);
     free(token);
-    /* return state == lineParsedSuccessfully ? True : False; */
+    return state;
 }
 
 int handleState(char *token, char *line, ParseState state)
