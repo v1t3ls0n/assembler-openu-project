@@ -5,7 +5,7 @@
 /* --------------------------------------------In errors.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void yieldError(Error err, int lineNumber);
+Bool yieldError(Error err);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -62,7 +62,7 @@ unsigned char dec2Bin2sComplement(int n);
 /* --------------------------------------------In parse.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 Bool isInstruction(char *s);
-int parseSingleLine(char *line, int lineNumber);
+void parseSingleLine(char *line);
 int handleState(char *token, char *line, ParseState state);
 int handleOperation(Operation *op, char *operands, char *line);
 int handleInstruction(int type, char *firstToken, char *nextTokens);

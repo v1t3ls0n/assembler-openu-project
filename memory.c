@@ -3,7 +3,6 @@
 #define MEMORY_START 100
 /* Shared global State variables*/
 extern State globalState;
-extern Error currentError;
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
@@ -32,9 +31,8 @@ int writeToMemory(Word *word, DataType type)
 
     if (DC + IC > 8191)
     {
-        globalState = collectErrors;
-        currentError = memoryAllocationFailure;
-        return False;
+        yieldError(memoryAllocationFailure);
+        return Err;
     }
 
     if (type == Code)

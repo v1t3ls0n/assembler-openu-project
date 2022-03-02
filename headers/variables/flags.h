@@ -50,26 +50,22 @@ typedef enum
 
 typedef enum
 {
-    skipLine,
-    newLine,
-    parseLabel,
-    parseInstruction,
-    parseOperation,
-    printError,
-    returnFalse,
-    lineParsedSuccessfully,
-    parsingLine,
-
-    parseDataVariable,
-    parseStringVariable,
-    parseEntryVariable,
-    parseExternalVariable,
-
-    parseSourceOperand,
-    parseDestinationOperand,
-
-    expectNewline
-
+    skipLine = 134,
+    newLine = 233,
+    parseLabel = 4364,
+    parseInstruction = 55,
+    parseOperation = 333,
+    returnFalse = 4678,
+    lineParsedSuccessfully = 23,
+    parsingLine = 112,
+    Err = 0,
+    parseDataVariables = 3,
+    parseStringVariables = 98,
+    parseEntryVariable = 97,
+    parseExternalVariable = 953,
+    parseSourceOperand = 77,
+    parseDestinationOperand = 93,
+    expectNewline = 92
 } ParseState;
 
 typedef enum
