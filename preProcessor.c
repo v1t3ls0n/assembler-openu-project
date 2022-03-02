@@ -8,7 +8,7 @@ void parseSourceFile(FILE *fp, char *filename)
     int c = 0;
     int start = 0, end = 1;
     char line[MAX_LINE_LEN + 1] = {0};
-    while ((c = fgetc(fp)) != NULL)
+    while ((c = fgetc(fp)) != EOF)
     {
 
         if (c == '\n')

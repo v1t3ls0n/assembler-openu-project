@@ -15,7 +15,11 @@ extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
-void addNumberToMemory(int number);
+extern void addNumberToMemory(int number);
+
+void parseExpandedSourceFile(FILE *fp, char *filename)
+{
+}
 
 void parseSingleLine(char *line)
 {

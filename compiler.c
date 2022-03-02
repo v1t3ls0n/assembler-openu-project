@@ -2,12 +2,13 @@
 /* Shared global State variables*/
 extern State globalState;
 extern void parseSourceFile(FILE *fp, char *filename);
+extern void parseExpandedSourceFile(FILE *fp, char *filename);
 
 int main(int argc, char *argv[])
 {
     FILE *fptr;
     char fileName[30] = {0};
-    int n, filesCount = argc - 1;
+    int filesCount = argc - 1;
     int i = 1;
 
     if (filesCount < 1)
@@ -23,11 +24,17 @@ int main(int argc, char *argv[])
             yieldError(fileCouldNotBeOpened);
         else
         {
-            parseSourceFile(fptr, argv[i]);
+            if (globalState == handleMacros)
+                parseSourceFile(fptr, argv[i]);
+
+            if (globalState == firstRun)
+                parseExpandedSourceFile(fptr, argv[i]);
+
             fclose(fptr);
         }
     }
 
+    printf("Finished Successfully!\n");
     return 0;
 }
 
@@ -46,9 +53,8 @@ int main(int argc, char *argv[])
     parseSingleLine("str:            .string          \"abcd\"        ");
     parseSingleLine("str2:            .string          \"AAADDDDDabcd\"        ");
     parseSingleLine("str3:            .string          \"FFFFFFFFAAADDDDDabcd\"        ");
-    /*
-        printSymbolTable();
-     */
 
-printf("Finished Successfully!\n");
-* /
+        printSymbolTable();
+
+
+*/

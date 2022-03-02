@@ -72,6 +72,7 @@ unsigned char dec2Bin2sComplement(int n);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In parse.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
+void parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 void parseSingleLine(char *line);
 int handleState(char *token, char *line, ParseState state);
