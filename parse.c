@@ -23,7 +23,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
-    while (((c = fgetc(fp)) != EOF) && globalState != collectErrors)
+    while (((c = fgetc(fp)) != EOF))
     {
 
         if (i >= MAX_LINE_LEN - 1 && c != '\n')
@@ -34,12 +34,18 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
         if (!isspace(c))
             line[i++] = c;
+        else
+        {
+            if (!isspace(line[i]))
+                line[i++] = ' ';
+        }
 
         if (c == '\n')
         {
-            state = parseSingleLine(line, state);
+            parseSingleLine(line, state);
             memset(line, '\0', i);
             i = 0;
+            state = newLine;
         }
     }
 

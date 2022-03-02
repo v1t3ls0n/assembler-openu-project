@@ -11,6 +11,9 @@ int main(int argc, char *argv[])
     printf("after macro state\n");
     handleSourceFiles(argc, argv);
     printf("Finished Successfully!\n");
+
+    /* printSymbolTable();
+     */
     return 0;
 }
 

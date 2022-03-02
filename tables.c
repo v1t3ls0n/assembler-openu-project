@@ -43,12 +43,23 @@ Item *install(char *name, ItemType type)
     {
         np = (Item *)malloc(sizeof(Item *));
         np->name = (char *)malloc(nameLength * sizeof(char));
-        memcpy(np->name, name, nameLength);
-        np->name[nameLength] = '\0';
         if (np == NULL || np->name == NULL)
         {
             yieldError(memoryAllocationFailure);
             return NULL;
+        }
+        memcpy(np->name, name, nameLength);
+        np->name[nameLength] = '\0';
+
+        if (type == Symbol)
+        {
+            np->val.s.attrs.code = 0;
+            np->val.s.attrs.entry = 0;
+            np->val.s.attrs.external = 0;
+            np->val.s.attrs.data = 0;
+            np->val.s.base = 0;
+            np->val.s.value = 0;
+            np->val.s.offset = 0;
         }
 
         np->next = (Item *)malloc(sizeof(Item *));
@@ -136,19 +147,21 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
     unsigned base;
     unsigned offset;
     Item *p = install(name, Symbol);
-
+    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
     if (p != NULL)
     {
-
-        if (p->val.s.attrs.external || p->val.s.attrs.entry)
+        if (p->val.s.attrs.external == 1 || p->val.s.attrs.entry)
         {
             if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
             {
+                printf("(p->val.s.attrs.external && (value || isCode || isData || isEntry))\n");
+
                 yieldError(illegalOverrideOfExternalSymbol);
                 return NULL;
             }
             else if (p->val.s.attrs.entry && (isCode || isExternal))
             {
+                printf("inside p->val.s.attrs.entry && (isCode || isExternal)\n");
                 yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
                 return NULL;
             }
