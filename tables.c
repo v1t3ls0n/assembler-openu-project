@@ -62,7 +62,7 @@ Item *install(char *name, ItemType type)
     /* Key name already exist inside table, yield Error of duplicate values in symbol/macro table,
     if it is an entry or an external do not yield error
     */
-    else if (type == Symbol && np->val.s.attrs.entry)
+    else if (type == Symbol && (np->val.s.attrs.entry || np->val.s.attrs.external))
         return np;
     else
     {
@@ -139,23 +139,41 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
 
     if (p != NULL)
     {
-        if (!p->val.s.attrs.entry)
-            printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
+
+        if (p->val.s.attrs.external || p->val.s.attrs.entry)
+        {
+            if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
+            {
+                yieldError(illegalOverrideOfExternalSymbol);
+                return NULL;
+            }
+            else if (p->val.s.attrs.entry && (isCode || isExternal))
+            {
+                yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
+                return NULL;
+            }
+        }
+
         else
-            printf("updated label entry with the name \"%s\" successfully to the symbol table!:)\n", name);
+        {
+            if (!isEntry || !isExternal)
+                printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
+            else
+                printf("updated exisiting  entry/external label with the name \"%s\" successfully to the symbol table!:)\n", name);
 
-        offset = value % 16;
-        base = value - offset;
-        p->val.s.value = value;
-        p->val.s.base = base;
-        p->val.s.offset = offset;
-        p->val.s.attrs.code = isCode ? 1 : 0;
-        p->val.s.attrs.entry = isEntry ? 1 : 0;
-        p->val.s.attrs.external = isExternal ? 1 : 0;
-        p->val.s.attrs.data = isData ? 1 : 0;
+            offset = value % 16;
+            base = value - offset;
+            p->val.s.value = value;
+            p->val.s.base = base;
+            p->val.s.offset = offset;
+            p->val.s.attrs.code = isCode ? 1 : 0;
+            p->val.s.attrs.entry = isEntry ? 1 : 0;
+            p->val.s.attrs.external = isExternal ? 1 : 0;
+            p->val.s.attrs.data = isData ? 1 : 0;
 
-        /* printSymbolTable();
-         */
+            /* printSymbolTable();
+             */
+        }
     }
 
     return p;

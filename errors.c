@@ -13,6 +13,9 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case illegalOverrideOfExternalSymbol:
+        printf("Overriding of external symbol exisiting in table is not allowed!");
+        break;
     case memoryAllocationFailure:
         printf("memory allocation failed");
         break;

@@ -32,7 +32,7 @@ typedef enum
     expectedIntegerNumber,
     expectedSingleCommaCharacter,
     expectedBlank,
-
+    illegalOverrideOfExternalSymbol,
     expectedQuotes
 } Error;
 
