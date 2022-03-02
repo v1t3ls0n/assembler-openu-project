@@ -1,17 +1,37 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
-/* Complex Struct Constant Variables: */
-extern Operation operations[OP_SIZE];
-extern unsigned char dec2Bin2sComplement(int n);
-extern void printMemoryStacks(EncodingFormat format);
-extern void printSymbolTable();
+extern void parseSourceFile(FILE *fp, char *filename);
 
-int main()
+int main(int argc, char *argv[])
 {
+    FILE *fptr;
+    char fileName[30] = {0};
+    int n, filesCount = argc - 1;
+    int i = 1;
 
+    if (filesCount < 1)
+    {
+        yieldError(AssemblerDidNotGetSourceFiles);
+        exit(1);
+    }
+
+    while (--filesCount)
+    {
+        sscanf(argv[i], "%s", fileName);
+        if ((fptr = fopen(strcat(argv[i], ".as"), "r")) == NULL)
+            yieldError(fileCouldNotBeOpened);
+        else
+        {
+            parseSourceFile(fptr, argv[i]);
+            fclose(fptr);
+        }
+    }
+
+    return 0;
+}
+
+/*
     parseSingleLine(".entry      x");
     parseSingleLine("x:            .data          3        ");
     parseSingleLine("x:            .string          3        ");
@@ -30,6 +50,5 @@ int main()
         printSymbolTable();
      */
 
-    printf("Finished Successfully!\n");
-    return 0;
-}
+printf("Finished Successfully!\n");
+* /
