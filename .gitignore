@@ -1,7 +1,7 @@
 *.json
 
 *.txt
-
+*.am
 # Prerequisites
 *.d
 
