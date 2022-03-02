@@ -1,41 +1,53 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-extern void parseSourceFile(FILE *fp, char *filename);
-extern void parseExpandedSourceFile(FILE *fp, char *filename);
+extern void parseSourceFile(FILE *source, char *filename);
+extern int parseExpandedSourceFile(FILE *fp, char *filename);
 
 int main(int argc, char *argv[])
 {
+    handleSourceFiles(argc, argv);
+    globalState = firstRun;
+    printf("after macro state\n");
+    handleSourceFiles(argc, argv);
+    printf("Finished Successfully!\n");
+    return 0;
+}
+
+int handleSourceFiles(int argc, char *argv[])
+{
     FILE *fptr;
-    char fileName[30] = {0};
+    char *fileName;
     int filesCount = argc - 1;
     int i = 1;
-
     if (filesCount < 1)
     {
         yieldError(AssemblerDidNotGetSourceFiles);
         exit(1);
     }
 
-    while (--filesCount)
+    while (--argc)
     {
+        fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
         sscanf(argv[i], "%s", fileName);
-        if ((fptr = fopen(strcat(argv[i], ".as"), "r")) == NULL)
+        printf("fileName:%s\n", fileName);
+        fileName = globalState == handleMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
+
+        if ((fptr = fopen(fileName, "r")) == NULL)
             yieldError(fileCouldNotBeOpened);
         else
         {
             if (globalState == handleMacros)
-                parseSourceFile(fptr, argv[i]);
-
+                parseSourceFile(fptr, fileName);
             if (globalState == firstRun)
-                parseExpandedSourceFile(fptr, argv[i]);
+                parseExpandedSourceFile(fptr, fileName);
 
             fclose(fptr);
+            free(fileName);
         }
     }
 
-    printf("Finished Successfully!\n");
-    return 0;
+    return True;
 }
 
 /*
