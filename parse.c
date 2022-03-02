@@ -2,7 +2,6 @@
 /* Shared global State variables*/
 extern State globalState;
 extern unsigned currentLine;
-
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
