@@ -31,7 +31,10 @@ int readFromFileByIndexes(FILE *fptr, char *filename, int start, int end)
     int c;
     if (fseek(fptr, end - start, start) != 0 || (c = fgetc(fptr)) == EOF)
     {
-        /* yield some error abou */
+        /* yield some error abou
+
+
+         */
     }
 
     return 1;
