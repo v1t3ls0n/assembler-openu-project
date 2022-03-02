@@ -120,11 +120,13 @@ unsigned getIC() { return IC; }
 
 void increaseDataCounter(int amount)
 {
-    DCF = DC += amount;
+    DC += amount;
+    DC++;
 }
-void inceaseInstructionCounter(int amount)
+void increaseInstructionCounter(int amount)
 {
-    ICF = IC += amount;
+    IC += amount;
+    IC++;
 }
 
 void printMemoryStacks(EncodingFormat format)

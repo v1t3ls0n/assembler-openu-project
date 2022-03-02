@@ -33,7 +33,6 @@ Item *install(char *name, ItemType type)
     Item *np;
     int nameLength = strlen(name);
     if (!verifyLabelNaming(name))
-
         return NULL;
 
     if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
@@ -124,6 +123,11 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
     Item *p;
     unsigned base;
     unsigned offset;
+
+    /*
+    char *symbolName = (char *)malloc(strlen(name) * sizeof(char) + 1);
+    memcpy(symbolName, name, strlen(name));
+    */
     p = install(name, Symbol);
     if (p != NULL)
     {
@@ -136,6 +140,7 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
         p->val.s.attrs.entry = isEntry ? 1 : 0;
         p->val.s.attrs.external = isExternal ? 1 : 0;
         p->val.s.attrs.data = isData ? 1 : 0;
+
         printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
         printSymbolTable();
     }
@@ -157,6 +162,17 @@ Item *findSymbol(char *name, ItemType type)
     return lookup(name, type);
 }
 
+Item *removeFromTable(char *name, ItemType type)
+{
+    Item *p = lookup(name, type);
+    if (p->next)
+        p = p->next;
+    else
+        p = NULL;
+
+    return p;
+}
+
 Item *updateSymbolAddressValue(char *name, int newValue)
 {
     Item *p = findSymbol(name, Symbol);
@@ -170,8 +186,10 @@ Item *updateSymbolAddressValue(char *name, int newValue)
         p->val.s.offset = offset;
         p->val.s.base = base;
         p->val.s.value = newValue;
-        printf("updated adrress values for \"%s\" successfully to the symbol table!:)\n", name);
-        printSymbolTable();
+        /*
+              printf("updated adrress values for \"%s\" successfully to the symbol table!:)\n", name);
+              printSymbolTable();
+      */
     }
     else
         currentError = symbolDoesNotExist;
@@ -200,8 +218,11 @@ Item *updateSymbolAttribute(char *name, int type)
                 p->val.s.attrs.external = 1;
             else if (type == _TYPE_CODE)
                 p->val.s.attrs.code = 1;
+
+            /*
             printf("updated \"%s\" attributes successfully to the symbol table!:)\n", name);
             printSymbolTable();
+            */
         }
     }
     else
