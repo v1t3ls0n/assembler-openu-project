@@ -13,6 +13,12 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case fileCouldNotBeOpened:
+        printf("file could not be  opened");
+        break;
+    case AssemblerDidNotGetSourceFiles:
+        printf("You did not passed any source files to the assembler!");
+        break;
     case illegalOverrideOfExternalSymbol:
         printf("Overriding of external symbol exisiting in table is not allowed!");
         break;

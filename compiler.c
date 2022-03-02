@@ -1,17 +1,44 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
-/* Complex Struct Constant Variables: */
-extern Operation operations[OP_SIZE];
-extern unsigned char dec2Bin2sComplement(int n);
-extern void printMemoryStacks(EncodingFormat format);
-extern void printSymbolTable();
+extern void parseSourceFile(FILE *fp, char *filename);
+extern void parseExpandedSourceFile(FILE *fp, char *filename);
 
-int main()
+int main(int argc, char *argv[])
 {
+    FILE *fptr;
+    char fileName[30] = {0};
+    int filesCount = argc - 1;
+    int i = 1;
 
+    if (filesCount < 1)
+    {
+        yieldError(AssemblerDidNotGetSourceFiles);
+        exit(1);
+    }
+
+    while (--filesCount)
+    {
+        sscanf(argv[i], "%s", fileName);
+        if ((fptr = fopen(strcat(argv[i], ".as"), "r")) == NULL)
+            yieldError(fileCouldNotBeOpened);
+        else
+        {
+            if (globalState == handleMacros)
+                parseSourceFile(fptr, argv[i]);
+
+            if (globalState == firstRun)
+                parseExpandedSourceFile(fptr, argv[i]);
+
+            fclose(fptr);
+        }
+    }
+
+    printf("Finished Successfully!\n");
+    return 0;
+}
+
+/*
     parseSingleLine(".entry      x");
     parseSingleLine("x:            .data          3        ");
     parseSingleLine("x:            .string          3        ");
@@ -26,10 +53,8 @@ int main()
     parseSingleLine("str:            .string          \"abcd\"        ");
     parseSingleLine("str2:            .string          \"AAADDDDDabcd\"        ");
     parseSingleLine("str3:            .string          \"FFFFFFFFAAADDDDDabcd\"        ");
-    /*
-        printSymbolTable();
-     */
 
-    printf("Finished Successfully!\n");
-    return 0;
-}
+        printSymbolTable();
+
+
+*/

@@ -33,7 +33,9 @@ typedef enum
     expectedSingleCommaCharacter,
     expectedBlank,
     illegalOverrideOfExternalSymbol,
-    expectedQuotes
+    AssemblerDidNotGetSourceFiles,
+    expectedQuotes,
+    fileCouldNotBeOpened
 } Error;
 
 typedef enum
@@ -58,6 +60,8 @@ typedef enum
     returnFalse = 4678,
     lineParsedSuccessfully = 23,
     parsingLine = 112,
+    parsingMacro = 86,
+    replacingMacro = 11,
     Err = 0,
     parseDataVariables = 3,
     parseStringVariables = 98,
