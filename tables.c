@@ -33,12 +33,6 @@ Item *install(char *name, ItemType type)
     Item *np;
     int nameLength = strlen(name);
 
-    /* printf("inside *install(char *name, ItemType type)\n");
-     */
-
-    if (!verifyLabelNaming(name))
-        return NULL;
-
     if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
     {
         np = (Item *)malloc(sizeof(Item *));
@@ -146,48 +140,43 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
 {
     unsigned base;
     unsigned offset;
-    Item *p = install(name, Symbol);
+    Item *p;
+    if (!verifyLabelNaming(name))
+        return NULL;
     printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
+    p = lookup(name, Symbol);
     if (p != NULL)
     {
-        if (p->val.s.attrs.external == 1 || p->val.s.attrs.entry)
-        {
-            if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
-            {
-                printf("(p->val.s.attrs.external && (value || isCode || isData || isEntry))\n");
 
-                yieldError(illegalOverrideOfExternalSymbol);
-                return NULL;
-            }
-            else if (p->val.s.attrs.entry && (isCode || isExternal))
-            {
-                printf("inside p->val.s.attrs.entry && (isCode || isExternal)\n");
-                yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
-                return NULL;
-            }
-        }
-
+        if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
+            yieldError(illegalOverrideOfExternalSymbol);
+        else if (p->val.s.attrs.entry && (isCode || isExternal))
+            yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
         else
-        {
-            if (!isEntry || !isExternal)
-                printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
-            else
-                printf("updated exisiting  entry/external label with the name \"%s\" successfully to the symbol table!:)\n", name);
-
-            offset = value % 16;
-            base = value - offset;
-            p->val.s.value = value;
-            p->val.s.base = base;
-            p->val.s.offset = offset;
-            p->val.s.attrs.code = isCode ? 1 : 0;
-            p->val.s.attrs.entry = isEntry ? 1 : 0;
-            p->val.s.attrs.external = isExternal ? 1 : 0;
-            p->val.s.attrs.data = isData ? 1 : 0;
-
-            /* printSymbolTable();
-             */
-        }
+            yieldError(illegalSymbolNameAlreadyInUse);
+        return NULL;
     }
+    else
+    {
+        p = install(name, Symbol);
+        offset = value % 16;
+        base = value - offset;
+        p->val.s.value = value;
+        p->val.s.base = base;
+        p->val.s.offset = offset;
+        p->val.s.attrs.code = isCode ? 1 : 0;
+        p->val.s.attrs.entry = isEntry ? 1 : 0;
+        p->val.s.attrs.external = isExternal ? 1 : 0;
+        p->val.s.attrs.data = isData ? 1 : 0;
+    }
+
+    /*    if (!isEntry || !isExternal)
+           printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
+       else
+           printf("updated exisiting  entry/external label with the name \"%s\" successfully to the symbol table!:)\n", name);
+    */
+    /* printSymbolTable();
+     */
 
     return p;
 }
