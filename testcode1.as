@@ -1,17 +1,22 @@
-   .entry      x
-   x:            .data          3        
-   MAIN:mov x, r2
-   x:            .string          3      
-   y:            .data          5, 8,     56        
-   add #3, y  
-   d:            .data          5, $,     56        
-   z:            .data          7      ,  ,   56,        
-   rts
-   fg:            .data          7      ,  ,   44,$^        
-   g:            .data          7      ,  ,   ,,,56,     
-   .external Bla
-   .external stamm      ddd   
-   .external dsafs   
-   str:            .string          "abcd"        
-   str2:            .string          "AAADDDDDabcd"        
-   str3:            .string          \"FFFFFFFFAAADDDDDabcd\"       
+; file ps.am
+.entry LIST
+.extern W
+MAIN: add r3, LIST
+LOOP: prn #48
+lea STR, r6
+inc r6
+mov r3, W
+sub r1, r4
+bne END
+cmp val1, #-6
+bne END[r15]
+dec K
+.entry MAIN
+sub LOOP[r10] ,r14
+END: stop
+STR: .string “abcd”
+LIST: .data 6, -9
+.data -100
+.entry K
+K: .data 31
+.extern val1

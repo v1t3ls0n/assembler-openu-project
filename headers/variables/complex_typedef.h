@@ -55,11 +55,11 @@ typedef struct
 
 typedef struct
 {
-    const unsigned int op;
-    const unsigned int funct : 4;
-    const char keyword[4];
-    const AddrMethodsOptions src;
-    const AddrMethodsOptions des;
+    unsigned int op;
+    unsigned int funct : 4;
+    char keyword[4];
+    AddrMethodsOptions src;
+    AddrMethodsOptions des;
 } Operation;
 
 typedef struct

@@ -22,29 +22,30 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
     printf("inside parseExpandedSourceFile");
+
     while (((c = fgetc(fp)) != EOF))
     {
-
-        if (i >= MAX_LINE_LEN - 1 && c != '\n')
-        {
-            globalState = collectErrors;
-            return yieldError(maxLineLengthExceeded);
-        }
-
-        if (!isspace(c))
-            line[i++] = (char)c;
-        else
-        {
-            if (!isspace(line[i]))
-                line[i++] = ' ';
-        }
 
         if (c == '\n')
         {
             parseSingleLine(line, state);
-            memset(line, 0, MAX_LINE_LEN);
+            memset(line, '\0', MAX_LINE_LEN);
             i = 0;
             state = newLine;
+        }
+
+        else if (i >= MAX_LINE_LEN - 1 && c != '\n')
+        {
+            globalState = collectErrors;
+            return yieldError(maxLineLengthExceeded);
+        }
+        else if (isspace(c))
+            line[i++] = ' ';
+
+        else
+        {
+            if (isprint(c))
+                line[i++] = c;
         }
     }
 
@@ -85,7 +86,7 @@ int parseSingleLine(char *line, ParseState state)
 
         case parseOperation:
         {
-            state = handleOperation(getOperationByName(token), strtok(NULL, " \t \n"), strtok(NULL, " \t \n"));
+            state = handleOperation(token, strtok(NULL, " \t \n"));
             break;
         }
 
@@ -142,14 +143,11 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(Operation *op, char *firstToken, char *operands)
+int handleOperation(char *op, char *operands)
 {
-    if (!firstToken)
-        return False;
-    printf("inside handleOperation,operation:%s firstToken:%s operands:%s\n", op->keyword, firstToken, operands);
-    if (isLabel(firstToken))
-    {
-    }
+
+    printf("inside handleOperation,operation:%s  operands:%s\n", op, operands);
+
     /*     printf("inside handleOperation\noperands:%s\n", operands);
      */
     return 1;
@@ -217,14 +215,12 @@ int handleLabel(char *labelName, char *nextToken, char *line)
             return yieldError(undefinedInstruction);
     }
 
-    else
+    else if (isOperation(nextToken) != -1)
     {
-        int opIndex = isOperation(nextToken);
-        if (opIndex != -1)
-        {
-            printf("line 221\n");
-            handleOperation(getOperationByName(nextToken), labelName, strtok(NULL, " \t \n"));
-        }
+        int icAddr = getIC();
+        labelName[strlen(labelName) - 1] = '\0';
+        if (handleOperation(nextToken, strtok(NULL, " \t \n")))
+            return addSymbol(labelName, icAddr, 1, 0, 0, 0);
     }
 
     return yieldError(illegalLabelUseExpectedOperationOrInstruction);

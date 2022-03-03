@@ -1,0 +1,1 @@
+rm -f *.am && rm -f out.txt && ./compiler.exe testcode1

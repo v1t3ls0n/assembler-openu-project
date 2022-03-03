@@ -23,12 +23,12 @@ we will read line by line from source file,
         if (c == '\n' || c == ';' || i == MAX_LINE_LEN)
         {
             parseNextLine(line, start, end);
-            memset(line, '\0', i);
+            memset(line, '\0', MAX_LINE_LEN);
             i = 0;
             start = end;
             end++;
         }
-        if (!isspace(c))
+        if (!isspace(c) || isprint(c))
             line[i++] = c;
         end++;
     }
@@ -73,7 +73,7 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName)
         exit(1);
     }
     while ((c = fgetc(source)) != EOF)
-        fputc((char)c, target);
+        fputc(c, target);
 
     printf("File copied successfully.\n");
     fclose(source);
