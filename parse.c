@@ -23,7 +23,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
-    printf("inside parseExpandedSourceFile");
+    /*     printf("inside parseExpandedSourceFile"); */
 
     while (((c = fgetc(fp)) != EOF))
     {
@@ -61,8 +61,8 @@ int parseSingleLine(char *line, ParseState state)
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
-    printf("inside parseSingleLine, line:%s p:%s token:%s\n", line, p, token);
-
+    /*     printf("inside parseSingleLine, line:%s p:%s token:%s\n", line, p, token);
+     */
     if (state == newLine)
         state = handleState(token, p, state);
 
@@ -88,7 +88,7 @@ int parseSingleLine(char *line, ParseState state)
 
         case parseOperation:
         {
-            state = handleOperation(p, token, line);
+            state = handleOperation(token, line);
             break;
         }
 
@@ -145,34 +145,23 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(char *operandName, char *firstOperand, char *secondOperand)
+int handleOperation(char *operandName, char *line)
 {
     Operation *p = getOperationByName(operandName);
-    /*     if (operandName == firstOperand)
-        {
-            firstOperand = secondOperand;
-            secondOperand = strtok(NULL, " \t \n");
-        } */
-    if (firstOperand == secondOperand)
-        secondOperand = strtok(NULL, " \t \n");
-
-    printf("\n\n\ninside handleOperation,operation:%s\n", operandName);
-
-    if (strlen(firstOperand) && strlen(secondOperand))
-        return parseOperands(firstOperand, secondOperand, p);
-    else if (!strlen(firstOperand) && !strlen(secondOperand))
-        return parseOperands("\0", "\0", p);
-    else
-        return parseOperands(firstOperand, "\0", p);
+    char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
+    char comma = 0;
+    line = operandName + strlen(operandName) + 1;
+    sscanf(line, "%s%c%s", firstOperand, &comma, secondOperand);
+    return parseOperands(firstOperand, secondOperand, p);
 }
 
 Bool parseOperands(char *src, char *des, Operation *op)
 {
     Bool isValid = True;
     /*     AddrMethodsOptions sourceAddr = {0, 0, 0, 0}, des = {0, 0, 0, 0}; */
-    printf("Operation allowed operands types:\n");
-    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
-    printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n\n\n", op->des.immediate, op->des.direct, op->des.index, op->des.reg);
+    /*    printf("Operation allowed operands types:\n");
+       printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
+       printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n\n\n", op->des.immediate, op->des.direct, op->des.index, op->des.reg); */
     if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
         return True;
 
@@ -219,13 +208,8 @@ Bool checkLegalUseOfCommas(char *s1, char *s2)
     if (s1 && s2)
     {
         if ((s1[strlen(s1) - 1] != ',' && s2[0] == ',') || (s1[strlen(s1) - 1] == ',' && s2[0] != ','))
-        {
-            s2 = strtok(NULL, " \t \n");
-            if (s2 != NULL && strchr(s2, ','))
-                return yieldError(wrongInstructionSyntaxExtraCommas);
-            else
-                return True;
-        }
+            return True;
+
         else if (s1[strlen(s1) - 1] == ',' && s2[0] == ',')
             return yieldError(wrongInstructionSyntaxExtraCommas);
         else if (s1[strlen(s1) - 1] != ',' && s2[0] != ',')
@@ -303,7 +287,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     {
         int icAddr = getIC();
         labelName[strlen(labelName) - 1] = '\0';
-        if (handleOperation(nextToken, nextToken, line))
+        if (handleOperation(nextToken, line))
         {
             printf("line 308\n");
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);

@@ -26,11 +26,6 @@ Operation *getOperationByName(char *s)
 {
     int i = getOpIndex(s);
 
-    /* Operation *p;
-    p = (Operation *)malloc(sizeof(Operation *));
-    p = &operations[i];
-    return p;
-     */
     if (i != -1)
         return &operations[i];
 

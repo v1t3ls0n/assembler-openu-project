@@ -4,7 +4,8 @@ extern unsigned currentLine;
 
 Bool yieldError(Error err)
 {
-    printf("\nError!! occured on line %d ", currentLine);
+    printf("\n###################################\n");
+    printf("Error!! occured on line %d ", currentLine);
     /*     illegalLabelNameUseOfCharacters
 
             illegalLabelNameLength
@@ -106,6 +107,7 @@ Bool yieldError(Error err)
         break;
     }
     printf("\n");
+    printf("###################################\n");
 
     return False;
 }
