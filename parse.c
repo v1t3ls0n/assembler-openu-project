@@ -2,9 +2,10 @@
 /* Shared global State variables*/
 extern State globalState;
 extern unsigned currentLine;
+/* Complex struct *Constant Variables: */
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-extern Operation *getOperationByName(char *s);
+extern const Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 
@@ -20,6 +21,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
+    printf("inside parseExpandedSourceFile");
     while (((c = fgetc(fp)) != EOF))
     {
 
@@ -52,7 +54,6 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 int parseSingleLine(char *line, ParseState state)
 {
 
-    int n = 0;
     char *p = calloc(strlen(line + 1), sizeof(char *));
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
@@ -83,7 +84,7 @@ int parseSingleLine(char *line, ParseState state)
 
         case parseOperation:
         {
-            state = handleOperation(getOperationByName(token), token + n, line);
+            state = handleOperation(getOperationByName(token), strtok(NULL, " \t \n"), strtok(NULL, " \t \n"));
             break;
         }
 
@@ -140,8 +141,12 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(Operation *op, char *operands, char *line)
+int handleOperation(const Operation *op, char *firstToken, char *operands)
 {
+    printf("inside handleOperation,operation:%s firstToken:%s operands:%s\n", (char *)op->keyword, firstToken, operands);
+    if (isLabel(firstToken))
+    {
+    }
     /*     printf("inside handleOperation\noperands:%s\n", operands);
      */
     return 1;
@@ -195,8 +200,6 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
-    /*     printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
-     */
     if (nextToken[0] == '.')
     {
         int instruction = getInstructionType(nextToken);
@@ -211,32 +214,23 @@ int handleLabel(char *labelName, char *nextToken, char *line)
             return yieldError(undefinedInstruction);
     }
 
-    else if (getOpIndex(nextToken) != -1)
-    {
-        labelName[strlen(labelName) - 1] = '\0';
-
-        /*
-            int opIndex = -1;
-int memoryAddress = -1;
-                    Word *new = calloc(1, sizeof(Word *));
-                    new->value->hex = generateFirstWordEncodedHex(getOperationByIndex(opIndex));
-                    memoryAddress = writeToMemory(new, Code);
-                    return handleOperation(getOperationByIndex(opIndex), nextToken, line); */
-    }
     else
-        return yieldError(illegalLabelUseExpectedOperationOrInstruction);
+    {
+        int opIndex = isOperation(nextToken);
+        if (opIndex != -1)
+        {
+            printf("line 221\n");
+            handleOperation(getOperationByName(nextToken), labelName, strtok(NULL, " \t \n"));
+        }
+    }
 
-    return Err;
+    return yieldError(illegalLabelUseExpectedOperationOrInstruction);
 }
 
 int isOperation(char *s)
 {
-    int opIndex = -1;
-    opIndex = getOpIndex(s);
-
-    /* printf("inside is operation op index:%d\n", opIndex);
-     */
-    return opIndex != -1 ? opIndex : -1;
+    printf("line 231\n");
+    return getOperationByName(s) != NULL ? True : False;
 }
 
 int isLabel(char *s)
