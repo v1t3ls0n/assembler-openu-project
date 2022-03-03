@@ -76,6 +76,7 @@ int parseSingleLine(char *line, ParseState state)
             break;
         case parseLabel:
         {
+
             state = handleLabel(token, strtok(NULL, " \t \n"), line);
             break;
         }
@@ -116,6 +117,7 @@ int parseSingleLine(char *line, ParseState state)
 
 int handleState(char *token, char *line, ParseState state)
 {
+    printf("inside handle State, token:%s\n", token);
     switch (state)
     {
     case skipLine:
@@ -145,14 +147,22 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(char *operandName, char *line)
+int handleOperation(char *operationName, char *line)
 {
-    Operation *p = getOperationByName(operandName);
+    Operation *p = getOperationByName(operationName);
     char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
-    line = operandName + strlen(operandName) + 1;
+    line = operationName + strlen(operationName) + 1;
     sscanf(line, "%s%c%s", firstOperand, &comma, secondOperand);
-    return parseOperands(firstOperand, secondOperand, p);
+    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\n", operationName, firstOperand, secondOperand, comma);
+
+    if (comma == ',' && (strchr(firstOperand, ',') || secondOperand[0] == ','))
+        return yieldError(wrongInstructionSyntaxExtraCommas);
+
+    else if (comma != ',' && (!strchr(firstOperand, ',') && secondOperand[0] != ','))
+        return yieldError(wrongInstructionSyntaxMissinCommas);
+    else
+        return parseOperands(firstOperand, secondOperand, p);
 }
 
 Bool parseOperands(char *src, char *des, Operation *op)
@@ -190,12 +200,13 @@ Bool parseOperands(char *src, char *des, Operation *op)
             isValid = validateOperandMatch(op->des, des) && checkLegalUseOfCommas(NULL, des);
     }
 
-    return isValid;
+    return True;
+    /*     return isValid;
+     */
 }
 
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
 {
-    printf("inside validateOperandMatch\n");
 
     /* yieldError(srcOperandTypeIsNotAllowed);
      */
@@ -215,7 +226,7 @@ Bool checkLegalUseOfCommas(char *s1, char *s2)
         else if (s1[strlen(s1) - 1] != ',' && s2[0] != ',')
             return yieldError(expectedSingleCommaCharacter);
     }
-    else if ((s1 && strchr(s1, ',') != NULL) || (s2 && strchr(s2, ',') != NULL))
+    else if (strchr(s1, ',') != NULL)
         return yieldError(wrongInstructionSyntaxExtraCommas);
 
     return True;
@@ -269,6 +280,7 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
+    printf("in handle Label labelName:%s nextToken:%s\n", labelName, nextToken);
     if (nextToken[0] == '.')
     {
         int instruction = getInstructionType(nextToken);
@@ -283,15 +295,12 @@ int handleLabel(char *labelName, char *nextToken, char *line)
             return yieldError(undefinedInstruction);
     }
 
-    else if (isOperation(nextToken) != -1)
+    else if (isOperation(nextToken))
     {
         int icAddr = getIC();
-        labelName[strlen(labelName) - 1] = '\0';
+
         if (handleOperation(nextToken, line))
-        {
-            printf("line 308\n");
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
-        }
     }
 
     return yieldError(illegalLabelUseExpectedOperationOrInstruction);
@@ -299,7 +308,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
 int isOperation(char *s)
 {
-    return getOperationByName(s) != NULL ? True : False;
+    return (getOperationByName(s) != NULL) ? True : False;
 }
 
 int isLabel(char *s)
