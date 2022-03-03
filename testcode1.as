@@ -5,10 +5,10 @@
    d:            .data          5, $,     56        
    z:            .data          7      ,  ,   56,        
    fg:            .data          7      ,  ,   44,$^        
-   g:            .data          7      ,  ,   ,,,56,        
+   g:            .data          7      ,  ,   ,,,56,     
    .external Bla
    .external stamm      ddd   
    .external dsafs   
-   str:            .string          \"abcd\"        
-   str2:            .string          \"AAADDDDDabcd\"        
+   str:            .string          "abcd"        
+   str2:            .string          "AAADDDDDabcd"        
    str3:            .string          \"FFFFFFFFAAADDDDDabcd\"        

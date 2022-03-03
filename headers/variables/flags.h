@@ -29,12 +29,13 @@ typedef enum
     emptyLabelDecleration,
     none,
     noErrors,
-    expectedIntegerNumber,
+    expectedNumber,
     expectedSingleCommaCharacter,
     expectedBlank,
     illegalOverrideOfExternalSymbol,
     AssemblerDidNotGetSourceFiles,
     expectedQuotes,
+    closingQuotesForStringIsMissing,
     fileCouldNotBeOpened
 } Error;
 
