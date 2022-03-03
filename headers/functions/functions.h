@@ -85,7 +85,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
-int handleOperation(Operation *op, char *operands, char *line);
+int handleOperation(char *op, char *operands);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);

@@ -138,7 +138,7 @@ printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, 
         return False;
     p = lookup(name, Symbol);
     if (p != NULL)
-        return updateSymbol(p, value, isCode, isData, isEntry, isExternal);
+        updateSymbol(p, value, isCode, isData, isEntry, isExternal);
     else
     {
         p = install(name, Symbol);
@@ -159,22 +159,34 @@ printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, 
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
 
-    if (p->val.s.attrs.entry && (!p->val.s.attrs.data && !p->val.s.attrs.code && !p->val.s.attrs.external))
-    {
-        if (isCode)
-            p->val.s.attrs.code = 1;
-        else if (isData)
-            p->val.s.attrs.data = 1;
-    }
-
-    else if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
+    if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
         return yieldError(illegalOverrideOfExternalSymbol);
 
     else if (p->val.s.attrs.entry && isExternal)
         return yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
-
     else
-        return yieldError(illegalSymbolNameAlreadyInUse);
+    {
+        if ((isData && isCode) || (isCode && p->val.s.attrs.data) || (isData && p->val.s.attrs.code))
+            return yieldError(illegalSymbolNameAlreadyInUse);
+
+        if (value)
+        {
+            unsigned base;
+            unsigned offset;
+            offset = value % 16;
+            base = value - offset;
+            p->val.s.value = value;
+            p->val.s.base = base;
+            p->val.s.offset = offset;
+        }
+
+        if (isEntry)
+            p->val.s.attrs.entry = 1;
+        if (isCode)
+            p->val.s.attrs.code = 1;
+        if (isData)
+            p->val.s.attrs.data = 1;
+    }
 
     return True;
 }

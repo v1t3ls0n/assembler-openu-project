@@ -34,7 +34,7 @@
 #define DATA ".data"
 #define STRING ".string"
 #define ENTRY ".entry"
-#define EXTERNAL ".external"
+#define EXTERNAL ".extern"
 
 #define _TYPE_DATA -11
 #define _TYPE_STRING -22
