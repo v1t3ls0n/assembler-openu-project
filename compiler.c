@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     handleSourceFiles(argc, argv);
     globalState = firstRun;
-    printf("after macro state\n");
+    printf("Start Parsing Assembly Code:\n\n\n\n\n\n\n");
     handleSourceFiles(argc, argv);
 
     if (globalState != collectErrors)
@@ -53,7 +53,6 @@ int handleSourceFiles(int argc, char *argv[])
     {
         fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
         sscanf(argv[i], "%s", fileName);
-        printf("fileName:%s\n", fileName);
         fileName = globalState == handleMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
 
         if ((fptr = fopen(fileName, "r")) == NULL)
@@ -72,24 +71,3 @@ int handleSourceFiles(int argc, char *argv[])
 
     return True;
 }
-
-/*
-    parseSingleLine(".entry      x");
-    parseSingleLine("x:            .data          3        ");
-    parseSingleLine("x:            .string          3        ");
-    parseSingleLine("y:            .data          5, 8,     56        ");
-    parseSingleLine("d:            .data          5, $,     56        ");
-    parseSingleLine("z:            .data          7      ,  ,   56,        ");
-    parseSingleLine("fg:            .data          7      ,  ,   44,$^        ");
-    parseSingleLine("g:            .data          7      ,  ,   ,,,56,        ");
-    parseSingleLine(".external Bla");
-    parseSingleLine(".external stamm      ddd   ");
-    parseSingleLine(".external dsafs   ");
-    parseSingleLine("str:            .string          \"abcd\"        ");
-    parseSingleLine("str2:            .string          \"AAADDDDDabcd\"        ");
-    parseSingleLine("str3:            .string          \"FFFFFFFFAAADDDDDabcd\"        ");
-
-        printSymbolTable();
-
-
-*/
