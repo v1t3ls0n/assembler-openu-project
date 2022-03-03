@@ -10,6 +10,7 @@ extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
+extern Bool verifyLabelNaming(char *s);
 
 extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
@@ -61,7 +62,7 @@ int parseSingleLine(char *line, ParseState state)
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
-    printf("\ninside parseSingleLine\nline:%s\n", line);
+    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
     if (state == newLine)
         state = handleState(token, p, state);
 
@@ -146,26 +147,24 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(char *operationName, char *line)
+Bool handleOperation(char *operationName, char *line)
 {
     Operation *p = getOperationByName(operationName);
     char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
+    int n = 0;
     line = operationName + strlen(operationName) + 1;
-    sscanf(line, "%s%c%s", firstOperand, &comma, secondOperand);
-
-    /*     printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\n", operationName, firstOperand, secondOperand, comma);
-     */
-
-    return parseOperands(firstOperand, secondOperand, p);
+    sscanf(line, "%s%c%s%n", firstOperand, &comma, secondOperand, &n);
+    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nn:%d\n", operationName, firstOperand, secondOperand, comma, n);
+    return parseOperands(firstOperand, comma, secondOperand, p);
 }
 
-Bool parseOperands(char *src, char *des, Operation *op)
+Bool parseOperands(char *src, char comma, char *des, Operation *op)
 {
     Bool isValid = True;
     /*     AddrMethodsOptions sourceAddr = {0, 0, 0, 0}, des = {0, 0, 0, 0}; */
     /*    printf("Operation allowed operands types:\n");
-       printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
+    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
        printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n\n\n", op->des.immediate, op->des.direct, op->des.index, op->des.reg); */
     if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
         return True;
@@ -177,7 +176,8 @@ Bool parseOperands(char *src, char *des, Operation *op)
         if (!strlen(des))
             isValid = isValid && yieldError(requiredDestinationOperandIsMissin);
 
-        isValid = isValid && validateOperandMatch(op->src, src) && checkLegalUseOfCommas(src, des) && validateOperandMatch(op->des, des);
+        isValid = isValid && validateOperandMatch(op->src, src) && validateOperandMatch(op->des, des);
+        isValid = isValid && checkLegalUseOfCommas(src, comma, des);
     }
 
     else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
@@ -185,14 +185,14 @@ Bool parseOperands(char *src, char *des, Operation *op)
         if (!strlen(src))
             isValid = yieldError(requiredSourceOperandIsMissin);
         else
-            isValid = validateOperandMatch(op->src, src) && checkLegalUseOfCommas(src, NULL);
+            isValid = validateOperandMatch(op->src, src);
     }
     else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
     {
         if (!strlen(des))
             isValid = yieldError(requiredDestinationOperandIsMissin);
         else
-            isValid = validateOperandMatch(op->des, des) && checkLegalUseOfCommas(NULL, des);
+            isValid = validateOperandMatch(op->des, des);
     }
 
     return True;
@@ -202,11 +202,31 @@ Bool parseOperands(char *src, char *des, Operation *op)
 
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
 {
+    if (!allowedAddrs.reg && !allowedAddrs.direct && !allowedAddrs.immediate && !allowedAddrs.index && strlen(operand) > 0)
+        return yieldError(operandTypeDoNotMatch);
+    else if (!allowedAddrs.reg && isRegistery(operand))
+        return yieldError(operandTypeDoNotMatch);
+    else if (!allowedAddrs.immediate && operand[0] == '#')
+        return yieldError(operandTypeDoNotMatch);
+    if (allowedAddrs.direct && !verifyLabelNaming(operand)) /*checks if the label's name is legal*/
+        return yieldError(illegalOperand);
 
+    /*     typedef struct
+        {
+            unsigned int immediate : 1;
+    # 4 or #- 3 integers unsigned int direct : 1;
+            label / entry / external unsigned int index : 1;
+            someVar[r2] unsigned int reg : 1;
+            r01 - r15
+        } AddrMethodsOptions;
+
+        if (allowedAddrs)
+
+             */
     return True;
 }
 
-Bool checkLegalUseOfCommas(char *s1, char *s2)
+Bool checkLegalUseOfCommas(char *s1, char comma, char *s2)
 {
     if (s1 && s2)
     {
@@ -504,6 +524,16 @@ Bool isRegistery(char *s)
         return yieldError(wrongRegisteryReferenceUndefinedReg);
     }
     return False;
+}
+
+Bool isValidImmediateParamter(char *s)
+{
+    /*
+    check #
+
+    */
+
+    return True;
 }
 
 /*

@@ -85,10 +85,10 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
-int handleOperation(char *operationName, char *line);
-Bool parseOperands(char *src, char *des, Operation *op);
+Bool handleOperation(char *operationName, char *line);
+Bool parseOperands(char *src, char comma, char *des, Operation *op);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand);
-Bool checkLegalUseOfCommas(char *s1, char *s2);
+Bool checkLegalUseOfCommas(char *s1, char comma, char *s2);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);
@@ -100,6 +100,7 @@ int handleInstructionDataArgs(char *tokens);
 int handleInstructionStringArgs(char *tokens);
 Bool isRegistery(char *s);
 const char *getRegisteryOperand(char *s);
+Bool isValidImmediateParamter(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

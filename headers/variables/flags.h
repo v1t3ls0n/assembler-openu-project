@@ -27,6 +27,7 @@ typedef enum
     illegalApearenceOfExtraCharactersOnLine,
     maxLineLengthExceeded,
     emptyLabelDecleration,
+    illegalOperand,
     none,
     noErrors,
     expectedNumber,
@@ -41,8 +42,8 @@ typedef enum
     requiredSourceOperandIsMissin,
     requiredDestinationOperandIsMissin,
     srcOperandTypeIsNotAllowed,
-    desOperandTypeIsNotAllowed
-
+    desOperandTypeIsNotAllowed,
+    operandTypeDoNotMatch
 } Error;
 
 typedef enum
