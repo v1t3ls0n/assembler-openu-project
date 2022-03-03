@@ -300,6 +300,7 @@ int handleInstructionDataArgs(char *token)
     int number = 0;
     int counter = 0;
     char illegalCharacter = 0;
+    Bool minusSignOn = False;
     Bool commaState = True;
 
     if (isInstruction(token))
@@ -307,7 +308,13 @@ int handleInstructionDataArgs(char *token)
 
     while (token)
     {
-        if (!isdigit(token[0]) && token[0] != ',')
+        if (token[0] != '-')
+        {
+            minusSignOn = True;
+            token = strtok(NULL, " \t \n");
+        }
+
+        else if (!isdigit(token[0]) && (token[0] != ',' || (token[0] != '+' && minusSignOn)))
         {
 
             if (isalpha(token[0]))
@@ -324,6 +331,7 @@ int handleInstructionDataArgs(char *token)
             if (commaState)
             {
                 sscanf(token, "%d%c", &number, &illegalCharacter);
+
                 if (illegalCharacter == '.')
                     return yieldError(wrongArgumentTypeNotAnInteger);
                 else if (illegalCharacter == ',')
@@ -332,7 +340,12 @@ int handleInstructionDataArgs(char *token)
                     commaState = False;
 
                 if (globalState == secondRun)
+                {
+                    if (minusSignOn)
+                        number = -1 * number;
+                    minusSignOn = False;
                     addNumberToMemory(number);
+                }
                 else
                     counter++;
             }
