@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     handleSourceFiles(argc, argv);
     globalState = firstRun;
-    printf("Start Parsing Assembly Code:\n\n\n\n\n\n\n");
+    printf("Start Parsing Assembly Code:\n");
     handleSourceFiles(argc, argv);
 
     if (globalState != collectErrors)
