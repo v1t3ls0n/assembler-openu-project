@@ -137,6 +137,8 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     /*     printf("inside addSymbol\n");
         printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
      */
+    if (name[strlen(name) - 1] == ':')
+        name[strlen(name) - 1] = '\0';
     if (!verifyLabelNaming(name))
         return False;
     p = lookup(name, Symbol);
