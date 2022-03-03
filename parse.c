@@ -155,14 +155,7 @@ int handleOperation(char *operationName, char *line)
     line = operationName + strlen(operationName) + 1;
     sscanf(line, "%s%c%s", firstOperand, &comma, secondOperand);
     printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\n", operationName, firstOperand, secondOperand, comma);
-
-    if (comma == ',' && (strchr(firstOperand, ',') || secondOperand[0] == ','))
-        return yieldError(wrongInstructionSyntaxExtraCommas);
-
-    else if (comma != ',' && (!strchr(firstOperand, ',') && secondOperand[0] != ','))
-        return yieldError(wrongInstructionSyntaxMissinCommas);
-    else
-        return parseOperands(firstOperand, secondOperand, p);
+    return parseOperands(firstOperand, secondOperand, p);
 }
 
 Bool parseOperands(char *src, char *des, Operation *op)
@@ -208,10 +201,7 @@ Bool parseOperands(char *src, char *des, Operation *op)
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
 {
 
-    /* yieldError(srcOperandTypeIsNotAllowed);
-     */
-
-    return True;
+     return True;
 }
 
 Bool checkLegalUseOfCommas(char *s1, char *s2)
