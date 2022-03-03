@@ -84,7 +84,8 @@ typedef enum
 
 typedef struct
 {
-    char *code;
+    int start;
+    int end;
 } MacroData;
 
 typedef struct

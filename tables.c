@@ -1,29 +1,28 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-
+extern unsigned getDC();
+extern unsigned getIC();
 unsigned hash(char *s)
 {
     unsigned hashval = 1;
-
     for (hashval = 0; *s != '\0'; s++)
         hashval = *s + 31 * hashval;
-
     return hashval % HASHSIZE;
 }
 
 Item *lookup(char *s, ItemType type)
 {
-
     Item *np;
-    for (np = (type == Symbol ? symbols[hash(s)] : macros[hash(s)]); np != NULL; np = np->next)
-        if (strcmp(s, np->name) == 0)
+    int i = hash(s);
+    for (np = (type == Symbol ? symbols[i] : macros[i]); np != NULL; np = np->next)
+        if (!strcmp(s, np->name))
             return np;
+
     return NULL;
 }
 
@@ -31,20 +30,16 @@ Item *install(char *name, ItemType type)
 {
     unsigned hashval;
     Item *np;
-    int nameLength = strlen(name);
-
-    if ((np = lookup(name, (type == Symbol ? Symbol : Macro))) == NULL)
+    np = (Item *)malloc(sizeof(Item *));
+    np->name = calloc(strlen(name) + 1, sizeof(char *));
+    if (np == NULL || np->name == NULL)
     {
-        np = (Item *)malloc(sizeof(Item *));
-        np->name = (char *)malloc(nameLength * sizeof(char));
-        if (np == NULL || np->name == NULL)
-        {
-            yieldError(memoryAllocationFailure);
-            return NULL;
-        }
-        memcpy(np->name, name, nameLength);
-        np->name[nameLength] = '\0';
-
+        yieldError(memoryAllocationFailure);
+        return NULL;
+    }
+    else
+    {
+        memcpy(np->name, name, strlen(name));
         if (type == Symbol)
         {
             np->val.s.attrs.code = 0;
@@ -55,6 +50,11 @@ Item *install(char *name, ItemType type)
             np->val.s.value = 0;
             np->val.s.offset = 0;
         }
+        else if (type == Macro)
+        {
+            np->val.m.start = -1;
+            np->val.m.end = -1;
+        }
 
         np->next = (Item *)malloc(sizeof(Item *));
         hashval = hash(name);
@@ -63,16 +63,6 @@ Item *install(char *name, ItemType type)
             symbols[hashval] = np;
         else
             macros[hashval] = np;
-    }
-    /* Key name already exist inside table, yield Error of duplicate values in symbol/macro table,
-    if it is an entry or an external do not yield error
-    */
-    else if (type == Symbol && (np->val.s.attrs.entry || np->val.s.attrs.external))
-        return np;
-    else
-    {
-        yieldError(type == Macro ? illegalMacroNameAlreadyInUse : illegalSymbolNameAlreadyInUse);
-        return NULL;
     }
 
     return np;
@@ -138,24 +128,18 @@ void printSymbolItem(Item *item)
 
 Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
+    /*
+printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
+*/
     unsigned base;
     unsigned offset;
     Item *p;
     if (!verifyLabelNaming(name))
         return NULL;
-    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
-    p = lookup(name, Symbol);
-    if (p != NULL)
-    {
 
-        if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
-            yieldError(illegalOverrideOfExternalSymbol);
-        else if (p->val.s.attrs.entry && (isCode || isExternal))
-            yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
-        else
-            yieldError(illegalSymbolNameAlreadyInUse);
-        return NULL;
-    }
+    if ((p = isLabelNameAlreadyTaken(name, Symbol)) != NULL)
+        return updateSymbol(p, value, isCode, isData, isEntry, isExternal) ? p : NULL;
+
     else
     {
         p = install(name, Symbol);
@@ -170,15 +154,30 @@ Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigne
         p->val.s.attrs.data = isData ? 1 : 0;
     }
 
-    /*    if (!isEntry || !isExternal)
-           printf("added the name \"%s\" successfully to the symbol table!:)\n", name);
-       else
-           printf("updated exisiting  entry/external label with the name \"%s\" successfully to the symbol table!:)\n", name);
-    */
-    /* printSymbolTable();
-     */
-
     return p;
+}
+
+Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+{
+
+    if (p->val.s.attrs.entry && (!p->val.s.attrs.data && !p->val.s.attrs.code && !p->val.s.attrs.external))
+    {
+        if (isCode)
+            p->val.s.attrs.code = 1;
+        else if (isData)
+            p->val.s.attrs.data = 1;
+    }
+
+    else if (p->val.s.attrs.external && (value || isCode || isData || isEntry))
+        return yieldError(illegalOverrideOfExternalSymbol);
+
+    else if (p->val.s.attrs.entry && isExternal)
+        return yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
+
+    else
+        return yieldError(illegalSymbolNameAlreadyInUse);
+
+    return True;
 }
 
 Item *findOrAddSymbol(char *name, ItemType type)
@@ -190,9 +189,24 @@ Item *findOrAddSymbol(char *name, ItemType type)
         return addSymbol(name, 0, 0, 0, 0, 0);
 }
 
-Item *findSymbol(char *name, ItemType type)
+Item *getSymbol(char *name, ItemType type)
 {
     return lookup(name, type);
+}
+
+Item *isLabelNameAlreadyTaken(char *name, ItemType type)
+{
+    Item *p = lookup(name, type);
+    if (p != NULL)
+    {
+        if (type == Symbol)
+            return (p->val.s.attrs.data || p->val.s.attrs.code || p->val.s.attrs.external || p->val.s.attrs.entry) ? p : NULL;
+
+        else if (type == Macro)
+            return p->val.m.start != -1 ? p : NULL;
+    }
+
+    return NULL;
 }
 
 Item *removeFromTable(char *name, ItemType type)
@@ -208,7 +222,7 @@ Item *removeFromTable(char *name, ItemType type)
 
 Item *updateSymbolAddressValue(char *name, int newValue)
 {
-    Item *p = findSymbol(name, Symbol);
+    Item *p = getSymbol(name, Symbol);
     unsigned base;
     unsigned offset;
 
@@ -222,11 +236,6 @@ Item *updateSymbolAddressValue(char *name, int newValue)
         p->val.s.offset = offset;
         p->val.s.base = base;
         p->val.s.value = newValue;
-        printf("updated adrress values for \"%s\" successfully to the symbol table!:)\n", name);
-
-        /*
-              printSymbolTable();
-      */
     }
     else
         yieldError(symbolDoesNotExist);
@@ -234,9 +243,10 @@ Item *updateSymbolAddressValue(char *name, int newValue)
     return p;
 }
 
+/*
 Item *updateSymbolAttribute(char *name, int type)
 {
-    Item *p = findSymbol(name, Symbol);
+     Item *p = getSymbol(name, Symbol);
 
     if (p != NULL)
     {
@@ -256,36 +266,44 @@ Item *updateSymbolAttribute(char *name, int type)
             else if (type == _TYPE_CODE)
                 p->val.s.attrs.code = 1;
 
-            /*
+
             printf("updated \"%s\" attributes successfully to the symbol table!:)\n", name);
             printSymbolTable();
-            */
+
         }
     }
     else
         yieldError(symbolDoesNotExist);
 
     return p;
-}
 
-char *getMacroCodeValue(char *s)
+
+}
+*/
+Item *getMacro(char *s)
 {
-    Item *result = lookup(s, Macro);
-    if (result != NULL)
-        return strdup(result->val.m.code);
-    else
+    Item *p = lookup(s, Macro);
+    if (p == NULL)
         yieldError(macroDoesNotExist);
-
-    return NULL;
+    return p;
 }
 
-Item *addMacro(char *name, char *code)
+Item *addMacro(char *name, int start, int end)
 {
-    Item *item = install(name, Macro);
-    if (item != NULL)
-        item->val.m.code = strdup(code);
+    Item *macro = lookup(name, Macro);
+    if (macro != NULL)
+    {
+        yieldError(illegalMacroNameAlreadyInUse);
+        return NULL;
+    }
+    else
+    {
+        macro = install(name, Macro);
+        macro->val.m.start = start;
+        macro->val.m.end = end;
+    }
 
-    return item;
+    return macro;
 }
 
 Bool verifyLabelNaming(char *s)

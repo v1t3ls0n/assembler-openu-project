@@ -6,14 +6,24 @@ extern int parseExpandedSourceFile(FILE *fp, char *filename);
 
 int main(int argc, char *argv[])
 {
+
     handleSourceFiles(argc, argv);
     globalState = firstRun;
     printf("after macro state\n");
     handleSourceFiles(argc, argv);
     printf("Finished Successfully!\n");
+    printSymbolTable();
 
-    /* printSymbolTable();
-     */
+    /*
+    symbol table from test should include:
+    x data entry
+    y data
+    Bla external
+    dsafs external
+    str2 string
+    str string
+    */
+
     return 0;
 }
 
