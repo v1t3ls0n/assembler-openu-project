@@ -13,6 +13,10 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case wrongRegisteryReferenceUndefinedReg:
+        printf("registery name passed as operand does not exist, registeries names are r0 - r15");
+        break;
+
     case fileCouldNotBeOpened:
         printf("file could not be  opened");
         break;

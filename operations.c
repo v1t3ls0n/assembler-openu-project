@@ -25,12 +25,14 @@ Operation operations[OP_SIZE] = {
 Operation *getOperationByName(char *s)
 {
     int i = getOpIndex(s);
-    Operation *p;
+
+    /* Operation *p;
+    p = (Operation *)malloc(sizeof(Operation *));
+    p = &operations[i];
+    return p;
+     */
     if (i != -1)
-    {
-        p = (Operation *)malloc(sizeof(Operation *));
-        return p;
-    }
+        return &operations[i];
 
     return NULL;
 }

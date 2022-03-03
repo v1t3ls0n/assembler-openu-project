@@ -36,7 +36,13 @@ typedef enum
     AssemblerDidNotGetSourceFiles,
     expectedQuotes,
     closingQuotesForStringIsMissing,
-    fileCouldNotBeOpened
+    fileCouldNotBeOpened,
+    wrongRegisteryReferenceUndefinedReg,
+    requiredSourceOperandIsMissin,
+    requiredDestinationOperandIsMissin,
+    srcOperandTypeIsNotAllowed,
+    desOperandTypeIsNotAllowed
+
 } Error;
 
 typedef enum

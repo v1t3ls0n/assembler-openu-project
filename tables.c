@@ -3,6 +3,7 @@
 extern State globalState;
 extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
+extern const char *regs[REGS_SIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
@@ -278,7 +279,6 @@ Item *addMacro(char *name, int start, int end)
 Bool verifyLabelNaming(char *s)
 {
     int i = 0;
-    const char *regs[] = {R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13, R14, R15};
     int labelLength = strlen(s);
 
     /* if label name does not start with a alphabet letter */
