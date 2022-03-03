@@ -85,7 +85,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
-int handleOperation(char *operandName, char *firstOperand, char *secondOperand);
+int handleOperation(char *operandName, char *line);
 Bool parseOperands(char *src, char *des, Operation *op);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand);
 Bool checkLegalUseOfCommas(char *s1, char *s2);

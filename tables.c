@@ -130,11 +130,13 @@ void printSymbolItem(Item *item)
 Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     /*
-printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
-*/
+     */
     unsigned base;
     unsigned offset;
     Item *p;
+    /*     printf("inside addSymbol\n");
+        printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
+     */
     if (!verifyLabelNaming(name))
         return False;
     p = lookup(name, Symbol);
@@ -159,7 +161,8 @@ printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, 
 
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-
+    /*     printf("inside updateSymbol\n");
+     */
     if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
         return yieldError(illegalOverrideOfExternalSymbol);
 
