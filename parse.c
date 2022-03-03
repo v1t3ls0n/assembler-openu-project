@@ -146,10 +146,13 @@ int handleState(char *token, char *line, ParseState state)
 int handleOperation(char *op, char *operands)
 {
 
-    printf("inside handleOperation,operation:%s  operands:%s\n", op, operands);
+    Operation *p = getOperationByName(op);
+    AddrMethodsOptions source = {0, 0, 0, 0}, des = {0, 0, 0, 0};
 
-    /*     printf("inside handleOperation\noperands:%s\n", operands);
-     */
+    printf("inside handleOperation,operation:%s  operands:%s\n", op, operands);
+    printf("Operation allowed operands types:\n");
+    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", p->src.immediate, p->src.direct, p->src.index, p->src.reg);
+    printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n", p->des.immediate, p->des.direct, p->des.index, p->des.reg);
     return 1;
 }
 
