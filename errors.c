@@ -4,7 +4,7 @@ extern unsigned currentLine;
 
 Bool yieldError(Error err)
 {
-    printf("\n\n######### Error!! occured on line %d:#################\n", currentLine);
+    printf("\nError!! occured on line %d ", currentLine);
     /*     illegalLabelNameUseOfCharacters
 
             illegalLabelNameLength
@@ -65,8 +65,12 @@ Bool yieldError(Error err)
         printf("Macro Name Already In Use");
         break;
     case wrongArgumentTypeNotAnInteger:
-        printf("Wrong Type, Not An Integer");
+        printf("Number must be an integer!");
         break;
+    case expectedNumber:
+        printf("Only integer numbers allowed!");
+        break;
+
     case symbolCannotBeBothCurrentTypeAndRequestedType:
         printf("symbol Cannot Be Both Current Type And Requested Type");
         break;
@@ -77,13 +81,17 @@ Bool yieldError(Error err)
         printf("Missing Comma");
         break;
     case illegalApearenceOfCharactersOnLine:
-        printf("Illegal use of extra characters in line");
+        printf("Illegal use of characters");
         break;
     case wrongInstructionSyntaxExtraCommas:
         printf("Illegal use of extra commas in line");
         break;
     case expectedQuotes:
-        printf("expected starting/ending quotes in string definition");
+        printf("expected opening quotes before string decleration");
+        break;
+
+    case closingQuotesForStringIsMissing:
+        printf("missin closing quotes of string variable");
         break;
 
     case maxLineLengthExceeded:
@@ -93,8 +101,7 @@ Bool yieldError(Error err)
     default:
         break;
     }
-    printf("\n##############################################################\n");
-    printf("\n\n\n");
+    printf("\n");
 
     return False;
 }

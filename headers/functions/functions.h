@@ -45,18 +45,16 @@ Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 void printSymbolItem(Item *item);
-Item *findOrAddSymbol(char *name, ItemType type);
 Item *getSymbol(char *name, ItemType type);
-Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Item *updateSymbolAddressValue(char *name, int newValue);
-Item *updateSymbolAttribute(char *name, int attribute);
 Item *getMacro(char *s);
 Item *addMacro(char *name, int start, int end);
 Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 
-Item *isLabelNameAlreadyTaken(char *name, ItemType type);
+Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/

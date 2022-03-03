@@ -5,8 +5,8 @@ extern unsigned currentLine;
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
-extern Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-extern Item *isLabelNameAlreadyTaken(char *name, ItemType type);
+extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 
 extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
@@ -59,7 +59,10 @@ int parseSingleLine(char *line, ParseState state)
     token = strtok(p, " \t \n");
     if (state == newLine)
         state = handleState(token, p, state);
-    printf("\n\n\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n", line, currentLine);
+
+    /*     printf("\n\n\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n", line, currentLine);
+     */
+
     while (token != NULL)
     {
 
@@ -158,9 +161,9 @@ int handleOperation(Operation *op, char *operands, char *line)
 
 int handleInstruction(int type, char *firstToken, char *nextTokens)
 {
-
-    printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
-
+    /*
+        printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
+     */
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
@@ -174,7 +177,7 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
             labelName = strdup(nextTokens);
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
-                return yieldError(illegalApearenceOfExtraCharactersOnLine);
+                return yieldError(illegalApearenceOfCharactersOnLine);
             else
             {
                 if (type == _TYPE_ENTRY)
@@ -187,14 +190,14 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
     else if (isLabel(firstToken))
     {
         int dataCounter = getDC();
+        Bool isLabelNameAvailable;
         firstToken[strlen(firstToken) - 1] = '\0';
-        if ((type == _TYPE_DATA && handleInstructionDataArgs(strtok(NULL, " \t \n"))) || (type == _TYPE_STRING && handleInstructionStringArgs(strtok(NULL, " \t \n"))))
-        {
-            if (isLabelNameAlreadyTaken(firstToken, Symbol))
-                return yieldError(illegalSymbolNameAlreadyInUse);
-            else
-                return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;
-        }
+        isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
+        if (!isLabelNameAvailable)
+            yieldError(illegalSymbolNameAlreadyInUse);
+
+        if ((type == _TYPE_DATA && handleInstructionDataArgs(nextTokens)) || (type == _TYPE_STRING && handleInstructionStringArgs(nextTokens)))
+            return isLabelNameAvailable ? addSymbol(firstToken, dataCounter, 0, 1, 0, 0) : False;
         else
             return Err;
     }
@@ -204,8 +207,8 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
-    printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
-
+    /*     printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
+     */
     if (nextToken[0] == '.')
     {
         int instruction = getInstructionType(nextToken);
@@ -315,33 +318,34 @@ int handleInstructionDataArgs(char *token)
 {
     int number = 0;
     int counter = 0;
+    char illegalCharacter = 0;
     Bool commaState = True;
+
+    if (isInstruction(token))
+        token = strtok(NULL, " \t \n");
 
     while (token)
     {
-        if (token[0] == ',')
-        {
-            if (commaState)
-                return yieldError(wrongInstructionSyntaxExtraCommas);
-            else
-                commaState = True;
-        }
-
-        else if (!isdigit(token[0]))
+        if (!isdigit(token[0]) && token[0] != ',')
         {
 
-            if (token[0] == '.')
-                return yieldError(expectedIntegerNumber);
+            if (isalpha(token[0]))
+                return yieldError(expectedNumber);
             else
                 return yieldError(illegalApearenceOfCharactersOnLine);
         }
+
+        else if (token[0] == ',' && commaState)
+            return yieldError(wrongInstructionSyntaxExtraCommas);
 
         else
         {
             if (commaState)
             {
-                sscanf(token, "%d", &number);
-                if (token[strlen(token) - 1] != ',')
+                sscanf(token, "%d%c", &number, &illegalCharacter);
+                if (illegalCharacter == '.')
+                    return yieldError(wrongArgumentTypeNotAnInteger);
+                else if (illegalCharacter == ',')
                     commaState = True;
                 else
                     commaState = False;
@@ -351,29 +355,36 @@ int handleInstructionDataArgs(char *token)
                 else
                     counter++;
             }
+            else if (!commaState && strtok(NULL, " \t \n"))
+            {
+                return yieldError(expectedSingleCommaCharacter);
+            }
             else
                 return yieldError(expectedSingleCommaCharacter);
         }
-
         token = strtok(NULL, " \t \n");
     }
 
     if (globalState != secondRun)
         increaseDataCounter(counter);
+
     return lineParsedSuccessfully;
 }
 
 int handleInstructionStringArgs(char *token)
 {
-
-    printf("inside handle instruction string args, token:%s\n", token);
+    if (isInstruction(token))
+        token = strtok(NULL, " \t \n");
 
     /*
 
+    printf("inside handle instruction string args, token:%s\n", token);
 
      */
 
-    if (!(token[0] == '\"') || !(token[strlen(token) - 1] == '\"'))
+    if ((token[0] == '\"') && !(token[strlen(token) - 1] == '\"'))
+        return yieldError(closingQuotesForStringIsMissing);
+    else if ((token[0] != '\"'))
         return yieldError(expectedQuotes);
 
     if (globalState == secondRun)

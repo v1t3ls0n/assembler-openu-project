@@ -11,7 +11,12 @@ int main(int argc, char *argv[])
     globalState = firstRun;
     printf("after macro state\n");
     handleSourceFiles(argc, argv);
-    printf("Finished Successfully!\n");
+
+    if (globalState != collectErrors)
+        printf("Finished Successfully!\n");
+    else
+        printf("\nFinished First Run With Errors\n");
+
     printSymbolTable();
 
     /*

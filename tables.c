@@ -126,7 +126,7 @@ void printSymbolItem(Item *item)
         printSymbolItem(item->next);
 }
 
-Item *addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     /*
 printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
@@ -135,11 +135,10 @@ printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, 
     unsigned offset;
     Item *p;
     if (!verifyLabelNaming(name))
-        return NULL;
-
-    if ((p = isLabelNameAlreadyTaken(name, Symbol)) != NULL)
-        return updateSymbol(p, value, isCode, isData, isEntry, isExternal) ? p : NULL;
-
+        return False;
+    p = lookup(name, Symbol);
+    if (p != NULL)
+        return updateSymbol(p, value, isCode, isData, isEntry, isExternal);
     else
     {
         p = install(name, Symbol);
@@ -154,7 +153,7 @@ printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, 
         p->val.s.attrs.data = isData ? 1 : 0;
     }
 
-    return p;
+    return True;
 }
 
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
@@ -180,33 +179,31 @@ Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned
     return True;
 }
 
-Item *findOrAddSymbol(char *name, ItemType type)
-{
-    Item *p = lookup(name, type);
-    if (p != NULL)
-        return p;
-    else
-        return addSymbol(name, 0, 0, 0, 0, 0);
-}
-
 Item *getSymbol(char *name, ItemType type)
 {
     return lookup(name, type);
 }
 
-Item *isLabelNameAlreadyTaken(char *name, ItemType type)
+Bool isLabelNameAlreadyTaken(char *name, ItemType type)
 {
     Item *p = lookup(name, type);
     if (p != NULL)
     {
         if (type == Symbol)
-            return (p->val.s.attrs.data || p->val.s.attrs.code || p->val.s.attrs.external || p->val.s.attrs.entry) ? p : NULL;
+        {
+            if (p->val.s.attrs.data || p->val.s.attrs.code)
+                return True;
+            if (p->val.s.attrs.entry)
+                return (!p->val.s.attrs.data && !p->val.s.attrs.code && !p->val.s.attrs.external) ? False : True;
+            if (p->val.s.attrs.external)
+                return (!p->val.s.attrs.data && !p->val.s.attrs.code && !p->val.s.attrs.entry) ? False : True;
+        }
 
         else if (type == Macro)
-            return p->val.m.start != -1 ? p : NULL;
+            return p->val.m.start != -1 ? False : True;
     }
 
-    return NULL;
+    return False;
 }
 
 Item *removeFromTable(char *name, ItemType type)
@@ -226,9 +223,6 @@ Item *updateSymbolAddressValue(char *name, int newValue)
     unsigned base;
     unsigned offset;
 
-    /*     printf("inside updateSymbolAddressValue\n");
-     */
-
     if (p != NULL)
     {
         offset = newValue % 16;
@@ -243,43 +237,6 @@ Item *updateSymbolAddressValue(char *name, int newValue)
     return p;
 }
 
-/*
-Item *updateSymbolAttribute(char *name, int type)
-{
-     Item *p = getSymbol(name, Symbol);
-
-    if (p != NULL)
-    {
-        if (((type == _TYPE_DATA || type == _TYPE_STRING) && p->val.s.attrs.code) || (type == _TYPE_CODE && p->val.s.attrs.data) || ((type == _TYPE_ENTRY) && p->val.s.attrs.external) || (type == _TYPE_EXTERNAL && p->val.s.attrs.entry))
-        {
-            yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
-            return NULL;
-        }
-        else
-        {
-            if (type == _TYPE_DATA || type == _TYPE_STRING)
-                p->val.s.attrs.data = 1;
-            else if (type == _TYPE_ENTRY)
-                p->val.s.attrs.entry = 1;
-            else if (type == _TYPE_EXTERNAL)
-                p->val.s.attrs.external = 1;
-            else if (type == _TYPE_CODE)
-                p->val.s.attrs.code = 1;
-
-
-            printf("updated \"%s\" attributes successfully to the symbol table!:)\n", name);
-            printSymbolTable();
-
-        }
-    }
-    else
-        yieldError(symbolDoesNotExist);
-
-    return p;
-
-
-}
-*/
 Item *getMacro(char *s)
 {
     Item *p = lookup(s, Macro);
