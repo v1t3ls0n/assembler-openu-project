@@ -2,6 +2,8 @@
 /* Shared global State variables*/
 extern State globalState;
 extern unsigned currentLine;
+extern const char *regs[REGS_SIZE];
+
 /* Complex struct *Constant Variables: */
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
@@ -86,7 +88,7 @@ int parseSingleLine(char *line, ParseState state)
 
         case parseOperation:
         {
-            state = handleOperation(token, strtok(NULL, " \t \n"));
+            state = handleOperation(p, token, line);
             break;
         }
 
@@ -143,17 +145,96 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(char *op, char *operands)
+int handleOperation(char *operandName, char *firstOperand, char *secondOperand)
 {
+    Operation *p = getOperationByName(operandName);
+    /*     if (operandName == firstOperand)
+        {
+            firstOperand = secondOperand;
+            secondOperand = strtok(NULL, " \t \n");
+        } */
+    if (firstOperand == secondOperand)
+        secondOperand = strtok(NULL, " \t \n");
 
-    Operation *p = getOperationByName(op);
-    AddrMethodsOptions source = {0, 0, 0, 0}, des = {0, 0, 0, 0};
+    printf("\n\n\ninside handleOperation,operation:%s\n", operandName);
 
-    printf("inside handleOperation,operation:%s  operands:%s\n", op, operands);
+    if (strlen(firstOperand) && strlen(secondOperand))
+        return parseOperands(firstOperand, secondOperand, p);
+    else if (!strlen(firstOperand) && !strlen(secondOperand))
+        return parseOperands("\0", "\0", p);
+    else
+        return parseOperands(firstOperand, "\0", p);
+}
+
+Bool parseOperands(char *src, char *des, Operation *op)
+{
+    Bool isValid = True;
+    /*     AddrMethodsOptions sourceAddr = {0, 0, 0, 0}, des = {0, 0, 0, 0}; */
     printf("Operation allowed operands types:\n");
-    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", p->src.immediate, p->src.direct, p->src.index, p->src.reg);
-    printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n", p->des.immediate, p->des.direct, p->des.index, p->des.reg);
-    return 1;
+    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
+    printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n\n\n", op->des.immediate, op->des.direct, op->des.index, op->des.reg);
+    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
+        return True;
+
+    else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
+    {
+        if (!strlen(src))
+            isValid = yieldError(requiredSourceOperandIsMissin);
+        if (!strlen(des))
+            isValid = isValid && yieldError(requiredDestinationOperandIsMissin);
+
+        isValid = isValid && validateOperandMatch(op->src, src) && checkLegalUseOfCommas(src, des) && validateOperandMatch(op->des, des);
+    }
+
+    else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
+    {
+        if (!strlen(src))
+            isValid = yieldError(requiredSourceOperandIsMissin);
+        else
+            isValid = validateOperandMatch(op->src, src) && checkLegalUseOfCommas(src, NULL);
+    }
+    else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
+    {
+        if (!strlen(des))
+            isValid = yieldError(requiredDestinationOperandIsMissin);
+        else
+            isValid = validateOperandMatch(op->des, des) && checkLegalUseOfCommas(NULL, des);
+    }
+
+    return isValid;
+}
+
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
+{
+    printf("inside validateOperandMatch\n");
+
+    /* yieldError(srcOperandTypeIsNotAllowed);
+     */
+
+    return True;
+}
+
+Bool checkLegalUseOfCommas(char *s1, char *s2)
+{
+    if (s1 && s2)
+    {
+        if ((s1[strlen(s1) - 1] != ',' && s2[0] == ',') || (s1[strlen(s1) - 1] == ',' && s2[0] != ','))
+        {
+            s2 = strtok(NULL, " \t \n");
+            if (s2 != NULL && strchr(s2, ','))
+                return yieldError(wrongInstructionSyntaxExtraCommas);
+            else
+                return True;
+        }
+        else if (s1[strlen(s1) - 1] == ',' && s2[0] == ',')
+            return yieldError(wrongInstructionSyntaxExtraCommas);
+        else if (s1[strlen(s1) - 1] != ',' && s2[0] != ',')
+            return yieldError(expectedSingleCommaCharacter);
+    }
+    else if ((s1 && strchr(s1, ',') != NULL) || (s2 && strchr(s2, ',') != NULL))
+        return yieldError(wrongInstructionSyntaxExtraCommas);
+
+    return True;
 }
 
 int handleInstruction(int type, char *firstToken, char *nextTokens)
@@ -222,8 +303,11 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     {
         int icAddr = getIC();
         labelName[strlen(labelName) - 1] = '\0';
-        if (handleOperation(nextToken, strtok(NULL, " \t \n")))
+        if (handleOperation(nextToken, nextToken, line))
+        {
+            printf("line 308\n");
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
+        }
     }
 
     return yieldError(illegalLabelUseExpectedOperationOrInstruction);
@@ -231,7 +315,6 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
 int isOperation(char *s)
 {
-    printf("line 231\n");
     return getOperationByName(s) != NULL ? True : False;
 }
 
@@ -398,6 +481,44 @@ int handleInstructionStringArgs(char *token)
         increaseDataCounter((int)(strlen(token) - 2));
 
     return lineParsedSuccessfully;
+}
+
+const char *getRegisteryOperand(char *s)
+{
+
+    int len = strlen(s);
+    int i = 0;
+
+    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return regs[i];
+            i++;
+        }
+        yieldError(wrongRegisteryReferenceUndefinedReg);
+    }
+
+    return 0;
+}
+
+Bool isRegistery(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+
+    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return True;
+            i++;
+        }
+        return yieldError(wrongRegisteryReferenceUndefinedReg);
+    }
+    return False;
 }
 
 /*
