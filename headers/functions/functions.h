@@ -101,6 +101,7 @@ int handleInstructionStringArgs(char *tokens);
 Bool isRegistery(char *s);
 const char *getRegisteryOperand(char *s);
 Bool isValidImmediateParamter(char *s);
+int getRegisteryNumber(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

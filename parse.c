@@ -156,7 +156,10 @@ Bool handleOperation(char *operationName, char *line)
     line = operationName + strlen(operationName) + 1;
     sscanf(line, "%s%c%s%n", firstOperand, &comma, secondOperand, &n);
     printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nn:%d\n", operationName, firstOperand, secondOperand, comma, n);
-    return parseOperands(firstOperand, comma, secondOperand, p);
+
+    return isValidImmediateParamter(firstOperand);
+    /* return parseOperands(firstOperand, comma, secondOperand, p);
+     */
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
@@ -489,6 +492,7 @@ int handleInstructionStringArgs(char *token)
 }
 
 const char *getRegisteryOperand(char *s)
+/*returns a constant- the name of the register, so it can b*/
 {
 
     int len = strlen(s);
@@ -536,6 +540,22 @@ Bool isValidImmediateParamter(char *s)
     return True;
 }
 
+int getRegisteryNumber(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+
+    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return i;
+            i++;
+        }
+    }
+    return -1;
+}
 /*
                   IC -> 10
 DC = Data Counter IC = Instruction counter
