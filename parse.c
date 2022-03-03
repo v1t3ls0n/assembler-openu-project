@@ -23,7 +23,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
-    /*     printf("inside parseExpandedSourceFile"); */
+    printf("inside parseExpandedSourceFile(FILE *fp, char *filename)\n");
 
     while (((c = fgetc(fp)) != EOF))
     {
@@ -61,8 +61,7 @@ int parseSingleLine(char *line, ParseState state)
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
-    /*     printf("inside parseSingleLine, line:%s p:%s token:%s\n", line, p, token);
-     */
+    printf("\ninside parseSingleLine\nline:%s\n", line);
     if (state == newLine)
         state = handleState(token, p, state);
 
@@ -117,7 +116,7 @@ int parseSingleLine(char *line, ParseState state)
 
 int handleState(char *token, char *line, ParseState state)
 {
-    printf("inside handle State, token:%s\n", token);
+    /*   printf("inside handle State, token:%s\n", token); */
     switch (state)
     {
     case skipLine:
@@ -154,15 +153,11 @@ int handleOperation(char *operationName, char *line)
     char comma = 0;
     line = operationName + strlen(operationName) + 1;
     sscanf(line, "%s%c%s", firstOperand, &comma, secondOperand);
-    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\n", operationName, firstOperand, secondOperand, comma);
 
-    if (comma == ',' && (strchr(firstOperand, ',') || secondOperand[0] == ','))
-        return yieldError(wrongInstructionSyntaxExtraCommas);
+    /*     printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\n", operationName, firstOperand, secondOperand, comma);
+     */
 
-    else if (comma != ',' && (!strchr(firstOperand, ',') && secondOperand[0] != ','))
-        return yieldError(wrongInstructionSyntaxMissinCommas);
-    else
-        return parseOperands(firstOperand, secondOperand, p);
+    return parseOperands(firstOperand, secondOperand, p);
 }
 
 Bool parseOperands(char *src, char *des, Operation *op)
@@ -207,9 +202,6 @@ Bool parseOperands(char *src, char *des, Operation *op)
 
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
 {
-
-    /* yieldError(srcOperandTypeIsNotAllowed);
-     */
 
     return True;
 }
@@ -280,7 +272,8 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
-    printf("in handle Label labelName:%s nextToken:%s\n", labelName, nextToken);
+    /*     printf("in handle Label labelName:%s nextToken:%s\n", labelName, nextToken);
+     */
     if (nextToken[0] == '.')
     {
         int instruction = getInstructionType(nextToken);
@@ -381,7 +374,6 @@ int handleInstructionDataArgs(char *token)
     char illegalCharacter = 0;
     Bool minusSignOn = False;
     Bool commaState = True;
-
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
