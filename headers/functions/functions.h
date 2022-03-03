@@ -31,8 +31,8 @@ Bool yieldError(Error err);
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-const Operation *getOperationByName(char *s);
-const Operation *getOperationByIndex(unsigned int i);
+Operation *getOperationByName(char *s);
+Operation *getOperationByIndex(unsigned int i);
 int getOpIndex(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -64,8 +64,8 @@ void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 HexWord *convertNumToHexWord(int num);
 BinaryWord *convertNumberToBinaryWord(int num);
-char *generateFirstWordEncodedToBinary(const Operation *op);
-HexWord *generateFirstWordEncodedHex(const Operation *op);
+char *generateFirstWordEncodedToBinary(Operation *op);
+HexWord *generateFirstWordEncodedHex(Operation *op);
 Word *convertNumberToWord(int n, EncodingFormat format);
 
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -85,7 +85,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
-int handleOperation(const Operation *op, char *firstToken, char *operands);
+int handleOperation(Operation *op, char *firstToken, char *operands);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);

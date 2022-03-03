@@ -65,7 +65,7 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName)
     FILE *target;
     int c = 0;
     fileName[strlen(fileName) - 1] = 'm';
-    target = fopen(fileName, "w");
+    target = fopen(fileName, "w+");
     if (target == NULL)
     {
         fclose(source);

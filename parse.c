@@ -5,7 +5,7 @@ extern unsigned currentLine;
 /* Complex struct *Constant Variables: */
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-extern const Operation *getOperationByName(char *s);
+extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 
@@ -32,7 +32,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         }
 
         if (!isspace(c))
-            line[i++] = c;
+            line[i++] = (char)c;
         else
         {
             if (!isspace(line[i]))
@@ -42,7 +42,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         if (c == '\n')
         {
             parseSingleLine(line, state);
-            memset(line, '\0', i);
+            memset(line, 0, MAX_LINE_LEN);
             i = 0;
             state = newLine;
         }
@@ -58,6 +58,7 @@ int parseSingleLine(char *line, ParseState state)
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
+    printf("inside parseSingleLine, line:%s p:%s token:%s\n", line, p, token);
 
     if (state == newLine)
         state = handleState(token, p, state);
@@ -141,9 +142,11 @@ int handleState(char *token, char *line, ParseState state)
     return True;
 }
 
-int handleOperation(const Operation *op, char *firstToken, char *operands)
+int handleOperation(Operation *op, char *firstToken, char *operands)
 {
-    printf("inside handleOperation,operation:%s firstToken:%s operands:%s\n", (char *)op->keyword, firstToken, operands);
+    if (!firstToken)
+        return False;
+    printf("inside handleOperation,operation:%s firstToken:%s operands:%s\n", op->keyword, firstToken, operands);
     if (isLabel(firstToken))
     {
     }

@@ -6,12 +6,12 @@ extern char *hexToBin(char *hex);
 extern void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 extern unsigned char dec2Bin2sComplement(int n);
 
-char *generateFirstWordEncodedToBinary(const Operation *operation)
+char *generateFirstWordEncodedToBinary(Operation *operation)
 {
     return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(operation->op)));
 }
 
-HexWord *generateFirstWordEncodedHex(const Operation *operation)
+HexWord *generateFirstWordEncodedHex(Operation *operation)
 {
     char *buf = (char *)calloc(6, sizeof(char));
     HexWord *newWord = (HexWord *)malloc(1 * sizeof(HexWord *));

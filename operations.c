@@ -3,7 +3,7 @@
 /*
 extern Operation operations[OP_SIZE];
  */
-const Operation operations[OP_SIZE] = {
+Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
     {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
@@ -22,7 +22,7 @@ const Operation operations[OP_SIZE] = {
     {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
 
-const Operation *getOperationByName(char *s)
+Operation *getOperationByName(char *s)
 {
     int i = getOpIndex(s);
     Operation *p;
@@ -35,7 +35,7 @@ const Operation *getOperationByName(char *s)
     return NULL;
 }
 
-const Operation *getOperationByIndex(unsigned int i)
+Operation *getOperationByIndex(unsigned int i)
 {
     return i < OP_SIZE ? &operations[i] : NULL;
 }
