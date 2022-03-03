@@ -123,13 +123,13 @@ int handleState(char *token, char *line, ParseState state)
         else if (isLabel(token))
             return parseLabel;
 
-        else if (token[0] == '.' && getInstructionType(token))
+        else if (token[0] == '.')
             return parseInstruction;
 
         else if (isOperation(token))
             return parseOperation;
         else
-            return Err;
+            return yieldError(illegalApearenceOfCharactersOnLine);
         break;
     }
 
