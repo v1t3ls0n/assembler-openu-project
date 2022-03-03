@@ -57,11 +57,9 @@ int parseSingleLine(char *line, ParseState state)
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
+
     if (state == newLine)
         state = handleState(token, p, state);
-
-    /*     printf("\n\n\t\t~ Currently parsing: ~\t\t\n\"%s\" (Line number 0%d)\n", line, currentLine);
-     */
 
     while (token != NULL)
     {
@@ -86,16 +84,6 @@ int parseSingleLine(char *line, ParseState state)
         case parseOperation:
         {
             state = handleOperation(getOperationByName(token), token + n, line);
-            break;
-        }
-
-        case parseDataVariables:
-        {
-            break;
-        }
-
-        case parseStringVariables:
-        {
             break;
         }
 
@@ -181,9 +169,9 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
             else
             {
                 if (type == _TYPE_ENTRY)
-                    return addSymbol(labelName, 0, 0, 0, 1, 0) ? lineParsedSuccessfully : Err;
+                    return addSymbol(labelName, 0, 0, 0, 1, 0);
                 if (type == _TYPE_EXTERNAL)
-                    return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
+                    return addSymbol(labelName, 0, 0, 0, 0, 1);
             }
         }
     }
