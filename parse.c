@@ -157,7 +157,7 @@ Bool handleOperation(char *operationName, char *line)
     sscanf(line, "%s%c%s%n", firstOperand, &comma, secondOperand, &n);
     printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nn:%d\n", operationName, firstOperand, secondOperand, comma, n);
 
-    return isValidImmediateParamter(firstOperand);
+    return isValidIndexParameter(firstOperand);
     /* return parseOperands(firstOperand, comma, secondOperand, p);
      */
 }
@@ -165,6 +165,11 @@ Bool handleOperation(char *operationName, char *line)
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
 {
     Bool isValid = True;
+    if (src[strlen(src) - 1] == ',')
+        src--;
+    if (des[0] == ',')
+        des++;
+
     /*     AddrMethodsOptions sourceAddr = {0, 0, 0, 0}, des = {0, 0, 0, 0}; */
     /*    printf("Operation allowed operands types:\n");
     printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
@@ -207,12 +212,16 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
 {
     if (!allowedAddrs.reg && !allowedAddrs.direct && !allowedAddrs.immediate && !allowedAddrs.index && strlen(operand) > 0)
         return yieldError(operandTypeDoNotMatch);
+    else if (!isRegistery(operand) && !isValidImmediateParamter(operand) && !verifyLabelNaming(operand) && !isValidIndexParameter(operand)) /*if the operand can't be sorted*/
+        return yieldError(operandTypeDoNotMatch);
     else if (!allowedAddrs.reg && isRegistery(operand))
         return yieldError(operandTypeDoNotMatch);
-    else if (!allowedAddrs.immediate && operand[0] == '#')
+    else if (!allowedAddrs.immediate && isValidImmediateParamter(operand))
         return yieldError(operandTypeDoNotMatch);
-    if (allowedAddrs.direct && !verifyLabelNaming(operand)) /*checks if the label's name is legal*/
+    else if (allowedAddrs.direct && !verifyLabelNaming(operand)) /*checks if the label's name is legal*/
         return yieldError(illegalOperand);
+    else if (!allowedAddrs.index && isValidIndexParameter(operand))
+        return yieldError(operandTypeDoNotMatch);
 
     /*     typedef struct
         {
@@ -536,10 +545,69 @@ Bool isValidImmediateParamter(char *s)
     check #
 
     */
+    int len = strlen(s);
+    int i = 2;
+    printf("line 550, s:%s\n", s);
+    if (len < 2)
+    {
+        return False;
+    }
+    if (s[0] != '#')
+    {
+        return False;
+    }
+    if (!(s[1] == '-' || s[1] == '+' || isdigit(s[1])))
+    {
+        return False;
+    }
+    while (i < len)
+    {
+        if (!isdigit(s[i]))
+        {
+            return False;
+        }
+    }
 
     return True;
 }
 
+Bool isValidIndexParameter(char *s)
+{
+    int len = strlen(s);
+    if (s[len - 1] == ',')
+        s--;
+    else if (len < 6)
+    {
+        return False;
+    }
+
+    else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
+    {
+        return False;
+    }
+    else
+    {
+        int i = len - 4;
+
+        char *regName = calloc(3, sizeof(char));
+        printf("line 593\n");
+        s = s[len - 4];
+        while (i < len - 1)
+        {
+            *regName = *s;
+            i++;
+            regName++;
+            s++;
+        }
+        printf("line 592, regName:%s\n", regName);
+
+        if (getRegisteryNumber(s) < 10)
+        {
+            return False;
+        }
+    }
+    return True;
+}
 int getRegisteryNumber(char *s)
 {
     int len = strlen(s);

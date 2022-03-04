@@ -102,6 +102,7 @@ Bool isRegistery(char *s);
 const char *getRegisteryOperand(char *s);
 Bool isValidImmediateParamter(char *s);
 int getRegisteryNumber(char *s);
+Bool isValidIndexParameter(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
