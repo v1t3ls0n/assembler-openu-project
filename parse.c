@@ -17,6 +17,7 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addNumberToMemory(int number);
+static AddrMethodsOptions activeMethods[2];
 
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
@@ -150,108 +151,104 @@ int handleState(char *token, char *line, ParseState state)
 Bool handleOperation(char *operationName, char *line)
 {
     Operation *p = getOperationByName(operationName);
+
     char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
-    int n = 0;
+    int n = 0, nFirst = 0;
     line = operationName + strlen(operationName) + 1;
-    sscanf(line, "%s%c%s%n", firstOperand, &comma, secondOperand, &n);
-    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nn:%d\n", operationName, firstOperand, secondOperand, comma, n);
+    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &n);
+    if (secondOperand[0] == 0 && firstOperand[0] != '\0')
+    {
+        memcpy(secondOperand, firstOperand, nFirst);
+        firstOperand[0] = '\0';
+    }
+    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nnFirst:%d n:%d\n", operationName, firstOperand, secondOperand, comma, nFirst, n);
+    if (parseOperands(firstOperand, comma, secondOperand, p))
+    {
+        printf("operands use is GOOD:)\n");
+        return True;
+    }
+    else
+    {
+        printf("operands use is ILLLEGAL :(\n");
+        return False;
+    }
 
-    return isValidIndexParameter(firstOperand);
-    /* return parseOperands(firstOperand, comma, secondOperand, p);
-     */
+    /* return parseOperands(firstOperand, comma, secondOperand, p); */
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
 {
-    Bool isValid = True;
-    if (src[strlen(src) - 1] == ',')
+
+    int commasCount = 0;
+    if (src[strlen(src) - 1] == ',' && des[0] != ',' && comma != ',')
+    {
+        commasCount++;
         src--;
-    if (des[0] == ',')
+    }
+    else if (des[0] == ',' && comma != ',')
+    {
+        commasCount++;
         des++;
-
-    /*     AddrMethodsOptions sourceAddr = {0, 0, 0, 0}, des = {0, 0, 0, 0}; */
-    /*    printf("Operation allowed operands types:\n");
-    printf("Source: immediate:%d direct:%d index:%d regDirect:%d\n", op->src.immediate, op->src.direct, op->src.index, op->src.reg);
-       printf("Destination: immediate:%d direct:%d index:%d regDirect:%d\n\n\n", op->des.immediate, op->des.direct, op->des.index, op->des.reg); */
-    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
-        return True;
-
-    else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
-    {
-        if (!strlen(src))
-            isValid = yieldError(requiredSourceOperandIsMissin);
-        if (!strlen(des))
-            isValid = isValid && yieldError(requiredDestinationOperandIsMissin);
-
-        isValid = isValid && validateOperandMatch(op->src, src) && validateOperandMatch(op->des, des);
-        isValid = isValid && checkLegalUseOfCommas(src, comma, des);
     }
-
-    else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
+    else if (comma == ',' && commasCount > (strlen(src) && strlen(des) ? 1 : 0))
     {
-        if (!strlen(src))
-            isValid = yieldError(requiredSourceOperandIsMissin);
-        else
-            isValid = validateOperandMatch(op->src, src);
-    }
-    else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
-    {
-        if (!strlen(des))
-            isValid = yieldError(requiredDestinationOperandIsMissin);
-        else
-            isValid = validateOperandMatch(op->des, des);
-    }
-
-    return True;
-    /*     return isValid;
-     */
-}
-
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand)
-{
-    if (!allowedAddrs.reg && !allowedAddrs.direct && !allowedAddrs.immediate && !allowedAddrs.index && strlen(operand) > 0)
-        return yieldError(operandTypeDoNotMatch);
-    else if (!isRegistery(operand) && !isValidImmediateParamter(operand) && !verifyLabelNaming(operand) && !isValidIndexParameter(operand)) /*if the operand can't be sorted*/
-        return yieldError(operandTypeDoNotMatch);
-    else if (!allowedAddrs.reg && isRegistery(operand))
-        return yieldError(operandTypeDoNotMatch);
-    else if (!allowedAddrs.immediate && isValidImmediateParamter(operand))
-        return yieldError(operandTypeDoNotMatch);
-    else if (allowedAddrs.direct && !verifyLabelNaming(operand)) /*checks if the label's name is legal*/
-        return yieldError(illegalOperand);
-    else if (!allowedAddrs.index && isValidIndexParameter(operand))
-        return yieldError(operandTypeDoNotMatch);
-
-    /*     typedef struct
-        {
-            unsigned int immediate : 1;
-    # 4 or #- 3 integers unsigned int direct : 1;
-            label / entry / external unsigned int index : 1;
-            someVar[r2] unsigned int reg : 1;
-            r01 - r15
-        } AddrMethodsOptions;
-
-        if (allowedAddrs)
-
-             */
-    return True;
-}
-
-Bool checkLegalUseOfCommas(char *s1, char comma, char *s2)
-{
-    if (s1 && s2)
-    {
-        if ((s1[strlen(s1) - 1] != ',' && s2[0] == ',') || (s1[strlen(s1) - 1] == ',' && s2[0] != ','))
-            return True;
-
-        else if (s1[strlen(s1) - 1] == ',' && s2[0] == ',')
-            return yieldError(wrongInstructionSyntaxExtraCommas);
-        else if (s1[strlen(s1) - 1] != ',' && s2[0] != ',')
-            return yieldError(expectedSingleCommaCharacter);
-    }
-    else if (strchr(s1, ',') != NULL)
         return yieldError(wrongInstructionSyntaxExtraCommas);
+    }
+    else if (comma != ',' && (strlen(src) && strlen(des)))
+    {
+        return yieldError(wrongInstructionSyntaxMissinCommas);
+    }
+
+    else
+    {
+        if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
+            return True;
+        else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
+        {
+            if (!strlen(src))
+                return yieldError(requiredSourceOperandIsMissin);
+            if (!strlen(des))
+                return yieldError(requiredDestinationOperandIsMissin);
+            return validateOperandMatch(op->src, src, 0) && validateOperandMatch(op->des, des, 1);
+        }
+        else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
+        {
+            if (!strlen(src))
+                return yieldError(requiredSourceOperandIsMissin);
+            return validateOperandMatch(op->src, src, 0);
+        }
+        else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
+        {
+            if (!strlen(des))
+                return yieldError(requiredDestinationOperandIsMissin);
+            return validateOperandMatch(op->des, des, 1);
+        }
+    }
+    return True;
+}
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type)
+{
+    Bool isImmediate = isValidImmediateParamter(operand);
+    Bool isDirectIndex = isValidIndexParameter(operand);
+    Bool isReg = isRegistery(operand);
+    Bool isLabel = verifyLabelNaming(operand);
+
+    if (!isReg && !isImmediate && !isLabel && !isDirectIndex)
+        return yieldError(notEnoughArgumentsPassed);
+    else if (!allowedAddrs.reg && isReg)
+        return yieldError(operandTypeDoNotMatch);
+    else if (!allowedAddrs.immediate && isImmediate)
+        return yieldError(operandTypeDoNotMatch);
+    else if (!allowedAddrs.direct && isLabel)
+        return yieldError(illegalOperand);
+    else if (!allowedAddrs.index && isDirectIndex)
+        return yieldError(operandTypeDoNotMatch);
+
+    activeMethods[type].direct = isDirectIndex;
+    activeMethods[type].reg = isReg;
+    activeMethods[type].immediate = isImmediate;
+    activeMethods[type].index = isDirectIndex;
 
     return True;
 }
@@ -507,7 +504,7 @@ const char *getRegisteryOperand(char *s)
     int len = strlen(s);
     int i = 0;
 
-    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    if (s[0] == 'r' && len >= 2)
     {
         while (i < REGS_SIZE)
         {
@@ -525,8 +522,7 @@ Bool isRegistery(char *s)
 {
     int len = strlen(s);
     int i = 0;
-
-    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    if (s[0] == 'r' && len >= 2)
     {
         while (i < REGS_SIZE)
         {
@@ -534,77 +530,35 @@ Bool isRegistery(char *s)
                 return True;
             i++;
         }
-        return yieldError(wrongRegisteryReferenceUndefinedReg);
     }
     return False;
 }
 
 Bool isValidImmediateParamter(char *s)
 {
-    /*
-    check #
-
-    */
-    int len = strlen(s);
-    int i = 2;
-    printf("line 550, s:%s\n", s);
-    if (len < 2)
-    {
+    int i, len = strlen(s);
+    if (len < 2 || s[0] != '#' || (!(s[1] == '-' || s[1] == '+' || isdigit(s[1]))))
         return False;
-    }
-    if (s[0] != '#')
-    {
-        return False;
-    }
-    if (!(s[1] == '-' || s[1] == '+' || isdigit(s[1])))
-    {
-        return False;
-    }
-    while (i < len)
-    {
+    for (i = 2; i < len; i++)
         if (!isdigit(s[i]))
-        {
             return False;
-        }
-    }
-
     return True;
 }
 
 Bool isValidIndexParameter(char *s)
 {
     int len = strlen(s);
-    if (s[len - 1] == ',')
-        s--;
-    else if (len < 6)
-    {
+    if (len < 6)
         return False;
-    }
-
     else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
-    {
         return False;
-    }
     else
     {
-        int i = len - 4;
-
-        char *regName = calloc(3, sizeof(char));
-        printf("line 593\n");
-        s = s[len - 4];
-        while (i < len - 1)
-        {
-            *regName = *s;
-            i++;
-            regName++;
-            s++;
-        }
-        printf("line 592, regName:%s\n", regName);
-
+        s = strchr(s, '[');
+        s++;
+        s[strlen(s) - 1] = 0;
         if (getRegisteryNumber(s) < 10)
-        {
             return False;
-        }
     }
     return True;
 }
@@ -612,12 +566,11 @@ int getRegisteryNumber(char *s)
 {
     int len = strlen(s);
     int i = 0;
-
-    if (strchr(s, 'r') && len >= 2 && len <= 3)
+    if (s[0] == 'r' && len >= 2)
     {
         while (i < REGS_SIZE)
         {
-            if ((strcmp(regs[i], s) == 0))
+            if ((strcmp(s, regs[i]) == 0))
                 return i;
             i++;
         }

@@ -53,7 +53,7 @@ Item *getMacro(char *s);
 Item *addMacro(char *name, int start, int end);
 Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
-
+Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -87,8 +87,7 @@ int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
 Bool handleOperation(char *operationName, char *line);
 Bool parseOperands(char *src, char comma, char *des, Operation *op);
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand);
-Bool checkLegalUseOfCommas(char *s1, char comma, char *s2);
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);
