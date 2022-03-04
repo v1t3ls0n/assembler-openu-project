@@ -14,6 +14,17 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case illegalOperand:
+    {
+        printf("illegal Operand!\n");
+        break;
+    }
+    case operandTypeDoNotMatch:
+    {
+        printf("Operand type does not fit to current operation\n");
+        break;
+    }
+
     case wrongRegisteryReferenceUndefinedReg:
         printf("registery name passed as operand does not exist, registeries names are r0 - r15");
         break;

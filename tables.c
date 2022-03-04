@@ -139,7 +139,7 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
      */
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
-    if (!verifyLabelNaming(name))
+    if (!verifyLabelNamingAndPrintErrors(name))
         return False;
     p = lookup(name, Symbol);
     if (p != NULL)
@@ -282,6 +282,55 @@ Item *addMacro(char *name, int start, int end)
 }
 
 Bool verifyLabelNaming(char *s)
+{
+    int i = 0;
+    int labelLength = strlen(s);
+
+    /* if label name does not start with a alphabet letter */
+    if (isalpha(s[0]) == 0)
+        return False;
+
+    /* maximum label name length is 31 characters */
+    if (strlen(s) > MAX_LABEL_LEN)
+        return False;
+
+    if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return False;
+
+            i++;
+        }
+    }
+
+    else if ((labelLength >= 3 && labelLength <= 4))
+    {
+        while (i < OP_SIZE)
+        {
+            if ((strcmp(operations[i].keyword, s) == 0))
+                return False;
+
+            i++;
+        }
+    }
+    else
+    {
+
+        while (i < labelLength)
+        {
+            if (!isalnum(s[i]))
+                return False;
+
+            i++;
+        }
+    }
+
+    return True;
+}
+
+Bool verifyLabelNamingAndPrintErrors(char *s)
 {
     int i = 0;
     int labelLength = strlen(s);

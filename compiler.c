@@ -4,10 +4,8 @@ extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int parseExpandedSourceFile(FILE *fp, char *filename);
 /*
-rm testcode1.am && ./compiler.exe testcode1
-rm -f *.am && rm -f out.txt && ./compiler.exe testop testcode1 > out.txt
-
-
+run program on test code, code from file code-for-test.as
+sh test.sh
  */
 int main(int argc, char *argv[])
 {

@@ -3,6 +3,29 @@
 /*
 extern Operation operations[OP_SIZE];
  */
+
+/*
+
+typedef struct
+{
+    unsigned int immediate : 1;
+    unsigned int direct : 1;
+    unsigned int index : 1;
+    unsigned int reg : 1;
+} AddrMethodsOptions;
+
+
+STRUCTURE:
+typedef struct
+{
+    unsigned int op;
+    unsigned int funct : 4;
+    char keyword[4];
+    AddrMethodsOptions src;
+    AddrMethodsOptions des;
+} Operation;
+
+ */
 Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},

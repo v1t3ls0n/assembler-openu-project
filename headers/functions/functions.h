@@ -53,7 +53,7 @@ Item *getMacro(char *s);
 Item *addMacro(char *name, int start, int end);
 Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
-
+Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -85,10 +85,9 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 int parseSingleLine(char *line, ParseState state);
 int handleState(char *token, char *line, ParseState state);
-int handleOperation(char *operationName, char *line);
-Bool parseOperands(char *src, char *des, Operation *op);
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand);
-Bool checkLegalUseOfCommas(char *s1, char *s2);
+Bool handleOperation(char *operationName, char *line);
+Bool parseOperands(char *src, char comma, char *des, Operation *op);
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 int isLabel(char *s);
@@ -100,6 +99,9 @@ int handleInstructionDataArgs(char *tokens);
 int handleInstructionStringArgs(char *tokens);
 Bool isRegistery(char *s);
 const char *getRegisteryOperand(char *s);
+Bool isValidImmediateParamter(char *s);
+int getRegisteryNumber(char *s);
+Bool isValidIndexParameter(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
