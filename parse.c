@@ -3,15 +3,11 @@
 extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
-
-/* Complex struct *Constant Variables: */
-/* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 extern Bool verifyLabelNaming(char *s);
-
 extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
@@ -162,19 +158,7 @@ Bool handleOperation(char *operationName, char *line)
         memcpy(secondOperand, firstOperand, nFirst);
         firstOperand[0] = '\0';
     }
-    printf("operationName:%s\nFirst Operand:%s\nSecond Operand:%s\ncomma:%c\nnFirst:%d n:%d\n", operationName, firstOperand, secondOperand, comma, nFirst, n);
-    if (parseOperands(firstOperand, comma, secondOperand, p))
-    {
-        printf("operands use is GOOD:)\n");
-        return True;
-    }
-    else
-    {
-        printf("operands use is ILLLEGAL :(\n");
-        return False;
-    }
-
-    /* return parseOperands(firstOperand, comma, secondOperand, p); */
+    return parseOperands(firstOperand, comma, secondOperand, p);
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
