@@ -3,10 +3,6 @@
 extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int parseExpandedSourceFile(FILE *fp, char *filename);
-/*
-run program on test code, code from file code-for-test.as
-sh test.sh
- */
 int main(int argc, char *argv[])
 {
 
@@ -21,16 +17,6 @@ int main(int argc, char *argv[])
         printf("\nFinished First Run With Errors\n");
 
     printSymbolTable();
-
-    /*
-    symbol table from test should include:
-    x data entry
-    y data
-    Bla external
-    dsafs external
-    str2 string
-    str string
-    */
 
     return 0;
 }
