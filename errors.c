@@ -93,15 +93,23 @@ Bool yieldError(Error err)
     case illegalLabelUseExpectedOperationOrInstruction:
         printf("illegal Label Use Expected Operation Or Instruction");
         break;
+    case wrongInstructionSyntaxMissinCommas:
+    {
+        printf("Missing Comma between operands");
+        break;
+    }
+    case wrongInstructionSyntaxExtraCommas:
+    {
+        printf("extra comma between operands");
+        break;
+    }
     case expectedSingleCommaCharacter:
         printf("Missing Comma");
         break;
     case illegalApearenceOfCharactersOnLine:
         printf("Illegal use of characters");
         break;
-    case wrongInstructionSyntaxExtraCommas:
-        printf("Illegal use of extra commas in line");
-        break;
+
     case expectedQuotes:
         printf("expected opening quotes before string decleration");
         break;

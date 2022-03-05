@@ -129,8 +129,6 @@ void printSymbolItem(Item *item)
 
 Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-    /*
-     */
     unsigned base;
     unsigned offset;
     Item *p;
@@ -294,7 +292,7 @@ Bool verifyLabelNaming(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return False;
 
-    if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
     {
         while (i < REGS_SIZE)
         {
@@ -343,7 +341,7 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return yieldError(illegalLabelNameLength);
 
-    if (strchr(s, 'r') && labelLength >= 2 && labelLength <= 3)
+    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
     {
         while (i < REGS_SIZE)
         {

@@ -60,6 +60,9 @@ int parseSingleLine(char *line, ParseState state)
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+
+    /*
+     */
     if (state == newLine)
         state = handleState(token, p, state);
 
@@ -155,9 +158,18 @@ Bool handleOperation(char *operationName, char *line)
     sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &n);
     if (secondOperand[0] == 0 && firstOperand[0] != '\0')
     {
-        memcpy(secondOperand, firstOperand, nFirst);
-        firstOperand[0] = '\0';
+        if (!strchr(firstOperand, ','))
+        {
+            memcpy(secondOperand, firstOperand, nFirst);
+            firstOperand[0] = '\0';
+        }
+        else
+        {
+            memcpy(secondOperand, strrchr(firstOperand, ','), strlen(firstOperand));
+            firstOperand[strlen(firstOperand) - strlen(secondOperand)] = 0;
+        }
     }
+
     return parseOperands(firstOperand, comma, secondOperand, p);
 }
 
@@ -165,26 +177,30 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op)
 {
 
     int commasCount = 0;
-    if (src[strlen(src) - 1] == ',' && des[0] != ',' && comma != ',')
+    int expectedCommasBasedOnNumberOfOperands = (strlen(src) > 0 && strlen(des) > 0) ? 1 : 0;
+
+    printf("inside parse operands,expectedCommas:%d\nsrc:%s comma:%c des:%s\n", expectedCommasBasedOnNumberOfOperands, src, comma, des);
+
+    if (src[strlen(src) - 1] == ',')
     {
         commasCount++;
         src--;
     }
-    else if (des[0] == ',' && comma != ',')
+    if (des[0] == ',')
     {
         commasCount++;
         des++;
     }
-    else if (comma == ',' && commasCount > (strlen(src) && strlen(des) ? 1 : 0))
-    {
-        return yieldError(wrongInstructionSyntaxExtraCommas);
-    }
-    else if (comma != ',' && (strlen(src) && strlen(des)))
-    {
-        return yieldError(wrongInstructionSyntaxMissinCommas);
-    }
+    if (comma == ',')
+        commasCount++;
 
-    else
+    if (commasCount > expectedCommasBasedOnNumberOfOperands)
+        return yieldError(wrongInstructionSyntaxExtraCommas);
+
+    else if (commasCount < expectedCommasBasedOnNumberOfOperands)
+        return yieldError(wrongInstructionSyntaxMissinCommas);
+
+    else if (commasCount == expectedCommasBasedOnNumberOfOperands)
     {
         if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
             return True;
@@ -285,9 +301,8 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
-    /*     printf("in handle Label labelName:%s nextToken:%s\n", labelName, nextToken);
-     */
-    if (nextToken[0] == '.')
+
+    if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
         if (instruction)
@@ -309,7 +324,9 @@ int handleLabel(char *labelName, char *nextToken, char *line)
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
     }
 
-    return yieldError(illegalLabelUseExpectedOperationOrInstruction);
+    else
+        yieldError(illegalLabelUseExpectedOperationOrInstruction);
+    return False;
 }
 
 int isOperation(char *s)
