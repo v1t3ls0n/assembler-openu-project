@@ -21,7 +21,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     ParseState state = newLine;
-    printf("inside parseExpandedSourceFile(FILE *fp, char *filename)\n");
+    printf("First Run:\n");
 
     while (((c = fgetc(fp)) != EOF))
     {
@@ -169,6 +169,10 @@ Bool handleOperation(char *operationName, char *line)
             firstOperand[strlen(firstOperand) - strlen(secondOperand)] = 0;
         }
     }
+
+    /* increase counters instead of using
+        static AddrMethodsOptions activeMethods[2];
+     */
 
     return parseOperands(firstOperand, comma, secondOperand, p);
 }
@@ -468,6 +472,7 @@ int handleInstructionDataArgs(char *token)
 
 int handleInstructionStringArgs(char *token)
 {
+    printf("line 471\n");
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
