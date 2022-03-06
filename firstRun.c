@@ -416,46 +416,52 @@ char *getInstructionNameByType(int type)
 int handleInstructionDataArgs(char *token)
 {
     int number = 0;
-    int counter = 0;
-    char illegalCharacter = 0;
+    int size = 0;
+    int commasCount = 0;
+    char c = 0;
+    int i;
     Bool minusSignOn = False;
-    Bool commaState = True;
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
     while (token)
     {
-        if (token[0] != '-')
+
+        for (i = 0; token[i] == ','; i++, commasCount++, token++)
+            ;
+        printf("commasCount:%d token:%s\n", commasCount, token);
+        if (token[0] == '-')
         {
             minusSignOn = True;
-            token = strtok(NULL, " \t \n");
+            token++;
         }
+        if (token[0] == '+')
+            token++;
 
-        else if (!isdigit(token[0]) && (token[0] != ',' || (token[0] != '+' && minusSignOn)))
+        else if (!isdigit(token[0]))
         {
-
             if (isalpha(token[0]))
                 return yieldError(expectedNumber);
             else
                 return yieldError(illegalApearenceOfCharactersOnLine);
         }
 
-        else if (token[0] == ',' && commaState)
+        else if (commasCount > 1)
             return yieldError(wrongInstructionSyntaxExtraCommas);
 
         else
         {
-            if (commaState)
+            if (commasCount == 1 || size == 0)
             {
-                sscanf(token, "%d%c", &number, &illegalCharacter);
-
-                if (illegalCharacter == '.')
+                sscanf(token, "%d%c", &number, &c);
+                printf("line 451, number:%d c:%c\n", number, c);
+                if (c == '.')
                     return yieldError(wrongArgumentTypeNotAnInteger);
-                else if (illegalCharacter == ',')
-                    commaState = True;
-                else
-                    commaState = False;
-
+                else if (c == ',')
+                {
+                    commasCount++;
+                    c = 0;
+                }
                 if (globalState == secondRun)
                 {
                     if (minusSignOn)
@@ -464,21 +470,20 @@ int handleInstructionDataArgs(char *token)
                     addNumberToMemory(number);
                 }
                 else
-                    counter++;
+                    size++;
             }
-            else if (!commaState && strtok(NULL, " \t \n"))
-            {
-                return yieldError(expectedSingleCommaCharacter);
-            }
-            else
-                return yieldError(expectedSingleCommaCharacter);
+            else if (commasCount < 1 && strtok(NULL, " \t \n"))
+                return yieldError(wrongInstructionSyntaxMissinCommas);
+
+            else if (commasCount != 0 && strtok(NULL, " \t \n") == NULL)
+                return yieldError(wrongInstructionSyntaxExtraCommas);
         }
         token = strtok(NULL, " \t \n");
     }
 
     if (globalState != secondRun)
-        increaseDataCounter(counter);
-
+        increaseDataCounter(size);
+    printf("line 481,size:%d\n", size);
     return lineParsedSuccessfully;
 }
 
