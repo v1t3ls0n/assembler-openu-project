@@ -189,20 +189,14 @@ Bool handleOperation(char *operationName, char *line)
     }
 
     return False;
-
-    /*
-          return parseOperands(firstOperand, comma, secondOperand, p);  */
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
 {
-
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = (strlen(src) > 0 && strlen(des) > 0) ? 1 : 0;
-    printf("inside parse operands,expectedCommas:%d\nsrc:%s comma:%c des:%s\n", expectedCommasBasedOnNumberOfOperands, src, comma, des);
     /*
-
-
+    printf("inside parse operands,expectedCommas:%d\nsrc:%s comma:%c des:%s\n", expectedCommasBasedOnNumberOfOperands, src, comma, des);
      */
     if (src[strlen(src) - 1] == ',')
     {
