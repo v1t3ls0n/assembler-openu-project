@@ -178,12 +178,10 @@ Bool handleOperation(char *operationName, char *line)
             int size = 2;
             if (activeMethods[0].immediate || activeMethods[1].immediate)
                 size++;
-            if (activeMethods[0].direct || activeMethods[0].index)
+            if ((activeMethods[0].direct || activeMethods[0].index) || (activeMethods[1].direct || activeMethods[1].index))
                 size += 2;
-
             activeMethods[0].direct = activeMethods[0].immediate = activeMethods[0].index = activeMethods[0].reg = 0;
             activeMethods[1].direct = activeMethods[1].immediate = activeMethods[1].index = activeMethods[1].reg = 0;
-
             increaseInstructionCounter(size);
         }
 
@@ -343,11 +341,9 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
     else if (isOperation(nextToken))
     {
+        int icAddr = getIC();
         if (handleOperation(nextToken, line))
-        {
-            int icAddr = getIC();
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
-        }
     }
 
     else
@@ -494,19 +490,20 @@ int handleInstructionDataArgs(char *token)
 
 int handleInstructionStringArgs(char *token)
 {
-    printf("line 471\n");
+
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
+    printf("line 501, inside handle instruction string args, token:%s\n", token);
+
     /*
 
-    printf("inside handle instruction string args, token:%s\n", token);
 
      */
 
-    if ((token[0] == '\"') && !(token[strlen(token) - 1] == '\"'))
+    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
         return yieldError(closingQuotesForStringIsMissing);
-    else if ((token[0] != '\"'))
+    else if (token[0] != '\"')
         return yieldError(expectedQuotes);
 
     if (globalState == secondRun)
@@ -522,7 +519,11 @@ int handleInstructionStringArgs(char *token)
     else
         increaseDataCounter((int)(strlen(token) - 2));
 
-    return lineParsedSuccessfully;
+    printf("line 526\n");
+    return True;
+    /*
+        return lineParsedSuccessfully;
+         */
 }
 
 const char *getRegisteryOperand(char *s)
@@ -605,17 +606,3 @@ int getRegisteryNumber(char *s)
     }
     return -1;
 }
-/*
-                  IC -> 10
-DC = Data Counter IC = Instruction counter
-1 - comment -> skip
-2 -> empty -> skip
-3 -> error in line -> print specific error, change globalState to collect error, skip line
-4 -> label or instruction -> check next token -> ? x: .data 3,3,5,67,7 DC
-A) label is data/string/entry/external -> addSymbol(x, DC)
--> if(globalState == firstRun) upadteDataCounter(someWordAmount)
--> if(globalState == secondRun)writeToMemory(value=3,Data)
-B) label is operation -> addSymbol(labelName, IC) ->
--> if(globalState == firstRun) upadteOperationCounter(someWordAmount)
--> if(globalState == secondRun) writeToMemory(word,Code) for each word of operation
-*/
