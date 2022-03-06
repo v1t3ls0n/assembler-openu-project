@@ -153,9 +153,10 @@ Bool handleOperation(char *operationName, char *line)
 
     char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
-    int n = 0, nFirst = 0;
+    int nTotal = 0, nFirst = 0;
     line = operationName + strlen(operationName) + 1;
-    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &n);
+    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
+
     if (secondOperand[0] == 0 && firstOperand[0] != '\0')
     {
         if (!strchr(firstOperand, ','))
@@ -170,11 +171,29 @@ Bool handleOperation(char *operationName, char *line)
         }
     }
 
-    /* increase counters instead of using
-        static AddrMethodsOptions activeMethods[2];
-     */
+    if (parseOperands(firstOperand, comma, secondOperand, p))
+    {
+        if (globalState == firstRun)
+        {
+            int size = 2;
+            if (activeMethods[0].immediate || activeMethods[1].immediate)
+                size++;
+            if (activeMethods[0].direct || activeMethods[0].index)
+                size += 2;
 
-    return parseOperands(firstOperand, comma, secondOperand, p);
+            activeMethods[0].direct = activeMethods[0].immediate = activeMethods[0].index = activeMethods[0].reg = 0;
+            activeMethods[1].direct = activeMethods[1].immediate = activeMethods[1].index = activeMethods[1].reg = 0;
+
+            increaseInstructionCounter(size);
+        }
+
+        return True;
+    }
+
+    return False;
+
+    /*
+          return parseOperands(firstOperand, comma, secondOperand, p);  */
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op)
@@ -182,13 +201,15 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op)
 
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = (strlen(src) > 0 && strlen(des) > 0) ? 1 : 0;
-
     printf("inside parse operands,expectedCommas:%d\nsrc:%s comma:%c des:%s\n", expectedCommasBasedOnNumberOfOperands, src, comma, des);
+    /*
 
+
+     */
     if (src[strlen(src) - 1] == ',')
     {
         commasCount++;
-        src--;
+        src[strlen(src) - 1] = 0;
     }
     if (des[0] == ',')
     {
@@ -236,20 +257,20 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int ty
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = isValidIndexParameter(operand);
     Bool isReg = isRegistery(operand);
-    Bool isLabel = verifyLabelNaming(operand);
+    Bool isDirect = verifyLabelNaming(operand);
 
-    if (!isReg && !isImmediate && !isLabel && !isDirectIndex)
+    if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
         return yieldError(notEnoughArgumentsPassed);
     else if (!allowedAddrs.reg && isReg)
         return yieldError(operandTypeDoNotMatch);
     else if (!allowedAddrs.immediate && isImmediate)
         return yieldError(operandTypeDoNotMatch);
-    else if (!allowedAddrs.direct && isLabel)
+    else if (!allowedAddrs.direct && isDirect)
         return yieldError(illegalOperand);
     else if (!allowedAddrs.index && isDirectIndex)
         return yieldError(operandTypeDoNotMatch);
 
-    activeMethods[type].direct = isDirectIndex;
+    activeMethods[type].direct = isDirect;
     activeMethods[type].reg = isReg;
     activeMethods[type].immediate = isImmediate;
     activeMethods[type].index = isDirectIndex;
@@ -322,10 +343,11 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
     else if (isOperation(nextToken))
     {
-        int icAddr = getIC();
-
         if (handleOperation(nextToken, line))
+        {
+            int icAddr = getIC();
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
+        }
     }
 
     else

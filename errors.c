@@ -25,7 +25,19 @@ Bool yieldError(Error err)
         break;
     }
 
-    case wrongRegisteryReferenceUndefinedReg:
+    case requiredSourceOperandIsMissin:
+    {
+        printf("requiredSourceOperandIsMissin");
+        break;
+    }
+
+    case requiredDestinationOperandIsMissin:
+    {
+        printf("requiredDestinationOperandIsMissin");
+        break;
+    }
+
+        case wrongRegisteryReferenceUndefinedReg:
         printf("registery name passed as operand does not exist, registeries names are r0 - r15");
         break;
 
