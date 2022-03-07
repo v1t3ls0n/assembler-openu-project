@@ -54,6 +54,7 @@ void parseSingleLine(char *line)
     ParseState state = newLine;
     char *p = calloc(strlen(line + 1), sizeof(char *));
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
+
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
 
     memcpy(p, line, strlen(line));
@@ -386,7 +387,9 @@ Bool countAndVerifyDataArguments(char *token)
 
         for (i = 0; token[i] == ','; i++, commasCount++, token++)
             ;
-        printf("commasCount:%d token:%s\n", commasCount, token);
+
+        /*   printf("commasCount:%d token:%s\n", commasCount, token);
+         */
         if (token[0] == '-')
         {
             minusSignOn = True;
@@ -411,7 +414,9 @@ Bool countAndVerifyDataArguments(char *token)
             if (commasCount == 1 || size == 0)
             {
                 sscanf(token, "%d%c", &number, &c);
-                printf("line 451, number:%d c:%c\n", number, c);
+
+                /* printf("line 451, number:%d c:%c\n", number, c);
+                 */
                 if (c == '.')
                     return yieldError(wrongArgumentTypeNotAnInteger);
                 else if (c == ',')
