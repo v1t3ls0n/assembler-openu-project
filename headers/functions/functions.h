@@ -79,24 +79,24 @@ unsigned char dec2Bin2sComplement(int n);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-/* --------------------------------------------In parse.c -------------------------------------------------------*/
+/* --------------------------------------------In firstRun.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
-int parseSingleLine(char *line, ParseState state);
-int handleState(char *token, char *line, ParseState state);
+void parseSingleLine(char *line);
+ParseState handleFirstToken(char *token, char *line, ParseState state);
 Bool handleOperation(char *operationName, char *line);
 Bool parseOperands(char *src, char comma, char *des, Operation *op);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
-int isLabel(char *s);
-int isOperation(char *s);
+Bool isLabel(char *s);
+Bool isOperation(char *s);
 int getInstructionType(char *s);
 char *getInstructionName(char *s);
 char *getInstructionNameByType(int type);
-int handleInstructionDataArgs(char *tokens);
-int handleInstructionStringArgs(char *tokens);
+Bool countAndVerifyDataArguments(char *tokens);
+Bool countAndVerifyStringArguments(char *tokens);
 Bool isRegistery(char *s);
 const char *getRegisteryOperand(char *s);
 Bool isValidImmediateParamter(char *s);

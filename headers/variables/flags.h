@@ -66,7 +66,7 @@ typedef enum
     parseInstruction = 55,
     parseOperation = 333,
     returnFalse = 4678,
-    lineParsedSuccessfully = 23,
+    lineParsedSuccessfully = 1,
     parsingLine = 112,
     parsingMacro = 86,
     replacingMacro = 11,
