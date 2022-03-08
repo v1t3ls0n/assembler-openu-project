@@ -46,6 +46,9 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         }
     }
 
+    printf("line: %s length: %d \n", line, (int)strlen(line));
+    if (strlen(line) > 0)
+        parseSingleLine(line);
     return True;
 }
 
@@ -54,9 +57,9 @@ void parseSingleLine(char *line)
     ParseState state = newLine;
     char *p = calloc(strlen(line + 1), sizeof(char *));
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
-
-    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
-
+    /*
+        printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+     */
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
     state = handleFirstToken(token, p, state);
@@ -457,7 +460,7 @@ Bool countAndVerifyStringArguments(char *token)
     else if (token[0] != '\"')
         return yieldError(expectedQuotes);
 
-    increaseDataCounter((int)(strlen(token) - 2));
+    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end as well*/
 
     return True;
 }
