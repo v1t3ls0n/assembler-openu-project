@@ -8,6 +8,19 @@ extern const char *regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
+
+void initTablesArrays()
+{
+    int i = 0;
+
+    while (i < HASHSIZE)
+    {
+        symbols[i] = NULL;
+        macros[i] = NULL;
+        i++;
+    }
+}
+
 unsigned hash(char *s)
 {
     unsigned hashval = 1;
@@ -73,11 +86,6 @@ void printSymbolTable()
 {
     int i = 0;
 
-    printf("inside  printSymbolTable()\n");
-
-    /*     printf("inside  printSymbolTable()\n");
-     */
-
     printf("\n\t\t ~ SYMBOL TABLE ~ \n");
     printf("name\tvalue\tbase\toffset\tattributes");
     while (i < HASHSIZE)
@@ -89,12 +97,10 @@ void printSymbolTable()
     printf("\n\n");
 }
 
-void printSymbolItem(Item *item)
+int printSymbolItem(Item *item)
 {
-    printf("line 94, inside printSymbolItem \n");
-    /*  if (!item)
-         return;
-  */
+    /*  printf("line 94, inside printSymbolItem \n");
+     */
     printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
     if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
         printf("   ");
@@ -125,9 +131,11 @@ void printSymbolItem(Item *item)
                 printf("external");
         }
     }
-    printf("line 128, table.c \n");
+    /*   printf("line 128, table.c \n");
+     */
     if (item->next != NULL)
         printSymbolItem(item->next);
+    return 0;
 }
 
 Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
@@ -135,9 +143,9 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     unsigned base;
     unsigned offset;
     Item *p;
-    printf("inside addSymbol\n");
+    /* printf("inside addSymbol\n");
     printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
-
+ */
     /*     printf("inside addSymbol\n");
         printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
      */

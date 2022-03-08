@@ -3,11 +3,14 @@
 extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int parseExpandedSourceFile(FILE *fp, char *filename);
+extern void initTablesArrays();
+
 int main(int argc, char *argv[])
 {
 
     handleSourceFiles(argc, argv);
     globalState = firstRun;
+    initTablesArrays();
     printf("Start Parsing Assembly Code:\n");
     handleSourceFiles(argc, argv);
 
