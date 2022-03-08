@@ -73,6 +73,8 @@ void printSymbolTable()
 {
     int i = 0;
 
+    printf("inside  printSymbolTable()\n");
+
     /*     printf("inside  printSymbolTable()\n");
      */
 
@@ -89,9 +91,10 @@ void printSymbolTable()
 
 void printSymbolItem(Item *item)
 {
-    if (!item)
-        return;
-
+    printf("line 94, inside printSymbolItem \n");
+    /*  if (!item)
+         return;
+  */
     printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
     if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
         printf("   ");
@@ -122,7 +125,7 @@ void printSymbolItem(Item *item)
                 printf("external");
         }
     }
-
+    printf("line 128, table.c \n");
     if (item->next != NULL)
         printSymbolItem(item->next);
 }
@@ -132,6 +135,9 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     unsigned base;
     unsigned offset;
     Item *p;
+    printf("inside addSymbol\n");
+    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
+
     /*     printf("inside addSymbol\n");
         printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
      */
@@ -161,6 +167,9 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
 
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
+    printf("inside updateSymbol\n");
+    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
+
     /*     printf("inside updateSymbol\n");
      */
     if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
@@ -175,10 +184,11 @@ Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned
 
         if (value)
         {
-            unsigned base;
-            unsigned offset;
+            unsigned base = 0;
+            unsigned offset = 0;
+            printf("base: %u offset: %u \n", base, offset);
             offset = value % 16;
-            base = value - offset;
+            base = abs((unsigned)value - offset);
             p->val.s.value = value;
             p->val.s.base = base;
             p->val.s.offset = offset;
