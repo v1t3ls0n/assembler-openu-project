@@ -5,7 +5,7 @@ extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
 extern Operation *getOperationByName(char *s);
-extern Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 extern Bool verifyLabelNaming(char *s);
 extern void increaseDataCounter(int amount);
@@ -453,14 +453,21 @@ Bool countAndVerifyStringArguments(char *token)
 {
 
     if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-
-    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-        return yieldError(closingQuotesForStringIsMissing);
-    else if (token[0] != '\"')
-        return yieldError(expectedQuotes);
-
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end as well*/
+    {
+        token = strdup(strtok(NULL, " \t \n"));
+    }
+    else
+        token = strdup(token);
+    printf("token: %s\n", token);
+    /*    if (token==NULL)
+           return True;
+     */
+    /*   if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
+          return yieldError(closingQuotesForStringIsMissing);
+      else if (token[0] != '\"')
+          return yieldError(expectedQuotes);
+   */
+    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
 }

@@ -138,7 +138,7 @@ int printSymbolItem(Item *item)
     return 0;
 }
 
-Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     unsigned base;
     unsigned offset;
@@ -160,7 +160,7 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     {
         p = install(name, Symbol);
         offset = value % 16;
-        base = value - offset;
+        base = abs((unsigned)value - offset);
         p->val.s.value = value;
         p->val.s.base = base;
         p->val.s.offset = offset;
@@ -173,7 +173,7 @@ Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned
     return True;
 }
 
-Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
+Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
     printf("inside updateSymbol\n");
     printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);

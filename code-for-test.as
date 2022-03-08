@@ -14,8 +14,8 @@ dec K
 .entry MAIN
 sub LOOP[r10] ,r14
 END: stop
-STR: .string "abcd"
 LIST: .data 6, -9
+HELLO: .string "aaa"
 .data -100
 .entry K
 K: .data 31
