@@ -44,7 +44,7 @@ unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
-void printSymbolItem(Item *item);
+int printSymbolItem(Item *item);
 Item *getSymbol(char *name, ItemType type);
 Bool addSymbol(char *name, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, int value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
@@ -55,6 +55,8 @@ Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
+void initTablesArrays();
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
