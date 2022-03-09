@@ -43,13 +43,8 @@ Item *lookup(char *s, ItemType type)
 
 Item *install(char *name, ItemType type)
 {
-
     unsigned hashval;
     Item *np;
-
-    /*     if (globalState == secondRun)
-            return NULL; */
-
     np = (Item *)malloc(sizeof(Item *));
     np->name = calloc(strlen(name) + 1, sizeof(char *));
     if (np == NULL || np->name == NULL)
@@ -149,8 +144,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
     unsigned base;
     unsigned offset;
     Item *p;
-    if (globalState == secondRun)
-        return True;
+
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
     if (!verifyLabelNamingAndPrintErrors(name))
@@ -177,8 +171,6 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-    if (globalState == secondRun)
-        return True;
     /*     printf("inside updateSymbol\n");
         printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
      */
@@ -305,8 +297,7 @@ Bool verifyLabelNaming(char *s)
 {
     int i = 0;
     int labelLength = strlen(s);
-    if (globalState == secondRun)
-        return True;
+
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
         return False;
@@ -355,8 +346,7 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
 {
     int i = 0;
     int labelLength = strlen(s);
-    if (globalState == secondRun)
-        return True;
+
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
         return yieldError(illegalLabelNameUseOfCharacters);
@@ -404,8 +394,6 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
 void updateFinalMemoryAddressesInSymbolTable()
 {
     int i = 0;
-    if (globalState == secondRun)
-        return True;
     while (i < HASHSIZE)
     {
         if (symbols[i] != NULL)
