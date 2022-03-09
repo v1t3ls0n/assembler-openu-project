@@ -8,7 +8,7 @@ extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern Word *convertNumberToWord(int n, EncodingFormat format);
-
+extern void updateFinalMemoryAddressesInSymbolTable();
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
@@ -115,6 +115,8 @@ void updateDataEntry(Item *p)
 
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }
+unsigned getICF() { return ICF; }
+unsigned getDCF() { return DCF; }
 
 void increaseDataCounter(int amount)
 {
@@ -146,11 +148,13 @@ void printMemoryStacks(EncodingFormat format)
     }
 }
 
-void resetCounters()
+void updateFinalCountersValue()
 {
 
     ICF = IC;
     DCF = ICF + DC;
-    DC = IC + 1;
+    DC = IC;
     IC = MEMORY_START;
+    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
+    updateFinalMemoryAddressesInSymbolTable();
 }
