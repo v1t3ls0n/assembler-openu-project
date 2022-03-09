@@ -15,6 +15,8 @@ extern unsigned getIC();
 extern void updateFinalCountersValue();
 extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
+extern int secondRunParseSource(FILE *fp, char *filename);
+
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
     int c = 0;
@@ -55,7 +57,13 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
     updateFinalCountersValue();
 
-    return True;
+    if (globalState != collectErrors)
+    {
+        rewind(fp);
+        secondRunParseSource(fp, filename);
+    }
+
+    return globalState != collectErrors ? True : False;
 }
 
 void parseSingleLine(char *line)
@@ -98,7 +106,7 @@ void parseSingleLine(char *line)
         case Err:
         {
             if (globalState == firstRun)
-                globalState = globalState != secondRun ? collectErrors : globalState;
+                globalState = collectErrors;
 
             state = Err;
             break;

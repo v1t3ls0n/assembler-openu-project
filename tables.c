@@ -214,6 +214,24 @@ Item *getSymbol(char *name, ItemType type)
     return lookup(name, type);
 }
 
+int getSymbolBaseAddress(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return -1;
+
+    return p->val.s.base;
+}
+
+int getSymbolOffset(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return -1;
+
+    return p->val.s.offset;
+}
+
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)
 {
     Item *p = lookup(name, type);
