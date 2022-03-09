@@ -22,9 +22,7 @@ int main(int argc, char *argv[])
     {
         printf("Finished Successfully!\n");
         printSymbolTable();
-
-        /*
-                printBinaryImg(); */
+        printBinaryImg();
     }
     else
         printf("\nFinished First Run With Errors\n");

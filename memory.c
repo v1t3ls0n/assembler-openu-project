@@ -32,7 +32,7 @@ void initMemory()
 
     for (i = 0; i < totalSize; i++)
     {
-        for (j = 0; i < BINARY_WORD_SIZE; j++)
+        for (j = 0; j < BINARY_WORD_SIZE; j++)
         {
 
             binaryImg[i].digit[j].on = 0;
