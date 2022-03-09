@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
     {
         printf("Finished Successfully!\n");
         printSymbolTable();
-        currentLine = 1;
 
         /*         handleSourceFiles(argc, argv); */
 

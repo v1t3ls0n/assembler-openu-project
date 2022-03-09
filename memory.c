@@ -46,7 +46,10 @@ void printBinaryImg()
     int i;
     int totalSize = DCF - MEMORY_START;
     for (i = 0; i < totalSize; i++)
+    {
+        printf("line:%d ", i + MEMORY_START);
         printWordBinary(&binaryImg[i]);
+    }
 }
 
 void writeIntegerIntoDataMemoryBinaryImg(int number)

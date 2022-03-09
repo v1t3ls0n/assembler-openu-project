@@ -35,7 +35,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         else if (i >= MAX_LINE_LEN - 1 && c != '\n')
         {
 
-            globalState = globalState != secondRun ? collectErrors : globalState;
+            globalState = collectErrors;
             return yieldError(maxLineLengthExceeded);
         }
         else if (isspace(c))
@@ -55,15 +55,51 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     {
         parseSingleLine(line);
         memset(line, 0, i);
+        i = 0;
     }
+
     if (globalState != collectErrors)
     {
         updateFinalCountersValue();
         initMemory();
+        rewind(fp);
+        printf("Second Run:\n");
+        globalState = secondRun;
+        currentLine = 1;
+        while (((c = fgetc(fp)) != EOF))
+        {
+
+            if (c == '\n')
+            {
+                parseSingleLine(line);
+                memset(line, 0, MAX_LINE_LEN);
+                i = 0;
+            }
+
+            else if (i >= MAX_LINE_LEN - 1 && c != '\n')
+            {
+
+                return yieldError(maxLineLengthExceeded);
+            }
+            else if (isspace(c))
+                line[i++] = ' ';
+
+            else
+            {
+                if (isprint(c))
+                    line[i++] = c;
+            }
+        }
         /*     globalState = secondRun;
          */
     }
 
+    if (i > 0)
+    {
+        parseSingleLine(line);
+        memset(line, 0, i);
+        i = 0;
+    }
     return True;
 }
 
@@ -207,6 +243,10 @@ Bool handleOperation(char *operationName, char *line)
             increaseInstructionCounter(size);
         }
 
+        if (globalState == secondRun)
+        {
+        }
+
         return True;
     }
 
@@ -297,46 +337,50 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
     /*
         printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
      */
-    if (isInstruction(firstToken))
+
+    if (globalState != secondRun)
     {
-        if (type == _TYPE_DATA)
-            return countAndVerifyDataArguments(nextTokens);
-        else if (type == _TYPE_STRING)
-            return countAndVerifyStringArguments(nextTokens);
-
-        if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
+        if (isInstruction(firstToken))
         {
-            char *labelName = calloc(strlen(nextTokens), sizeof(char *));
-            strcpy(labelName, nextTokens);
+            if (type == _TYPE_DATA)
+                return countAndVerifyDataArguments(nextTokens);
+            else if (type == _TYPE_STRING)
+                return countAndVerifyStringArguments(nextTokens);
 
-            nextTokens = strtok(NULL, " \t \n");
-            if (nextTokens)
-                return yieldError(illegalApearenceOfCharactersOnLine);
-            else
+            if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
             {
-                if (type == _TYPE_ENTRY)
-                    return addSymbol(labelName, 0, 0, 0, 1, 0);
-                if (type == _TYPE_EXTERNAL)
-                    return addSymbol(labelName, 0, 0, 0, 0, 1);
+                char *labelName = calloc(strlen(nextTokens), sizeof(char *));
+                strcpy(labelName, nextTokens);
+
+                nextTokens = strtok(NULL, " \t \n");
+                if (nextTokens)
+                    return yieldError(illegalApearenceOfCharactersOnLine);
+                else
+                {
+                    if (type == _TYPE_ENTRY)
+                        return addSymbol(labelName, 0, 0, 0, 1, 0);
+                    if (type == _TYPE_EXTERNAL)
+                        return addSymbol(labelName, 0, 0, 0, 0, 1);
+                }
             }
         }
-    }
-    else if (isLabel(firstToken))
-    {
-        int dataCounter = getDC();
-        Bool isLabelNameAvailable;
-        firstToken[strlen(firstToken) - 1] = '\0';
-        isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
-        if (!isLabelNameAvailable)
-            yieldError(illegalSymbolNameAlreadyInUse);
+        else if (isLabel(firstToken))
+        {
+            int dataCounter = getDC();
+            Bool isLabelNameAvailable;
+            firstToken[strlen(firstToken) - 1] = '\0';
+            isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
+            if (!isLabelNameAvailable)
+                yieldError(illegalSymbolNameAlreadyInUse);
 
-        if ((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens)))
-            return isLabelNameAvailable ? addSymbol(firstToken, dataCounter, 0, 1, 0, 0) : False;
-        else
-            return Err;
-    }
+            if ((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens)))
+                return isLabelNameAvailable ? addSymbol(firstToken, dataCounter, 0, 1, 0, 0) : False;
+            else
+                return Err;
+        }
 
-    return yieldError(undefinedOperation);
+        return yieldError(undefinedOperation);
+    }
 }
 
 int handleLabel(char *labelName, char *nextToken, char *line)
@@ -459,9 +503,10 @@ Bool countAndVerifyDataArguments(char *token)
                         number = -1 * number;
 
                     minusSignOn = False;
-                    /*
                     writeIntegerIntoDataMemoryBinaryImg(number);
- */
+
+                    /*
+                     */
                 }
                 else
                     size++;
@@ -495,21 +540,24 @@ Bool countAndVerifyStringArguments(char *token)
     else if (token[0] != '\"')
         return yieldError(expectedQuotes);
     token++;
-    if (globalState == firstRun)
-        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
     if (globalState == secondRun)
     {
-        for (i = 0; i < strlen(token) - 1; i++)
+        for (i = 0; i < strlen(token) - 2; i++)
         {
             printf("token[%d]:%c ", i, (char)token[i]);
-
-            /* writeIntegerIntoDataMemoryBinaryImg((int)token[i]);
-             */
+            writeIntegerIntoDataMemoryBinaryImg((int)token[i]);
         }
     }
+    /*    if (globalState == firstRun) */
+    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
+}
+
+void addStringArgumentsToMemoryImg(char *token)
+{
+    countAndVerifyStringArguments(token);
 }
 
 Bool isRegistery(char *s)
