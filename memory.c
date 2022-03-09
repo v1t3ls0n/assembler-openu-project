@@ -33,17 +33,13 @@ void printBinaryImg()
     int i;
     int totalSize = DCF - MEMORY_START;
     for (i = 0; i < totalSize; i++)
-    {
-    }
-    /*         printWordBinary(&binaryImg[i]); */
+        printWordBinary(&binaryImg[i]);
 }
 
 void writeIntegerIntoDataMemoryBinaryImg(int number)
 {
     int index = DC - MEMORY_START;
-
-    /* binaryImg[index] = *convertNumberToBinaryWord(number);
-     */
+    binaryImg[index] = *convertNumberToBinaryWord(number);
     DC++;
     printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
     printWordBinary(&binaryImg[index]);
@@ -54,9 +50,7 @@ void printWordBinary(BinaryWord *wordBin)
 {
     int j;
     for (j = 0; j < BINARY_WORD_SIZE; j++)
-    {
-    }
-    /*   printf("%c", wordBin->digit[j].on ? '1' : '0'); */
+        printf("%c", wordBin->digit[j].on ? '1' : '0');
 
     printf("\n");
 }

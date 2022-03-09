@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
         printSymbolTable();
         currentLine = 1;
         handleSourceFiles(argc, argv);
+        printBinaryImg();
     }
     else
         printf("\nFinished First Run With Errors\n");
