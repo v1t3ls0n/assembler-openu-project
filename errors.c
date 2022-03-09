@@ -14,6 +14,12 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case labelNotExist:
+    {
+        printf("undefined label name, label name was not found in symbol table, assembler compilation faild, not files were created");
+        break;
+    }
+
     case illegalOperand:
     {
         printf("illegal Operand!\n");
@@ -37,7 +43,7 @@ Bool yieldError(Error err)
         break;
     }
 
-        case wrongRegisteryReferenceUndefinedReg:
+    case wrongRegisteryReferenceUndefinedReg:
         printf("registery name passed as operand does not exist, registeries names are r0 - r15");
         break;
 

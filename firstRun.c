@@ -13,7 +13,12 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void updateFinalCountersValue();
-extern void addNumberToMemory(int number);
+extern void writeIntegerIntoDataMemoryBinaryImg(int number);
+extern void initMemory();
+extern int secondRunParseSource(FILE *fp, char *filename);
+
+extern Bool writeOperationBinary(char *operationName, char *line);
+Bool writeInstructionBinary(char *instructionName, char *line);
 
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
@@ -55,7 +60,15 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
     updateFinalCountersValue();
 
-    return True;
+    if (globalState != collectErrors)
+    {
+        printf("before second run parse source in firstRUn.c\n");
+
+        rewind(fp);
+        secondRunParseSource(fp, filename);
+    }
+
+    return globalState != collectErrors ? True : False;
 }
 
 void parseSingleLine(char *line)
@@ -97,7 +110,9 @@ void parseSingleLine(char *line)
 
         case Err:
         {
-            globalState = collectErrors;
+            if (globalState == firstRun)
+                globalState = collectErrors;
+
             state = Err;
             break;
         }
@@ -119,6 +134,7 @@ void parseSingleLine(char *line)
 ParseState handleFirstToken(char *token, char *line, ParseState state)
 {
     /*   printf("inside handle State, token:%s\n", token); */
+
     switch (state)
     {
     case skipLine:
@@ -133,10 +149,14 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
             return parseLabel;
 
         else if (isInstruction(token))
+
             return parseInstruction;
 
         else if (isOperation(token))
+        {
+
             return parseOperation;
+        }
         else
         {
             yieldError(illegalApearenceOfCharactersOnLine);
@@ -160,9 +180,7 @@ Bool handleOperation(char *operationName, char *line)
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     line = operationName + strlen(operationName) + 1;
 
-    printf("line 163, handle Operation\n");
     sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
-    printf("line 165, handle Operation\n");
 
     if (secondOperand[0] == 0 && firstOperand[0] != 0)
     {
@@ -180,9 +198,9 @@ Bool handleOperation(char *operationName, char *line)
 
     if (parseOperands(firstOperand, comma, secondOperand, p, active))
     {
-        printf("line 183, handle Operation\n");
-        printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
-        printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
+        /*  printf("line 183, handle Operation\n");
+         printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
+         printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg); */
         if (globalState == firstRun)
         {
             int size = 2;
@@ -196,6 +214,10 @@ Bool handleOperation(char *operationName, char *line)
             active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
             active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
             increaseInstructionCounter(size);
+        }
+
+        if (globalState == secondRun)
+        {
         }
 
         return True;
@@ -288,6 +310,10 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
     /*
         printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
      */
+
+    if (globalState == secondRun)
+        return True;
+
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
@@ -298,7 +324,8 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
             char *labelName = calloc(strlen(nextTokens), sizeof(char *));
-            labelName = strdup(nextTokens);
+            strcpy(labelName, nextTokens);
+
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
                 return yieldError(illegalApearenceOfCharactersOnLine);
@@ -328,7 +355,6 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
     return yieldError(undefinedOperation);
 }
-
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
 
@@ -447,7 +473,7 @@ Bool countAndVerifyDataArguments(char *token)
                     if (minusSignOn)
                         number = -1 * number;
                     minusSignOn = False;
-                    addNumberToMemory(number);
+                    /*             addNumberToMemory(number); */
                 }
                 else
                     size++;
@@ -468,11 +494,8 @@ Bool countAndVerifyStringArguments(char *token)
 {
 
     if (isInstruction(token))
-    {
-        token = strdup(strtok(NULL, " \t \n"));
-    }
-    else
-        token = strdup(token);
+        token = strtok(NULL, " \t \n");
+
     printf("token: %s\n", token);
     /*    if (token==NULL)
            return True;
@@ -485,6 +508,11 @@ Bool countAndVerifyStringArguments(char *token)
     increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
+}
+
+void addStringArgumentsToMemoryImg(char *token)
+{
+    countAndVerifyStringArguments(token);
 }
 
 Bool isRegistery(char *s)

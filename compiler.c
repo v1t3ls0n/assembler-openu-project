@@ -4,6 +4,10 @@ extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int parseExpandedSourceFile(FILE *fp, char *filename);
 extern void initTablesArrays();
+extern void printBinaryImg();
+extern unsigned currentLine;
+
+extern void initMemory();
 
 int main(int argc, char *argv[])
 {
@@ -15,12 +19,16 @@ int main(int argc, char *argv[])
     handleSourceFiles(argc, argv);
 
     if (globalState != collectErrors)
+    {
         printf("Finished Successfully!\n");
+        printSymbolTable();
+    }
     else
         printf("\nFinished First Run With Errors\n");
 
-    printSymbolTable();
+    /*     printBinaryImg();
 
+    */
     return 0;
 }
 
@@ -49,6 +57,8 @@ int handleSourceFiles(int argc, char *argv[])
             if (globalState == handleMacros)
                 parseSourceFile(fptr, fileName);
             if (globalState == firstRun)
+                parseExpandedSourceFile(fptr, fileName);
+            if (globalState == secondRun)
                 parseExpandedSourceFile(fptr, fileName);
 
             fclose(fptr);

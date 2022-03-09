@@ -43,7 +43,9 @@ typedef enum
     requiredDestinationOperandIsMissin,
     srcOperandTypeIsNotAllowed,
     desOperandTypeIsNotAllowed,
-    operandTypeDoNotMatch
+    operandTypeDoNotMatch,
+    labelNotExist,
+    secondRunFailed = 0
 } Error;
 
 typedef enum
@@ -77,9 +79,32 @@ typedef enum
     parseExternalVariable = 953,
     parseSourceOperand = 77,
     parseDestinationOperand = 93,
-    expectNewline = 92
+    expectNewline = 92,
+    writingOperationIntoMemoryImg,
+    writingDataIntoMemoryImg,
+    genFirstWord,
+    genSecondWord
 } ParseState;
-
+/* typedef enum
+{
+    skipLine = 134,
+    newLine = 233,
+    parseLabel = 4364,
+    parseInstruction = 55,
+    parseOperation = 333,
+    Err = 0,
+    parseDataVariables = 3,
+    parseStringVariables = 98,
+    parseEntryVariable = 97,
+    parseExternalVariable = 953,
+    parseSourceOperand = 77,
+    parseDestinationOperand = 93,
+    expectNewline = 92,
+    writingOperationIntoMemoryImg,
+    writingDataIntoMemoryImg,
+    genFirstWord,
+    genSecondWord,
+} ParseState; */
 typedef enum
 {
     Binary,

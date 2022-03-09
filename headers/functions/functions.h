@@ -2,6 +2,20 @@
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------In Second Run.c: ----------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+
+int secondRunParseSource(FILE *fp, char *filename);
+extern void writeDirectOperand(unsigned base, unsigned offset, int _ARE);
+void writeFirstWord(Operation *operation);
+void writeSecondWord();
+Bool writeOperationBinary(char *operationName, char *line);
+Bool writeInstructionBinary(char *instructionName, char *line);
+void parseSingleLineSecondRun(char *line);
+ParseState handleSecondRunFirstToken(char *token, char *line, ParseState state);
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In compiler.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
@@ -58,7 +72,9 @@ Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 void initTablesArrays();
 void updateFinalMemoryAddressesInSymbolTable();
 int updateSingleItemAddress(Item *item);
-
+int getSymbolBaseAddress(char *name);
+int getSymbolOffset(char *name);
+Bool isExternal(char *name);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -124,4 +140,10 @@ unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
 void printMemoryStacks(EncodingFormat format);
-void addNumberToMemory(int number);
+void writeIntegerIntoDataMemoryBinaryImg(int number);
+void initMemory();
+void printBinaryImg();
+void printWordBinary(int index);
+void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
+void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
+void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE]);
