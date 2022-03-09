@@ -56,6 +56,8 @@ Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 void initTablesArrays();
+void updateFinalMemoryAddressesInSymbolTable();
+int updateSingleItemAddress(Item *item);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -88,8 +90,8 @@ Bool isInstruction(char *s);
 void parseSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 Bool handleOperation(char *operationName, char *line);
-Bool parseOperands(char *src, char comma, char *des, Operation *op);
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type);
+Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
 int handleLabel(char *labelName, char *nextToken, char *line);
 Bool isLabel(char *s);
@@ -116,8 +118,10 @@ void updateSymbolTableFinalValues();
 void updateDataEntry(Item *p);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
-void resetCounters();
+void updateFinalCountersValue();
 unsigned getDC();
 unsigned getIC();
+unsigned getICF();
+unsigned getDCF();
 void printMemoryStacks(EncodingFormat format);
 void addNumberToMemory(int number);

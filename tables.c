@@ -8,6 +8,7 @@ extern const char *regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
+extern unsigned getICF();
 
 void initTablesArrays()
 {
@@ -143,12 +144,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
     unsigned base;
     unsigned offset;
     Item *p;
-    /* printf("inside addSymbol\n");
-    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
- */
-    /*     printf("inside addSymbol\n");
-        printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
-     */
+
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
     if (!verifyLabelNamingAndPrintErrors(name))
@@ -175,9 +171,9 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-    printf("inside updateSymbol\n");
-    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
-
+    /*     printf("inside updateSymbol\n");
+        printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
+     */
     /*     printf("inside updateSymbol\n");
      */
     if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
@@ -393,4 +389,32 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     }
 
     return True;
+}
+
+void updateFinalMemoryAddressesInSymbolTable()
+{
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (symbols[i] != NULL)
+            updateSingleItemAddress(symbols[i]);
+        i++;
+    }
+}
+
+int updateSingleItemAddress(Item *item)
+{
+    if (item->val.s.attrs.data)
+    {
+        unsigned base = 0, offset = 0, newValue = item->val.s.value + getICF();
+        offset = newValue % 16;
+        base = newValue - offset;
+        item->val.s.offset = offset;
+        item->val.s.base = base;
+        item->val.s.value = newValue;
+    }
+
+    if (item->next != NULL)
+        updateSingleItemAddress(item->next);
+    return 0;
 }

@@ -12,8 +12,8 @@ extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
+extern void updateFinalCountersValue();
 extern void addNumberToMemory(int number);
-static AddrMethodsOptions activeMethods[2];
 
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
@@ -47,8 +47,14 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     }
 
     printf("line: %s length: %d \n", line, (int)strlen(line));
-    if (strlen(line) > 0)
+    if (i > 0)
+    {
         parseSingleLine(line);
+        memset(line, 0, i);
+    }
+
+    updateFinalCountersValue();
+
     return True;
 }
 
@@ -57,9 +63,9 @@ void parseSingleLine(char *line)
     ParseState state = newLine;
     char *p = calloc(strlen(line + 1), sizeof(char *));
     char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
-    /*
-        printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
-     */
+
+    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
     state = handleFirstToken(token, p, state);
@@ -148,14 +154,17 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
 Bool handleOperation(char *operationName, char *line)
 {
     Operation *p = getOperationByName(operationName);
-
     char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
     int nTotal = 0, nFirst = 0;
+    AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     line = operationName + strlen(operationName) + 1;
-    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
 
-    if (secondOperand[0] == 0 && firstOperand[0] != '\0')
+    printf("line 163, handle Operation\n");
+    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
+    printf("line 165, handle Operation\n");
+
+    if (secondOperand[0] == 0 && firstOperand[0] != 0)
     {
         if (!strchr(firstOperand, ','))
         {
@@ -169,17 +178,23 @@ Bool handleOperation(char *operationName, char *line)
         }
     }
 
-    if (parseOperands(firstOperand, comma, secondOperand, p))
+    if (parseOperands(firstOperand, comma, secondOperand, p, active))
     {
+        printf("line 183, handle Operation\n");
+        printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
+        printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
         if (globalState == firstRun)
         {
             int size = 2;
-            if (activeMethods[0].immediate || activeMethods[1].immediate)
+            if (active[0].immediate || active[1].immediate)
                 size++;
-            if ((activeMethods[0].direct || activeMethods[0].index) || (activeMethods[1].direct || activeMethods[1].index))
+            if ((active[0].direct || active[0].index) || (active[1].direct || active[1].index))
                 size += 2;
-            activeMethods[0].direct = activeMethods[0].immediate = activeMethods[0].index = activeMethods[0].reg = 0;
-            activeMethods[1].direct = activeMethods[1].immediate = activeMethods[1].index = activeMethods[1].reg = 0;
+            if (!p->funct && (!active[0].direct && !active[0].immediate && !active[0].index && !active[0].reg) && (!active[1].direct && !active[1].immediate && !active[1].index && !active[1].reg))
+                size = 1;
+
+            active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
+            active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
             increaseInstructionCounter(size);
         }
 
@@ -189,7 +204,7 @@ Bool handleOperation(char *operationName, char *line)
     return False;
 }
 
-Bool parseOperands(char *src, char comma, char *des, Operation *op)
+Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = (strlen(src) > 0 && strlen(des) > 0) ? 1 : 0;
@@ -225,24 +240,24 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op)
                 return yieldError(requiredSourceOperandIsMissin);
             if (!strlen(des))
                 return yieldError(requiredDestinationOperandIsMissin);
-            return validateOperandMatch(op->src, src, 0) && validateOperandMatch(op->des, des, 1);
+            return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
         }
         else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
         {
             if (!strlen(src))
                 return yieldError(requiredSourceOperandIsMissin);
-            return validateOperandMatch(op->src, src, 0);
+            return validateOperandMatch(op->src, active, src, 0);
         }
         else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
         {
             if (!strlen(des))
                 return yieldError(requiredDestinationOperandIsMissin);
-            return validateOperandMatch(op->des, des, 1);
+            return validateOperandMatch(op->des, active, des, 1);
         }
     }
     return True;
 }
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int type)
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = isValidIndexParameter(operand);
@@ -260,10 +275,10 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, char *operand, int ty
     else if (!allowedAddrs.index && isDirectIndex)
         return yieldError(operandTypeDoNotMatch);
 
-    activeMethods[type].direct = isDirect;
-    activeMethods[type].reg = isReg;
-    activeMethods[type].immediate = isImmediate;
-    activeMethods[type].index = isDirectIndex;
+    active[type].direct = isDirect;
+    active[type].reg = isReg;
+    active[type].immediate = isImmediate;
+    active[type].index = isDirectIndex;
 
     return True;
 }
