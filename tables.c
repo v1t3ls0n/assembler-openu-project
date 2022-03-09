@@ -47,8 +47,8 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
 
-    if (globalState == secondRun)
-        return NULL;
+    /*     if (globalState == secondRun)
+            return NULL; */
 
     np = (Item *)malloc(sizeof(Item *));
     np->name = calloc(strlen(name) + 1, sizeof(char *));
@@ -403,9 +403,9 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
 
 void updateFinalMemoryAddressesInSymbolTable()
 {
+    int i = 0;
     if (globalState == secondRun)
         return True;
-    int i = 0;
     while (i < HASHSIZE)
     {
         if (symbols[i] != NULL)

@@ -58,48 +58,45 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         i = 0;
     }
 
-    if (globalState != collectErrors)
-    {
-        updateFinalCountersValue();
-        initMemory();
-        rewind(fp);
-        printf("Second Run:\n");
-        globalState = secondRun;
-        currentLine = 1;
-        while (((c = fgetc(fp)) != EOF))
+    updateFinalCountersValue();
+    initMemory();
+
+    /*     if (globalState != collectErrors)
         {
-
-            if (c == '\n')
-            {
-                parseSingleLine(line);
-                memset(line, 0, MAX_LINE_LEN);
-                i = 0;
-            }
-
-            else if (i >= MAX_LINE_LEN - 1 && c != '\n')
+            updateFinalCountersValue();
+            initMemory();
+            rewind(fp);
+            printf("Second Run:\n");
+            globalState = secondRun;
+            currentLine = 1;
+            while (((c = fgetc(fp)) != EOF))
             {
 
-                return yieldError(maxLineLengthExceeded);
-            }
-            else if (isspace(c))
-                line[i++] = ' ';
+                if (c == '\n')
+                {
+                    parseSingleLine(line);
+                    memset(line, 0, MAX_LINE_LEN);
+                    i = 0;
+                }
 
-            else
-            {
-                if (isprint(c))
-                    line[i++] = c;
+                else if (isspace(c))
+                    line[i++] = ' ';
+
+                else
+                {
+                    if (isprint(c))
+                        line[i++] = c;
+                }
             }
+
         }
-        /*     globalState = secondRun;
-         */
-    }
 
-    if (i > 0)
-    {
-        parseSingleLine(line);
-        memset(line, 0, i);
-        i = 0;
-    }
+        if (i > 0)
+        {
+            parseSingleLine(line);
+            memset(line, 0, i);
+            i = 0;
+        } */
     return True;
 }
 
@@ -382,7 +379,6 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
         return yieldError(undefinedOperation);
     }
 }
-
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
 
@@ -443,7 +439,6 @@ Bool isInstruction(char *s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
 }
-
 Bool countAndVerifyDataArguments(char *token)
 {
     int number = 0;
@@ -501,12 +496,8 @@ Bool countAndVerifyDataArguments(char *token)
                 {
                     if (minusSignOn)
                         number = -1 * number;
-
                     minusSignOn = False;
                     writeIntegerIntoDataMemoryBinaryImg(number);
-
-                    /*
-                     */
                 }
                 else
                     size++;
@@ -529,18 +520,6 @@ Bool countAndVerifyStringArguments(char *token)
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
-    /* printf("token: %s\n", token);
-     */
-
-    if (token == NULL)
-        return True;
-
-    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-        return yieldError(closingQuotesForStringIsMissing);
-    else if (token[0] != '\"')
-        return yieldError(expectedQuotes);
-    token++;
-
     if (globalState == secondRun)
     {
         for (i = 0; i < strlen(token) - 2; i++)
@@ -549,8 +528,20 @@ Bool countAndVerifyStringArguments(char *token)
             writeIntegerIntoDataMemoryBinaryImg((int)token[i]);
         }
     }
-    /*    if (globalState == firstRun) */
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    else
+    {
+        if (token == NULL)
+            return True;
+
+        if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
+            return yieldError(closingQuotesForStringIsMissing);
+        else if (token[0] != '\"')
+            return yieldError(expectedQuotes);
+        token++;
+
+        if (globalState == firstRun)
+            increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    }
 
     return True;
 }
