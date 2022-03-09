@@ -43,8 +43,10 @@ Item *lookup(char *s, ItemType type)
 
 Item *install(char *name, ItemType type)
 {
+
     unsigned hashval;
     Item *np;
+
     np = (Item *)malloc(sizeof(Item *));
     np->name = calloc(strlen(name) + 1, sizeof(char *));
     if (np == NULL || np->name == NULL)

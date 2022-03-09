@@ -7,8 +7,12 @@ extern Item *symbols[HASHSIZE];
 extern Item *macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-extern Word *convertNumberToWord(int n, EncodingFormat format);
+
+/* extern Word *convertNumberToWord(int n, EncodingFormat format);
+ */
 extern void updateFinalMemoryAddressesInSymbolTable();
+extern BinaryWord *convertNumberToBinaryWord(int num);
+
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
@@ -16,15 +20,46 @@ unsigned static DCF = 0;
 
 MemoryStack *codeMemoryStack;
 MemoryStack *dataMemoryStack;
+static BinaryWord *binaryImg;
 
-void addNumberToMemory(int number)
+void initMemory()
 {
-    Word *new;
-    printf("inside addNumberToMemory\n");
-    new = convertNumberToWord(number, Binary);
-    writeToMemory(new, Data);
+    int totalSize = DCF - MEMORY_START;
+    binaryImg = calloc(totalSize, sizeof(BinaryWord *));
+    printf("inside initMemory,totalSize:%d\nbinaryImg size:%d\n", totalSize, (int)(sizeof(binaryImg) * sizeof(BinaryWord *) * 20));
+}
+void printBinaryImg()
+{
+    int i;
+    int totalSize = DCF - MEMORY_START;
+    for (i = 0; i < totalSize; i++)
+    {
+    }
+    /*         printWordBinary(&binaryImg[i]); */
 }
 
+void writeIntegerIntoDataMemoryBinaryImg(int number)
+{
+    int index = DC - MEMORY_START;
+
+    /* binaryImg[index] = *convertNumberToBinaryWord(number);
+     */
+    DC++;
+    printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
+    printWordBinary(&binaryImg[index]);
+    printf("\n");
+}
+
+void printWordBinary(BinaryWord *wordBin)
+{
+    int j;
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
+    {
+    }
+    /*   printf("%c", wordBin->digit[j].on ? '1' : '0'); */
+
+    printf("\n");
+}
 int writeToMemory(Word *word, DataType type)
 {
     printf("inside writeToMemory\n");

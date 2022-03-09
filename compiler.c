@@ -4,6 +4,8 @@ extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int parseExpandedSourceFile(FILE *fp, char *filename);
 extern void initTablesArrays();
+extern void printBinaryImg();
+extern unsigned currentLine;
 
 int main(int argc, char *argv[])
 {
@@ -14,13 +16,19 @@ int main(int argc, char *argv[])
     printf("Start Parsing Assembly Code:\n");
     handleSourceFiles(argc, argv);
 
-    if (globalState != collectErrors)
+    if (globalState = globalState != secondRun ? collectErrors : globalState)
+    {
         printf("Finished Successfully!\n");
+        printSymbolTable();
+        currentLine = 1;
+        handleSourceFiles(argc, argv);
+    }
     else
         printf("\nFinished First Run With Errors\n");
 
-    printSymbolTable();
+    /*     printBinaryImg();
 
+    */
     return 0;
 }
 
@@ -49,6 +57,8 @@ int handleSourceFiles(int argc, char *argv[])
             if (globalState == handleMacros)
                 parseSourceFile(fptr, fileName);
             if (globalState == firstRun)
+                parseExpandedSourceFile(fptr, fileName);
+            if (globalState == secondRun)
                 parseExpandedSourceFile(fptr, fileName);
 
             fclose(fptr);

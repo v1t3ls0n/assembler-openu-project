@@ -13,7 +13,8 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void updateFinalCountersValue();
-extern void addNumberToMemory(int number);
+extern void writeIntegerIntoDataMemoryBinaryImg(int number);
+extern void initMemory();
 
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
@@ -33,7 +34,8 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
         else if (i >= MAX_LINE_LEN - 1 && c != '\n')
         {
-            globalState = collectErrors;
+
+            globalState = globalState != secondRun ? collectErrors : globalState;
             return yieldError(maxLineLengthExceeded);
         }
         else if (isspace(c))
@@ -46,14 +48,22 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         }
     }
 
-    printf("line: %s length: %d \n", line, (int)strlen(line));
+    /* printf("line: %s length: %d \n", line, (int)strlen(line));
+     */
+
     if (i > 0)
     {
         parseSingleLine(line);
         memset(line, 0, i);
     }
+    if (globalState != collectErrors)
+    {
+        updateFinalCountersValue();
+        initMemory();
 
-    updateFinalCountersValue();
+        /*     globalState = secondRun;
+         */
+    }
 
     return True;
 }
@@ -97,7 +107,9 @@ void parseSingleLine(char *line)
 
         case Err:
         {
-            globalState = collectErrors;
+            if (globalState == firstRun)
+                globalState = globalState != secondRun ? collectErrors : globalState;
+
             state = Err;
             break;
         }
@@ -160,9 +172,7 @@ Bool handleOperation(char *operationName, char *line)
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     line = operationName + strlen(operationName) + 1;
 
-    printf("line 163, handle Operation\n");
     sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
-    printf("line 165, handle Operation\n");
 
     if (secondOperand[0] == 0 && firstOperand[0] != 0)
     {
@@ -180,9 +190,9 @@ Bool handleOperation(char *operationName, char *line)
 
     if (parseOperands(firstOperand, comma, secondOperand, p, active))
     {
-        printf("line 183, handle Operation\n");
-        printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
-        printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
+        /*  printf("line 183, handle Operation\n");
+         printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
+         printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg); */
         if (globalState == firstRun)
         {
             int size = 2;
@@ -390,6 +400,7 @@ Bool isInstruction(char *s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
 }
+
 Bool countAndVerifyDataArguments(char *token)
 {
     int number = 0;
@@ -448,7 +459,7 @@ Bool countAndVerifyDataArguments(char *token)
                     if (minusSignOn)
                         number = -1 * number;
                     minusSignOn = False;
-                    addNumberToMemory(number);
+                    writeIntegerIntoDataMemoryBinaryImg(number);
                 }
                 else
                     size++;
@@ -471,15 +482,17 @@ Bool countAndVerifyStringArguments(char *token)
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
-    printf("token: %s\n", token);
-    /*    if (token==NULL)
-           return True;
+    /* printf("token: %s\n", token);
      */
-    /*   if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-          return yieldError(closingQuotesForStringIsMissing);
-      else if (token[0] != '\"')
-          return yieldError(expectedQuotes);
-   */
+
+    if (token == NULL)
+        return True;
+
+    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
+        return yieldError(closingQuotesForStringIsMissing);
+    else if (token[0] != '\"')
+        return yieldError(expectedQuotes);
+
     increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
