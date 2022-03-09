@@ -49,7 +49,7 @@ int secondRunParseSource(FILE *fp, char *filename)
 
         if (c == '\n')
         {
-            parseSingleLine(line);
+            parseSingleLineSecondRun(line);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -81,10 +81,9 @@ Bool writeOperationBinary(char *operationName, char *line)
     char comma = 0;
     int nTotal = 0, nFirst = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+    printf("writeOperationBinary in second run line 84\n");
     line = operationName + strlen(operationName) + 1;
-
     sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
-
     if (secondOperand[0] == 0 && firstOperand[0] != 0)
     {
         if (!strchr(firstOperand, ','))
@@ -101,39 +100,42 @@ Bool writeOperationBinary(char *operationName, char *line)
 
     if (parseOperands(firstOperand, comma, secondOperand, p, active))
     {
-        /*  printf("line 183, handle Operation\n");
-         printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
-         printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg); */
 
         unsigned srcBase = 0, srcOffset = 0, desBase = 0, desOffset = 0;
-        writeFirstWord(p);
-        if (active[0].direct || active[0].index)
-        {
+        printf("line 183, handle Operation\n");
+        printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
+        printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
+        /*
+                writeFirstWord(p); */
 
-            srcBase = getSymbolBaseAddress(firstOperand);
-            srcOffset = getSymbolOffset(firstOperand);
+        /*         if (active[0].direct || active[0].index)
+                {
 
-            if (!srcBase || !srcOffset)
-            {
-                globalState = secondRunFailed;
-                return yieldError(labelNotExist);
-            }
-            else
-                writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
-        }
-        if (active[1].direct || active[1].index)
-        {
-            desBase = getSymbolBaseAddress(secondOperand);
-            desOffset = getSymbolOffset(secondOperand);
-            if (!desBase || !desOffset)
-            {
-                globalState = secondRunFailed;
-                return yieldError(labelNotExist);
-            }
+                    srcBase = getSymbolBaseAddress(firstOperand);
+                    srcOffset = getSymbolOffset(firstOperand);
 
-            else
-                writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
-        }
+                    if (!srcBase || !srcOffset)
+                    {
+                        globalState = secondRunFailed;
+                        return yieldError(labelNotExist);
+                    }
+                    else
+                        writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
+                }
+                if (active[1].direct || active[1].index)
+                {
+                    desBase = getSymbolBaseAddress(secondOperand);
+                    desOffset = getSymbolOffset(secondOperand);
+                    if (!desBase || !desOffset)
+                    {
+                        globalState = secondRunFailed;
+                        return yieldError(labelNotExist);
+                    }
+
+                    else
+                        writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
+                }
+             */
     }
 
     return True;
@@ -148,15 +150,114 @@ void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
 
 void writeFirstWord(Operation *operation)
 {
-    writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
+
+    /* writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
+     */
 }
 
 void writeSecondWord()
 {
 
-    /*     char binaryString[BINARY_WORD_SIZE] = {"00000000000000000000"};
-     */
+    char binaryString[BINARY_WORD_SIZE] = {"00000000000000000000"};
 
-    char binaryString[BINARY_WORD_SIZE] = {0};
     writeIntoCodeBinaryImg(binaryString);
+}
+
+Bool writeInstructionBinary(char *instructionName, char *line)
+{
+    printf("writeInstructionBinary in second run line 170\n");
+
+    return True;
+}
+
+void parseSingleLineSecondRun(char *line)
+{
+    ParseState state = newLine;
+    char *p = calloc(strlen(line + 1), sizeof(char *));
+    char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
+
+    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+
+    memcpy(p, line, strlen(line));
+    token = strtok(p, " \t \n");
+    state = handleFirstToken(token, p, state);
+
+    while (token != NULL)
+    {
+
+        switch (state)
+        {
+
+        case writingOperationIntoMemoryImg:
+        {
+            state = writeOperationBinary(token, line);
+            break;
+        }
+
+        case writingDataIntoMemoryImg:
+        {
+            state = writeInstructionBinary(token, line);
+
+            break;
+        }
+
+        case Err:
+        {
+            if (globalState == firstRun)
+                globalState = collectErrors;
+
+            state = Err;
+            break;
+        }
+
+        case skipLine:
+            state = lineParsedSuccessfully;
+
+        default:
+            break;
+        }
+        token = strtok(NULL, " \t \n");
+    }
+
+    currentLine++;
+    free(p);
+    free(token);
+}
+
+ParseState handleSecondRunFirstToken(char *token, char *line, ParseState state)
+{
+    /*   printf("inside handle State, token:%s\n", token); */
+
+    printf("firstRun.c, line 138\n");
+
+    switch (state)
+    {
+    case skipLine:
+        return lineParsedSuccessfully;
+
+    case newLine:
+    {
+        if (token[0] == ';')
+            return skipLine;
+
+        if (isLabel(token))
+        {
+            token = strtok(NULL, " \t \n");
+            if (isInstruction(token))
+                return writingDataIntoMemoryImg;
+
+            else if (isOperation(token))
+                return writingOperationIntoMemoryImg;
+        }
+        else if (isInstruction(token))
+            return writingDataIntoMemoryImg;
+
+        else if (isOperation(token))
+            return writingOperationIntoMemoryImg;
+    }
+
+    default:
+        break;
+    }
+    return True;
 }

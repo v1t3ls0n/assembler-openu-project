@@ -28,7 +28,7 @@ void initMemory()
 
     int i, j;
 
-    binaryImg = calloc(totalSize, sizeof(BinaryWord *));
+    binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord *));
 
     for (i = 0; i < totalSize; i++)
     {
@@ -48,7 +48,7 @@ void printBinaryImg()
     for (i = 0; i < totalSize; i++)
     {
         printf("line:%d ", i + MEMORY_START);
-        printWordBinary(&binaryImg[i]);
+        printWordBinary(i);
     }
 }
 
@@ -58,39 +58,37 @@ void writeIntegerIntoDataMemoryBinaryImg(int number)
     binaryImg[index] = *convertNumberToBinaryWord(number);
     DC++;
     printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
-    printWordBinary(&binaryImg[index]);
+    printWordBinary(index);
     printf("\n");
 }
 
 void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE])
 {
 
-    binaryImg[DC] = *convertBinaryStringToBinaryWordObj(s);
+    convertBinaryStringToBinaryWordObj(s);
     DC++;
 }
 
 void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE])
 {
 
-    binaryImg[IC] = *convertBinaryStringToBinaryWordObj(s);
+    convertBinaryStringToBinaryWordObj(s);
     IC++;
 }
 
-BinaryWord *convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE])
+void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE])
 {
     int j;
-    BinaryWord *w = calloc(1, sizeof(BinaryWord *));
-    for (j = 0; j < BINARY_WORD_SIZE; j++)
-        w->digit[j].on = s[j] == '1' ? 1 : 0;
 
-    return w;
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
+        binaryImg[DC].digit[j].on = s[j] == '1' ? 1 : 0;
 }
 
-void printWordBinary(BinaryWord *wordBin)
+void printWordBinary(int index)
 {
     int j;
     for (j = 0; j < BINARY_WORD_SIZE; j++)
-        printf("%c", wordBin->digit[j].on ? '1' : '0');
+        printf("%c", binaryImg[index].digit[j].on ? '1' : '0');
 
     printf("\n");
 }

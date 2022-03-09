@@ -7,6 +7,8 @@ extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLine;
 
+extern void initMemory();
+
 int main(int argc, char *argv[])
 {
 
@@ -21,12 +23,8 @@ int main(int argc, char *argv[])
         printf("Finished Successfully!\n");
         printSymbolTable();
 
-        /*         handleSourceFiles(argc, argv); */
-
         /*
-
-         */
-        printBinaryImg();
+                printBinaryImg(); */
     }
     else
         printf("\nFinished First Run With Errors\n");

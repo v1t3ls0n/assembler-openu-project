@@ -17,6 +17,9 @@ extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
 extern int secondRunParseSource(FILE *fp, char *filename);
 
+extern Bool writeOperationBinary(char *operationName, char *line);
+Bool writeInstructionBinary(char *instructionName, char *line);
+
 int parseExpandedSourceFile(FILE *fp, char *filename)
 {
     int c = 0;
@@ -129,6 +132,7 @@ void parseSingleLine(char *line)
 ParseState handleFirstToken(char *token, char *line, ParseState state)
 {
     /*   printf("inside handle State, token:%s\n", token); */
+
     switch (state)
     {
     case skipLine:
@@ -143,10 +147,14 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
             return parseLabel;
 
         else if (isInstruction(token))
+
             return parseInstruction;
 
         else if (isOperation(token))
+        {
+
             return parseOperation;
+        }
         else
         {
             yieldError(illegalApearenceOfCharactersOnLine);
