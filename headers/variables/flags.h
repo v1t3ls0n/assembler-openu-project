@@ -44,7 +44,8 @@ typedef enum
     srcOperandTypeIsNotAllowed,
     desOperandTypeIsNotAllowed,
     operandTypeDoNotMatch,
-    labelNotExist
+    labelNotExist,
+    secondRunFailed = 0
 } Error;
 
 typedef enum

@@ -6,7 +6,10 @@
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int secondRunParseSource(FILE *fp, char *filename);
-
+extern void writeDirectOperand(unsigned base, unsigned offset, int _ARE);
+void writeFirstWord(Operation *operation);
+void writeSecondWord();
+Bool writeOperationBinary(char *operationName, char *line);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -68,6 +71,7 @@ void updateFinalMemoryAddressesInSymbolTable();
 int updateSingleItemAddress(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
+Bool isExternal(char *name);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -137,3 +141,6 @@ void writeIntegerIntoDataMemoryBinaryImg(int number);
 void initMemory();
 void printBinaryImg();
 void printWordBinary(BinaryWord *wordBin);
+void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
+void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
+BinaryWord *convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE]);

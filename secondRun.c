@@ -20,6 +20,7 @@ extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrM
 /* from table.c: */
 extern int getSymbolBaseAddress(char *name);
 extern int getSymbolOffset(char *name);
+extern Bool isExternal(char *name);
 
 /* from operation.c */
 extern Operation operations[OP_SIZE];
@@ -29,6 +30,11 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void writeIntegerIntoDataMemoryBinaryImg(int number);
+extern void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
+extern void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
+
+/* from encode.c */
+extern char *generateFirstWordEncodedToBinary(Operation *operation);
 
 int secondRunParseSource(FILE *fp, char *filename)
 {
@@ -99,24 +105,58 @@ Bool writeOperationBinary(char *operationName, char *line)
          printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
          printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg); */
 
-        unsigned base = 0, offset = 0;
+        unsigned srcBase = 0, srcOffset = 0, desBase = 0, desOffset = 0;
+        writeFirstWord(p);
         if (active[0].direct || active[0].index)
         {
 
-            base = getSymbolBaseAddress(firstOperand);
-            offset = getSymbolOffset(secondOperand);
+            srcBase = getSymbolBaseAddress(firstOperand);
+            srcOffset = getSymbolOffset(firstOperand);
+
+            if (!srcBase || !srcOffset)
+            {
+                globalState = secondRunFailed;
+                return yieldError(labelNotExist);
+            }
+            else
+                writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
         }
         if (active[1].direct || active[1].index)
         {
-            base = getSymbolBaseAddress(secondOperand);
-            offset = getSymbolOffset(secondOperand);
-        }
+            desBase = getSymbolBaseAddress(secondOperand);
+            desOffset = getSymbolOffset(secondOperand);
+            if (!desBase || !desOffset)
+            {
+                globalState = secondRunFailed;
+                return yieldError(labelNotExist);
+            }
 
-        if (base == -1 || offset == -1)
-        {
-            yieldError(labelNotExist);
+            else
+                writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
         }
     }
 
     return True;
+}
+
+void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
+{
+
+    writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(base))));
+    writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(offset))));
+}
+
+void writeFirstWord(Operation *operation)
+{
+    writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
+}
+
+void writeSecondWord()
+{
+
+    /*     char binaryString[BINARY_WORD_SIZE] = {"00000000000000000000"};
+     */
+
+    char binaryString[BINARY_WORD_SIZE] = {0};
+    writeIntoCodeBinaryImg(binaryString);
 }
