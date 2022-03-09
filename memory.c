@@ -25,10 +25,9 @@ static BinaryWord *binaryImg;
 void initMemory()
 {
     int totalSize = DCF - MEMORY_START;
-
     int i, j;
-
     binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord *));
+    printf("inside initMemory\n");
 
     for (i = 0; i < totalSize; i++)
     {
@@ -65,12 +64,14 @@ void writeIntegerIntoDataMemoryBinaryImg(int number)
 void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE])
 {
 
+    printf("inside writeIntoDataBinaryImg, s:%s DC:%u\n", s, DC);
     convertBinaryStringToBinaryWordObj(s);
     DC++;
 }
 
 void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE])
 {
+    printf("inside writeIntoCodeBinaryImg, s:%s DC:%u\n", s, DC);
 
     convertBinaryStringToBinaryWordObj(s);
     IC++;

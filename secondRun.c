@@ -42,6 +42,7 @@ int secondRunParseSource(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     currentLine = 1;
+    initMemory();
 
     printf("Second Run:\n");
     while (((c = fgetc(fp)) != EOF))
@@ -105,37 +106,36 @@ Bool writeOperationBinary(char *operationName, char *line)
         printf("line 183, handle Operation\n");
         printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
         printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
-        /*
-                writeFirstWord(p); */
 
-        /*         if (active[0].direct || active[0].index)
-                {
+        writeFirstWord(p);
 
-                    srcBase = getSymbolBaseAddress(firstOperand);
-                    srcOffset = getSymbolOffset(firstOperand);
+        if (active[0].direct || active[0].index)
+        {
 
-                    if (!srcBase || !srcOffset)
-                    {
-                        globalState = secondRunFailed;
-                        return yieldError(labelNotExist);
-                    }
-                    else
-                        writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
-                }
-                if (active[1].direct || active[1].index)
-                {
-                    desBase = getSymbolBaseAddress(secondOperand);
-                    desOffset = getSymbolOffset(secondOperand);
-                    if (!desBase || !desOffset)
-                    {
-                        globalState = secondRunFailed;
-                        return yieldError(labelNotExist);
-                    }
+            srcBase = getSymbolBaseAddress(firstOperand);
+            srcOffset = getSymbolOffset(firstOperand);
 
-                    else
-                        writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
-                }
-             */
+            if (!srcBase || !srcOffset)
+            {
+                globalState = secondRunFailed;
+                return yieldError(labelNotExist);
+            }
+            else
+                writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
+        }
+        if (active[1].direct || active[1].index)
+        {
+            desBase = getSymbolBaseAddress(secondOperand);
+            desOffset = getSymbolOffset(secondOperand);
+            if (!desBase || !desOffset)
+            {
+                globalState = secondRunFailed;
+                return yieldError(labelNotExist);
+            }
+
+            else
+                writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
+        }
     }
 
     return True;
@@ -151,8 +151,7 @@ void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
 void writeFirstWord(Operation *operation)
 {
 
-    /* writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
-     */
+    writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
 }
 
 void writeSecondWord()
@@ -180,7 +179,7 @@ void parseSingleLineSecondRun(char *line)
 
     memcpy(p, line, strlen(line));
     token = strtok(p, " \t \n");
-    state = handleFirstToken(token, p, state);
+    state = handleSecondRunFirstToken(token, p, state);
 
     while (token != NULL)
     {
@@ -190,12 +189,15 @@ void parseSingleLineSecondRun(char *line)
 
         case writingOperationIntoMemoryImg:
         {
+            printf("state: writingOperationIntoMemoryImg\n");
             state = writeOperationBinary(token, line);
             break;
         }
 
         case writingDataIntoMemoryImg:
         {
+            printf("state: writeInstructionBinary\n");
+
             state = writeInstructionBinary(token, line);
 
             break;

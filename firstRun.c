@@ -62,9 +62,9 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
     if (globalState != collectErrors)
     {
-        rewind(fp);
-        initMemory();
+        printf("before second run parse source in firstRUn.c\n");
 
+        rewind(fp);
         secondRunParseSource(fp, filename);
     }
 
