@@ -16,12 +16,17 @@ int main(int argc, char *argv[])
     printf("Start Parsing Assembly Code:\n");
     handleSourceFiles(argc, argv);
 
-    if (globalState = globalState != secondRun ? collectErrors : globalState)
+    if (globalState != collectErrors)
     {
         printf("Finished Successfully!\n");
         printSymbolTable();
         currentLine = 1;
-        handleSourceFiles(argc, argv);
+
+        /*         handleSourceFiles(argc, argv); */
+
+        /*
+
+         */
         printBinaryImg();
     }
     else

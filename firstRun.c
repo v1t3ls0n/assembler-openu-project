@@ -60,7 +60,6 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     {
         updateFinalCountersValue();
         initMemory();
-
         /*     globalState = secondRun;
          */
     }
@@ -458,8 +457,11 @@ Bool countAndVerifyDataArguments(char *token)
                 {
                     if (minusSignOn)
                         number = -1 * number;
+
                     minusSignOn = False;
+                    /*
                     writeIntegerIntoDataMemoryBinaryImg(number);
+ */
                 }
                 else
                     size++;
@@ -478,7 +480,7 @@ Bool countAndVerifyDataArguments(char *token)
 }
 Bool countAndVerifyStringArguments(char *token)
 {
-
+    int i;
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
@@ -492,8 +494,20 @@ Bool countAndVerifyStringArguments(char *token)
         return yieldError(closingQuotesForStringIsMissing);
     else if (token[0] != '\"')
         return yieldError(expectedQuotes);
+    token++;
+    if (globalState == firstRun)
+        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
 
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    if (globalState == secondRun)
+    {
+        for (i = 0; i < strlen(token) - 1; i++)
+        {
+            printf("token[%d]:%c ", i, (char)token[i]);
+
+            /* writeIntegerIntoDataMemoryBinaryImg((int)token[i]);
+             */
+        }
+    }
 
     return True;
 }

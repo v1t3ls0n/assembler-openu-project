@@ -25,7 +25,20 @@ static BinaryWord *binaryImg;
 void initMemory()
 {
     int totalSize = DCF - MEMORY_START;
+
+    /* int i, j;
+     */
     binaryImg = calloc(totalSize, sizeof(BinaryWord *));
+
+    /*     for (i = 0; i < totalSize; i++)
+        {
+            for (j = 0; i < BINARY_WORD_SIZE; j++)
+            {
+
+                binaryImg[i].digit[j].on = 0;
+            }
+        } */
+
     printf("inside initMemory,totalSize:%d\nbinaryImg size:%d\n", totalSize, (int)(sizeof(binaryImg) * sizeof(BinaryWord *) * 20));
 }
 void printBinaryImg()
