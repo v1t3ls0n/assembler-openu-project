@@ -7,24 +7,24 @@ operation address)
 
  */
 #include "data.h"
-/* from variables.c (global Variables) */
+ /* from variables.c (global Variables) */
 extern State globalState;
 extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
+extern const char* regs[REGS_SIZE];
 
 /* from firstRun.c */
-extern void parseSingleLine(char *line);
-extern ParseState handleFirstToken(char *token, char *line, ParseState state);
-extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
+extern void parseSingleLine(char* line);
+extern ParseState handleFirstToken(char* token, char* line, ParseState state);
+extern Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsOptions active[2]);
 
 /* from table.c: */
-extern int getSymbolBaseAddress(char *name);
-extern int getSymbolOffset(char *name);
-extern Bool isExternal(char *name);
+extern int getSymbolBaseAddress(char* name);
+extern int getSymbolOffset(char* name);
+extern Bool isExternal(char* name);
 
 /* from operation.c */
 extern Operation operations[OP_SIZE];
-extern Operation *getOperationByName(char *s);
+extern Operation* getOperationByName(char* s);
 
 /* from memory.c */
 extern unsigned getDC();
@@ -34,13 +34,13 @@ extern void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
 extern void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
 
 /* from encode.c */
-extern char *generateFirstWordEncodedToBinary(Operation *operation);
+extern char* generateFirstWordEncodedToBinary(Operation* operation);
 
-int secondRunParseSource(FILE *fp, char *filename)
+int secondRunParseSource(FILE* fp, char* filename)
 {
     int c = 0;
     int i = 0;
-    char line[MAX_LINE_LEN + 1] = {0};
+    char line[MAX_LINE_LEN + 1] = { 0 };
     currentLine = 1;
     initMemory();
 
@@ -65,7 +65,6 @@ int secondRunParseSource(FILE *fp, char *filename)
         }
     }
 
-    printf("line: %s length: %d \n", line, (int)strlen(line));
     if (i > 0)
     {
         parseSingleLine(line);
@@ -75,13 +74,13 @@ int secondRunParseSource(FILE *fp, char *filename)
     return True;
 }
 
-Bool writeOperationBinary(char *operationName, char *line)
+Bool writeOperationBinary(char* operationName, char* line)
 {
-    Operation *p = getOperationByName(operationName);
-    char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
+    Operation* p = getOperationByName(operationName);
+    char firstOperand[MAX_LABEL_LEN] = { 0 }, secondOperand[MAX_LABEL_LEN] = { 0 };
     char comma = 0;
     int nTotal = 0, nFirst = 0;
-    AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+    AddrMethodsOptions active[2] = { {0, 0, 0, 0}, {0, 0, 0, 0} };
     printf("writeOperationBinary in second run line 84\n");
     line = operationName + strlen(operationName) + 1;
     sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
@@ -148,7 +147,7 @@ void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
     writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(offset))));
 }
 
-void writeFirstWord(Operation *operation)
+void writeFirstWord(Operation* operation)
 {
 
     writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
@@ -157,23 +156,23 @@ void writeFirstWord(Operation *operation)
 void writeSecondWord()
 {
 
-    char binaryString[BINARY_WORD_SIZE] = {"00000000000000000000"};
+    char binaryString[BINARY_WORD_SIZE] = { "00000000000000000000" };
 
     writeIntoCodeBinaryImg(binaryString);
 }
 
-Bool writeInstructionBinary(char *instructionName, char *line)
+Bool writeInstructionBinary(char* instructionName, char* line)
 {
     printf("writeInstructionBinary in second run line 170\n");
 
     return True;
 }
 
-void parseSingleLineSecondRun(char *line)
+void parseSingleLineSecondRun(char* line)
 {
     ParseState state = newLine;
-    char *p = calloc(strlen(line + 1), sizeof(char *));
-    char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
+    char* p = calloc(strlen(line + 1), sizeof(char*));
+    char* token = calloc(MAX_LABEL_LEN, sizeof(char*));
 
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
 
@@ -190,7 +189,10 @@ void parseSingleLineSecondRun(char *line)
         case writingOperationIntoMemoryImg:
         {
             printf("state: writingOperationIntoMemoryImg\n");
+            /*
             state = writeOperationBinary(token, line);
+ */
+
             break;
         }
 
@@ -198,8 +200,8 @@ void parseSingleLineSecondRun(char *line)
         {
             printf("state: writeInstructionBinary\n");
 
-            state = writeInstructionBinary(token, line);
-
+            /* state = writeInstructionBinary(token, line);
+ */
             break;
         }
 
@@ -226,7 +228,7 @@ void parseSingleLineSecondRun(char *line)
     free(token);
 }
 
-ParseState handleSecondRunFirstToken(char *token, char *line, ParseState state)
+ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state)
 {
     /*   printf("inside handle State, token:%s\n", token); */
 
