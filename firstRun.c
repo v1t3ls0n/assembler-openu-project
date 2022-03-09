@@ -298,7 +298,8 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
             char *labelName = calloc(strlen(nextTokens), sizeof(char *));
-            labelName = strdup(nextTokens);
+            strcpy(labelName, nextTokens);
+
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
                 return yieldError(illegalApearenceOfCharactersOnLine);
@@ -468,11 +469,8 @@ Bool countAndVerifyStringArguments(char *token)
 {
 
     if (isInstruction(token))
-    {
-        token = strdup(strtok(NULL, " \t \n"));
-    }
-    else
-        token = strdup(token);
+        token = strtok(NULL, " \t \n");
+
     printf("token: %s\n", token);
     /*    if (token==NULL)
            return True;
