@@ -68,6 +68,7 @@ typedef enum
     parseLabel = 4364,
     parseInstruction = 55,
     parseOperation = 333,
+
     returnFalse = 4678,
     lineParsedSuccessfully = 11111111,
     parsingLine = 112,

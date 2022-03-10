@@ -17,7 +17,7 @@ extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
 extern int secondRunParseSource(FILE* fp, char* filename);
 
-extern Bool writeOperationBinary(char* operationName, char* line);
+extern Bool writeOperationBinary(char* operationName, char* args);
 Bool writeInstructionBinary(char* instructionName, char* line);
 
 int parseExpandedSourceFile(FILE* fp, char* filename)
@@ -388,7 +388,6 @@ int handleLabel(char* labelName, char* nextToken, char* line)
 Bool isOperation(char* s)
 {
 
-    printf("inside Bool isOperation(char* s)\n");
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
