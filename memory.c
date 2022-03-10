@@ -3,30 +3,31 @@
 #define MEMORY_START 100
 /* Shared global State variables*/
 extern State globalState;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
+extern Item* symbols[HASHSIZE];
+extern Item* macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 
 /* extern Word *convertNumberToWord(int n, EncodingFormat format);
  */
 extern void updateFinalMemoryAddressesInSymbolTable();
-extern BinaryWord *convertNumberToBinaryWord(int num);
+extern BinaryWord* convertNumberToBinaryWord(int num);
 
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
 
-MemoryStack *codeMemoryStack;
-MemoryStack *dataMemoryStack;
-static BinaryWord *binaryImg;
+
+static BinaryWord* binaryImg;
 
 void initMemory()
 {
-    int totalSize = DCF - MEMORY_START;
+    const int totalSize = DCF - MEMORY_START;
     int i, j;
-    binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord *));
+    binaryImg = (BinaryWord*)malloc(totalSize * sizeof(BinaryWord));
+
+
     printf("inside initMemory\n");
 
     for (i = 0; i < totalSize; i++)
@@ -38,7 +39,10 @@ void initMemory()
         }
     }
 
-    printf("inside initMemory,totalSize:%d\nbinaryImg size:%d\n", totalSize, (int)(sizeof(binaryImg) * sizeof(BinaryWord *) * 20));
+    /*
+        printf("inside initMemory,totalSize:%d\nbinaryImg size:%d\n", totalSize, (int)(sizeof(binaryImg) * sizeof(BinaryWord*) * 20));
+     */
+
 }
 void printBinaryImg()
 {
@@ -53,12 +57,14 @@ void printBinaryImg()
 
 void writeIntegerIntoDataMemoryBinaryImg(int number)
 {
-    int index = DC - MEMORY_START;
+    printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
+
+    /* int index = DC - MEMORY_START;
     binaryImg[index] = *convertNumberToBinaryWord(number);
     DC++;
-    printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
     printWordBinary(index);
     printf("\n");
+     */
 }
 
 void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE])
@@ -73,16 +79,19 @@ void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE])
 {
     printf("inside writeIntoCodeBinaryImg, s:%s DC:%u\n", s, DC);
 
-    convertBinaryStringToBinaryWordObj(s);
+    /* convertBinaryStringToBinaryWordObj(s);
+     */
     IC++;
 }
 
 void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE])
 {
-    int j;
 
-    for (j = 0; j < BINARY_WORD_SIZE; j++)
-        binaryImg[DC].digit[j].on = s[j] == '1' ? 1 : 0;
+    printf("inside convertBinaryStringToBinaryWordObj");
+    /*     int j;
+
+        for (j = 0; j < BINARY_WORD_SIZE; j++)
+            binaryImg[DC].digit[j].on = s[j] == '1' ? 1 : 0; */
 }
 
 void printWordBinary(int index)
@@ -93,65 +102,7 @@ void printWordBinary(int index)
 
     printf("\n");
 }
-int writeToMemory(Word *word, DataType type)
-{
-    printf("inside writeToMemory\n");
 
-    if (DC + IC > 8191)
-    {
-        yieldError(memoryAllocationFailure);
-        return Err;
-    }
-
-    if (type == Code)
-        writeIntoCodeStack(word);
-
-    else
-        writeIntoDataStack(word);
-
-    return type == Code ? IC : DC;
-}
-
-void writeIntoCodeStack(Word *word)
-{
-
-    /*     if (codeMemoryStack == NULL)
-        {
-            codeMemoryStack = calloc(1, sizeof(MemoryStack *));
-            codeMemoryStack->head = word;
-            codeMemoryStack->tail = word;
-        }
-        else
-        {
-            codeMemoryStack->tail->next = word;
-            codeMemoryStack->tail = word;
-        } */
-
-    IC++;
-}
-
-void writeIntoDataStack(Word *word)
-{
-    /*     printf("inside write into data stack\n");
-        if (dataMemoryStack == NULL)
-        {
-            printf("in line 71\n");
-
-            dataMemoryStack->head = calloc(1, sizeof(Word *));
-            dataMemoryStack->tail = calloc(1, sizeof(Word *));
-
-            dataMemoryStack->head = word;
-            dataMemoryStack->tail = word;
-        }
-        else
-        {
-            dataMemoryStack->tail->next = calloc(1, sizeof(Word *));
-            dataMemoryStack->tail->next = &word;
-            dataMemoryStack->tail = word;
-        } */
-
-    DC++;
-}
 
 void updateSymbolTableFinalValues()
 {
@@ -167,7 +118,7 @@ void updateSymbolTableFinalValues()
     }
 }
 
-void updateDataEntry(Item *p)
+void updateDataEntry(Item* p)
 {
     if (p->val.s.attrs.data)
     {
@@ -195,10 +146,26 @@ void increaseInstructionCounter(int amount)
     IC += amount;
 }
 
+
+void updateFinalCountersValue()
+{
+
+    ICF = IC;
+    DCF = ICF + DC;
+    DC = IC;
+    IC = MEMORY_START;
+    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
+    updateFinalMemoryAddressesInSymbolTable();
+}
+
+/*
+
+MemoryStack* codeMemoryStack;
+MemoryStack* dataMemoryStack;
 void printMemoryStacks(EncodingFormat format)
 {
 
-    Word *dataImgP = dataMemoryStack->head;
+    Word* dataImgP = dataMemoryStack->head;
 
     if (format == Binary)
     {
@@ -216,13 +183,66 @@ void printMemoryStacks(EncodingFormat format)
     }
 }
 
-void updateFinalCountersValue()
+
+int writeToMemory(Word* word, DataType type)
+{
+    printf("inside writeToMemory\n");
+
+    if (DC + IC > 8191)
+    {
+        yieldError(memoryAllocationFailure);
+        return Err;
+    }
+
+    if (type == Code)
+        writeIntoCodeStack(word);
+
+    else
+        writeIntoDataStack(word);
+
+    return type == Code ? IC : DC;
+}
+
+void writeIntoCodeStack(Word* word)
 {
 
-    ICF = IC;
-    DCF = ICF + DC;
-    DC = IC;
-    IC = MEMORY_START;
-    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
-    updateFinalMemoryAddressesInSymbolTable();
+      if (codeMemoryStack == NULL)
+        {
+            codeMemoryStack = calloc(1, sizeof(MemoryStack *));
+            codeMemoryStack->head = word;
+            codeMemoryStack->tail = word;
+        }
+        else
+        {
+            codeMemoryStack->tail->next = word;
+            codeMemoryStack->tail = word;
+        }
+
+    IC++;
 }
+
+ void writeIntoDataStack(Word* word)
+{
+        printf("inside write into data stack\n");
+        if (dataMemoryStack == NULL)
+        {
+            printf("in line 71\n");
+
+            dataMemoryStack->head = calloc(1, sizeof(Word *));
+            dataMemoryStack->tail = calloc(1, sizeof(Word *));
+
+            dataMemoryStack->head = word;
+            dataMemoryStack->tail = word;
+        }
+        else
+        {
+            dataMemoryStack->tail->next = calloc(1, sizeof(Word *));
+            dataMemoryStack->tail->next = &word;
+            dataMemoryStack->tail = word;
+        }
+
+    DC++;
+}
+
+
+ */

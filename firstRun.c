@@ -50,8 +50,9 @@ int parseExpandedSourceFile(FILE* fp, char* filename)
                 line[i++] = c;
         }
     }
-
-    printf("line: %s length: %d \n", line, (int)strlen(line));
+    /*
+        printf("line: %s length: %d \n", line, (int)strlen(line));
+         */
     if (i > 0)
     {
         parseSingleLine(line);
@@ -73,7 +74,7 @@ void parseSingleLine(char* line)
 {
     ParseState state = newLine;
     char* p = calloc(strlen(line + 1), sizeof(char*));
-    char* token = calloc(MAX_LABEL_LEN, sizeof(char*));
+    char* token;
 
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
 
@@ -124,9 +125,11 @@ void parseSingleLine(char* line)
         token = strtok(NULL, " \t \n");
     }
 
+    if (token != NULL)free(token);
+    if (p != NULL)free(p);
     currentLine++;
-    free(p);
-    free(token);
+
+
 }
 
 ParseState handleFirstToken(char* token, char* line, ParseState state)
@@ -384,6 +387,8 @@ int handleLabel(char* labelName, char* nextToken, char* line)
 
 Bool isOperation(char* s)
 {
+
+    printf("inside Bool isOperation(char* s)\n");
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
@@ -591,7 +596,7 @@ char* getInstructionNameByType(int type)
         break;
     }
 
-    return "NOT AN INSTRUCTION!";
+    return NULL;
 }
 char* getInstructionName(char* s)
 {

@@ -4,28 +4,28 @@
 extern Operation operations[OP_SIZE];
  */
 
-/*
+ /*
 
-typedef struct
-{
-    unsigned int immediate : 1;
-    unsigned int direct : 1;
-    unsigned int index : 1;
-    unsigned int reg : 1;
-} AddrMethodsOptions;
+ typedef struct
+ {
+     unsigned int immediate : 1;
+     unsigned int direct : 1;
+     unsigned int index : 1;
+     unsigned int reg : 1;
+ } AddrMethodsOptions;
 
 
-STRUCTURE:
-typedef struct
-{
-    unsigned int op;
-    unsigned int funct : 4;
-    char keyword[4];
-    AddrMethodsOptions src;
-    AddrMethodsOptions des;
-} Operation;
+ STRUCTURE:
+ typedef struct
+ {
+     unsigned int op;
+     unsigned int funct : 4;
+     char keyword[4];
+     AddrMethodsOptions src;
+     AddrMethodsOptions des;
+ } Operation;
 
- */
+  */
 Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
@@ -45,7 +45,7 @@ Operation operations[OP_SIZE] = {
     {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
 
-Operation *getOperationByName(char *s)
+Operation* getOperationByName(char* s)
 {
     int i = getOpIndex(s);
 
@@ -55,12 +55,12 @@ Operation *getOperationByName(char *s)
     return NULL;
 }
 
-Operation *getOperationByIndex(unsigned int i)
+Operation* getOperationByIndex(unsigned int i)
 {
     return i < OP_SIZE ? &operations[i] : NULL;
 }
 
-int getOpIndex(char *s)
+int getOpIndex(char* s)
 {
     int i = 0;
     while (i < OP_SIZE)

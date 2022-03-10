@@ -64,11 +64,12 @@ typedef enum
 {
     skipLine = 134,
     newLine = 233,
+    skipToNextToken = 359,
     parseLabel = 4364,
     parseInstruction = 55,
     parseOperation = 333,
     returnFalse = 4678,
-    lineParsedSuccessfully = 1,
+    lineParsedSuccessfully = 11111111,
     parsingLine = 112,
     parsingMacro = 86,
     replacingMacro = 11,
