@@ -96,12 +96,8 @@ void wordStringToWordObj(char* s, DataType type)
     int j;
     int index = type == IC ? IC - MEMORY_START : DC - MEMORY_START;
     for (j = 0; j < BINARY_WORD_SIZE; j++)
-    {
-
         binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
 
-    }
-    printf("\n");
 
     printWordBinary(index);
 
@@ -110,8 +106,6 @@ void wordStringToWordObj(char* s, DataType type)
 void printWordBinary(unsigned index)
 {
     int j;
-    /*     printf("printed word after converted to word object:\n");
-        printf("index:%d:\n", index); */
     for (j = 0; j < BINARY_WORD_SIZE; j++)
         printf("%d", binaryImg[index].digit[j].on ? 1 : 0);
 
