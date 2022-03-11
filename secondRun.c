@@ -204,13 +204,6 @@ ParseState handleState(char *token, char *line, ParseState state)
             char args[MAX_LINE_LEN] = {0};
             line = line + strlen(token);
             strcpy(args, line);
-            printf("line 203\nline:%s\ntoken:%s\nargs:%s\n", line, token, args);
-            /*             line = line + strlen(token);
-                        strcpy(args, line);
-                        printf("line 203,line:%s\ntoken:%s\nargs:%s\n", line, token, args); */
-
-            /*             int offset = token + (int)(strlen(token) + 1);
-                        strcpy(args, &line[offset]); */
 
             return writeOperationBinary(token, line);
         }
@@ -230,7 +223,6 @@ Bool writeOperationBinary(char *operationName, char *args)
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
 
-    printf("inside write operation binary\nfirst:%s second:%s\n", first, second);
     writeFirstWord(op);
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
     {
