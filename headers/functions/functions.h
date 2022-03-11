@@ -147,7 +147,6 @@ unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
 void printMemoryStacks(EncodingFormat format);
-void writeIntegerIntoDataMemoryBinaryImg(int number);
 void initMemory();
 void printBinaryImg();
 void printWordBinary(unsigned index);

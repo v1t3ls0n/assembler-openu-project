@@ -19,9 +19,6 @@ unsigned static ICF = 0;
 unsigned static DCF = 0;
 
 extern char* numToBin(int num);
-
-
-
 static BinaryWord* binaryImg;
 
 void initMemory()
@@ -42,9 +39,7 @@ void initMemory()
         }
     }
 
-    /*
-        printf("inside initMemory,totalSize:%d\nbinaryImg size:%d\n", totalSize, (int)(sizeof(binaryImg) * sizeof(BinaryWord*) * 20));
-     */
+
 
 }
 void printBinaryImg()
@@ -56,17 +51,7 @@ void printBinaryImg()
 
 }
 
-void writeIntegerIntoDataMemoryBinaryImg(int number)
-{
-    printf("inside write writeIntegerIntoDataMemoryBinaryImg, number:%d Binary:", number);
 
-    /* int index = DC - MEMORY_START;
-    binaryImg[index] = *convertNumberToBinaryWord(number);
-    DC++;
-    printWordBinary(index);
-    printf("\n");
-     */
-}
 
 void addWord(unsigned value, DataType type)
 {
@@ -74,13 +59,11 @@ void addWord(unsigned value, DataType type)
         addWordToCodeImage(numToBin(value));
     else if (type == Data)
         addWordToDataImage(numToBin(value));
-
 }
 
 
 void addWordToDataImage(char* s)
 {
-
     wordStringToWordObj(s, Data);
     DC++;
 }
@@ -89,18 +72,19 @@ void addWordToCodeImage(char* s)
 {
     wordStringToWordObj(s, Code);
     IC++;
+    printf("IC:%d\n", IC);
 }
 
 void wordStringToWordObj(char* s, DataType type)
 {
     int j;
-    int index = type == IC ? IC - MEMORY_START : DC - MEMORY_START;
+    int index = type == Code ? IC - MEMORY_START : DC - MEMORY_START;
+    printf("index:%d\n", index);
+
     for (j = 0; j < BINARY_WORD_SIZE; j++)
         binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
 
-
-    printWordBinary(index);
-
+    /*     printWordBinary(index); */
 }
 
 void printWordBinary(unsigned index)
@@ -166,92 +150,3 @@ void updateFinalCountersValue()
     printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
     updateFinalMemoryAddressesInSymbolTable();
 }
-
-/*
-
-MemoryStack* codeMemoryStack;
-MemoryStack* dataMemoryStack;
-void printMemoryStacks(EncodingFormat format)
-{
-
-    Word* dataImgP = dataMemoryStack->head;
-
-    if (format == Binary)
-    {
-        int i = 0;
-        printf("Data Image Binary:\n");
-        while (dataImgP != NULL)
-        {
-            while (i < BINARY_WORD_SIZE)
-            {
-                printf("%c", dataImgP->value->binary->digit[i].on ? '1' : '0');
-            }
-            printf("\n");
-            dataImgP = dataImgP->next;
-        }
-    }
-}
-
-
-int writeToMemory(Word* word, DataType type)
-{
-    printf("inside writeToMemory\n");
-
-    if (DC + IC > 8191)
-    {
-        yieldError(memoryAllocationFailure);
-        return Err;
-    }
-
-    if (type == Code)
-        writeIntoCodeStack(word);
-
-    else
-        writeIntoDataStack(word);
-
-    return type == Code ? IC : DC;
-}
-
-void writeIntoCodeStack(Word* word)
-{
-
-      if (codeMemoryStack == NULL)
-        {
-            codeMemoryStack = calloc(1, sizeof(MemoryStack *));
-            codeMemoryStack->head = word;
-            codeMemoryStack->tail = word;
-        }
-        else
-        {
-            codeMemoryStack->tail->next = word;
-            codeMemoryStack->tail = word;
-        }
-
-    IC++;
-}
-
- void writeIntoDataStack(Word* word)
-{
-        printf("inside write into data stack\n");
-        if (dataMemoryStack == NULL)
-        {
-            printf("in line 71\n");
-
-            dataMemoryStack->head = calloc(1, sizeof(Word *));
-            dataMemoryStack->tail = calloc(1, sizeof(Word *));
-
-            dataMemoryStack->head = word;
-            dataMemoryStack->tail = word;
-        }
-        else
-        {
-            dataMemoryStack->tail->next = calloc(1, sizeof(Word *));
-            dataMemoryStack->tail->next = &word;
-            dataMemoryStack->tail = word;
-        }
-
-    DC++;
-}
-
-
- */

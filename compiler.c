@@ -1,15 +1,15 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-extern void parseSourceFile(FILE *source, char *filename);
-extern int parseExpandedSourceFile(FILE *fp, char *filename);
+extern void parseSourceFile(FILE* source, char* filename);
+extern int parseExpandedSourceFile(FILE* fp, char* filename);
 extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLine;
 
 extern void initMemory();
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 
     handleSourceFiles(argc, argv);
@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     {
         printf("Finished Successfully!\n");
         printSymbolTable();
+        printBinaryImg();
     }
     else
         printf("\nFinished First Run With Errors\n");
@@ -32,10 +33,10 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int handleSourceFiles(int argc, char *argv[])
+int handleSourceFiles(int argc, char* argv[])
 {
-    FILE *fptr;
-    char *fileName;
+    FILE* fptr;
+    char* fileName;
     int filesCount = argc - 1;
     int i = 1;
     if (filesCount < 1)
@@ -46,7 +47,7 @@ int handleSourceFiles(int argc, char *argv[])
 
     while (--argc)
     {
-        fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
+        fileName = calloc(strlen(argv[i]) + 3, sizeof(char*));
         sscanf(argv[i], "%s", fileName);
         fileName = globalState == handleMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
 
