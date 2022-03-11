@@ -14,9 +14,8 @@ Bool writeInstructionBinary(char* instructionName, char* line);
 void parseSingleLineSecondRun(char* line);
 ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state);
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type);
-void addWord(int value, int _ARE);
-
-
+void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op);
+void writeFirstWord(Operation* op);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -122,7 +121,6 @@ char* getInstructionNameByType(int type);
 Bool countAndVerifyDataArguments(char* tokens);
 Bool countAndVerifyStringArguments(char* tokens);
 Bool isRegistery(char* s);
-const char* getRegisteryOperand(char* s);
 Bool isValidImmediateParamter(char* s);
 int getRegisteryNumber(char* s);
 Bool isValidIndexParameter(char* s);
@@ -151,7 +149,8 @@ void printMemoryStacks(EncodingFormat format);
 void writeIntegerIntoDataMemoryBinaryImg(int number);
 void initMemory();
 void printBinaryImg();
-void printWordBinary(int index);
-void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
-void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
-void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE]);
+void printWordBinary(unsigned index);
+void wordStringToWordObj(char s[BINARY_WORD_SIZE + 1], DataType type);
+void addWordToDataImage(char s[BINARY_WORD_SIZE + 1]);
+void addWordToCodeImage(char s[BINARY_WORD_SIZE + 1]);
+void addWord(unsigned value, DataType type);

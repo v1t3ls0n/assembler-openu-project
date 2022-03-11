@@ -25,7 +25,7 @@ int parseExpandedSourceFile(FILE* fp, char* filename)
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = { 0 };
-    printf("First Run:\n");
+    printf("\n\n\nFirst Run:\n");
     while (((c = fgetc(fp)) != EOF))
     {
 
@@ -609,23 +609,4 @@ char* getInstructionName(char* s)
         return EXTERNAL;
     return 0;
 }
-const char* getRegisteryOperand(char* s)
-/*returns a constant- the name of the register, so it can b*/
-{
 
-    int len = strlen(s);
-    int i = 0;
-
-    if (s[0] == 'r' && len >= 2)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return regs[i];
-            i++;
-        }
-        yieldError(wrongRegisteryReferenceUndefinedReg);
-    }
-
-    return 0;
-}

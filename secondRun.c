@@ -1,52 +1,3 @@
-/*
-
-Symbol table is fully updated with all of the symbols with correct
-values (.data/.string/.entry arguments address is updated as well to start after last
-operation address)
-
-
- */
-#include "data.h"
- /* from variables.c (global Variables) */
-extern State globalState;
-extern unsigned currentLine;
-extern const char* regs[REGS_SIZE];
-
-/* from firstRun.c */
-extern void parseSingleLine(char* line);
-extern ParseState handleFirstToken(char* token, char* line, ParseState state);
-extern Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsOptions active[2]);
-extern int getInstructionType(char* s);
-extern Bool isOperation(char* s);
-
-extern Bool isValidIndexParameter(char* s);
-extern Bool isRegistery(char* s);
-extern Bool isValidImmediateParamter(char* s);
-
-
-/* from table.c: */
-extern int getSymbolBaseAddress(char* name);
-extern int getSymbolOffset(char* name);
-extern Bool isExternal(char* name);
-extern Item* getSymbol(char* name);
-
-
-/* from operation.c */
-extern Operation operations[OP_SIZE];
-extern Operation* getOperationByName(char* s);
-
-/* from memory.c */
-extern unsigned getDC();
-extern unsigned getIC();
-extern void writeIntegerIntoDataMemoryBinaryImg(int number);
-extern void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
-extern void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
-
-/* from encode.c */
-extern char* generateFirstWordEncodedToBinary(Operation* operation);
-
-char* numToBin(int num);
-
 
 
 
@@ -111,25 +62,48 @@ converted already to binary.
 
 
 
-void addWord(int value, int _ARE)
-
-{
-    char wordBinary[BINARY_WORD_SIZE + 7] = { 0 };
-    strncpy(wordBinary, numToBin(_ARE | value), BINARY_WORD_SIZE + 7);
-
-
-
-
-    /*
-
-     */
-    printf("word binary string: %s\n", wordBinary);
-}
 
 
 
 
 
+
+
+
+
+#include "data.h"
+  /* from variables.c (global Variables) */
+extern State globalState;
+extern unsigned currentLine;
+extern const char* regs[REGS_SIZE];
+
+/* from firstRun.c */
+extern void parseSingleLine(char* line);
+extern ParseState handleFirstToken(char* token, char* line, ParseState state);
+extern Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsOptions active[2]);
+extern int getInstructionType(char* s);
+extern Bool isOperation(char* s);
+extern Bool isValidIndexParameter(char* s);
+extern Bool isRegistery(char* s);
+extern Bool isValidImmediateParamter(char* s);
+
+/* from table.c: */
+extern int getSymbolBaseAddress(char* name);
+extern int getSymbolOffset(char* name);
+extern Bool isExternal(char* name);
+extern Item* getSymbol(char* name);
+
+
+/* from operation.c */
+extern Operation* getOperationByName(char* s);
+
+/* from memory.c */
+extern unsigned getDC();
+extern unsigned getIC();
+extern void addWord(unsigned value, DataType type);
+
+/* helpers.c  */
+extern unsigned char dec2Bin2sComplement(int n);
 
 
 int secondRunParseSource(FILE* fp, char* filename)
@@ -140,7 +114,7 @@ int secondRunParseSource(FILE* fp, char* filename)
     currentLine = 1;
     initMemory();
 
-    printf("Second Run:\n");
+    printf("\n\n\nSecond Run:\n");
     while (((c = fgetc(fp)) != EOF))
     {
 
@@ -173,28 +147,22 @@ void parseSingleLineSecondRun(char* line)
 {
     ParseState state = newLine;
     char* p = calloc(strlen(line + 1), sizeof(char*));
-    /* char* token = calloc(MAX_LABEL_LEN, sizeof(char*)); */
     char* token;
-    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+    printf("\nLine Number (%d):\n%s\n", currentLine, line);
+    printf("DC:%u IC:%u\n", getDC(), getIC());
+
     memcpy(p, line, strlen(line));
     token = strtok(p, ", \t \n");
     state = handleSecondRunFirstToken(token, line, state);
 
     while (token != NULL && state != lineParsedSuccessfully)
     {
-        printf("inside while loop, token:%s\n", token);
 
         switch (state)
         {
 
         case writingOperationIntoMemoryImg:
         {
-            printf("state: write operation\n");
-
-            /*
-            state = writeOperationBinary(token, line);
- */
-
             break;
         }
 
@@ -215,9 +183,7 @@ void parseSingleLineSecondRun(char* line)
         }
         case Err:
         {
-
-            globalState = collectErrors;
-
+            globalState = secondRunFailed;
             break;
         }
 
@@ -282,92 +248,132 @@ ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state)
     }
     return True;
 }
-
-
-
 Bool writeOperationBinary(char* operationName, char* args)
 {
+    /*     printf("operation:%s\nargs:%s\n", operationName, args);
+    printf("first:%s\nsecond:%s\n", first, second); */
+
     Operation* op = getOperationByName(operationName);
     char* first, * second;
     AddrMethodsOptions active[2] = { {0, 0, 0, 0}, {0, 0, 0, 0} };
-
-
-    args = operationName + strlen(operationName) + 1;
-    printf("operation:%s\nargs:%s\n", operationName, args);
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
+    writeFirstWord(op);
+    if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
+    {
+        writeSecondWord(first, second, active, op);
+        /*         if (active[0].direct) {
+                    unsigned base = 0, offset = 0;
+                    int _ARE = isExternal(first) ? E : R;
+                    base = getSymbolBaseAddress(first);
+                    offset = getSymbolOffset(first);
+                    addWord(_ARE | base, Code);
+                    addWord(_ARE | offset, Code);
+                }
 
-    printf("first:%s\nsecond:%s\n", first, second);
+                else if (active[0].immediate)
+                    addWord(A | dec2Bin2sComplement(atoi(first)), Code);
 
-    addWord(op->op, A);
-    if (!first && !second)
-        return lineParsedSuccessfully;
-    else  if (!second && first)
+
+
+                if (active[1].direct) {
+                    unsigned base = 0, offset = 0;
+                    int _ARE = isExternal(second) ? E : R;
+                    base = getSymbolBaseAddress(second);
+                    offset = getSymbolOffset(second);
+                    addWord(_ARE | base, Code);
+                    addWord(_ARE | offset, Code);
+                }
+
+
+                else if (active[1].immediate)
+                    addWord(A | dec2Bin2sComplement(atoi(second)), Code); */
+
+
+
+    }
+    else  if ((!second && first) && detectOperandType(first, active, 1))
     {
         second = first;
-        detectOperandType(second, active, 1);
-    }
-    else if (first && second)
-    {
-        detectOperandType(first, active, 0);
-        detectOperandType(second, active, 1);
+        first = 0;
+        writeSecondWord(first, second, active, op);
+
+        /*         if (active[0].direct) {
+                    unsigned base = 0, offset = 0;
+                    int _ARE = isExternal(first) ? E : R;
+                    base = getSymbolBaseAddress(first);
+                    offset = getSymbolOffset(first);
+                    addWord(_ARE | base, Code);
+                    addWord(_ARE | offset, Code);
+                }
+
+                else if (active[0].immediate)
+                    addWord(A | dec2Bin2sComplement(atoi(first)), Code);
+
+
+
+                if (active[1].direct) {
+                    unsigned base = 0, offset = 0;
+                    int _ARE = isExternal(second) ? E : R;
+                    base = getSymbolBaseAddress(second);
+                    offset = getSymbolOffset(second);
+                    addWord(_ARE | base, Code);
+                    addWord(_ARE | offset, Code);
+                }
+
+
+                else if (active[1].immediate)
+                    addWord(A | dec2Bin2sComplement(atoi(second)), Code);
+
+                   */
 
     }
+    else if (!first && !second && !op->funct)
+        return lineParsedSuccessfully;
 
-
-
-
-
-
-
-
-
-
-
-
+    else
+        return Err;
 
     return lineParsedSuccessfully;
-
-
-
-    /*
-
-    unsigned srcBase = 0, srcOffset = 0, desBase = 0, desOffset = 0;
-
-    writeFirstWord(p);
-
-    if (active[0].direct || active[0].index)
-    {
-
-        srcBase = getSymbolBaseAddress(firstOperand);
-        srcOffset = getSymbolOffset(firstOperand);
-
-        if (!srcBase || !srcOffset)
-        {
-            globalState = secondRunFailed;
-            return yieldError(labelNotExist);
-        }
-        else
-            writeDirectOperand(srcBase, srcOffset, isExternal(firstOperand) ? E : R);
-    }
-    if (active[1].direct || active[1].index)
-    {
-        desBase = getSymbolBaseAddress(secondOperand);
-        desOffset = getSymbolOffset(secondOperand);
-        if (!desBase || !desOffset)
-        {
-            globalState = secondRunFailed;
-            return yieldError(labelNotExist);
-        }
-
-        else
-            writeDirectOperand(desBase, desOffset, isExternal(firstOperand) ? E : R);
-    }
-
-
-    }
-    */
 }
+
+
+
+
+void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op) {
+
+
+    unsigned secondWord = (A << 16) | (op->funct << 12);
+
+
+
+    if (first && (active[0].reg || active[0].index))
+        secondWord = secondWord | (getRegisteryNumber(first) << 8) | (active[0].reg ? (REGISTER_DIRECT_ADDR << 6) : (INDEX_ADDR << 6));
+
+    else if (active[0].direct || active[0].immediate)
+        secondWord = secondWord | (0 << 8) | (active[0].direct ? (DIRECT_ADDR << 6) : (IMMEDIATE_ADDR << 6));
+
+
+    if (second && (active[1].reg || active[1].index))
+        secondWord = secondWord | (getRegisteryNumber(second) << 2) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
+
+    else if (active[1].direct || active[1].immediate)
+        secondWord = secondWord | (0 << 2) | (active[1].direct ? (DIRECT_ADDR) : (IMMEDIATE_ADDR));
+
+    addWord(secondWord, Code);
+
+
+
+
+}
+
+
+void writeFirstWord(Operation* op) {
+    /*     unsigned firstWord = (A << 16) | op->op; */
+
+    addWord(A | op->op, Code);
+}
+
 
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type) {
     if (isRegistery(operand))
@@ -380,14 +386,20 @@ Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type) {
         if (getSymbol(operand) != NULL)
             active[type].direct = 1;
         else
+        {
+            yieldError(labelNotExist);
             return False;
+        }
 
     }
 
     return True;
 
 }
-void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
+
+
+
+/* void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
 {
 
     writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(base))));
@@ -415,3 +427,4 @@ Bool writeInstructionBinary(char* instructionName, char* line)
     return True;
 }
 
+ */

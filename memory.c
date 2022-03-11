@@ -18,6 +18,9 @@ unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
 
+extern char* numToBin(int num);
+
+
 
 static BinaryWord* binaryImg;
 
@@ -49,10 +52,8 @@ void printBinaryImg()
     int i;
     int totalSize = DCF - MEMORY_START;
     for (i = 0; i < totalSize; i++)
-    {
-        printf("line:%d ", i + MEMORY_START);
         printWordBinary(i);
-    }
+
 }
 
 void writeIntegerIntoDataMemoryBinaryImg(int number)
@@ -67,38 +68,53 @@ void writeIntegerIntoDataMemoryBinaryImg(int number)
      */
 }
 
-void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE])
+void addWord(unsigned value, DataType type)
+{
+    if (type == Code)
+        addWordToCodeImage(numToBin(value));
+    else if (type == Data)
+        addWordToDataImage(numToBin(value));
+
+}
+
+
+void addWordToDataImage(char* s)
 {
 
-    printf("inside writeIntoDataBinaryImg, s:%s DC:%u\n", s, DC);
-    convertBinaryStringToBinaryWordObj(s);
+    wordStringToWordObj(s, Data);
     DC++;
 }
 
-void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE])
+void addWordToCodeImage(char* s)
 {
-    printf("inside writeIntoCodeBinaryImg, s:%s DC:%u\n", s, DC);
-
-    /* convertBinaryStringToBinaryWordObj(s);
-     */
+    wordStringToWordObj(s, Code);
     IC++;
 }
 
-void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE])
-{
-
-    printf("inside convertBinaryStringToBinaryWordObj");
-    /*     int j;
-
-        for (j = 0; j < BINARY_WORD_SIZE; j++)
-            binaryImg[DC].digit[j].on = s[j] == '1' ? 1 : 0; */
-}
-
-void printWordBinary(int index)
+void wordStringToWordObj(char* s, DataType type)
 {
     int j;
+    int index = type == IC ? IC - MEMORY_START : DC - MEMORY_START;
+    printf("index:%d\n", index);
     for (j = 0; j < BINARY_WORD_SIZE; j++)
-        printf("%c", binaryImg[index].digit[j].on ? '1' : '0');
+    {
+
+        binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
+
+    }
+    printf("\n");
+
+    printWordBinary(index);
+
+}
+
+void printWordBinary(unsigned index)
+{
+    int j;
+    /*     printf("printed word after converted to word object:\n");
+        printf("index:%d:\n", index); */
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
+        printf("%d", binaryImg[index].digit[j].on ? 1 : 0);
 
     printf("\n");
 }
