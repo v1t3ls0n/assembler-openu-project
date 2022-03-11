@@ -6,7 +6,7 @@
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int secondRunParseSource(FILE* fp, char* filename);
-extern void writeDirectOperand(unsigned base, unsigned offset, int _ARE);
+void writeDirectOperandWord(char* labelName);
 void writeFirstWord(Operation* operation);
 void writeSecondWord();
 Bool writeOperationBinary(char* operationName, char* line);
@@ -16,6 +16,7 @@ ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state);
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op);
 void writeFirstWord(Operation* op);
+void writeImmediateOperandWord(char* n);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

@@ -95,7 +95,6 @@ void wordStringToWordObj(char* s, DataType type)
 {
     int j;
     int index = type == IC ? IC - MEMORY_START : DC - MEMORY_START;
-    printf("index:%d\n", index);
     for (j = 0; j < BINARY_WORD_SIZE; j++)
     {
 

@@ -137,7 +137,7 @@ int secondRunParseSource(FILE* fp, char* filename)
 
     if (i > 0)
     {
-        parseSingleLine(line);
+        parseSingleLineSecondRun(line);
         memset(line, 0, i);
     }
 
@@ -262,32 +262,16 @@ Bool writeOperationBinary(char* operationName, char* args)
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
     {
         writeSecondWord(first, second, active, op);
-        /*         if (active[0].direct) {
-                    unsigned base = 0, offset = 0;
-                    int _ARE = isExternal(first) ? E : R;
-                    base = getSymbolBaseAddress(first);
-                    offset = getSymbolOffset(first);
-                    addWord(_ARE | base, Code);
-                    addWord(_ARE | offset, Code);
-                }
+        if (active[0].direct)
+            writeDirectOperandWord(first);
+        else if (active[0].immediate)
+            writeImmediateOperandWord(first);
 
-                else if (active[0].immediate)
-                    addWord(A | dec2Bin2sComplement(atoi(first)), Code);
+        if (active[1].direct)
+            writeDirectOperandWord(second);
 
-
-
-                if (active[1].direct) {
-                    unsigned base = 0, offset = 0;
-                    int _ARE = isExternal(second) ? E : R;
-                    base = getSymbolBaseAddress(second);
-                    offset = getSymbolOffset(second);
-                    addWord(_ARE | base, Code);
-                    addWord(_ARE | offset, Code);
-                }
-
-
-                else if (active[1].immediate)
-                    addWord(A | dec2Bin2sComplement(atoi(second)), Code); */
+        else if (active[1].immediate)
+            writeImmediateOperandWord(second);
 
 
 
@@ -298,34 +282,15 @@ Bool writeOperationBinary(char* operationName, char* args)
         first = 0;
         writeSecondWord(first, second, active, op);
 
-        /*         if (active[0].direct) {
-                    unsigned base = 0, offset = 0;
-                    int _ARE = isExternal(first) ? E : R;
-                    base = getSymbolBaseAddress(first);
-                    offset = getSymbolOffset(first);
-                    addWord(_ARE | base, Code);
-                    addWord(_ARE | offset, Code);
-                }
+        if (active[1].direct)
+            writeDirectOperandWord(second);
 
-                else if (active[0].immediate)
-                    addWord(A | dec2Bin2sComplement(atoi(first)), Code);
+
+        else if (active[1].immediate)
+            writeImmediateOperandWord(second);
 
 
 
-                if (active[1].direct) {
-                    unsigned base = 0, offset = 0;
-                    int _ARE = isExternal(second) ? E : R;
-                    base = getSymbolBaseAddress(second);
-                    offset = getSymbolOffset(second);
-                    addWord(_ARE | base, Code);
-                    addWord(_ARE | offset, Code);
-                }
-
-
-                else if (active[1].immediate)
-                    addWord(A | dec2Bin2sComplement(atoi(second)), Code);
-
-                   */
 
     }
     else if (!first && !second && !op->funct)
@@ -369,9 +334,22 @@ void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Op
 
 
 void writeFirstWord(Operation* op) {
-    /*     unsigned firstWord = (A << 16) | op->op; */
+    unsigned firstWord = (A << 16) | op->op;
+    addWord(firstWord, Code);
+}
 
-    addWord(A | op->op, Code);
+void writeDirectOperandWord(char* labelName) {
+    unsigned base = 0, offset = 0;
+    int _ARE = isExternal(labelName) ? E : R;
+    base = getSymbolBaseAddress(labelName);
+    offset = getSymbolOffset(labelName);
+    addWord((_ARE << 16) | base, Code);
+    addWord((_ARE << 16) | offset, Code);
+}
+
+void writeImmediateOperandWord(char* n)
+{
+    addWord((A << 16) | dec2Bin2sComplement(atoi(n)), Code);
 }
 
 
@@ -397,34 +375,3 @@ Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type) {
 
 }
 
-
-
-/* void writeDirectOperand(unsigned base, unsigned offset, int _ARE)
-{
-
-    writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(base))));
-    writeIntoCodeBinaryImg(strcat(hexToBin(decToHex(_ARE)), hexToBin(decToHex(offset))));
-}
-
-void writeFirstWord(Operation* operation)
-{
-
-    writeIntoCodeBinaryImg(generateFirstWordEncodedToBinary(operation));
-}
-
-void writeSecondWord()
-{
-
-    char binaryString[BINARY_WORD_SIZE] = { "00000000000000000000" };
-
-    writeIntoCodeBinaryImg(binaryString);
-}
-
-Bool writeInstructionBinary(char* instructionName, char* line)
-{
-    printf("writeInstructionBinary in second run line 170\n");
-
-    return True;
-}
-
- */
