@@ -514,10 +514,7 @@ Bool countAndVerifyStringArguments(char* token)
     return True;
 }
 
-void addStringArgumentsToMemoryImg(char* token)
-{
-    countAndVerifyStringArguments(token);
-}
+
 
 Bool isRegistery(char* s)
 {
@@ -561,6 +558,13 @@ Bool isValidIndexParameter(char* s)
     }
     return True;
 }
+
+
+
+
+
+
+
 int getRegisteryNumber(char* s)
 {
     int len = strlen(s);

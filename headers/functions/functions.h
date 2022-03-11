@@ -17,6 +17,9 @@ Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op);
 void writeFirstWord(Operation* op);
 void writeImmediateOperandWord(char* n);
+
+Bool writeStringInstruction(char* s);
+Bool writeDataInstruction(char* s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
