@@ -27,7 +27,6 @@ void initMemory()
     int i, j;
     binaryImg = (BinaryWord*)malloc(totalSize * sizeof(BinaryWord));
 
-
     printf("inside initMemory\n");
 
     for (i = 0; i < totalSize; i++)
@@ -72,19 +71,15 @@ void addWordToCodeImage(char* s)
 {
     wordStringToWordObj(s, Code);
     IC++;
-    printf("IC:%d\n", IC);
 }
 
 void wordStringToWordObj(char* s, DataType type)
 {
     int j;
     int index = type == Code ? IC - MEMORY_START : DC - MEMORY_START;
-    printf("index:%d\n", index);
-
     for (j = 0; j < BINARY_WORD_SIZE; j++)
         binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
 
-    /*     printWordBinary(index); */
 }
 
 void printWordBinary(unsigned index)

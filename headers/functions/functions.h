@@ -12,7 +12,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char* operationName, char* line);
 Bool writeInstructionBinary(char* instructionName, char* line);
 void parseSingleLineSecondRun(char* line);
-ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state);
+ParseState handleState(char* token, char* line, ParseState state);
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op);
 void writeFirstWord(Operation* op);

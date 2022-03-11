@@ -149,36 +149,19 @@ void parseSingleLineSecondRun(char* line)
     char* p = calloc(strlen(line + 1), sizeof(char*));
     char* token;
     printf("\nLine Number (%d):\n%s\n", currentLine, line);
-    printf("DC:%u IC:%u\n", getDC(), getIC());
-
     memcpy(p, line, strlen(line));
     token = strtok(p, ", \t \n");
-    state = handleSecondRunFirstToken(token, line, state);
 
     while (token != NULL && state != lineParsedSuccessfully)
     {
-
+        state = handleState(token, line, state);
         switch (state)
         {
-
-        case writingOperationIntoMemoryImg:
-        {
-            break;
-        }
-
-        case writingDataIntoMemoryImg:
-        {
-            printf("state: write instruction\n");
-
-            /* state = writeInstructionBinary(token, line);*/
-            break;
-        }
         case lineParsedSuccessfully: {
             break;
-
         }
         case skipToNextToken: {
-            state = handleSecondRunFirstToken(strtok(NULL, ", \t \n"), line, newLine);
+            state = handleState(strtok(NULL, ", \t \n"), line, newLine);
             break;
         }
         case Err:
@@ -186,12 +169,8 @@ void parseSingleLineSecondRun(char* line)
             globalState = secondRunFailed;
             break;
         }
-
-
         default:
-
             break;
-
         }
         token = strtok(NULL, ", \t \n");
     }
@@ -203,10 +182,9 @@ void parseSingleLineSecondRun(char* line)
 
 }
 
-ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state)
+ParseState handleState(char* token, char* line, ParseState state)
 {
-    /*    printf("inside handleSecondRunFirstToken\ntoken:%s\n", token);
-    */
+
     switch (state)
     {
     case skipLine:
@@ -231,16 +209,8 @@ ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state)
         }
 
         else if (isOperation(token))
-        {
-            /*
-            printf("is operation!\n");
- */
-
             return  writeOperationBinary(token, token + strlen(token) + 1);
 
-            /* return writingOperationIntoMemoryImg;
-             */
-        }
     }
 
     default:
@@ -248,11 +218,10 @@ ParseState handleSecondRunFirstToken(char* token, char* line, ParseState state)
     }
     return True;
 }
+
+
 Bool writeOperationBinary(char* operationName, char* args)
 {
-    /*     printf("operation:%s\nargs:%s\n", operationName, args);
-    printf("first:%s\nsecond:%s\n", first, second); */
-
     Operation* op = getOperationByName(operationName);
     char* first, * second;
     AddrMethodsOptions active[2] = { {0, 0, 0, 0}, {0, 0, 0, 0} };
@@ -273,25 +242,16 @@ Bool writeOperationBinary(char* operationName, char* args)
         else if (active[1].immediate)
             writeImmediateOperandWord(second);
 
-
-
     }
     else  if ((!second && first) && detectOperandType(first, active, 1))
     {
         second = first;
         first = 0;
         writeSecondWord(first, second, active, op);
-
         if (active[1].direct)
             writeDirectOperandWord(second);
-
-
         else if (active[1].immediate)
             writeImmediateOperandWord(second);
-
-
-
-
     }
     else if (!first && !second && !op->funct)
         return lineParsedSuccessfully;
@@ -302,36 +262,18 @@ Bool writeOperationBinary(char* operationName, char* args)
     return lineParsedSuccessfully;
 }
 
-
-
-
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op) {
-
-
     unsigned secondWord = (A << 16) | (op->funct << 12);
-
-
-
     if (first && (active[0].reg || active[0].index))
         secondWord = secondWord | (getRegisteryNumber(first) << 8) | (active[0].reg ? (REGISTER_DIRECT_ADDR << 6) : (INDEX_ADDR << 6));
-
     else if (active[0].direct || active[0].immediate)
         secondWord = secondWord | (0 << 8) | (active[0].direct ? (DIRECT_ADDR << 6) : (IMMEDIATE_ADDR << 6));
-
-
     if (second && (active[1].reg || active[1].index))
         secondWord = secondWord | (getRegisteryNumber(second) << 2) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
-
     else if (active[1].direct || active[1].immediate)
         secondWord = secondWord | (0 << 2) | (active[1].direct ? (DIRECT_ADDR) : (IMMEDIATE_ADDR));
-
     addWord(secondWord, Code);
-
-
-
-
 }
-
 
 void writeFirstWord(Operation* op) {
     unsigned firstWord = (A << 16) | op->op;
@@ -352,7 +294,6 @@ void writeImmediateOperandWord(char* n)
     addWord((A << 16) | dec2Bin2sComplement(atoi(n)), Code);
 }
 
-
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type) {
     if (isRegistery(operand))
         active[type].reg = 1;
@@ -368,10 +309,7 @@ Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type) {
             yieldError(labelNotExist);
             return False;
         }
-
     }
-
     return True;
-
 }
 
