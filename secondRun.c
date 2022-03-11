@@ -132,11 +132,11 @@ int secondRunParseSource(FILE *fp, char *filename)
 void parseSingleLineSecondRun(char *line)
 {
     ParseState state = newLine;
-    char *p = calloc(strlen(line + 1), sizeof(char *));
+    char lineCopy[MAX_LINE_LEN] = {0};
+    memcpy(lineCopy, line, MAX_LINE_LEN);
     char *token;
     printf("\nLine Number (%d):\n%s\n", currentLine, line);
-    memcpy(p, line, strlen(line));
-    token = strtok(p, ", \t \n");
+    token = strtok(lineCopy, ", \t \n");
 
     while (token != NULL && state != lineParsedSuccessfully)
     {
@@ -149,6 +149,7 @@ void parseSingleLineSecondRun(char *line)
         }
         case skipToNextToken:
         {
+            line = line + strlen(token) + 1;
             state = handleState(strtok(NULL, ", \t \n"), line, newLine);
             break;
         }
@@ -162,9 +163,6 @@ void parseSingleLineSecondRun(char *line)
         }
         token = strtok(NULL, ", \t \n");
     }
-
-    if (p != NULL)
-        free(p);
 
     currentLine++;
 }
@@ -184,7 +182,10 @@ ParseState handleState(char *token, char *line, ParseState state)
             return lineParsedSuccessfully;
 
         if (isLabel(token))
+        {
+
             return skipToNextToken;
+        }
 
         else if (isInstruction(token))
         {
@@ -199,7 +200,20 @@ ParseState handleState(char *token, char *line, ParseState state)
         }
 
         else if (isOperation(token))
-            return writeOperationBinary(token, token + strlen(token) + 1);
+        {
+            char args[MAX_LINE_LEN] = {0};
+            line = line + strlen(token);
+            strcpy(args, line);
+            printf("line 203\nline:%s\ntoken:%s\nargs:%s\n", line, token, args);
+            /*             line = line + strlen(token);
+                        strcpy(args, line);
+                        printf("line 203,line:%s\ntoken:%s\nargs:%s\n", line, token, args); */
+
+            /*             int offset = token + (int)(strlen(token) + 1);
+                        strcpy(args, &line[offset]); */
+
+            return writeOperationBinary(token, line);
+        }
     }
 
     default:
@@ -215,11 +229,21 @@ Bool writeOperationBinary(char *operationName, char *args)
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
+
+    printf("inside write operation binary\nfirst:%s second:%s\n", first, second);
     writeFirstWord(op);
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
     {
+        printf("operation:%s args:%s first:%s second:%s\n", operationName, args, first, second);
+
         writeSecondWord(first, second, active, op);
-        if (active[0].direct)
+
+        if (active[0].index)
+        {
+            parseLabelNameFromIndexAddrOperand(first);
+            writeDirectOperandWord(first);
+        }
+        else if (active[0].direct)
             writeDirectOperandWord(first);
         else if (active[0].immediate)
             writeImmediateOperandWord(first);
@@ -229,13 +253,28 @@ Bool writeOperationBinary(char *operationName, char *args)
 
         else if (active[1].immediate)
             writeImmediateOperandWord(second);
+
+        else if (active[1].index)
+        {
+            parseLabelNameFromIndexAddrOperand(second);
+            writeDirectOperandWord(second);
+        }
     }
-    else if ((!second && first) && detectOperandType(first, active, 1))
+    else if (!second && first && detectOperandType(first, active, 1))
     {
+
         second = first;
-        first = 0;
+
+        printf("operation:%s args:%s first:%s second:%s\n", operationName, args, first, second);
+
         writeSecondWord(first, second, active, op);
-        if (active[1].direct)
+
+        if (active[1].index)
+        {
+            parseLabelNameFromIndexAddrOperand(second);
+            writeDirectOperandWord(second);
+        }
+        else if (active[1].direct)
             writeDirectOperandWord(second);
         else if (active[1].immediate)
             writeImmediateOperandWord(second);
@@ -273,13 +312,14 @@ Bool writeStringInstruction(char *s)
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op)
 {
     unsigned secondWord = (A << 16) | (op->funct << 12);
+    printf("inside write second word\n");
     if (first && (active[0].reg || active[0].index))
-        secondWord = secondWord | (getRegisteryNumber(first) << 8) | (active[0].reg ? (REGISTER_DIRECT_ADDR << 6) : (INDEX_ADDR << 6));
-    else if (active[0].direct || active[0].immediate)
+        secondWord = secondWord | (active[0].reg ? (getRegisteryNumber(first) << 8) : (parseRegNumberFromIndexAddrOperand(first) << 8)) | (active[0].reg ? (REGISTER_DIRECT_ADDR << 6) : (INDEX_ADDR << 6));
+    else if (first && (active[0].direct || active[0].immediate))
         secondWord = secondWord | (0 << 8) | (active[0].direct ? (DIRECT_ADDR << 6) : (IMMEDIATE_ADDR << 6));
     if (second && (active[1].reg || active[1].index))
-        secondWord = secondWord | (getRegisteryNumber(second) << 2) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
-    else if (active[1].direct || active[1].immediate)
+        secondWord = secondWord | (active[1].reg ? (getRegisteryNumber(second) << 2) : (parseRegNumberFromIndexAddrOperand(second) << 2)) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
+    else if (second && (active[1].direct || active[1].immediate))
         secondWord = secondWord | (0 << 2) | (active[1].direct ? (DIRECT_ADDR) : (IMMEDIATE_ADDR));
     addWord(secondWord, Code);
 }
@@ -302,6 +342,9 @@ void writeDirectOperandWord(char *labelName)
 
 void writeImmediateOperandWord(char *n)
 {
+    n++;
+    printf("inside writeImmediateOperandWord, n:%s\n", n);
+
     addWord((A << 16) | dec2Bin2sComplement(atoi(n)), Code);
 }
 
@@ -324,4 +367,25 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
         }
     }
     return True;
+}
+
+char *parseLabelNameFromIndexAddrOperand(char *s)
+{
+    int len = strlen(s);
+    char *p = strchr(s, '[');
+    s[len - strlen(p)] = 0;
+    printf("inside parseLabelNameFromIndexAddrOperand\n");
+    return s;
+}
+
+int parseRegNumberFromIndexAddrOperand(char *s)
+{
+    int len = strlen(s);
+    s = strchr(s, '[');
+    s++;
+    if (s[len - 1] == ']')
+        s[len - 1] = 0;
+
+    printf("inside parseRegNumberFromIndexAddrOperand, s:%s\n", s);
+    return getRegisteryNumber(s);
 }

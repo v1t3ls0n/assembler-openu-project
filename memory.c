@@ -65,6 +65,8 @@ void addWordToDataImage(char *s)
 
 void addWordToCodeImage(char *s)
 {
+    printf("inside addWordToCodeImage, s:%s\n", s);
+
     wordStringToWordObj(s, Code);
     IC++;
 }
