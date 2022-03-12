@@ -192,30 +192,22 @@ Bool handleOperation(char *operationName, char *args)
     if (!first && !inBetweenCharacters)
     {
     }
-    else if (first && inBetweenCharacters != NULL)
+    else if (first && inBetweenCharacters != NULL && strlen(inBetweenCharacters) == 1 && inBetweenCharacters[0] == ',')
     {
-        if (strlen(inBetweenCharacters) == 1)
-        {
-            comma = inBetweenCharacters[0] == ',' ? ',' : 0;
-            second = strtok(NULL, " \t \n");
-        }
-        else
-            second = inBetweenCharacters;
-
-        extra = strtok(NULL, " \t \n");
-        if (extra)
-            return yieldError(illegalApearenceOfExtraCharactersOnLine);
+        comma = ',';
+        second = strtok(NULL, " \t \n");
     }
+    else if (inBetweenCharacters != NULL)
+        second = inBetweenCharacters;
 
     else
     {
         if (strchr(first, ','))
         {
-            second = strchr(first, ',');
+            char *p = strchr(first, ',');
+            second = p;
             second++;
-            first = second;
-            first--;
-            *first = 0;
+            first[strlen(first) - strlen(second)] = '\0';
         }
         else
         {
@@ -223,15 +215,13 @@ Bool handleOperation(char *operationName, char *args)
             first = 0;
         }
     }
-
-    printf("first:%s second:%s\n", first, second);
+    extra = strtok(NULL, " \t \n");
+    if (extra)
+        return yieldError(illegalApearenceOfExtraCharactersOnLine);
 
     if (parseOperands(first, comma, second, p, active))
     {
-        /*         printf("line 183, handle Operation\n");
-                printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
-                printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
-         */
+
         int size = 2;
         if (active[0].immediate || active[1].immediate)
             size++;
@@ -254,15 +244,15 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
-    printf("inside parse operands\n");
+    printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
 
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
 
     if (src && strchr(src, ','))
     {
         char *p = strchr(src, ',');
-        p--;
-        src = p;
+        *p = '\0';
+
         commasCount++;
     }
     if (des && strchr(des, ','))
