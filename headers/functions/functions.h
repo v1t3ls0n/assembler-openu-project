@@ -6,13 +6,21 @@
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int secondRunParseSource(FILE *fp, char *filename);
-extern void writeDirectOperand(unsigned base, unsigned offset, int _ARE);
+void writeDirectOperandWord(char *labelName);
 void writeFirstWord(Operation *operation);
 void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLineSecondRun(char *line);
-ParseState handleSecondRunFirstToken(char *token, char *line, ParseState state);
+ParseState handleState(char *token, char *line, ParseState state);
+Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
+void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
+void writeFirstWord(Operation *op);
+void writeImmediateOperandWord(char *n);
+char *parseLabelNameFromIndexAddrOperand(char *s);
+int parseRegNumberFromIndexAddrOperand(char *s);
+Bool writeStringInstruction(char *s);
+Bool writeDataInstruction(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -59,7 +67,7 @@ Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 int printSymbolItem(Item *item);
-Item *getSymbol(char *name, ItemType type);
+Item *getSymbol(char *name);
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Item *updateSymbolAddressValue(char *name, int newValue);
@@ -95,8 +103,8 @@ Word *convertNumberToWord(int n, EncodingFormat format);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-unsigned char dec2Bin2sComplement(int n);
 
+char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In firstRun.c -------------------------------------------------------*/
@@ -105,7 +113,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 void parseSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
-Bool handleOperation(char *operationName, char *line);
+Bool handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
 int handleInstruction(int type, char *firstToken, char *nextTokens);
@@ -118,7 +126,6 @@ char *getInstructionNameByType(int type);
 Bool countAndVerifyDataArguments(char *tokens);
 Bool countAndVerifyStringArguments(char *tokens);
 Bool isRegistery(char *s);
-const char *getRegisteryOperand(char *s);
 Bool isValidImmediateParamter(char *s);
 int getRegisteryNumber(char *s);
 Bool isValidIndexParameter(char *s);
@@ -140,10 +147,10 @@ unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
 void printMemoryStacks(EncodingFormat format);
-void writeIntegerIntoDataMemoryBinaryImg(int number);
 void initMemory();
 void printBinaryImg();
-void printWordBinary(int index);
-void writeIntoDataBinaryImg(char s[BINARY_WORD_SIZE]);
-void writeIntoCodeBinaryImg(char s[BINARY_WORD_SIZE]);
-void convertBinaryStringToBinaryWordObj(char s[BINARY_WORD_SIZE]);
+void printWordBinary(unsigned index);
+void wordStringToWordObj(char s[BINARY_WORD_SIZE + 1], DataType type);
+void addWordToDataImage(char s[BINARY_WORD_SIZE + 1]);
+void addWordToCodeImage(char s[BINARY_WORD_SIZE + 1]);
+void addWord(int value, DataType type);
