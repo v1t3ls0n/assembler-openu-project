@@ -14,7 +14,7 @@ char *decToHex(int num)
 char *numToBin(int num)
 {
     int i = 0;
-    unsigned long result;
+    unsigned int result;
     char *word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
     char hex[6];
 
@@ -23,7 +23,7 @@ char *numToBin(int num)
         result = abs(num);
         result = ~result;
         result++;
-        sprintf(hex, "%05x", (int)(((A << 16) | result) & 0xfffff));
+        sprintf(hex, "%05x", (int)(result & 0x4ffff));
     }
     else
         sprintf(hex, "%05x", (int)num & 0xfffff);
