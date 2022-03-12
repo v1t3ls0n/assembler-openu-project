@@ -103,7 +103,7 @@ Word *convertNumberToWord(int n, EncodingFormat format);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-unsigned char dec2Bin2sComplement(int n);
+char *dec2Bin2sComplement(int n);
 char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

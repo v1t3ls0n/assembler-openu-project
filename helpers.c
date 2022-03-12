@@ -1,18 +1,20 @@
 #include "data.h"
-extern HexWord* convertNumToHexWord(int num);
-char* decToHex(int num)
+extern HexWord *convertNumToHexWord(int num);
+char *decToHex(int num)
 {
     int i = num, size = 0;
-    char* hex;
+    char *hex;
     for (size = 0; i > 0; i = i / 16)
         size++;
-    hex = (char*)calloc(size, sizeof(char));
-    sprintf(hex, "%x", num);
+    hex = (char *)calloc(size, sizeof(char));
+    sprintf(hex, "%05x", num);
     return hex;
 }
 
-unsigned char dec2Bin2sComplement(int n)
+char *dec2Bin2sComplement(int n)
 {
+    unsigned char result;
+
     /*
     Function converts decimal integer to binary/hex representation in a 2'Complement
     format, we use the first technic type of converting integers to 2'Complement numbers.
@@ -22,24 +24,26 @@ unsigned char dec2Bin2sComplement(int n)
     3 - adding 1 to the result
     4 - saving it as a string of chracers and as HexWord Typedef struct variable
     */
-    unsigned char result = 0;
-    result = n;
-    result = ~result;
-    result++;
-    return result;
+    if (n < 0)
+    {
+        result = abs(n);
+        result = ~result;
+        result++;
+
+        printf("original number:%d\nresult in 2s complement:%s\n", n, numToBin(result));
+    }
+
+    return n < 0 ? numToBin(result) : numToBin(n);
 }
 
-char* numToBin(int num) {
-
-    /*     char* hex = decToHex(num);
-        char* word = (char*)calloc(strlen(hex) * 4, sizeof(char)); */
-
+char *numToBin(int num)
+{
     int i = 0;
-    char hex[5] = { 0 };
-    char* word = (char*)calloc(BINARY_WORD_SIZE, sizeof(char));
-    sprintf(hex, "%x", num);
+    char *word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+    char *hex = decToHex(num);
+    printf("hex:%s\n", hex);
 
-    while (hex[i] != '\0')
+    while (hex[i] != 0)
     {
         switch (hex[i])
         {
@@ -104,19 +108,25 @@ char* numToBin(int num) {
 
         i++;
     }
+
+    /*     if (num < 0)
+        {
+            i = 3;
+            while (i < BINARY_WORD_SIZE)
+            {
+                i++;
+            }
+        } */
     /*
-        strcat(word, "\0"); */
-
-
+     */
+    strcat(word, "\0");
     return word;
-
 }
 
-char* hexToBin(char* hex)
+char *hexToBin(char *hex)
 {
     int i = 0;
-    char* binaryStr = (char*)calloc(BINARY_WORD_SIZE + 6, sizeof(char*));
-
+    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
 
     while (hex[i] != '\0')
     {

@@ -90,7 +90,7 @@ extern unsigned getIC();
 extern void addWord(unsigned value, DataType type);
 
 /* helpers.c  */
-extern unsigned char dec2Bin2sComplement(int n);
+extern char *dec2Bin2sComplement(int n);
 
 int secondRunParseSource(FILE *fp, char *filename)
 {
@@ -133,8 +133,8 @@ void parseSingleLineSecondRun(char *line)
 {
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
-    memcpy(lineCopy, line, MAX_LINE_LEN);
     char *token;
+    memcpy(lineCopy, line, MAX_LINE_LEN);
     printf("\nLine Number (%d):\n%s\n", currentLine, line);
     token = strtok(lineCopy, ", \t \n");
 
@@ -285,7 +285,11 @@ Bool writeDataInstruction(char *token)
 
     while (token != NULL)
     {
-        addWord((A << 16) | dec2Bin2sComplement((unsigned)atoi(token)), Data);
+
+        addWordToDataImage(dec2Bin2sComplement((A << 16) | atoi(token)));
+
+        /* addWord((A << 16) | num, Data);
+         */
         token = strtok(NULL, ", \t \n");
     }
     return lineParsedSuccessfully;
@@ -296,8 +300,8 @@ Bool writeStringInstruction(char *s)
     int i = 1;
     printf("inside write String Instruction, token: %s\n", s);
     for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
-        addWord((A << 16) | dec2Bin2sComplement((unsigned)s[i]), Data);
-
+        addWord((A << 16) | s[i], Data);
+    addWord((A << 16) | '\0', Data);
     return lineParsedSuccessfully;
 }
 
@@ -337,7 +341,7 @@ void writeImmediateOperandWord(char *n)
     n++;
     printf("inside writeImmediateOperandWord, n:%s\n", n);
 
-    addWord((A << 16) | dec2Bin2sComplement(atoi(n)), Code);
+    addWord((A << 16) | atoi(n), Code);
 }
 
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)

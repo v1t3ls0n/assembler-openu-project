@@ -4,7 +4,7 @@ extern Operation operations[OP_SIZE];
 extern char *decToHex(int num);
 extern char *hexToBin(char *hex);
 extern void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
-extern unsigned char dec2Bin2sComplement(int n);
+extern char *dec2Bin2sComplement(int n);
 
 char *generateFirstWordEncodedToBinary(Operation *operation)
 {
@@ -25,7 +25,7 @@ HexWord *generateFirstWordEncodedHex(Operation *operation)
     return newWord;
 }
 
-Word *convertNumberToWord(int n, EncodingFormat format)
+/* Word *convertNumberToWord(int n, EncodingFormat format)
 {
     Word *w = (Word *)malloc(sizeof(Word *));
     if (n < 0)
@@ -41,7 +41,7 @@ Word *convertNumberToWord(int n, EncodingFormat format)
     printf("inside convert number to word last line\n");
     return w;
 }
-
+ */
 BinaryWord *convertNumberToBinaryWord(int num)
 {
     BinaryWord *newBinary = (BinaryWord *)malloc(sizeof(BinaryWord *));
