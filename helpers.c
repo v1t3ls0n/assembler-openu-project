@@ -11,39 +11,24 @@ char *decToHex(int num)
     return hex;
 }
 
-char *dec2Bin2sComplement(int n)
-{
-    unsigned char result;
-
-    /*
-    Function converts decimal integer to binary/hex representation in a 2'Complement
-    format, we use the first technic type of converting integers to 2'Complement numbers.
-    Algorthim:
-    1 - taking the absolute value of the number argument (n)
-    2 - doing a NOT bitwise operation on all bits
-    3 - adding 1 to the result
-    4 - saving it as a string of chracers and as HexWord Typedef struct variable
-    */
-    if (n < 0)
-    {
-        result = abs(n);
-        result = ~result;
-        result++;
-
-        printf("original number:%d\nresult in 2s complement:%s\n", n, numToBin(result));
-    }
-
-    return n < 0 ? numToBin(result) : numToBin(n);
-}
-
 char *numToBin(int num)
 {
     int i = 0;
+    unsigned long result;
     char *word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
-    char *hex = decToHex(num);
-    printf("hex:%s\n", hex);
+    char hex[6];
 
-    while (hex[i] != 0)
+    if (num < 0)
+    {
+        result = abs(num);
+        result = ~result;
+        result++;
+        sprintf(hex, "%05x", (int)(((A << 16) | result) & 0xfffff));
+    }
+    else
+        sprintf(hex, "%05x", (int)num & 0xfffff);
+
+    while (hex[i] != '\0')
     {
         switch (hex[i])
         {

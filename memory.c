@@ -49,7 +49,7 @@ void printBinaryImg()
     }
 }
 
-void addWord(unsigned value, DataType type)
+void addWord(int value, DataType type)
 {
     if (type == Code)
         addWordToCodeImage(numToBin(value));

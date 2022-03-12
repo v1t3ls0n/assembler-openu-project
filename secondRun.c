@@ -87,10 +87,9 @@ extern Operation *getOperationByName(char *s);
 /* from memory.c */
 extern unsigned getDC();
 extern unsigned getIC();
-extern void addWord(unsigned value, DataType type);
+extern void addWord(int value, DataType type);
 
 /* helpers.c  */
-extern char *dec2Bin2sComplement(int n);
 
 int secondRunParseSource(FILE *fp, char *filename)
 {
@@ -282,11 +281,13 @@ Bool writeOperationBinary(char *operationName, char *args)
 
 Bool writeDataInstruction(char *token)
 {
-
+    int num;
     while (token != NULL)
     {
+        num = atoi(token);
 
-        addWordToDataImage(dec2Bin2sComplement((A << 16) | atoi(token)));
+        /*         addWordToDataImage(dec2Bin2sComplement((A << 16) | atoi(token))); */
+        addWord((A << 16) | num, Data);
 
         /* addWord((A << 16) | num, Data);
          */

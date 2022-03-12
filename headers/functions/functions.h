@@ -103,7 +103,7 @@ Word *convertNumberToWord(int n, EncodingFormat format);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-char *dec2Bin2sComplement(int n);
+
 char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -153,4 +153,4 @@ void printWordBinary(unsigned index);
 void wordStringToWordObj(char s[BINARY_WORD_SIZE + 1], DataType type);
 void addWordToDataImage(char s[BINARY_WORD_SIZE + 1]);
 void addWordToCodeImage(char s[BINARY_WORD_SIZE + 1]);
-void addWord(unsigned value, DataType type);
+void addWord(int value, DataType type);

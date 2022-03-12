@@ -4,7 +4,6 @@ extern Operation operations[OP_SIZE];
 extern char *decToHex(int num);
 extern char *hexToBin(char *hex);
 extern void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
-extern char *dec2Bin2sComplement(int n);
 
 char *generateFirstWordEncodedToBinary(Operation *operation)
 {
