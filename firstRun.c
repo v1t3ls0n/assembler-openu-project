@@ -2,12 +2,12 @@
 /* Shared global State variables*/
 extern State globalState;
 extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
+extern const char* regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
-extern Operation *getOperationByName(char *s);
-extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
-extern Bool verifyLabelNaming(char *s);
+extern Operation* getOperationByName(char* s);
+extern Bool addSymbol(char* name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
+extern Bool isLabelNameAlreadyTaken(char* name, ItemType type);
+extern Bool verifyLabelNaming(char* s);
 extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
@@ -15,16 +15,16 @@ extern unsigned getIC();
 extern void updateFinalCountersValue();
 extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
-extern int secondRunParseSource(FILE *fp, char *filename);
+extern int secondRunParseSource(FILE* fp, char* filename);
 
-extern Bool writeOperationBinary(char *operationName, char *args);
-Bool writeInstructionBinary(char *instructionName, char *line);
+extern Bool writeOperationBinary(char* operationName, char* args);
+Bool writeInstructionBinary(char* instructionName, char* line);
 
-int parseExpandedSourceFile(FILE *fp, char *filename)
+int parseExpandedSourceFile(FILE* fp, char* filename)
 {
     int c = 0;
     int i = 0;
-    char line[MAX_LINE_LEN + 1] = {0};
+    char line[MAX_LINE_LEN + 1] = { 0 };
     printf("\n\n\nFirst Run:\n");
     while (((c = fgetc(fp)) != EOF))
     {
@@ -50,7 +50,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
                 line[i++] = c;
         }
     }
-  
+
     if (i > 0)
     {
         parseSingleLine(line);
@@ -68,11 +68,11 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     return globalState != collectErrors ? True : False;
 }
 
-void parseSingleLine(char *line)
+void parseSingleLine(char* line)
 {
     ParseState state = newLine;
-    char *p = calloc(strlen(line + 1), sizeof(char *));
-    char *token;
+    char* p = calloc(strlen(line + 1), sizeof(char*));
+    char* token;
 
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
 
@@ -100,10 +100,10 @@ void parseSingleLine(char *line)
 
         case parseOperation:
         {
-            char args[MAX_LINE_LEN] = {0};
+            char args[MAX_LINE_LEN] = { 0 };
             line = line + strlen(token);
 
-            /*          
+            /*
 
                int offset = (int)(strlen(token) + 1);
 
@@ -139,7 +139,7 @@ void parseSingleLine(char *line)
     currentLine++;
 }
 
-ParseState handleFirstToken(char *token, char *line, ParseState state)
+ParseState handleFirstToken(char* token, char* line, ParseState state)
 {
     /*   printf("inside handle State, token:%s\n", token); */
 
@@ -150,7 +150,7 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
 
     case newLine:
     {
-        if (token[0] == ';')
+        if (isComment(token))
             return skipLine;
 
         else if (isLabel(token))
@@ -161,7 +161,7 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
 
         else if (isOperation(token))
             return parseOperation;
-        
+
         else
         {
             yieldError(illegalApearenceOfCharactersOnLine);
@@ -176,12 +176,12 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
     return state;
 }
 
-Bool handleOperation(char *operationName, char *args)
+Bool handleOperation(char* operationName, char* args)
 {
-    Operation *p = getOperationByName(operationName);
+    Operation* p = getOperationByName(operationName);
     char comma = 0;
-    char *first = 0, *second = 0, *inBetweenCharacters = 0, *extra = 0;
-    AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+    char* first = 0, * second = 0, * inBetweenCharacters = 0, * extra = 0;
+    AddrMethodsOptions active[2] = { {0, 0, 0, 0}, {0, 0, 0, 0} };
 
     first = strtok(args, " \t \n");
     inBetweenCharacters = strtok(NULL, " \t \n");
@@ -201,7 +201,7 @@ Bool handleOperation(char *operationName, char *args)
     {
         if (strchr(first, ','))
         {
-            char *p = strchr(first, ',');
+            char* p = strchr(first, ',');
             second = p;
             second++;
             first[strlen(first) - strlen(second)] = '\0';
@@ -237,7 +237,7 @@ Bool handleOperation(char *operationName, char *args)
     return False;
 }
 
-Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
+Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsOptions active[2])
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
@@ -247,7 +247,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 
     if (src && strchr(src, ','))
     {
-        char *p = strchr(src, ',');
+        char* p = strchr(src, ',');
         *p = '\0';
 
         commasCount++;
@@ -293,7 +293,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
     }
     return True;
 }
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char* operand, int type)
 {
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = isValidIndexParameter(operand);
@@ -319,7 +319,7 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-int handleInstruction(int type, char *firstToken, char *nextTokens)
+int handleInstruction(int type, char* firstToken, char* nextTokens)
 {
     /*
 
@@ -340,7 +340,7 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
-            char *labelName = calloc(strlen(nextTokens), sizeof(char *));
+            char* labelName = calloc(strlen(nextTokens), sizeof(char*));
             strcpy(labelName, nextTokens);
 
             nextTokens = strtok(NULL, " \t \n");
@@ -372,7 +372,7 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
 
     return yieldError(undefinedOperation);
 }
-int handleLabel(char *labelName, char *nextToken, char *line)
+int handleLabel(char* labelName, char* nextToken, char* line)
 {
 
     if (isInstruction(nextToken))
@@ -392,7 +392,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     else if (isOperation(nextToken))
     {
         int icAddr = getIC();
-        char args[MAX_LINE_LEN] = {0};
+        char args[MAX_LINE_LEN] = { 0 };
         int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
         strcpy(args, &line[offset]);
 
@@ -408,13 +408,13 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     return False;
 }
 
-Bool isOperation(char *s)
+Bool isOperation(char* s)
 {
 
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
-Bool isLabel(char *s)
+Bool isLabel(char* s)
 {
     int len = strlen(s);
     if (len <= 1)
@@ -423,7 +423,7 @@ Bool isLabel(char *s)
     return s[len - 1] == ':' ? True : False;
 }
 
-int getInstructionType(char *s)
+int getInstructionType(char* s)
 {
     if (!strcmp(s, DATA))
         return _TYPE_DATA;
@@ -436,11 +436,11 @@ int getInstructionType(char *s)
     return False;
 }
 
-Bool isInstruction(char *s)
+Bool isInstruction(char* s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
 }
-Bool countAndVerifyDataArguments(char *token)
+Bool countAndVerifyDataArguments(char* token)
 {
     int number = 0;
     int size = 0;
@@ -515,7 +515,7 @@ Bool countAndVerifyDataArguments(char *token)
     increaseDataCounter(size);
     return True;
 }
-Bool countAndVerifyStringArguments(char *token)
+Bool countAndVerifyStringArguments(char* token)
 {
 
     if (isInstruction(token))
@@ -534,7 +534,7 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
-Bool isRegistery(char *s)
+Bool isRegistery(char* s)
 {
     int len = strlen(s);
     int i = 0;
@@ -549,7 +549,7 @@ Bool isRegistery(char *s)
     }
     return False;
 }
-Bool isValidImmediateParamter(char *s)
+Bool isValidImmediateParamter(char* s)
 {
     int i, len = strlen(s);
     if (len < 2 || s[0] != '#' || (!(s[1] == '-' || s[1] == '+' || isdigit(s[1]))))
@@ -559,7 +559,7 @@ Bool isValidImmediateParamter(char *s)
             return False;
     return True;
 }
-Bool isValidIndexParameter(char *s)
+Bool isValidIndexParameter(char* s)
 {
     int len = strlen(s);
     if (len < 6)
@@ -579,7 +579,11 @@ Bool isValidIndexParameter(char *s)
     return True;
 }
 
-int getRegisteryNumber(char *s)
+Bool isComment(char* s) {
+    return s[0] == ';' ? True : False;
+}
+
+int getRegisteryNumber(char* s)
 {
     int len = strlen(s);
     int i = 0;
@@ -595,7 +599,7 @@ int getRegisteryNumber(char *s)
     return -1;
 }
 
-char *getInstructionNameByType(int type)
+char* getInstructionNameByType(int type)
 {
     switch (type)
     {
@@ -617,7 +621,7 @@ char *getInstructionNameByType(int type)
 
     return NULL;
 }
-char *getInstructionName(char *s)
+char* getInstructionName(char* s)
 {
     if (!strcmp(s, DATA))
         return DATA;
