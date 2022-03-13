@@ -93,7 +93,7 @@ extern void addWord(int value, DataType type);
 
 
 
-int secondRunParseSource(FILE* fp, char* filename)
+int secondRunParsing(FILE* fp, char* filename)
 {
     int c = 0;
     int i = 0;
@@ -106,7 +106,7 @@ int secondRunParseSource(FILE* fp, char* filename)
 
         if (c == '\n')
         {
-            parseSingleLineSecondRun(line);
+            parseSingleLinesecondRunParsing(line);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -123,13 +123,13 @@ int secondRunParseSource(FILE* fp, char* filename)
 
     if (i > 0)
     {
-        parseSingleLineSecondRun(line);
+        parseSingleLinesecondRunParsing(line);
         memset(line, 0, i);
     }
 
     return True;
 }
-void parseSingleLineSecondRun(char* line)
+void parseSingleLinesecondRunParsing(char* line)
 {
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = { 0 };
@@ -155,7 +155,7 @@ void parseSingleLineSecondRun(char* line)
         }
         case Err:
         {
-            globalState = secondRunFailed;
+            globalState = collectErrors;
             break;
         }
         default:

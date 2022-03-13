@@ -15,12 +15,12 @@ extern unsigned getIC();
 extern void updateFinalCountersValue();
 extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
-extern int secondRunParseSource(FILE* fp, char* filename);
+extern int secondRunParsing(FILE* fp, char* filename);
 
 extern Bool writeOperationBinary(char* operationName, char* args);
 Bool writeInstructionBinary(char* instructionName, char* line);
 
-int parseExpandedSourceFile(FILE* fp, char* filename)
+int firstRunParsing(FILE* fp, char* filename)
 {
     int c = 0;
     int i = 0;
@@ -58,12 +58,6 @@ int parseExpandedSourceFile(FILE* fp, char* filename)
     }
 
     updateFinalCountersValue();
-
-    if (globalState != collectErrors)
-    {
-        rewind(fp);
-        secondRunParseSource(fp, filename);
-    }
 
     return globalState != collectErrors ? True : False;
 }
@@ -204,7 +198,12 @@ Bool handleOperation(char* operationName, char* args)
             char* p = strchr(first, ',');
             second = p;
             second++;
-            first[strlen(first) - strlen(second)] = '\0';
+            comma = ',';
+            *p = '\0';
+
+            /* first[strlen(first) - strlen(second)] = '\0';
+ */
+            printf("line 208, first:%s, second:%s\n", first, second);
         }
         else
         {
@@ -241,8 +240,8 @@ Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsO
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
-    /*     printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
-     */
+    printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
+
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
 
     if (src && strchr(src, ','))
