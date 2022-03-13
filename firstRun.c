@@ -110,10 +110,7 @@ void parseSingleLine(char* line)
 
         case Err:
         {
-            if (globalState == firstRun)
-                globalState = collectErrors;
-
-            state = Err;
+            globalState = collectErrors;
             break;
         }
 
@@ -125,11 +122,12 @@ void parseSingleLine(char* line)
         }
         token = strtok(NULL, " \t \n");
     }
-
-    if (token != NULL)
-        free(token);
     if (p != NULL)
         free(p);
+
+    if (!state)
+        globalState = collectErrors;
+
     currentLine++;
 }
 
@@ -318,7 +316,7 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-int handleInstruction(int type, char* firstToken, char* nextTokens)
+Bool handleInstruction(int type, char* firstToken, char* nextTokens)
 {
     /*
 
@@ -327,8 +325,6 @@ int handleInstruction(int type, char* firstToken, char* nextTokens)
      /*
          printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
       */
-    if (globalState == secondRun)
-        return True;
 
     if (isInstruction(firstToken))
     {
@@ -363,8 +359,9 @@ int handleInstruction(int type, char* firstToken, char* nextTokens)
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if ((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens)))
-            return isLabelNameAvailable ? addSymbol(firstToken, dataCounter, 0, 1, 0, 0) : False;
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0);
+
         else
             return Err;
     }
@@ -401,7 +398,10 @@ int handleLabel(char* labelName, char* nextToken, char* line)
           */
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
+        else
+            return False;
     }
+
 
     else
         yieldError(illegalLabelUseExpectedOperationOrInstruction);
@@ -440,6 +440,9 @@ Bool isInstruction(char* s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
 }
+
+
+
 Bool countAndVerifyDataArguments(char* token)
 {
     int number = 0;
@@ -447,83 +450,88 @@ Bool countAndVerifyDataArguments(char* token)
     int commasCount = 0;
     char c = 0;
     int i;
-    Bool minusSignOn = False;
+    Bool isValid = True;
+    Bool isFirstParamter = True;
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
     while (token)
     {
+        for (i = 0; token[i]; i++) {
+            if (token[i] == ',') {
+                commasCount++;
+                if (commasCount > 1)
+                    isValid = yieldError(wrongInstructionSyntaxExtraCommas);
 
-        for (i = 0; token[i] == ','; i++, commasCount++, token++)
-            ;
-
-        /*   printf("commasCount:%d token:%s\n", commasCount, token);
-         */
-        if (token[0] == '-')
-        {
-            minusSignOn = True;
-            token++;
+                token++;
+            }
+            else if (token[i] != ',' && !isdigit(token[i]) && token[0] != '-' && token[0] != '+') isValid = yieldError(illegalApearenceOfCharactersOnLine);
         }
+
+
+
+
+        if (token[0] == '-')
+            token++;
+
         if (token[0] == '+')
             token++;
 
-        else if (!isdigit(token[0]))
-        {
-            if (isalpha(token[0]))
-                return yieldError(expectedNumber);
-            else
-                return yieldError(illegalApearenceOfCharactersOnLine);
+
+        printf("comma count:%d\n", commasCount);
+
+
+
+
+        sscanf(token, "%d%c", &number, &c);
+
+        printf("line 451, number:%d c:%c\n", number, c);
+
+
+        if (number && !c && (commasCount == 1 || isFirstParamter)) {
+            size++;
+            commasCount = 0;
         }
+        else if (number && c == ',')
+            size++;
+
+        else if (c == '.')
+            isValid = yieldError(wrongArgumentTypeNotAnInteger);
+
+        else if (c)
+            isValid = yieldError(illegalApearenceOfCharactersOnLine);
+
+
+
+        else if (commasCount < 1 && !isFirstParamter)
+            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
 
         else if (commasCount > 1)
-            return yieldError(wrongInstructionSyntaxExtraCommas);
-
-        else
         {
-            if (commasCount == 1 || size == 0)
-            {
-                sscanf(token, "%d%c", &number, &c);
-
-                /* printf("line 451, number:%d c:%c\n", number, c);
-                 */
-                if (c == '.')
-                    return yieldError(wrongArgumentTypeNotAnInteger);
-                else if (c == ',')
-                {
-                    commasCount++;
-                    c = 0;
-                }
-                if (globalState == secondRun)
-                {
-                    if (minusSignOn)
-                        number = -1 * number;
-                    minusSignOn = False;
-                    /*             addNumberToMemory(number); */
-                }
-                else
-                    size++;
-            }
-            else if (commasCount < 1 && strtok(NULL, " \t \n"))
-                return yieldError(wrongInstructionSyntaxMissinCommas);
-
-            else if (commasCount != 0 && strtok(NULL, " \t \n") == NULL)
-                return yieldError(wrongInstructionSyntaxExtraCommas);
+            isValid = yieldError(wrongInstructionSyntaxExtraCommas); commasCount = 0;
         }
+
+        number = 0;
+        c = 0;
+        isFirstParamter = False;
         token = strtok(NULL, " \t \n");
+
     }
 
-    increaseDataCounter(size);
-    return True;
+    if (commasCount > 0)isValid = yieldError(wrongInstructionSyntaxExtraCommas);
+    if (isValid)
+        increaseDataCounter(size);
+
+    return isValid;
 }
+
+
+
 Bool countAndVerifyStringArguments(char* token)
 {
 
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
-
-    if (token == NULL)
-        return True;
-
     if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
         return yieldError(closingQuotesForStringIsMissing);
     else if (token[0] != '\"')

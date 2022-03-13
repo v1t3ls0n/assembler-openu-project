@@ -116,7 +116,7 @@ ParseState handleFirstToken(char* token, char* line, ParseState state);
 Bool handleOperation(char* operationName, char* args);
 Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsOptions active[2]);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char* operand, int type);
-int handleInstruction(int type, char* firstToken, char* nextTokens);
+Bool handleInstruction(int type, char* firstToken, char* nextTokens);
 int handleLabel(char* labelName, char* nextToken, char* line);
 Bool isLabel(char* s);
 Bool isOperation(char* s);

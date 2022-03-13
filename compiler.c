@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
     globalState = firstRun;
     handleSourceFiles(argc, argv);
     if (globalState != collectErrors) {
+        printf("global state is not collect errors after first run\n");
         globalState = secondRun;
         handleSourceFiles(argc, argv);
     }
