@@ -132,8 +132,7 @@ int printSymbolItem(Item* item)
                 printf("external");
         }
     }
-    /*   printf("line 128, table.c \n");
-     */
+
     if (item->next != NULL)
         printSymbolItem(item->next);
     return 0;
@@ -190,7 +189,6 @@ Bool updateSymbol(Item* p, unsigned value, unsigned isCode, unsigned isData, uns
         {
             unsigned base = 0;
             unsigned offset = 0;
-            printf("base: %u offset: %u \n", base, offset);
             offset = value % 16;
             base = abs((unsigned)value - offset);
             p->val.s.value = value;
