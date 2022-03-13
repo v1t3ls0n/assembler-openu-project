@@ -65,17 +65,14 @@ int firstRunParsing(FILE *fp, char *filename)
 void parseSingleLine(char *line)
 {
     ParseState state = newLine;
-    char *p = calloc(strlen(line + 1), sizeof(char *));
+    char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
-
-    memcpy(p, line, strlen(line));
-    token = strtok(p, " \t \n");
-
+    memcpy(lineCopy, line, strlen(line));
+    token = strtok(lineCopy, " \t \n");
     while (token != NULL)
     {
-        state = handleFirstToken(token, p, state);
+        state = handleFirstToken(token, lineCopy, state);
         switch (state)
         {
 
@@ -95,15 +92,7 @@ void parseSingleLine(char *line)
         case parseOperation:
         {
             char args[MAX_LINE_LEN] = {0};
-            line = line + strlen(token);
-
-            /*
-
-               int offset = (int)(strlen(token) + 1);
-
-             */
-            strcpy(args, line);
-
+            strcpy(args, (line + strlen(token)));
             state = handleOperation(token, args);
             break;
         }
@@ -122,8 +111,6 @@ void parseSingleLine(char *line)
         }
         token = strtok(NULL, " \t \n");
     }
-    if (p != NULL)
-        free(p);
 
     if (!state)
         globalState = collectErrors;
@@ -443,6 +430,7 @@ Bool isInstruction(char *s)
 Bool countAndVerifyDataArguments(char *token)
 {
     int number = 0;
+    int n = 0;
     int size = 0;
     int commasCount = 0;
     char c = 0;
@@ -451,27 +439,36 @@ Bool countAndVerifyDataArguments(char *token)
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
 
-    while (token)
+    while (token != '\0')
     {
+
+        if (isspace(token[0]))
+        {
+            printf("is space\n");
+            token = strtok(NULL, " \t \n");
+        }
+
         if (token[0] == '-')
             token++;
         if (token[0] == '+')
             token++;
-        if (token[0] == ',')
+
+        while (*token == ',')
         {
-            token++;
             commasCount++;
+            token++;
         }
 
-        sscanf(token, "%d%c", &number, &c);
-        printf("comma count:%d\n", commasCount);
-        printf("line 451, number:%d c:%c\n", number, c);
-        if (c == '.')
-            isValid = yieldError(wrongArgumentTypeNotAnInteger);
+        sscanf(token, "%d%c%n", &number, &c, &n);
+        printf("token:%s number:%d n:%d c:%c commaCount:%d\n", token, number, n, c, commasCount);
+        token = token + n;
 
-        else if (number && (commasCount == 1 || isFirstParamter))
+        /*
+        sscanf(token, "%d%n%c", &number, &n, &c);
+        printf("number:%d n:%d c:%c commaCount:%d\n", number, n, c, commasCount);
+        if (isFirstParamter && commasCount)
         {
-            size++;
+            isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
             commasCount = 0;
         }
         else if (commasCount > 1)
@@ -480,27 +477,40 @@ Bool countAndVerifyDataArguments(char *token)
             commasCount--;
         }
         else if (commasCount < 1 && !isFirstParamter)
-        {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-        }
-        else if (c)
-            isValid = yieldError(illegalApearenceOfCharactersOnLine);
 
+        else if (!n && !c && token)
+        {
+            commasCount = 0;
+            isValid = yieldError(expectedNumber);
+        }
+
+        else if (c == '.')
+            isValid = yieldError(wrongArgumentTypeNotAnInteger);
+
+        else if (n && (!c || c == ','))
+        {
+            size++;
+            commasCount = 0;
+        }
+
+
+        isFirstParamter = False;
+ */
         number = 0;
         c = 0;
-        isFirstParamter = False;
+        n = 0;
         if (strchr(token, ',') != NULL)
         {
             token = strchr(token, ',');
-            commasCount++;
-            token++;
         }
         else
             token = strtok(NULL, " \t \n");
     }
 
     if (commasCount > 0)
-        isValid = yieldError(illegalApearenceOfCharactersOnLine);
+        isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
+
     if (isValid)
         increaseDataCounter(size);
 
