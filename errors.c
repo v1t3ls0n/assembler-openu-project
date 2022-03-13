@@ -14,6 +14,11 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case wrongInstructionSyntaxIllegalCommaPosition:
+    {
+        printf("comma appearence on line is illegal!");
+        break;
+    }
     case labelNotExist:
     {
         printf("undefined label name, label name was not found in symbol table, assembler compilation faild, not files were created");

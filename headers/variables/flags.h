@@ -45,7 +45,8 @@ typedef enum
     desOperandTypeIsNotAllowed,
     operandTypeDoNotMatch,
     labelNotExist,
-    secondRunFailed = 0
+    wrongInstructionSyntaxIllegalCommaPosition,
+    secondRunFailed
 } Error;
 
 typedef enum

@@ -1,21 +1,23 @@
 #include "data.h"
 /* Shared global State variables*/
 extern State globalState;
-extern void parseSourceFile(FILE* source, char* filename);
-extern int firstRunParsing(FILE* fp, char* filename);
+extern void parseSourceFile(FILE *source, char *filename);
+extern int firstRunParsing(FILE *fp, char *filename);
 extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLine;
 extern void initMemory();
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     globalState = replacingMacros;
     handleSourceFiles(argc, argv);
     initTablesArrays();
     globalState = firstRun;
     handleSourceFiles(argc, argv);
-    if (globalState != collectErrors) {
+    if (globalState != collectErrors)
+    {
+        printf("global state is not collect errors after first run\n");
         globalState = secondRun;
         handleSourceFiles(argc, argv);
     }
@@ -31,15 +33,13 @@ int main(int argc, char* argv[])
     else
         printf("\nSecond Run Finished With Errors, files will not be exported!\n");
 
-
-
     return 0;
 }
 
-int handleSourceFiles(int argc, char* argv[])
+int handleSourceFiles(int argc, char *argv[])
 {
-    FILE* fptr;
-    char* fileName;
+    FILE *fptr;
+    char *fileName;
     int filesCount = argc - 1;
     int i = 1;
     if (filesCount < 1)
@@ -50,7 +50,7 @@ int handleSourceFiles(int argc, char* argv[])
 
     while (--argc)
     {
-        fileName = calloc(strlen(argv[i]) + 3, sizeof(char*));
+        fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
         sscanf(argv[i], "%s", fileName);
         fileName = globalState == replacingMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
 
@@ -60,24 +60,19 @@ int handleSourceFiles(int argc, char* argv[])
         {
             if (globalState == replacingMacros)
                 parseSourceFile(fptr, fileName);
-            else  if (globalState == firstRun)
+            else if (globalState == firstRun)
             {
                 firstRunParsing(fptr, fileName);
                 rewind(fptr);
-
             }
-            else if (globalState == secondRun) {
+            else if (globalState == secondRun)
+            {
                 secondRunParsing(fptr, fileName);
-
             }
-
-
-
         }
+
+        free(fileName);
     }
-
-    free(fileName);
-
 
     return True;
 }
