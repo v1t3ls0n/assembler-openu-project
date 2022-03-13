@@ -3,32 +3,32 @@
 #define MEMORY_START 100
 /* Shared global State variables*/
 extern State globalState;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
+extern Item* symbols[HASHSIZE];
+extern Item* macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 
 /* extern Word *convertNumberToWord(int n, EncodingFormat format);
  */
 extern void updateFinalMemoryAddressesInSymbolTable();
-extern BinaryWord *convertNumberToBinaryWord(int num);
+extern BinaryWord* convertNumberToBinaryWord(int num);
 
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
 
-extern char *numToBin(int num);
-static BinaryWord *binaryImg;
+extern char* numToBin(int num);
+static BinaryWord* binaryImg;
 
 void initMemory()
 {
     const int totalSize = DCF - MEMORY_START;
     int i, j;
-    binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
-
-    printf("inside initMemory\n");
-
+    binaryImg = (BinaryWord*)malloc(totalSize * sizeof(BinaryWord));
+    /*
+        printf("inside initMemory\n");
+     */
     for (i = 0; i < totalSize; i++)
     {
         for (j = 0; j < BINARY_WORD_SIZE; j++)
@@ -57,21 +57,21 @@ void addWord(int value, DataType type)
         addWordToDataImage(numToBin(value));
 }
 
-void addWordToDataImage(char *s)
+void addWordToDataImage(char* s)
 {
     wordStringToWordObj(s, Data);
     DC++;
 }
 
-void addWordToCodeImage(char *s)
+void addWordToCodeImage(char* s)
 {
-    printf("inside addWordToCodeImage, s:%s\n", s);
-
+    /*     printf("inside addWordToCodeImage, s:%s\n", s);
+     */
     wordStringToWordObj(s, Code);
     IC++;
 }
 
-void wordStringToWordObj(char *s, DataType type)
+void wordStringToWordObj(char* s, DataType type)
 {
     int j;
     int index = type == Code ? IC - MEMORY_START : DC - MEMORY_START;
@@ -83,7 +83,10 @@ void printWordBinary(unsigned index)
 {
     int j;
     for (j = 0; j < BINARY_WORD_SIZE; j++)
+    {
+        if (j % 4 == 0)printf(" ");
         printf("%d", binaryImg[index].digit[j].on ? 1 : 0);
+    }
 
     printf("\n");
 }
@@ -102,7 +105,7 @@ void updateSymbolTableFinalValues()
     }
 }
 
-void updateDataEntry(Item *p)
+void updateDataEntry(Item* p)
 {
     if (p->val.s.attrs.data)
     {

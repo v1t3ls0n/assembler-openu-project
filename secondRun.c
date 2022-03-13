@@ -291,7 +291,9 @@ Bool writeDataInstruction(char* token)
 Bool writeStringInstruction(char* s)
 {
     int i = 1;
-    printf("inside write String Instruction, token: %s\n", s);
+    /*
+     printf("inside write String Instruction, token: %s\n", s);
+  */
     for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
         addWord((A << 16) | s[i], Data);
     addWord((A << 16) | '\0', Data);
@@ -301,7 +303,6 @@ Bool writeStringInstruction(char* s)
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op)
 {
     unsigned secondWord = (A << 16) | (op->funct << 12);
-    printf("inside write second word\n");
     if (first && (active[0].reg || active[0].index))
         secondWord = secondWord | (active[0].reg ? (getRegisteryNumber(first) << 8) : (parseRegNumberFromIndexAddrOperand(first) << 8)) | (active[0].reg ? (REGISTER_DIRECT_ADDR << 6) : (INDEX_ADDR << 6));
     else if (first && (active[0].direct || active[0].immediate))

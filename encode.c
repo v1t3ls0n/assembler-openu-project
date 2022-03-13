@@ -1,19 +1,19 @@
 #include "data.h"
 /* Shared global State variables*/
 extern Operation operations[OP_SIZE];
-extern char *decToHex(int num);
-extern char *hexToBin(char *hex);
-extern void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
+extern char* decToHex(int num);
+extern char* hexToBin(char* hex);
+extern void printBinaryFile(HexWord* words[], unsigned int ICF, unsigned int DCF);
 
-char *generateFirstWordEncodedToBinary(Operation *operation)
+char* generateFirstWordEncodedToBinary(Operation* operation)
 {
     return strcat(hexToBin(decToHex(A)), hexToBin(decToHex(operation->op)));
 }
 
-HexWord *generateFirstWordEncodedHex(Operation *operation)
+HexWord* generateFirstWordEncodedHex(Operation* operation)
 {
-    char *buf = (char *)calloc(6, sizeof(char));
-    HexWord *newWord = (HexWord *)malloc(1 * sizeof(HexWord *));
+    char* buf = (char*)calloc(6, sizeof(char));
+    HexWord* newWord = (HexWord*)malloc(1 * sizeof(HexWord*));
     sprintf(buf, "%x", (A | operation->op));
     newWord->_A = buf[0];
     newWord->_B = buf[1];
@@ -41,13 +41,15 @@ HexWord *generateFirstWordEncodedHex(Operation *operation)
     return w;
 }
  */
-BinaryWord *convertNumberToBinaryWord(int num)
+BinaryWord* convertNumberToBinaryWord(int num)
 {
-    BinaryWord *newBinary = (BinaryWord *)malloc(sizeof(BinaryWord *));
-    char *buf = hexToBin(decToHex(num));
+    BinaryWord* newBinary = (BinaryWord*)malloc(sizeof(BinaryWord*));
+    char* buf = hexToBin(decToHex(num));
     int i = BINARY_WORD_SIZE - 1;
     int j = strlen(buf);
-    printf("inside convertNumberToBinaryWord, binary is:%s\n", buf);
+
+    /* printf("inside convertNumberToBinaryWord, binary is:%s\n", buf);
+     */
     while (j > 0)
     {
         newBinary->digit[i].on = buf[j] == '1' ? 1 : 0;
@@ -57,14 +59,14 @@ BinaryWord *convertNumberToBinaryWord(int num)
     free(buf);
     return newBinary;
 }
-HexWord *convertNumToHexWord(int num)
+HexWord* convertNumToHexWord(int num)
 {
     int i = 0;
-    char *buf = decToHex(num);
-    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord *));
+    char* buf = decToHex(num);
+    HexWord* newHex = (HexWord*)malloc(sizeof(HexWord*));
 
-    printf("inside convertNumToHexWord, buf:%s\n", buf);
-
+    /*     printf("inside convertNumToHexWord, buf:%s\n", buf);
+     */
     while (i < 5)
     {
         if (i == 0)
@@ -83,7 +85,7 @@ HexWord *convertNumToHexWord(int num)
     return newHex;
 }
 
-void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF)
+void printObjectFile(HexWord* words[], unsigned int ICF, unsigned int DCF)
 {
     int i;
     printf("              %d   %d\n", ICF, DCF);
@@ -91,7 +93,7 @@ void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF)
         printf("%04d A%x-B%x-C%x-D%x-E%x\n", 100 + i, words[i]->_A, words[i]->_B, words[i]->_C, words[i]->_D, words[i]->_E);
 }
 
-void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF)
+void printBinaryFile(HexWord* words[], unsigned int ICF, unsigned int DCF)
 {
     int i;
     for (i = 0; i < (DCF + ICF); i++)

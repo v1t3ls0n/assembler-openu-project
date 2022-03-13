@@ -109,7 +109,7 @@ void parseSingleLine(char* line)
 
              */
             strcpy(args, line);
-            printf("line 109,args:%s\n", args);
+
             state = handleOperation(token, args);
             break;
         }
@@ -241,8 +241,8 @@ Bool parseOperands(char* src, char comma, char* des, Operation* op, AddrMethodsO
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
-    printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
-
+    /*     printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
+     */
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
 
     if (src && strchr(src, ','))
@@ -325,9 +325,9 @@ int handleInstruction(int type, char* firstToken, char* nextTokens)
 
 
      */
-
-    printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
-
+     /*
+         printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
+      */
     if (globalState == secondRun)
         return True;
 
@@ -396,9 +396,10 @@ int handleLabel(char* labelName, char* nextToken, char* line)
         int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
         strcpy(args, &line[offset]);
 
-        printf("args:%s\noffset:%d\n", args, offset);
-        /* printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
+        /* printf("args:%s\noffset:%d\n", args, offset);
          */
+         /* printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
+          */
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
     }
