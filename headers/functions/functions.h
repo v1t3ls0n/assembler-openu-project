@@ -5,13 +5,13 @@
 /* --------------------------------------------In Second Run.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-int secondRunParseSource(FILE* fp, char* filename);
+int secondRunParsing(FILE* fp, char* filename);
 void writeDirectOperandWord(char* labelName);
 void writeFirstWord(Operation* operation);
 void writeSecondWord();
 Bool writeOperationBinary(char* operationName, char* line);
 Bool writeInstructionBinary(char* instructionName, char* line);
-void parseSingleLineSecondRun(char* line);
+void parseSingleLinesecondRunParsing(char* line);
 ParseState handleState(char* token, char* line, ParseState state);
 Bool detectOperandType(char* operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char* first, char* second, AddrMethodsOptions active[2], Operation* op);
@@ -109,7 +109,7 @@ char* numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In firstRun.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int parseExpandedSourceFile(FILE* fp, char* filename);
+int firstRunParsing(FILE* fp, char* filename);
 Bool isInstruction(char* s);
 void parseSingleLine(char* line);
 ParseState handleFirstToken(char* token, char* line, ParseState state);

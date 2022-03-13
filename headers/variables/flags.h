@@ -52,7 +52,7 @@ typedef enum
 {
     firstRun,
     secondRun,
-    handleMacros,
+    replacingMacros,
     writeFiles,
     collectErrors,
     stopProgram,
