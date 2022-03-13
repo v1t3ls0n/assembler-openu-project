@@ -50,9 +50,7 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
                 line[i++] = c;
         }
     }
-    /*
-        printf("line: %s length: %d \n", line, (int)strlen(line));
-         */
+  
     if (i > 0)
     {
         parseSingleLine(line);
