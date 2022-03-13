@@ -64,7 +64,6 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
     if (globalState != collectErrors)
     {
         rewind(fp);
-
         secondRunParseSource(fp, filename);
     }
 
@@ -106,7 +105,10 @@ void parseSingleLine(char *line)
             char args[MAX_LINE_LEN] = {0};
             line = line + strlen(token);
 
-            /*             int offset = (int)(strlen(token) + 1);
+            /*          
+
+               int offset = (int)(strlen(token) + 1);
+
              */
             strcpy(args, line);
             printf("line 109,args:%s\n", args);
@@ -157,14 +159,11 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
             return parseLabel;
 
         else if (isInstruction(token))
-
             return parseInstruction;
 
         else if (isOperation(token))
-        {
-
             return parseOperation;
-        }
+        
         else
         {
             yieldError(illegalApearenceOfCharactersOnLine);
@@ -325,8 +324,11 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 int handleInstruction(int type, char *firstToken, char *nextTokens)
 {
     /*
-        printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
+
+
      */
+
+    printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
 
     if (globalState == secondRun)
         return True;
