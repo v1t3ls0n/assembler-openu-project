@@ -85,7 +85,7 @@ void parseSingleLine(char *line)
 
         case parseInstruction:
         {
-            state = handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"));
+            state = handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line);
             break;
         }
 
@@ -303,7 +303,7 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-Bool handleInstruction(int type, char *firstToken, char *nextTokens)
+Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
     /*
 
@@ -316,7 +316,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens)
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
-            return countAndVerifyDataArguments(nextTokens);
+            return countAndVerifyDataArguments(line);
         else if (type == _TYPE_STRING)
             return countAndVerifyStringArguments(nextTokens);
 
@@ -346,7 +346,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens)
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if (((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0);
 
         else
@@ -364,9 +364,9 @@ int handleLabel(char *labelName, char *nextToken, char *line)
         if (instruction)
         {
             if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
-                return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"));
+                return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
             else
-                return handleInstruction(instruction, labelName, nextToken);
+                return handleInstruction(instruction, labelName, nextToken, line);
         }
         else
             return yieldError(undefinedInstruction);
@@ -425,96 +425,6 @@ int getInstructionType(char *s)
 Bool isInstruction(char *s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
-}
-
-Bool countAndVerifyDataArguments(char *token)
-{
-    int number = 0;
-    int n = 0;
-    int size = 0;
-    int commasCount = 0;
-    char c = 0;
-    Bool isValid = True;
-    Bool isFirstParamter = True;
-    if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-
-    while (token != '\0')
-    {
-
-        if (isspace(token[0]))
-        {
-            printf("is space\n");
-            token = strtok(NULL, " \t \n");
-        }
-
-        if (token[0] == '-')
-            token++;
-        if (token[0] == '+')
-            token++;
-
-        while (*token == ',')
-        {
-            commasCount++;
-            token++;
-        }
-
-        sscanf(token, "%d%c%n", &number, &c, &n);
-        printf("token:%s number:%d n:%d c:%c commaCount:%d\n", token, number, n, c, commasCount);
-        token = token + n;
-
-        /*
-        sscanf(token, "%d%n%c", &number, &n, &c);
-        printf("number:%d n:%d c:%c commaCount:%d\n", number, n, c, commasCount);
-        if (isFirstParamter && commasCount)
-        {
-            isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
-            commasCount = 0;
-        }
-        else if (commasCount > 1)
-        {
-            isValid = yieldError(wrongInstructionSyntaxExtraCommas);
-            commasCount--;
-        }
-        else if (commasCount < 1 && !isFirstParamter)
-            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-
-        else if (!n && !c && token)
-        {
-            commasCount = 0;
-            isValid = yieldError(expectedNumber);
-        }
-
-        else if (c == '.')
-            isValid = yieldError(wrongArgumentTypeNotAnInteger);
-
-        else if (n && (!c || c == ','))
-        {
-            size++;
-            commasCount = 0;
-        }
-
-
-        isFirstParamter = False;
- */
-        number = 0;
-        c = 0;
-        n = 0;
-        if (strchr(token, ',') != NULL)
-        {
-            token = strchr(token, ',');
-        }
-        else
-            token = strtok(NULL, " \t \n");
-    }
-
-    if (commasCount > 0)
-        isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
-
-    if (isValid)
-        increaseDataCounter(size);
-
-    return isValid;
 }
 
 Bool countAndVerifyStringArguments(char *token)
