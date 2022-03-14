@@ -8,6 +8,7 @@ extern const char *regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
+extern unsigned getICF();
 
 void initTablesArrays()
 {
@@ -82,6 +83,28 @@ Item *install(char *name, ItemType type)
     return np;
 }
 
+void printMacroTable()
+{
+    int i = 0;
+    printf("\n\t\t ~ MACRO TABLE ~ \n");
+    printf("name\tstart\tend\tline count\t");
+    while (i < HASHSIZE)
+    {
+        if (macros[i] != NULL)
+            printMacroItem(macros[i]);
+        i++;
+    }
+    printf("\n\n");
+}
+
+int printMacroItem(Item *item)
+{
+    printf("\n%s\t%d\t%d\t%d\t", item->name, item->val.m.start, item->val.m.end, item->val.m.linesLen);
+    if (item->next != NULL)
+        printMacroItem(item->next);
+    return 0;
+}
+
 void printSymbolTable()
 {
     int i = 0;
@@ -131,8 +154,7 @@ int printSymbolItem(Item *item)
                 printf("external");
         }
     }
-    /*   printf("line 128, table.c \n");
-     */
+
     if (item->next != NULL)
         printSymbolItem(item->next);
     return 0;
@@ -143,12 +165,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
     unsigned base;
     unsigned offset;
     Item *p;
-    /* printf("inside addSymbol\n");
-    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
- */
-    /*     printf("inside addSymbol\n");
-        printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", name, value, isCode, isData, isEntry, isExternal);
-     */
+
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
     if (!verifyLabelNamingAndPrintErrors(name))
@@ -175,9 +192,9 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-    printf("inside updateSymbol\n");
-    printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
-
+    /*     printf("inside updateSymbol\n");
+        printf("name:%s value:%d isCode:%u isData:%u isEntry:%u isExternal:%u\n", p->name, value, isCode, isData, isEntry, isExternal);
+     */
     /*     printf("inside updateSymbol\n");
      */
     if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
@@ -194,7 +211,6 @@ Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, uns
         {
             unsigned base = 0;
             unsigned offset = 0;
-            printf("base: %u offset: %u \n", base, offset);
             offset = value % 16;
             base = abs((unsigned)value - offset);
             p->val.s.value = value;
@@ -213,9 +229,35 @@ Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, uns
     return True;
 }
 
-Item *getSymbol(char *name, ItemType type)
+Item *getSymbol(char *name)
 {
-    return lookup(name, type);
+    return lookup(name, Symbol);
+}
+
+int getSymbolBaseAddress(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return -1;
+
+    return p->val.s.base;
+}
+
+int getSymbolOffset(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return -1;
+
+    return p->val.s.offset;
+}
+
+Bool isExternal(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return -1;
+    return p->val.s.attrs.external;
 }
 
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)
@@ -253,7 +295,7 @@ Item *removeFromTable(char *name, ItemType type)
 
 Item *updateSymbolAddressValue(char *name, int newValue)
 {
-    Item *p = getSymbol(name, Symbol);
+    Item *p = getSymbol(name);
     unsigned base;
     unsigned offset;
 
@@ -279,9 +321,10 @@ Item *getMacro(char *s)
     return p;
 }
 
-Item *addMacro(char *name, int start, int end)
+Item *addMacro(char *name, int start, int end, int linesLen)
 {
     Item *macro = lookup(name, Macro);
+    printf("inside addMacro, name:%s start:%d end:%d linesLen:%d\n", name, start, end, linesLen);
     if (macro != NULL)
     {
         yieldError(illegalMacroNameAlreadyInUse);
@@ -290,9 +333,28 @@ Item *addMacro(char *name, int start, int end)
     else
     {
         macro = install(name, Macro);
-        macro->val.m.start = start;
-        macro->val.m.end = end;
+
+        if (start != -1)
+            macro->val.m.start = start;
+        if (end != -1)
+            macro->val.m.end = end;
+        if (linesLen != -1)
+            macro->val.m.linesLen = linesLen;
     }
+
+    return macro;
+}
+Item *updateMacro(char *name, int start, int end, int linesLen)
+{
+    Item *macro = getMacro(name);
+    if (!macro)
+        return NULL;
+    if (start != -1)
+        macro->val.m.start = start;
+    if (end != -1)
+        macro->val.m.end = end;
+    if (linesLen != -1)
+        macro->val.m.linesLen = linesLen;
 
     return macro;
 }
@@ -393,4 +455,32 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     }
 
     return True;
+}
+
+void updateFinalMemoryAddressesInSymbolTable()
+{
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (symbols[i] != NULL)
+            updateSingleItemAddress(symbols[i]);
+        i++;
+    }
+}
+
+int updateSingleItemAddress(Item *item)
+{
+    if (item->val.s.attrs.data)
+    {
+        unsigned base = 0, offset = 0, newValue = item->val.s.value + getICF();
+        offset = newValue % 16;
+        base = newValue - offset;
+        item->val.s.offset = offset;
+        item->val.s.base = base;
+        item->val.s.value = newValue;
+    }
+
+    if (item->next != NULL)
+        updateSingleItemAddress(item->next);
+    return 0;
 }

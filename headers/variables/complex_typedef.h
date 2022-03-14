@@ -31,22 +31,6 @@ typedef struct
 
 typedef struct
 {
-    Word *head;
-    Word *tail;
-} MemoryStack;
-
-typedef struct
-{
-    unsigned int are : 4;
-    unsigned int funct : 4;
-    unsigned int srcReg : 4;
-    unsigned int srcAddr : 2;
-    unsigned int desReg : 4;
-    unsigned int desAddr : 2;
-} secondWordState;
-
-typedef struct
-{
     unsigned int immediate : 1;
     unsigned int direct : 1;
     unsigned int index : 1;
@@ -86,6 +70,7 @@ typedef struct
 {
     int start;
     int end;
+    int linesLen;
 } MacroData;
 
 typedef struct

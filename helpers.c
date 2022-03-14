@@ -1,5 +1,13 @@
 #include "data.h"
 extern HexWord *convertNumToHexWord(int num);
+extern const char *regs[REGS_SIZE];
+extern Operation operations[OP_SIZE];
+char *trimFromLeft(char *s)
+{
+    while (isspace(*s))
+        s++;
+    return s;
+}
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -7,33 +15,113 @@ char *decToHex(int num)
     for (size = 0; i > 0; i = i / 16)
         size++;
     hex = (char *)calloc(size, sizeof(char));
-    sprintf(hex, "%x", num);
+    sprintf(hex, "%05x", num);
     return hex;
 }
 
-unsigned char dec2Bin2sComplement(int n)
+char *numToBin(int num)
 {
+    int i = 0;
+    unsigned int result;
+    char *word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+    char hex[6];
+
+    if (num < 0)
+    {
+        result = abs(num);
+        result = ~result;
+        result++;
+        sprintf(hex, "%05x", (int)(result & 0x4ffff));
+    }
+    else
+        sprintf(hex, "%05x", (int)num & 0xfffff);
+
+    while (hex[i] != '\0')
+    {
+        switch (hex[i])
+        {
+
+        case '0':
+            strcat(word, "0000");
+            break;
+        case '1':
+            strcat(word, "0001");
+            break;
+        case '2':
+            strcat(word, "0010");
+            break;
+        case '3':
+            strcat(word, "0011");
+            break;
+        case '4':
+            strcat(word, "0100");
+            break;
+        case '5':
+            strcat(word, "0101");
+            break;
+        case '6':
+            strcat(word, "0110");
+            break;
+        case '7':
+            strcat(word, "0111");
+            break;
+        case '8':
+            strcat(word, "1000");
+            break;
+        case '9':
+            strcat(word, "1001");
+            break;
+        case 'A':
+        case 'a':
+            strcat(word, "1010");
+            break;
+        case 'B':
+        case 'b':
+            strcat(word, "1011");
+            break;
+        case 'C':
+        case 'c':
+            strcat(word, "1100");
+            break;
+        case 'D':
+        case 'd':
+            strcat(word, "1101");
+            break;
+        case 'E':
+        case 'e':
+            strcat(word, "1110");
+            break;
+        case 'F':
+        case 'f':
+            strcat(word, "1111");
+            break;
+        default:
+            break;
+        }
+
+        i++;
+    }
+
+    /*     if (num < 0)
+        {
+            i = 3;
+            while (i < BINARY_WORD_SIZE)
+            {
+                i++;
+            }
+        } */
     /*
-    Function converts decimal integer to binary/hex representation in a 2'Complement
-    format, we use the first technic type of converting integers to 2'Complement numbers.
-    Algorthim:
-    1 - taking the absolute value of the number argument (n)
-    2 - doing a NOT bitwise operation on all bits
-    3 - adding 1 to the result
-    4 - saving it as a string of chracers and as HexWord Typedef struct variable
-    */
-    unsigned char result = 0;
-    result = n;
-    result = ~result;
-    result++;
-    return result;
+     */
+    strcat(word, "\0");
+    return word;
 }
 
 char *hexToBin(char *hex)
 {
-    int i = 0, size = strlen(hex) * 4;
-    char *binaryStr = (char *)calloc(size + 1, sizeof(char *));
-    while (hex[i])
+    int i = 0;
+    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
+
+    while (hex[i] != '\0')
     {
         switch (hex[i])
         {
@@ -98,6 +186,7 @@ char *hexToBin(char *hex)
 
         i++;
     }
+
     strcat(binaryStr, "\0");
     return binaryStr;
 }
@@ -110,4 +199,138 @@ int hex2int(char ch)
     if (ch >= 'a' && ch <= 'f')
         return ch - 'a' + 10;
     return -1;
+}
+
+Bool isOperation(char *s)
+{
+
+    return (getOperationByName(s) != NULL) ? True : False;
+}
+
+Bool isLabel(char *s)
+{
+    int len = strlen(s);
+    if (len <= 1)
+        return yieldError(illegalLabelNameLength);
+
+    return s[len - 1] == ':' ? True : False;
+}
+
+int getInstructionType(char *s)
+{
+    if (!strcmp(s, DATA))
+        return _TYPE_DATA;
+    if (!strcmp(s, STRING))
+        return _TYPE_STRING;
+    if (!strcmp(s, ENTRY))
+        return _TYPE_ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return _TYPE_EXTERNAL;
+    return False;
+}
+
+Bool isInstruction(char *s)
+{
+    return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
+}
+
+Bool isRegistery(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+    if (s[0] == 'r' && len >= 2)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return True;
+            i++;
+        }
+    }
+    return False;
+}
+Bool isValidImmediateParamter(char *s)
+{
+    int i, len = strlen(s);
+    if (len < 2 || s[0] != '#' || (!(s[1] == '-' || s[1] == '+' || isdigit(s[1]))))
+        return False;
+    for (i = 2; i < len; i++)
+        if (!isdigit(s[i]))
+            return False;
+    return True;
+}
+Bool isValidIndexParameter(char *s)
+{
+    int len = strlen(s);
+    if (len < 6)
+        return False;
+    else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
+        return False;
+    else
+    {
+        s = strchr(s, '[');
+        s++;
+
+        s[strlen(s) - 1] = 0;
+
+        if (getRegisteryNumber(s) < 10)
+            return False;
+    }
+    return True;
+}
+
+Bool isComment(char *s)
+{
+    return s[0] == ';' ? True : False;
+}
+
+int getRegisteryNumber(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+    if (s[0] == 'r' && len >= 2)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(s, regs[i]) == 0))
+                return i;
+            i++;
+        }
+    }
+    return -1;
+}
+
+char *getInstructionNameByType(int type)
+{
+    switch (type)
+    {
+    case _TYPE_DATA:
+        return "DATA INSTRUCTION";
+
+    case _TYPE_STRING:
+        return "STRING INSTRUCTION";
+
+    case _TYPE_ENTRY:
+        return "ENTRY INSTRUCTION";
+
+    case _TYPE_EXTERNAL:
+        return "EXTERNAL INSTRUCTION";
+
+    default:
+        break;
+    }
+
+    return NULL;
+}
+char *getInstructionName(char *s)
+{
+    if (!strcmp(s, DATA))
+        return DATA;
+    if (!strcmp(s, STRING))
+        return STRING;
+    if (!strcmp(s, ENTRY))
+        return ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return EXTERNAL;
+    return 0;
 }
