@@ -1,0 +1,1 @@
+ make && ./compiler.exe ./_tests/good_code/as_files/*.as > ../outputs/*.txt

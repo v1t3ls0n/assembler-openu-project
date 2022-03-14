@@ -164,6 +164,6 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In parse.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-Bool countAndVerifyDataArguments(char *line);
+Bool countAndVerifyDataArguments(char *line, char *token);
 Bool countAndVerifyStringArguments(char *token);
 char *trimFromLeft(char *s);
