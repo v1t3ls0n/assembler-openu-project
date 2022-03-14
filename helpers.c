@@ -2,6 +2,12 @@
 extern HexWord *convertNumToHexWord(int num);
 extern const char *regs[REGS_SIZE];
 extern Operation operations[OP_SIZE];
+char *trimFromLeft(char *s)
+{
+    while (isspace(*s))
+        s++;
+    return s;
+}
 char *decToHex(int num)
 {
     int i = num, size = 0;

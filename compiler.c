@@ -11,6 +11,8 @@ extern unsigned currentLine;
 extern void initMemory();
 extern void updateFinalCountersValue();
 
+extern Bool parseFile(FILE *fp, char *filename);
+
 int main(int argc, char *argv[])
 {
     initTablesArrays();
@@ -80,54 +82,4 @@ int handleSourceFiles(int argc, char *argv[])
     }
 
     return True;
-}
-
-Bool parseFile(FILE *fp, char *filename)
-{
-    int c = 0;
-    int i = 0;
-    char line[MAX_LINE_LEN + 1] = {0};
-    currentLine = 1;
-
-    if (globalState == secondRun)
-        printf("\n\n\nSecond Run:\n");
-    else
-        printf("\n\n\nFirst Run:\n");
-
-    while (((c = fgetc(fp)) != EOF))
-    {
-        if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
-        {
-
-            globalState = collectErrors;
-            yieldError(maxLineLengthExceeded);
-            memset(line, 0, MAX_LINE_LEN);
-            i = 0;
-        }
-
-        if (c == '\n')
-        {
-
-            parseSingleLine(line);
-            memset(line, 0, MAX_LINE_LEN);
-            i = 0;
-        }
-
-        else if (isspace(c))
-            line[i++] = ' ';
-
-        else
-        {
-            if (isprint(c))
-                line[i++] = c;
-        }
-    }
-
-    if (i > 0)
-    {
-        parseSingleLine(line);
-        memset(line, 0, i);
-    }
-
-    return globalState != collectErrors ? True : False;
 }

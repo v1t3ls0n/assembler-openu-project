@@ -92,34 +92,6 @@ void printWordBinary(unsigned index)
     printf("\n");
 }
 
-void updateSymbolTableFinalValues()
-{
-    int i = 0;
-    ICF = IC;
-    DCF = ICF + DC;
-    while (i < HASHSIZE && IC > 0)
-    {
-        if (symbols[i] != NULL)
-            updateDataEntry(symbols[i]);
-
-        i++;
-    }
-}
-
-void updateDataEntry(Item *p)
-{
-    if (p->val.s.attrs.data)
-    {
-        p->val.s.value = p->val.s.value + DCF;
-        p->val.s.offset = p->val.s.value % 16;
-        p->val.s.base = p->val.s.value - p->val.s.offset;
-        DC--;
-    }
-
-    if (p->next != NULL)
-        updateDataEntry(p->next);
-}
-
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }
 unsigned getICF() { return ICF; }

@@ -1,9 +1,10 @@
 #include "data.h"
 extern Bool yieldError(Error err);
-char *trimFromLeft(char *s);
+extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
+
 Bool countAndVerifyDataArguments(char *line)
 {
     char args[MAX_LINE_LEN + 1] = {0};
@@ -96,7 +97,6 @@ Bool countAndVerifyDataArguments(char *line)
 
     return isValid;
 }
-
 Bool countAndVerifyStringArguments(char *token)
 {
 
@@ -232,9 +232,53 @@ void parseSingleLine(char *line)
 
     currentLine++;
 }
-char *trimFromLeft(char *s)
+
+Bool parseFile(FILE *fp, char *filename)
 {
-    while (isspace(*s))
-        s++;
-    return s;
+    int c = 0;
+    int i = 0;
+    char line[MAX_LINE_LEN + 1] = {0};
+    currentLine = 1;
+
+    if (globalState == secondRun)
+        printf("\n\n\nSecond Run:\n");
+    else
+        printf("\n\n\nFirst Run:\n");
+
+    while (((c = fgetc(fp)) != EOF))
+    {
+        if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
+        {
+
+            globalState = collectErrors;
+            yieldError(maxLineLengthExceeded);
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
+        }
+
+        if (c == '\n')
+        {
+
+            parseSingleLine(line);
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
+        }
+
+        else if (isspace(c))
+            line[i++] = ' ';
+
+        else
+        {
+            if (isprint(c))
+                line[i++] = c;
+        }
+    }
+
+    if (i > 0)
+    {
+        parseSingleLine(line);
+        memset(line, 0, i);
+    }
+
+    return globalState != collectErrors ? True : False;
 }

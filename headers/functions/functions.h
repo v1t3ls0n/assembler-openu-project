@@ -140,8 +140,6 @@ Bool isComment(char *s);
 void writeIntoDataStack(Word *word);
 void writeIntoCodeStack(Word *word);
 int writeToMemory(Word *word, DataType type);
-void updateSymbolTableFinalValues();
-void updateDataEntry(Item *p);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
 void updateFinalCountersValue();
