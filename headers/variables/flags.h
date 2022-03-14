@@ -46,7 +46,8 @@ typedef enum
     operandTypeDoNotMatch,
     labelNotExist,
     wrongInstructionSyntaxIllegalCommaPosition,
-    secondRunFailed
+    secondRunFailed,
+    illegalMacroNameUseOfSavedKeywords
 } Error;
 
 typedef enum
@@ -69,7 +70,6 @@ typedef enum
     parseLabel = 4364,
     parseInstruction = 55,
     parseOperation = 333,
-
     returnFalse = 4678,
     lineParsedSuccessfully = 11111111,
     parsingLine = 112,
@@ -77,6 +77,8 @@ typedef enum
     replacingMacro = 11,
     Err = 0,
     parseDataVariables = 3,
+    parseMacroName,
+    parseMacroContent,
     parseStringVariables = 98,
     parseEntryVariable = 97,
     parseExternalVariable = 953,
@@ -86,7 +88,8 @@ typedef enum
     writingOperationIntoMemoryImg,
     writingDataIntoMemoryImg,
     genFirstWord,
-    genSecondWord
+    genSecondWord,
+    endParsingOfMacroThatHaveNoEndingTag
 } ParseState;
 /* typedef enum
 {

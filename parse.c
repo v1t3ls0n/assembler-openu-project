@@ -115,7 +115,7 @@ Bool countAndVerifyStringArguments(char *token)
 ParseState handleState(char *token, char *line, ParseState state)
 
 {
-    /*   printf("inside handle State, token:%s\n", token); */
+    /*     printf("inside handle State, token:%s\n", token); */
 
     switch (state)
     {
@@ -125,7 +125,7 @@ ParseState handleState(char *token, char *line, ParseState state)
     case newLine:
     {
         if (isComment(token))
-            return skipLine;
+            return lineParsedSuccessfully;
 
         if (isLabel(token))
             return skipToNextToken;
@@ -188,15 +188,11 @@ void parseSingleLine(char *line)
     else if (globalState == secondRun)
         token = strtok(lineCopy, ", \t \n");
 
-    while (token != NULL)
+    while (token != NULL && state != lineParsedSuccessfully)
     {
         state = handleState(token, line, state);
         switch (state)
         {
-        case lineParsedSuccessfully:
-        {
-            break;
-        }
         case skipLine:
             state = lineParsedSuccessfully;
         case skipToNextToken:
