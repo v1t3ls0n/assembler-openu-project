@@ -14,7 +14,7 @@ extern unsigned getIC();
 extern Bool writeOperationBinary(char *operationName, char *args);
 
 /* parse.c */
-extern Bool countAndVerifyDataArguments(char *line);
+extern Bool countAndVerifyDataArguments(char *line, char *token);
 extern Bool countAndVerifyStringArguments(char *token);
 extern Bool parseFile(FILE *fp, char *filename);
 
@@ -170,7 +170,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
-            return countAndVerifyDataArguments(line);
+            return countAndVerifyDataArguments(line, nextTokens);
         else if (type == _TYPE_STRING)
             return countAndVerifyStringArguments(nextTokens);
 
@@ -200,7 +200,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line, nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0);
 
         else

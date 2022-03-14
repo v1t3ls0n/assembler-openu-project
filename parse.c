@@ -5,8 +5,16 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
-Bool countAndVerifyDataArguments(char *line)
+Bool countAndVerifyDataArguments(char *line, char *token)
 {
+    /*
+    token is only one  token at time connected to strtok, you can use it
+    or you can use line argument which is the fullline without strtok,
+    inside this function we create string variable named "args[MAX_LINE_LEN+1]"
+    that takes the full string of arguments that starts straight after the .data
+    token. choose what you want.
+     */
+
     char args[MAX_LINE_LEN + 1] = {0};
     int size = 0, num = 0, n = 0, commasCounter = 0, i = 0, len = 0;
     char c = 0, *p = strstr(line, DATA) + strlen(DATA);
@@ -97,6 +105,7 @@ Bool countAndVerifyDataArguments(char *line)
 
     return isValid;
 }
+
 Bool countAndVerifyStringArguments(char *token)
 {
 

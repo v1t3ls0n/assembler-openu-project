@@ -6,6 +6,7 @@ Bool yieldError(Error err)
 {
     printf("\n###################################\n");
     printf("Error!! occured on line %d ", currentLine);
+
     /*     illegalLabelNameUseOfCharacters
 
             illegalLabelNameLength
