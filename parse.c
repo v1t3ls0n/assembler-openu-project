@@ -163,7 +163,7 @@ ParseState handleState(char *token, char *line, ParseState state)
         {
             if (globalState == firstRun)
             {
-                yieldError(illegalApearenceOfCharactersOnLine);
+                yieldError(illegalLabelUseExpectedOperationOrInstruction);
                 return Err;
             }
         }
