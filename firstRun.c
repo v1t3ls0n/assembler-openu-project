@@ -12,114 +12,15 @@ extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
-extern void writeIntegerIntoDataMemoryBinaryImg(int number);
-extern void initMemory();
-extern int secondRunParsing(FILE *fp, char *filename);
-
 extern Bool writeOperationBinary(char *operationName, char *args);
-Bool writeInstructionBinary(char *instructionName, char *line);
 
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
 extern Bool parseFile(FILE *fp, char *filename);
 
-int firstRunParsing(FILE *fp, char *filename)
-{
-    return parseFile(fp, filename);
-}
-
-void parseSingleLine(char *line)
-{
-    ParseState state = newLine;
-    char lineCopy[MAX_LINE_LEN] = {0};
-    char *token;
-    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
-    memcpy(lineCopy, line, strlen(line));
-    token = strtok(lineCopy, " \t \n");
-    while (token != NULL)
-    {
-        state = handleFirstToken(token, lineCopy, state);
-        switch (state)
-        {
-
-        case parseLabel:
-        {
-
-            state = handleLabel(token, strtok(NULL, " \t \n"), line);
-            break;
-        }
-
-        case parseInstruction:
-        {
-            state = handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line);
-            break;
-        }
-
-        case parseOperation:
-        {
-            char args[MAX_LINE_LEN] = {0};
-            strcpy(args, (line + strlen(token)));
-            state = handleOperation(token, args);
-            break;
-        }
-
-        case Err:
-        {
-            break;
-        }
-
-        case skipLine:
-            state = lineParsedSuccessfully;
-
-        default:
-            break;
-        }
-        token = strtok(NULL, " \t \n");
-    }
-
-    if (!state)
-        globalState = collectErrors;
-
-    currentLine++;
-}
-
-ParseState handleFirstToken(char *token, char *line, ParseState state)
-{
-    /*   printf("inside handle State, token:%s\n", token); */
-
-    switch (state)
-    {
-    case skipLine:
-        return lineParsedSuccessfully;
-
-    case newLine:
-    {
-        if (isComment(token))
-            return skipLine;
-
-        else if (isLabel(token))
-            return parseLabel;
-
-        else if (isInstruction(token))
-            return parseInstruction;
-
-        else if (isOperation(token))
-            return parseOperation;
-
-        else
-        {
-            yieldError(illegalApearenceOfCharactersOnLine);
-            return Err;
-        }
-    }
-
-    default:
-        break;
-    }
-
-    return state;
-}
+extern Bool writeStringInstruction(char *s);
+extern Bool writeDataInstruction(char *s);
 
 Bool handleOperation(char *operationName, char *args)
 {
@@ -480,4 +381,125 @@ char *getInstructionName(char *s)
     if (!strcmp(s, EXTERNAL))
         return EXTERNAL;
     return 0;
+}
+
+ParseState handleState(char *token, char *line, ParseState state)
+
+{
+    /*   printf("inside handle State, token:%s\n", token); */
+
+    switch (state)
+    {
+    case skipLine:
+        return lineParsedSuccessfully;
+
+    case newLine:
+    {
+        if (isComment(token))
+            return skipLine;
+
+        if (isLabel(token))
+            return skipToNextToken;
+
+        else if (isInstruction(token))
+        {
+            if (globalState == firstRun)
+                return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+            else
+            {
+                int type = getInstructionType(token);
+                line = line + strlen(token);
+
+                if (type == _TYPE_DATA)
+                {
+                    return writeDataInstruction(line);
+                }
+                else if (type == _TYPE_STRING)
+                {
+                    return writeStringInstruction(line);
+                }
+                else
+                    return lineParsedSuccessfully;
+            }
+        }
+
+        else if (isOperation(token))
+        {
+            char args[MAX_LINE_LEN] = {0};
+            /*            line = line + strlen(token); */
+            strcpy(args, (line + strlen(token)));
+            return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
+        }
+        else
+        {
+            if (globalState == firstRun)
+            {
+                yieldError(illegalApearenceOfCharactersOnLine);
+                return Err;
+            }
+        }
+    }
+
+    default:
+        break;
+    }
+
+    return lineParsedSuccessfully;
+}
+
+void parseSingleLine(char *line)
+{
+    ParseState state = newLine;
+    char lineCopy[MAX_LINE_LEN] = {0};
+    char *token;
+    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+    memcpy(lineCopy, line, strlen(line));
+    if (globalState == firstRun)
+        token = strtok(lineCopy, " \t \n");
+    else if (globalState == secondRun)
+        token = strtok(lineCopy, ", \t \n");
+
+    while (token != NULL)
+    {
+        state = handleState(token, line, state);
+        switch (state)
+        {
+        case lineParsedSuccessfully:
+        {
+            break;
+        }
+        case skipLine:
+            state = lineParsedSuccessfully;
+        case skipToNextToken:
+        {
+
+            if (globalState == firstRun)
+                state = handleLabel(token, strtok(NULL, " \t \n"), line);
+            else if (globalState == secondRun)
+            {
+                line = line + strlen(token) + 1;
+                state = handleState(strtok(NULL, ", \t \n"), line, newLine);
+            }
+
+            break;
+        }
+
+        case Err:
+        {
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (globalState == firstRun)
+            token = strtok(NULL, " \t \n");
+        else if (globalState == secondRun)
+            token = strtok(NULL, ", \t \n");
+    }
+
+    if (!state)
+        globalState = collectErrors;
+
+    currentLine++;
 }

@@ -91,11 +91,10 @@ extern unsigned getIC();
 extern void addWord(int value, DataType type);
 extern Bool parseFile(FILE *fp, char *filename);
 
-int secondRunParsing(FILE *fp, char *filename)
-{
-    return parseFile(fp, filename);
-}
-void parseSingleLinesecondRunParsing(char *line)
+extern ParseState handleState(char *token, char *line, ParseState state);
+extern void parseSingleLine(char *line);
+
+/* void parseSingleLinesecondRunParsing(char *line)
 {
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
@@ -106,7 +105,7 @@ void parseSingleLinesecondRunParsing(char *line)
 
     while (token != NULL && state != lineParsedSuccessfully)
     {
-        state = handleState(token, line, state);
+        state = state && handleState(token, line, state);
         switch (state)
         {
         case lineParsedSuccessfully:
@@ -116,7 +115,7 @@ void parseSingleLinesecondRunParsing(char *line)
         case skipToNextToken:
         {
             line = line + strlen(token) + 1;
-            state = handleState(strtok(NULL, ", \t \n"), line, newLine);
+            state = state && handleState(strtok(NULL, ", \t \n"), line, newLine);
             break;
         }
         case Err:
@@ -134,50 +133,7 @@ void parseSingleLinesecondRunParsing(char *line)
 
     currentLine++;
 }
-
-ParseState handleState(char *token, char *line, ParseState state)
-{
-
-    switch (state)
-    {
-    case skipLine:
-        return lineParsedSuccessfully;
-
-    case newLine:
-    {
-        if (isComment(token))
-            return lineParsedSuccessfully;
-
-        if (isLabel(token))
-            return skipToNextToken;
-
-        else if (isInstruction(token))
-        {
-            int type = getInstructionType(token);
-
-            if (type == _TYPE_DATA)
-                return writeDataInstruction(strtok(NULL, ", \t \n"));
-            else if (type == _TYPE_STRING)
-                return writeStringInstruction(strtok(NULL, ", \t \n"));
-            else
-                return lineParsedSuccessfully;
-        }
-
-        else if (isOperation(token))
-        {
-            char args[MAX_LINE_LEN] = {0};
-            line = line + strlen(token);
-            strcpy(args, line);
-            return writeOperationBinary(token, line);
-        }
-    }
-
-    default:
-        break;
-    }
-    return True;
-}
-
+ */
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);
@@ -245,7 +201,10 @@ Bool writeOperationBinary(char *operationName, char *args)
 
 Bool writeDataInstruction(char *token)
 {
+
     int num;
+
+    printf("token:%s\n");
     while (token != NULL)
     {
         num = atoi(token);
@@ -258,9 +217,10 @@ Bool writeDataInstruction(char *token)
 Bool writeStringInstruction(char *s)
 {
     int i = 1;
+    printf("inside write String Instruction, token: %s\n", s);
+
     /*
-     printf("inside write String Instruction, token: %s\n", s);
-  */
+     */
     for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
         addWord((A << 16) | s[i], Data);
     addWord((A << 16) | '\0', Data);

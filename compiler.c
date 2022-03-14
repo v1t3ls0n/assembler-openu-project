@@ -3,6 +3,8 @@
 extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int firstRunParsing(FILE *fp, char *filename);
+extern void parseSingleLine(char *line);
+
 extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLine;
@@ -16,9 +18,11 @@ int main(int argc, char *argv[])
     handleSourceFiles(argc, argv);
     globalState = firstRun;
     handleSourceFiles(argc, argv);
+
     if (globalState != collectErrors)
     {
         updateFinalCountersValue();
+        printSymbolTable();
         initMemory();
         globalState = secondRun;
         handleSourceFiles(argc, argv);
@@ -29,7 +33,6 @@ int main(int argc, char *argv[])
     if (globalState != collectErrors)
     {
         printf("Finished Successfully, about to export files!\n");
-        printSymbolTable();
         printBinaryImg();
     }
     else
@@ -64,12 +67,12 @@ int handleSourceFiles(int argc, char *argv[])
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
             {
-                firstRunParsing(fptr, fileName);
-                rewind(fptr);
+                parseFile(fptr, fileName);
             }
             else if (globalState == secondRun)
             {
-                secondRunParsing(fptr, fileName);
+                rewind(fptr);
+                parseFile(fptr, fileName);
             }
         }
 
@@ -85,6 +88,7 @@ Bool parseFile(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     currentLine = 1;
+
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
@@ -101,13 +105,10 @@ Bool parseFile(FILE *fp, char *filename)
             i = 0;
         }
 
-        else if (c == '\n')
+        if (c == '\n')
         {
-            if (globalState == secondRun)
-                parseSingleLinesecondRunParsing(line);
-            else
-                parseSingleLine(line);
 
+            parseSingleLine(line);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -124,10 +125,7 @@ Bool parseFile(FILE *fp, char *filename)
 
     if (i > 0)
     {
-        if (globalState == secondRun)
-            parseSingleLinesecondRunParsing(line);
-        else
-            parseSingleLine(line);
+        parseSingleLine(line);
         memset(line, 0, i);
     }
 
