@@ -1,1 +1,0 @@
-rm -f *.am  && make && ./compiler.exe code-for-test
