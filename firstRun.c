@@ -20,6 +20,10 @@ extern int secondRunParsing(FILE *fp, char *filename);
 extern Bool writeOperationBinary(char *operationName, char *args);
 Bool writeInstructionBinary(char *instructionName, char *line);
 
+/* parse.c */
+extern Bool countAndVerifyDataArguments(char *line);
+extern Bool countAndVerifyStringArguments(char *token);
+
 int firstRunParsing(FILE *fp, char *filename)
 {
     int c = 0;
@@ -185,10 +189,8 @@ Bool handleOperation(char *operationName, char *args)
             second++;
             comma = ',';
             *p = '\0';
-
-            /* first[strlen(first) - strlen(second)] = '\0';
-             */
-            printf("line 208, first:%s, second:%s\n", first, second);
+            /*
+                     printf("line 208, first:%s, second:%s\n", first, second); */
         }
         else
         {
@@ -214,7 +216,6 @@ Bool handleOperation(char *operationName, char *args)
         active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
         active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
         increaseInstructionCounter(size);
-
         return True;
     }
 
@@ -226,9 +227,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
     printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
-
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
-
     if (src && strchr(src, ','))
     {
         char *p = strchr(src, ',');
@@ -305,13 +304,6 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    /*
-
-
-     */
-    /*
-        printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
-     */
 
     if (isInstruction(firstToken))
     {
@@ -425,21 +417,6 @@ int getInstructionType(char *s)
 Bool isInstruction(char *s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
-}
-
-Bool countAndVerifyStringArguments(char *token)
-{
-
-    if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-        return yieldError(closingQuotesForStringIsMissing);
-    else if (token[0] != '\"')
-        return yieldError(expectedQuotes);
-
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
-
-    return True;
 }
 
 Bool isRegistery(char *s)

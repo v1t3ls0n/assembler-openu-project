@@ -95,6 +95,21 @@ Bool countAndVerifyDataArguments(char *line)
     return isValid;
 }
 
+Bool countAndVerifyStringArguments(char *token)
+{
+
+    if (isInstruction(token))
+        token = strtok(NULL, " \t \n");
+    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
+        return yieldError(closingQuotesForStringIsMissing);
+    else if (token[0] != '\"')
+        return yieldError(expectedQuotes);
+
+    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+
+    return True;
+}
+
 char *trimFromLeft(char *s)
 {
     while (isspace(*s))
