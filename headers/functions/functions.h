@@ -41,7 +41,7 @@ void replaceWithMacro(FILE *p, int startIndex, int endIndex);
 void parseMacro(FILE *fp);
 int readFromFileByIndexes(FILE *fptr, char *filename, int start, int end);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
-int parseNextLine(char *line, int start, int end);
+int parseNextLine(int start, int end);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -64,17 +64,20 @@ int getOpIndex(char *s);
 /* --------------------------------------------In table.c --------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
+void printMacroTable();
+int printMacroItem(Item *item);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
 Item *install(char *name, ItemType type);
 void printSymbolTable();
 int printSymbolItem(Item *item);
 Item *getSymbol(char *name);
+Item *addMacro(char *name, int start, int end, int linesLen);
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Item *updateSymbolAddressValue(char *name, int newValue);
 Item *getMacro(char *s);
-Item *addMacro(char *name, int start, int end);
+Item *updateMacro(char *name, int start, int end, int linesLen);
 Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);

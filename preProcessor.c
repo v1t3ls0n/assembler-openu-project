@@ -2,43 +2,139 @@
 
 #include "data.h"
 extern State globalState;
+extern Bool isLabel(char *s);
+extern Bool isOperation(char *s);
+extern Bool isComment(char *s);
+extern Bool isInstruction(char *s);
+extern Bool verifyLabelNaming(char *s);
+extern Item *addMacro(char *name, int start, int end, int linesLen);
+extern Item *updateMacro(char *name, int start, int end, int linesLen);
+extern void printMacroTable();
+extern int printMacroItem(Item *item);
+Bool isMacroOpening(char *s)
+{
+    return !strcmp(s, "macro") ? True : False;
+}
+
+Bool isMacroClosing(char *s)
+{
+    printf("in is macro closing, s:%s\n", s);
+
+    return !strcmp(s, "endm") ? True : False;
+}
+
+Bool isLegalMacroName(char *s)
+{
+
+    return !isInstruction(s) && !isOperation(s);
+}
 
 void parseSourceFile(FILE *source, char *filename)
 {
-    /*
 
-    1 - we create new file for the extended source file without the macros,
-        we will write the output in the new file.
-        we will read line by line from source file
+    int c = 0, i = 0, j = 0;
+    int start = 1, end = 1, current = 1;
 
-    */
-    int c = 0;
-    int i = 0;
-    int start = 0, end = 1;
-    char line[MAX_LINE_LEN + 1] = {0};
-    /*     ParseState state = newLine; */
+    char token[MAX_LINE_LEN] = {0};
+    char macroName[MAX_LABEL_LEN] = {0};
+    ParseState state = newLine;
     FILE *newFile = createCopyFromSourceFile(source, filename);
-
+    rewind(newFile);
     while ((c = fgetc(newFile)) != EOF)
     {
-        fputc(c, newFile);
-        if (c == '\n' || c == ';' || i == MAX_LINE_LEN)
+        if (c == '\n')
         {
-            parseNextLine(line, start, end);
-            memset(line, '\0', MAX_LINE_LEN);
-            i = 0;
-            start = end;
-            end++;
+            current++;
+            memset(token, 0, j);
+            j = 0;
         }
-        if (!isspace(c) || isprint(c))
-            line[i++] = c;
-        end++;
+
+        if (!isspace(c) && isprint(c))
+            token[j++] = c;
+
+        switch (state)
+        {
+        case skipLine:
+        {
+
+            memset(token, 0, MAX_LABEL_LEN);
+            memset(macroName, 0, MAX_LABEL_LEN);
+            j = 0;
+            i = 0;
+            state = newLine;
+            break;
+        }
+
+        case newLine:
+        {
+            printf("in new line state\n");
+
+            if (isspace(c) && j > 0)
+            {
+                if (isMacroOpening(token))
+                {
+                    state = parseMacroName;
+                    start = current;
+                }
+            }
+
+            break;
+        }
+        case parseMacroName:
+        {
+
+            if (!isspace(c) && isprint(c))
+            {
+                macroName[i++] = c;
+                printf("inside  if (!isspace(c) && isprint(c))\n");
+            }
+            printf("in macro name state\nmacroName:%s i:%d\n", macroName, i);
+
+            if (isspace(c) && i > 0)
+            {
+                printf("token:%s macroName:%s\n", token, macroName);
+                if (isLegalMacroName(macroName))
+                {
+                    state = parseMacroContent;
+                    addMacro(macroName, start, current, current - start);
+                }
+                else
+                {
+                    yieldError(illegalMacroNameUseOfSavedKeywords);
+                    memset(macroName, 0, i + 1);
+                    i = 0;
+                }
+            }
+
+            break;
+        }
+
+        case parseMacroContent:
+        {
+
+            if (!isspace(c))
+            {
+                if (isMacroClosing(token) || isMacroOpening(token))
+                {
+                    end = current;
+                    updateMacro(macroName, start, end, end - start);
+                    state = skipLine;
+                }
+            }
+        }
+
+        default:
+            break;
+        }
     }
+    printMacroTable();
+    fclose(newFile);
 }
 
-int parseNextLine(char *line, int start, int end)
+int parseNextLine(int start, int end)
 {
-    printf("inside parse next line in the pre proccessor\nline:%s\nstart:%d\nend:%d\n", line, start, end);
+
+    printf("start:%d\nend:%d\n", start, end);
     return 1;
 }
 
@@ -76,11 +172,13 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName)
         exit(1);
     }
     while ((c = fgetc(source)) != EOF)
+    {
         fputc(c, target);
+    }
 
     printf("File copied successfully.\n");
     fclose(source);
-    fclose(target);
+    /*     fclose(target); */
 
     return target;
 }
