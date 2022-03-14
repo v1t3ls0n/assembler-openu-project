@@ -6,11 +6,12 @@ extern State globalState;
 void parseSourceFile(FILE *source, char *filename)
 {
     /*
-1 - we create new file for the extended source file without the macros,
-we will write the output in the new file.
-we will read line by line from source file,
-
-*/
+    
+    1 - we create new file for the extended source file without the macros,
+        we will write the output in the new file.
+        we will read line by line from source file
+        
+    */
     int c = 0;
     int i = 0;
     int start = 0, end = 1;

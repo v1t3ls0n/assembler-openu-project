@@ -3,86 +3,92 @@
 #define MEMORY_START 100
 /* Shared global State variables*/
 extern State globalState;
-extern Item *symbols[HASHSIZE];
-extern Item *macros[HASHSIZE];
+extern Item* symbols[HASHSIZE];
+extern Item* macros[HASHSIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
-extern Word *convertNumberToWord(int n, EncodingFormat format);
+
+/* extern Word *convertNumberToWord(int n, EncodingFormat format);
+ */
 extern void updateFinalMemoryAddressesInSymbolTable();
+extern BinaryWord* convertNumberToBinaryWord(int num);
+
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
 
-MemoryStack *codeMemoryStack;
-MemoryStack *dataMemoryStack;
+extern char* numToBin(int num);
+static BinaryWord* binaryImg;
 
-void addNumberToMemory(int number)
+void initMemory()
 {
-    Word *new;
-    printf("inside addNumberToMemory\n");
-    new = convertNumberToWord(number, Binary);
-    writeToMemory(new, Data);
+    const int totalSize = DCF - MEMORY_START;
+    int i, j;
+    binaryImg = (BinaryWord*)malloc(totalSize * sizeof(BinaryWord));
+    /*
+        printf("inside initMemory\n");
+     */
+    for (i = 0; i < totalSize; i++)
+    {
+        for (j = 0; j < BINARY_WORD_SIZE; j++)
+        {
+
+            binaryImg[i].digit[j].on = 0;
+        }
+    }
+}
+void printBinaryImg()
+{
+    int i;
+    int totalSize = DCF - MEMORY_START;
+    for (i = 0; i < totalSize; i++)
+    {
+        printf("%04d ", MEMORY_START + i);
+        printWordBinary(i);
+    }
 }
 
-int writeToMemory(Word *word, DataType type)
+void addWord(int value, DataType type)
 {
-    printf("inside writeToMemory\n");
-
-    if (DC + IC > 8191)
-    {
-        yieldError(memoryAllocationFailure);
-        return Err;
-    }
-
     if (type == Code)
-        writeIntoCodeStack(word);
-
-    else
-        writeIntoDataStack(word);
-
-    return type == Code ? IC : DC;
+        addWordToCodeImage(numToBin(value));
+    else if (type == Data)
+        addWordToDataImage(numToBin(value));
 }
 
-void writeIntoCodeStack(Word *word)
+void addWordToDataImage(char* s)
 {
+    wordStringToWordObj(s, Data);
+    DC++;
+}
 
-    if (codeMemoryStack == NULL)
-    {
-        codeMemoryStack = calloc(1, sizeof(MemoryStack *));
-        codeMemoryStack->head = word;
-        codeMemoryStack->tail = word;
-    }
-    else
-    {
-        codeMemoryStack->tail->next = word;
-        codeMemoryStack->tail = word;
-    }
-
+void addWordToCodeImage(char* s)
+{
+    /*     printf("inside addWordToCodeImage, s:%s\n", s);
+     */
+    wordStringToWordObj(s, Code);
     IC++;
 }
 
-void writeIntoDataStack(Word *word)
+void wordStringToWordObj(char* s, DataType type)
 {
-    printf("inside write into data stack\n");
-    if (dataMemoryStack == NULL)
-    {
-        printf("in line 71\n");
+    int j;
+    int index = type == Code ? IC - MEMORY_START : DC - MEMORY_START;
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
+        binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
+}
 
-        dataMemoryStack->head = calloc(1, sizeof(Word *));
-        dataMemoryStack->tail = calloc(1, sizeof(Word *));
-
-        dataMemoryStack->head = word;
-        dataMemoryStack->tail = word;
-    }
-    else
+void printWordBinary(unsigned index)
+{
+    int j;
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
     {
-        dataMemoryStack->tail->next = calloc(1, sizeof(Word *));
-        dataMemoryStack->tail->next = &word;
-        dataMemoryStack->tail = word;
+        if (j % 4 == 0)printf(" ");
+        printf("%d", binaryImg[index].digit[j].on ? 1 : 0);
     }
 
-    DC++;
+    printf("\n");
 }
 
 void updateSymbolTableFinalValues()
@@ -99,7 +105,7 @@ void updateSymbolTableFinalValues()
     }
 }
 
-void updateDataEntry(Item *p)
+void updateDataEntry(Item* p)
 {
     if (p->val.s.attrs.data)
     {
@@ -125,27 +131,6 @@ void increaseDataCounter(int amount)
 void increaseInstructionCounter(int amount)
 {
     IC += amount;
-}
-
-void printMemoryStacks(EncodingFormat format)
-{
-
-    Word *dataImgP = dataMemoryStack->head;
-
-    if (format == Binary)
-    {
-        int i = 0;
-        printf("Data Image Binary:\n");
-        while (dataImgP != NULL)
-        {
-            while (i < BINARY_WORD_SIZE)
-            {
-                printf("%c", dataImgP->value->binary->digit[i].on ? '1' : '0');
-            }
-            printf("\n");
-            dataImgP = dataImgP->next;
-        }
-    }
 }
 
 void updateFinalCountersValue()

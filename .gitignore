@@ -1,5 +1,5 @@
 *.json
-
+compiler
 *.txt
 *.am
 # Prerequisites
@@ -54,3 +54,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+out
+compiler

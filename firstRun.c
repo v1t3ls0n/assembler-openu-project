@@ -13,14 +13,23 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void updateFinalCountersValue();
-extern void addNumberToMemory(int number);
+extern void writeIntegerIntoDataMemoryBinaryImg(int number);
+extern void initMemory();
+extern int secondRunParsing(FILE *fp, char *filename);
 
-int parseExpandedSourceFile(FILE *fp, char *filename)
+extern Bool writeOperationBinary(char *operationName, char *args);
+Bool writeInstructionBinary(char *instructionName, char *line);
+
+/* parse.c */
+extern Bool countAndVerifyDataArguments(char *line);
+extern Bool countAndVerifyStringArguments(char *token);
+
+int firstRunParsing(FILE *fp, char *filename)
 {
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
-    printf("First Run:\n");
+    printf("\n\n\nFirst Run:\n");
     while (((c = fgetc(fp)) != EOF))
     {
 
@@ -46,7 +55,6 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
         }
     }
 
-    printf("line: %s length: %d \n", line, (int)strlen(line));
     if (i > 0)
     {
         parseSingleLine(line);
@@ -55,24 +63,20 @@ int parseExpandedSourceFile(FILE *fp, char *filename)
 
     updateFinalCountersValue();
 
-    return True;
+    return globalState != collectErrors ? True : False;
 }
 
 void parseSingleLine(char *line)
 {
     ParseState state = newLine;
-    char *p = calloc(strlen(line + 1), sizeof(char *));
-    char *token = calloc(MAX_LABEL_LEN, sizeof(char *));
-
+    char lineCopy[MAX_LINE_LEN] = {0};
+    char *token;
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
-
-    memcpy(p, line, strlen(line));
-    token = strtok(p, " \t \n");
-    state = handleFirstToken(token, p, state);
-
+    memcpy(lineCopy, line, strlen(line));
+    token = strtok(lineCopy, " \t \n");
     while (token != NULL)
     {
-
+        state = handleFirstToken(token, lineCopy, state);
         switch (state)
         {
 
@@ -85,20 +89,21 @@ void parseSingleLine(char *line)
 
         case parseInstruction:
         {
-            state = handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"));
+            state = handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line);
             break;
         }
 
         case parseOperation:
         {
-            state = handleOperation(token, line);
+            char args[MAX_LINE_LEN] = {0};
+            strcpy(args, (line + strlen(token)));
+            state = handleOperation(token, args);
             break;
         }
 
         case Err:
         {
             globalState = collectErrors;
-            state = Err;
             break;
         }
 
@@ -111,14 +116,16 @@ void parseSingleLine(char *line)
         token = strtok(NULL, " \t \n");
     }
 
+    if (!state)
+        globalState = collectErrors;
+
     currentLine++;
-    free(p);
-    free(token);
 }
 
 ParseState handleFirstToken(char *token, char *line, ParseState state)
 {
     /*   printf("inside handle State, token:%s\n", token); */
+
     switch (state)
     {
     case skipLine:
@@ -126,7 +133,7 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
 
     case newLine:
     {
-        if (token[0] == ';')
+        if (isComment(token))
             return skipLine;
 
         else if (isLabel(token))
@@ -137,6 +144,7 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
 
         else if (isOperation(token))
             return parseOperation;
+
         else
         {
             yieldError(illegalApearenceOfCharactersOnLine);
@@ -151,53 +159,63 @@ ParseState handleFirstToken(char *token, char *line, ParseState state)
     return state;
 }
 
-Bool handleOperation(char *operationName, char *line)
+Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
-    char firstOperand[MAX_LABEL_LEN] = {0}, secondOperand[MAX_LABEL_LEN] = {0};
     char comma = 0;
-    int nTotal = 0, nFirst = 0;
+    char *first = 0, *second = 0, *inBetweenCharacters = 0, *extra = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    line = operationName + strlen(operationName) + 1;
 
-    printf("line 163, handle Operation\n");
-    sscanf(line, "%s%n%c%s%n", firstOperand, &nFirst, &comma, secondOperand, &nTotal);
-    printf("line 165, handle Operation\n");
+    first = strtok(args, " \t \n");
+    inBetweenCharacters = strtok(NULL, " \t \n");
 
-    if (secondOperand[0] == 0 && firstOperand[0] != 0)
+    if (!first && !inBetweenCharacters)
     {
-        if (!strchr(firstOperand, ','))
+    }
+    else if (first && inBetweenCharacters != NULL && strlen(inBetweenCharacters) == 1 && inBetweenCharacters[0] == ',')
+    {
+        comma = ',';
+        second = strtok(NULL, " \t \n");
+    }
+    else if (inBetweenCharacters != NULL)
+        second = inBetweenCharacters;
+
+    else
+    {
+        if (strchr(first, ','))
         {
-            memcpy(secondOperand, firstOperand, nFirst);
-            firstOperand[0] = '\0';
+            char *p = strchr(first, ',');
+            second = p;
+            second++;
+            comma = ',';
+            *p = '\0';
+            /*
+                     printf("line 208, first:%s, second:%s\n", first, second); */
         }
         else
         {
-            memcpy(secondOperand, strrchr(firstOperand, ','), strlen(firstOperand));
-            firstOperand[strlen(firstOperand) - strlen(secondOperand)] = 0;
+            second = first;
+            first = 0;
         }
     }
+    extra = strtok(NULL, " \t \n");
+    if (extra)
+        return yieldError(illegalApearenceOfExtraCharactersOnLine);
 
-    if (parseOperands(firstOperand, comma, secondOperand, p, active))
+    if (parseOperands(first, comma, second, p, active))
     {
-        printf("line 183, handle Operation\n");
-        printf("active:\nSRC: direct:%u index:%u immediate:%u reg:%u\n", active[0].direct, active[0].index, active[0].immediate, active[0].reg);
-        printf("DES: direct:%u index:%u immediate:%u reg:%u\n", active[1].direct, active[1].index, active[1].immediate, active[1].reg);
-        if (globalState == firstRun)
-        {
-            int size = 2;
-            if (active[0].immediate || active[1].immediate)
-                size++;
-            if ((active[0].direct || active[0].index) || (active[1].direct || active[1].index))
-                size += 2;
-            if (!p->funct && (!active[0].direct && !active[0].immediate && !active[0].index && !active[0].reg) && (!active[1].direct && !active[1].immediate && !active[1].index && !active[1].reg))
-                size = 1;
 
-            active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
-            active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
-            increaseInstructionCounter(size);
-        }
+        int size = 2;
+        if (active[0].immediate || active[1].immediate)
+            size++;
+        if ((active[0].direct || active[0].index) || (active[1].direct || active[1].index))
+            size += 2;
+        if (!p->funct && (!active[0].direct && !active[0].immediate && !active[0].index && !active[0].reg) && (!active[1].direct && !active[1].immediate && !active[1].index && !active[1].reg))
+            size = 1;
 
+        active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
+        active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
+        increaseInstructionCounter(size);
         return True;
     }
 
@@ -207,16 +225,17 @@ Bool handleOperation(char *operationName, char *line)
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
 {
     int commasCount = 0;
-    int expectedCommasBasedOnNumberOfOperands = (strlen(src) > 0 && strlen(des) > 0) ? 1 : 0;
-    /*
-    printf("inside parse operands,expectedCommas:%d\nsrc:%s comma:%c des:%s\n", expectedCommasBasedOnNumberOfOperands, src, comma, des);
-     */
-    if (src[strlen(src) - 1] == ',')
+    int expectedCommasBasedOnNumberOfOperands = 0;
+    printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
+    expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
+    if (src && strchr(src, ','))
     {
+        char *p = strchr(src, ',');
+        *p = '\0';
+
         commasCount++;
-        src[strlen(src) - 1] = 0;
     }
-    if (des[0] == ',')
+    if (des && strchr(des, ','))
     {
         commasCount++;
         des++;
@@ -232,7 +251,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 
     else if (commasCount == expectedCommasBasedOnNumberOfOperands)
     {
-        if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !strlen(src) && !strlen(des))
+        if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
             return True;
         else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
         {
@@ -283,22 +302,21 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-int handleInstruction(int type, char *firstToken, char *nextTokens)
+Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    /*
-        printf("instructionType:%s firstToken:%s nextToken:%s\n", getInstructionNameByType(type), firstToken, nextTokens);
-     */
+
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
-            return countAndVerifyDataArguments(nextTokens);
+            return countAndVerifyDataArguments(line);
         else if (type == _TYPE_STRING)
             return countAndVerifyStringArguments(nextTokens);
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
             char *labelName = calloc(strlen(nextTokens), sizeof(char *));
-            labelName = strdup(nextTokens);
+            strcpy(labelName, nextTokens);
+
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
                 return yieldError(illegalApearenceOfCharactersOnLine);
@@ -320,15 +338,15 @@ int handleInstruction(int type, char *firstToken, char *nextTokens)
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if ((type == _TYPE_DATA && countAndVerifyDataArguments(nextTokens)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens)))
-            return isLabelNameAvailable ? addSymbol(firstToken, dataCounter, 0, 1, 0, 0) : False;
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0);
+
         else
             return Err;
     }
 
     return yieldError(undefinedOperation);
 }
-
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
 
@@ -338,9 +356,9 @@ int handleLabel(char *labelName, char *nextToken, char *line)
         if (instruction)
         {
             if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
-                return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"));
+                return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
             else
-                return handleInstruction(instruction, labelName, nextToken);
+                return handleInstruction(instruction, labelName, nextToken, line);
         }
         else
             return yieldError(undefinedInstruction);
@@ -349,8 +367,18 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     else if (isOperation(nextToken))
     {
         int icAddr = getIC();
-        if (handleOperation(nextToken, line))
+        char args[MAX_LINE_LEN] = {0};
+        int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
+        strcpy(args, &line[offset]);
+
+        /* printf("args:%s\noffset:%d\n", args, offset);
+         */
+        /* printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
+         */
+        if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0);
+        else
+            return False;
     }
 
     else
@@ -360,6 +388,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
 
 Bool isOperation(char *s)
 {
+
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
@@ -388,103 +417,6 @@ int getInstructionType(char *s)
 Bool isInstruction(char *s)
 {
     return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
-}
-Bool countAndVerifyDataArguments(char *token)
-{
-    int number = 0;
-    int size = 0;
-    int commasCount = 0;
-    char c = 0;
-    int i;
-    Bool minusSignOn = False;
-    if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-
-    while (token)
-    {
-
-        for (i = 0; token[i] == ','; i++, commasCount++, token++)
-            ;
-
-        /*   printf("commasCount:%d token:%s\n", commasCount, token);
-         */
-        if (token[0] == '-')
-        {
-            minusSignOn = True;
-            token++;
-        }
-        if (token[0] == '+')
-            token++;
-
-        else if (!isdigit(token[0]))
-        {
-            if (isalpha(token[0]))
-                return yieldError(expectedNumber);
-            else
-                return yieldError(illegalApearenceOfCharactersOnLine);
-        }
-
-        else if (commasCount > 1)
-            return yieldError(wrongInstructionSyntaxExtraCommas);
-
-        else
-        {
-            if (commasCount == 1 || size == 0)
-            {
-                sscanf(token, "%d%c", &number, &c);
-
-                /* printf("line 451, number:%d c:%c\n", number, c);
-                 */
-                if (c == '.')
-                    return yieldError(wrongArgumentTypeNotAnInteger);
-                else if (c == ',')
-                {
-                    commasCount++;
-                    c = 0;
-                }
-                if (globalState == secondRun)
-                {
-                    if (minusSignOn)
-                        number = -1 * number;
-                    minusSignOn = False;
-                    addNumberToMemory(number);
-                }
-                else
-                    size++;
-            }
-            else if (commasCount < 1 && strtok(NULL, " \t \n"))
-                return yieldError(wrongInstructionSyntaxMissinCommas);
-
-            else if (commasCount != 0 && strtok(NULL, " \t \n") == NULL)
-                return yieldError(wrongInstructionSyntaxExtraCommas);
-        }
-        token = strtok(NULL, " \t \n");
-    }
-
-    increaseDataCounter(size);
-    return True;
-}
-Bool countAndVerifyStringArguments(char *token)
-{
-
-    if (isInstruction(token))
-    {
-        token = strdup(strtok(NULL, " \t \n"));
-    }
-    else
-        token = strdup(token);
-    printf("token: %s\n", token);
-    /*    if (token==NULL)
-           return True;
-     */
-    /*   if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-          return yieldError(closingQuotesForStringIsMissing);
-      else if (token[0] != '\"')
-          return yieldError(expectedQuotes);
-   */
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
-
-    return True;
 }
 
 Bool isRegistery(char *s)
@@ -523,12 +455,20 @@ Bool isValidIndexParameter(char *s)
     {
         s = strchr(s, '[');
         s++;
+
         s[strlen(s) - 1] = 0;
+
         if (getRegisteryNumber(s) < 10)
             return False;
     }
     return True;
 }
+
+Bool isComment(char *s)
+{
+    return s[0] == ';' ? True : False;
+}
+
 int getRegisteryNumber(char *s)
 {
     int len = strlen(s);
@@ -565,7 +505,7 @@ char *getInstructionNameByType(int type)
         break;
     }
 
-    return "NOT AN INSTRUCTION!";
+    return NULL;
 }
 char *getInstructionName(char *s)
 {
@@ -577,25 +517,5 @@ char *getInstructionName(char *s)
         return ENTRY;
     if (!strcmp(s, EXTERNAL))
         return EXTERNAL;
-    return 0;
-}
-const char *getRegisteryOperand(char *s)
-/*returns a constant- the name of the register, so it can b*/
-{
-
-    int len = strlen(s);
-    int i = 0;
-
-    if (s[0] == 'r' && len >= 2)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return regs[i];
-            i++;
-        }
-        yieldError(wrongRegisteryReferenceUndefinedReg);
-    }
-
     return 0;
 }
