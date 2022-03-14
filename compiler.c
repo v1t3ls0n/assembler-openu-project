@@ -3,21 +3,27 @@
 extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int firstRunParsing(FILE *fp, char *filename);
+extern void parseSingleLine(char *line);
+
 extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLine;
 extern void initMemory();
+extern void updateFinalCountersValue();
 
 int main(int argc, char *argv[])
 {
+    initTablesArrays();
     globalState = replacingMacros;
     handleSourceFiles(argc, argv);
-    initTablesArrays();
     globalState = firstRun;
     handleSourceFiles(argc, argv);
+
     if (globalState != collectErrors)
     {
-        printf("global state is not collect errors after first run\n");
+        updateFinalCountersValue();
+        printSymbolTable();
+        initMemory();
         globalState = secondRun;
         handleSourceFiles(argc, argv);
     }
@@ -27,7 +33,6 @@ int main(int argc, char *argv[])
     if (globalState != collectErrors)
     {
         printf("Finished Successfully, about to export files!\n");
-        printSymbolTable();
         printBinaryImg();
     }
     else
@@ -62,12 +67,12 @@ int handleSourceFiles(int argc, char *argv[])
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
             {
-                firstRunParsing(fptr, fileName);
-                rewind(fptr);
+                parseFile(fptr, fileName);
             }
             else if (globalState == secondRun)
             {
-                secondRunParsing(fptr, fileName);
+                rewind(fptr);
+                parseFile(fptr, fileName);
             }
         }
 
@@ -75,4 +80,54 @@ int handleSourceFiles(int argc, char *argv[])
     }
 
     return True;
+}
+
+Bool parseFile(FILE *fp, char *filename)
+{
+    int c = 0;
+    int i = 0;
+    char line[MAX_LINE_LEN + 1] = {0};
+    currentLine = 1;
+
+    if (globalState == secondRun)
+        printf("\n\n\nSecond Run:\n");
+    else
+        printf("\n\n\nFirst Run:\n");
+
+    while (((c = fgetc(fp)) != EOF))
+    {
+        if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
+        {
+
+            globalState = collectErrors;
+            yieldError(maxLineLengthExceeded);
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
+        }
+
+        if (c == '\n')
+        {
+
+            parseSingleLine(line);
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
+        }
+
+        else if (isspace(c))
+            line[i++] = ' ';
+
+        else
+        {
+            if (isprint(c))
+                line[i++] = c;
+        }
+    }
+
+    if (i > 0)
+    {
+        parseSingleLine(line);
+        memset(line, 0, i);
+    }
+
+    return globalState != collectErrors ? True : False;
 }
