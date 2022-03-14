@@ -5,6 +5,8 @@ compiler
 # Prerequisites
 *.d
 
+.editorconfig
+
 # Object files
 *.o
 *.ko
