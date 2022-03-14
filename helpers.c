@@ -1,5 +1,7 @@
 #include "data.h"
 extern HexWord *convertNumToHexWord(int num);
+extern const char *regs[REGS_SIZE];
+extern Operation operations[OP_SIZE];
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -191,4 +193,138 @@ int hex2int(char ch)
     if (ch >= 'a' && ch <= 'f')
         return ch - 'a' + 10;
     return -1;
+}
+
+Bool isOperation(char *s)
+{
+
+    return (getOperationByName(s) != NULL) ? True : False;
+}
+
+Bool isLabel(char *s)
+{
+    int len = strlen(s);
+    if (len <= 1)
+        return yieldError(illegalLabelNameLength);
+
+    return s[len - 1] == ':' ? True : False;
+}
+
+int getInstructionType(char *s)
+{
+    if (!strcmp(s, DATA))
+        return _TYPE_DATA;
+    if (!strcmp(s, STRING))
+        return _TYPE_STRING;
+    if (!strcmp(s, ENTRY))
+        return _TYPE_ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return _TYPE_EXTERNAL;
+    return False;
+}
+
+Bool isInstruction(char *s)
+{
+    return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
+}
+
+Bool isRegistery(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+    if (s[0] == 'r' && len >= 2)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(regs[i], s) == 0))
+                return True;
+            i++;
+        }
+    }
+    return False;
+}
+Bool isValidImmediateParamter(char *s)
+{
+    int i, len = strlen(s);
+    if (len < 2 || s[0] != '#' || (!(s[1] == '-' || s[1] == '+' || isdigit(s[1]))))
+        return False;
+    for (i = 2; i < len; i++)
+        if (!isdigit(s[i]))
+            return False;
+    return True;
+}
+Bool isValidIndexParameter(char *s)
+{
+    int len = strlen(s);
+    if (len < 6)
+        return False;
+    else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
+        return False;
+    else
+    {
+        s = strchr(s, '[');
+        s++;
+
+        s[strlen(s) - 1] = 0;
+
+        if (getRegisteryNumber(s) < 10)
+            return False;
+    }
+    return True;
+}
+
+Bool isComment(char *s)
+{
+    return s[0] == ';' ? True : False;
+}
+
+int getRegisteryNumber(char *s)
+{
+    int len = strlen(s);
+    int i = 0;
+    if (s[0] == 'r' && len >= 2)
+    {
+        while (i < REGS_SIZE)
+        {
+            if ((strcmp(s, regs[i]) == 0))
+                return i;
+            i++;
+        }
+    }
+    return -1;
+}
+
+char *getInstructionNameByType(int type)
+{
+    switch (type)
+    {
+    case _TYPE_DATA:
+        return "DATA INSTRUCTION";
+
+    case _TYPE_STRING:
+        return "STRING INSTRUCTION";
+
+    case _TYPE_ENTRY:
+        return "ENTRY INSTRUCTION";
+
+    case _TYPE_EXTERNAL:
+        return "EXTERNAL INSTRUCTION";
+
+    default:
+        break;
+    }
+
+    return NULL;
+}
+char *getInstructionName(char *s)
+{
+    if (!strcmp(s, DATA))
+        return DATA;
+    if (!strcmp(s, STRING))
+        return STRING;
+    if (!strcmp(s, ENTRY))
+        return ENTRY;
+    if (!strcmp(s, EXTERNAL))
+        return EXTERNAL;
+    return 0;
 }
