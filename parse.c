@@ -12,14 +12,16 @@ Bool countAndVerifyDataArguments(char *line)
     len = strlen(p);
     memcpy(args, p, len);
     p = args;
+    p = trimFromLeft(p);
+    i = len - strlen(p);
 
-    trimFromLeft(p);
     if (*p == ',')
         isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
 
     while (p && i < len)
     {
-        trimFromLeft(p);
+        p = trimFromLeft(p);
+        i = len - strlen(p);
         while (*p == ',')
         {
             commasCounter++;
@@ -41,10 +43,17 @@ Bool countAndVerifyDataArguments(char *line)
                 p++;
         }
 
-        else if (isdigit(*p))
+        if (commasCounter < 1 && size > 1)
+            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+
+        else if (commasCounter > 1)
+            isValid = yieldError(wrongInstructionSyntaxExtraCommas);
+
+        if (isdigit(*p))
         {
             i = len - strlen(p);
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
+
             if (c && c != ',' && !isspace(c) && c != '.')
                 isValid = yieldError(expectedNumber);
             else if (c == '.')
@@ -54,11 +63,6 @@ Bool countAndVerifyDataArguments(char *line)
                 i += n;
                 sscanf(&args[i], "%d%n", &num, &n);
             }
-            else if (commasCounter > 1)
-                isValid = yieldError(wrongInstructionSyntaxExtraCommas);
-
-            else if (commasCounter < 1 && size > 1)
-                isValid = yieldError(wrongInstructionSyntaxMissinCommas);
 
             else if (commasCounter == 1 || (commasCounter == 0 && size == 0))
                 size++;
@@ -69,8 +73,6 @@ Bool countAndVerifyDataArguments(char *line)
 
         if (c == ',')
             commasCounter++;
-
-        i = len - strlen(p);
 
         if (n)
         {
