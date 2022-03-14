@@ -1,5 +1,6 @@
 
 #define BINARY_WORD_SIZE 20
+#define MEMORY_START 100
 #define REGS_SIZE 16
 #define OP_SIZE 16
 #define RAM_MEMORY_SIZE 8192
