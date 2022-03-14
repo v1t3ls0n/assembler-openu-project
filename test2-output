@@ -1,0 +1,230 @@
+File copied successfully.
+
+		 ~ MACRO TABLE ~ 
+name	start	end	line count	
+
+File copied successfully.
+
+		 ~ MACRO TABLE ~ 
+name	start	end	line count	
+
+
+
+
+First Run:
+
+inside parseSingleLine, Line Number (1):
+; file ps.am
+
+inside parseSingleLine, Line Number (2):
+.entry LIST
+
+inside parseSingleLine, Line Number (3):
+.extern W
+
+inside parseSingleLine, Line Number (4):
+MAIN: add r3, LIST
+inside parse operands
+src:r3,
+des:LIST
+
+inside parseSingleLine, Line Number (5):
+LOOP: prn #48
+inside parse operands
+src:(null)
+des:#48
+
+inside parseSingleLine, Line Number (6):
+lea STR, r6
+inside parse operands
+src:STR,
+des:r6
+
+inside parseSingleLine, Line Number (7):
+inc r6
+inside parse operands
+src:(null)
+des:r6
+
+inside parseSingleLine, Line Number (8):
+mov r3, W
+inside parse operands
+src:r3,
+des:W
+
+inside parseSingleLine, Line Number (9):
+sub r1, r4
+inside parse operands
+src:r1,
+des:r4
+
+inside parseSingleLine, Line Number (10):
+bne END
+inside parse operands
+src:(null)
+des:END
+
+inside parseSingleLine, Line Number (11):
+cmp val1, #-6
+inside parse operands
+src:val1,
+des:#-6
+
+inside parseSingleLine, Line Number (12):
+bne END[r15]
+inside parse operands
+src:(null)
+des:END[r15]
+
+inside parseSingleLine, Line Number (13):
+dec K
+inside parse operands
+src:(null)
+des:K
+
+inside parseSingleLine, Line Number (14):
+.entry MAIN
+
+inside parseSingleLine, Line Number (15):
+sub LOOP[r10] ,r14
+inside parse operands
+src:LOOP[r10]
+des:,r14
+
+inside parseSingleLine, Line Number (16):
+END: stop
+inside parse operands
+src:(null)
+des:(null)
+
+inside parseSingleLine, Line Number (17):
+STR: .string "abcd"
+
+inside parseSingleLine, Line Number (18):
+LIST: .data 6, -9
+
+inside parseSingleLine, Line Number (19):
+.data -100
+
+inside parseSingleLine, Line Number (20):
+.entry K
+
+inside parseSingleLine, Line Number (21):
+K: .data 31
+
+inside parseSingleLine, Line Number (22):
+.extern val1
+
+
+
+First Run:
+
+inside parseSingleLine, Line Number (1):
+; file ps.am
+
+inside parseSingleLine, Line Number (2):
+.entry LIST
+
+inside parseSingleLine, Line Number (3):
+.extern W
+
+inside parseSingleLine, Line Number (4):
+MAIN: add r3, LIST
+inside parse operands
+src:r3,
+des:LIST
+
+inside parseSingleLine, Line Number (5):
+LOOP: prn #48
+inside parse operands
+src:(null)
+des:#48
+
+inside parseSingleLine, Line Number (6):
+lea STR, r6
+inside parse operands
+src:STR,
+des:r6
+
+inside parseSingleLine, Line Number (7):
+inc r6
+inside parse operands
+src:(null)
+des:r6
+
+inside parseSingleLine, Line Number (8):
+mov r3, W
+inside parse operands
+src:r3,
+des:W
+
+inside parseSingleLine, Line Number (9):
+sub r1, r4
+inside parse operands
+src:r1,
+des:r4
+
+inside parseSingleLine, Line Number (10):
+bne END
+inside parse operands
+src:(null)
+des:END
+
+inside parseSingleLine, Line Number (11):
+cmp val1, #-6
+inside parse operands
+src:val1,
+des:#-6
+
+inside parseSingleLine, Line Number (12):
+bne END[r15]
+inside parse operands
+src:(null)
+des:END[r15]
+
+inside parseSingleLine, Line Number (13):
+dec K
+inside parse operands
+src:(null)
+des:K
+
+inside parseSingleLine, Line Number (14):
+.entry MAIN
+
+inside parseSingleLine, Line Number (15):
+sub LOOP[r10] ,r14
+inside parse operands
+src:LOOP[r10]
+des:,r14
+
+inside parseSingleLine, Line Number (16):
+END: stop
+inside parse operands
+src:(null)
+des:(null)
+
+inside parseSingleLine, Line Number (17):
+STR: .string "abcd"
+
+###################################
+Error!! occured on line 17 Label Name Already In Use
+###################################
+
+inside parseSingleLine, Line Number (18):
+LIST: .data 6, -9
+
+inside parseSingleLine, Line Number (19):
+.data -100
+
+inside parseSingleLine, Line Number (20):
+.entry K
+
+inside parseSingleLine, Line Number (21):
+K: .data 31
+
+inside parseSingleLine, Line Number (22):
+.extern val1
+
+Finished First Run With Errors
+
+Second Run Finished With Errors, files will not be exported!
