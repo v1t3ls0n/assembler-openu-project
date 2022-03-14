@@ -6,11 +6,11 @@ extern State globalState;
 void parseSourceFile(FILE *source, char *filename)
 {
     /*
-    
+
     1 - we create new file for the extended source file without the macros,
         we will write the output in the new file.
         we will read line by line from source file
-        
+
     */
     int c = 0;
     int i = 0;
@@ -21,6 +21,7 @@ void parseSourceFile(FILE *source, char *filename)
 
     while ((c = fgetc(newFile)) != EOF)
     {
+        fputc(c, newFile);
         if (c == '\n' || c == ';' || i == MAX_LINE_LEN)
         {
             parseNextLine(line, start, end);
@@ -37,6 +38,7 @@ void parseSourceFile(FILE *source, char *filename)
 
 int parseNextLine(char *line, int start, int end)
 {
+    printf("inside parse next line in the pre proccessor\nline:%s\nstart:%d\nend:%d\n", line, start, end);
     return 1;
 }
 
@@ -82,3 +84,28 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName)
 
     return target;
 }
+/*
+FILE *createExpendedSourceFileWithoutMacros(FILE *source, char *fileName)
+{
+    FILE *target;
+    int c = 0;
+    fileName[strlen(fileName) - 1] = 'm';
+    target = fopen(fileName, "w+");
+    if (target == NULL)
+    {
+        fclose(source);
+        printf("Press any key to exit...\n");
+        exit(1);
+    }
+    while ((c = fgetc(source)) != EOF)
+    {
+
+        fputc(c, target);
+    }
+
+    printf("File copied successfully.\n");
+    fclose(source);
+    fclose(target);
+
+    return target;
+} */
