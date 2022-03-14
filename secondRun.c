@@ -94,46 +94,6 @@ extern Bool parseFile(FILE *fp, char *filename);
 extern ParseState handleState(char *token, char *line, ParseState state);
 extern void parseSingleLine(char *line);
 
-/* void parseSingleLinesecondRunParsing(char *line)
-{
-    ParseState state = newLine;
-    char lineCopy[MAX_LINE_LEN] = {0};
-    char *token;
-    memcpy(lineCopy, line, MAX_LINE_LEN);
-    printf("\nLine Number (%d):\n%s\n", currentLine, line);
-    token = strtok(lineCopy, ", \t \n");
-
-    while (token != NULL && state != lineParsedSuccessfully)
-    {
-        state = state && handleState(token, line, state);
-        switch (state)
-        {
-        case lineParsedSuccessfully:
-        {
-            break;
-        }
-        case skipToNextToken:
-        {
-            line = line + strlen(token) + 1;
-            state = state && handleState(strtok(NULL, ", \t \n"), line, newLine);
-            break;
-        }
-        case Err:
-        {
-            break;
-        }
-        default:
-            break;
-        }
-        token = strtok(NULL, ", \t \n");
-    }
-
-    if (!state)
-        globalState = collectErrors;
-
-    currentLine++;
-}
- */
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);

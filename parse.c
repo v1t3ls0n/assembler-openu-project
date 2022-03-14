@@ -1,7 +1,9 @@
 #include "data.h"
 extern Bool yieldError(Error err);
 char *trimFromLeft(char *s);
-
+extern State globalState;
+extern unsigned currentLine;
+extern const char *regs[REGS_SIZE];
 Bool countAndVerifyDataArguments(char *line)
 {
     char args[MAX_LINE_LEN + 1] = {0};
@@ -110,6 +112,126 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
+ParseState handleState(char *token, char *line, ParseState state)
+
+{
+    /*   printf("inside handle State, token:%s\n", token); */
+
+    switch (state)
+    {
+    case skipLine:
+        return lineParsedSuccessfully;
+
+    case newLine:
+    {
+        if (isComment(token))
+            return skipLine;
+
+        if (isLabel(token))
+            return skipToNextToken;
+
+        else if (isInstruction(token))
+        {
+            if (globalState == firstRun)
+                return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+            else
+            {
+                int type = getInstructionType(token);
+                line = line + strlen(token);
+
+                if (type == _TYPE_DATA)
+                {
+                    return writeDataInstruction(line);
+                }
+                else if (type == _TYPE_STRING)
+                {
+                    return writeStringInstruction(line);
+                }
+                else
+                    return lineParsedSuccessfully;
+            }
+        }
+
+        else if (isOperation(token))
+        {
+            char args[MAX_LINE_LEN] = {0};
+            /*            line = line + strlen(token); */
+            strcpy(args, (line + strlen(token)));
+            return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
+        }
+        else
+        {
+            if (globalState == firstRun)
+            {
+                yieldError(illegalApearenceOfCharactersOnLine);
+                return Err;
+            }
+        }
+    }
+
+    default:
+        break;
+    }
+
+    return lineParsedSuccessfully;
+}
+
+void parseSingleLine(char *line)
+{
+    ParseState state = newLine;
+    char lineCopy[MAX_LINE_LEN] = {0};
+    char *token;
+    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+    memcpy(lineCopy, line, strlen(line));
+    if (globalState == firstRun)
+        token = strtok(lineCopy, " \t \n");
+    else if (globalState == secondRun)
+        token = strtok(lineCopy, ", \t \n");
+
+    while (token != NULL)
+    {
+        state = handleState(token, line, state);
+        switch (state)
+        {
+        case lineParsedSuccessfully:
+        {
+            break;
+        }
+        case skipLine:
+            state = lineParsedSuccessfully;
+        case skipToNextToken:
+        {
+
+            if (globalState == firstRun)
+                state = handleLabel(token, strtok(NULL, " \t \n"), line);
+            else if (globalState == secondRun)
+            {
+                line = line + strlen(token) + 1;
+                state = handleState(strtok(NULL, ", \t \n"), line, newLine);
+            }
+
+            break;
+        }
+
+        case Err:
+        {
+            break;
+        }
+        default:
+            break;
+        }
+
+        if (globalState == firstRun)
+            token = strtok(NULL, " \t \n");
+        else if (globalState == secondRun)
+            token = strtok(NULL, ", \t \n");
+    }
+
+    if (!state)
+        globalState = collectErrors;
+
+    currentLine++;
+}
 char *trimFromLeft(char *s)
 {
     while (isspace(*s))
