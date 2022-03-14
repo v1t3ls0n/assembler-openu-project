@@ -161,12 +161,10 @@ Bool writeOperationBinary(char *operationName, char *args)
 
 Bool writeDataInstruction(char *token)
 {
-
     int num;
-
-    printf("token:%s\n");
     while (token != NULL)
     {
+        /*         printf("token:%s\n", token); */
         num = atoi(token);
         addWord((A << 16) | num, Data);
         token = strtok(NULL, ", \t \n");
@@ -177,12 +175,9 @@ Bool writeDataInstruction(char *token)
 Bool writeStringInstruction(char *s)
 {
     int i = 1;
-    printf("inside write String Instruction, token: %s\n", s);
-
-    /*
-     */
     for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
         addWord((A << 16) | s[i], Data);
+
     addWord((A << 16) | '\0', Data);
     return lineParsedSuccessfully;
 }

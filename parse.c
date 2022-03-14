@@ -137,15 +137,15 @@ ParseState handleState(char *token, char *line, ParseState state)
             else
             {
                 int type = getInstructionType(token);
-                line = line + strlen(token);
+                token = strtok(NULL, ", \t \n");
 
                 if (type == _TYPE_DATA)
                 {
-                    return writeDataInstruction(line);
+                    return writeDataInstruction(token);
                 }
                 else if (type == _TYPE_STRING)
                 {
-                    return writeStringInstruction(line);
+                    return writeStringInstruction(token);
                 }
                 else
                     return lineParsedSuccessfully;
