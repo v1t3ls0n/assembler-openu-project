@@ -12,7 +12,6 @@ extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
-extern void updateFinalCountersValue();
 extern void writeIntegerIntoDataMemoryBinaryImg(int number);
 extern void initMemory();
 extern int secondRunParsing(FILE *fp, char *filename);
@@ -23,47 +22,11 @@ Bool writeInstructionBinary(char *instructionName, char *line);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
+extern Bool parseFile(FILE *fp, char *filename);
 
 int firstRunParsing(FILE *fp, char *filename)
 {
-    int c = 0;
-    int i = 0;
-    char line[MAX_LINE_LEN + 1] = {0};
-    printf("\n\n\nFirst Run:\n");
-    while (((c = fgetc(fp)) != EOF))
-    {
-
-        if (c == '\n')
-        {
-            parseSingleLine(line);
-            memset(line, 0, MAX_LINE_LEN);
-            i = 0;
-        }
-
-        else if (i >= MAX_LINE_LEN - 1 && c != '\n')
-        {
-            globalState = collectErrors;
-            return yieldError(maxLineLengthExceeded);
-        }
-        else if (isspace(c))
-            line[i++] = ' ';
-
-        else
-        {
-            if (isprint(c))
-                line[i++] = c;
-        }
-    }
-
-    if (i > 0)
-    {
-        parseSingleLine(line);
-        memset(line, 0, i);
-    }
-
-    updateFinalCountersValue();
-
-    return globalState != collectErrors ? True : False;
+    return parseFile(fp, filename);
 }
 
 void parseSingleLine(char *line)
@@ -103,7 +66,6 @@ void parseSingleLine(char *line)
 
         case Err:
         {
-            globalState = collectErrors;
             break;
         }
 
