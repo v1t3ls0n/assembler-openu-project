@@ -1,1 +1,1 @@
- make && ./compiler.exe ./test1
+ make && ./compiler.exe ./test

@@ -1,19 +1,19 @@
 #include "data.h"
 extern Bool yieldError(Error err);
-extern char* trimFromLeft(char* s);
+extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLine;
-extern const char* regs[REGS_SIZE];
+extern const char *regs[REGS_SIZE];
 
 int getNumberLength(int num)
 {
-    int length = 1; /*counts the first digit of the given number*/
+    int length = 1;  /*counts the first digit of the given number*/
     while (num / 10) /*divides the number each time by 10 in order to remov digits its already counted*/
-        length++; /*increase the digit's counter by 1*/
+        length++;    /*increase the digit's counter by 1*/
 
     return length; /*returns the amount of digits in the given number*/
 }
-Bool countAndVerifyDataArguments(char* line, char* token)
+Bool countAndVerifyDataArguments(char *line, char *token)
 {
     /*
     token is only one  token at time connected to strtok, you can use it
@@ -23,9 +23,9 @@ Bool countAndVerifyDataArguments(char* line, char* token)
     token. choose what you want.
      */
 
-    char args[MAX_LINE_LEN + 1] = { 0 };
+    char args[MAX_LINE_LEN + 1] = {0};
     int size = 0, num = 0, n = 0, commasCounter = 0, i = 0, len = 0;
-    char c = 0, * p = strstr(line, DATA) + strlen(DATA);
+    char c = 0, *p = strstr(line, DATA) + strlen(DATA);
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
     len = strlen(p);
@@ -54,14 +54,13 @@ Bool countAndVerifyDataArguments(char* line, char* token)
                 p++;
                 if (*p && !isdigit(p[0]))
                     isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                else --p;
-
+                else
+                    --p;
             }
             else
                 isValid = yieldError(illegalApearenceOfCharactersOnLine);
             p++;
         }
-
 
         if (isprint(*p) && !isdigit(p[0]) && !isspace(*p))
         {
@@ -74,38 +73,39 @@ Bool countAndVerifyDataArguments(char* line, char* token)
         if (commasCounter < 1 && size > 1)
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
 
-        else if (commasCounter > 0 && (size < commasCounter))
+        else if (commasCounter > 0 && (size < commasCounter - 1))
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
         else if (size > commasCounter)
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-
 
         if (isdigit(*p))
         {
             i = len - strlen(p);
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
-
-
+            printf("size:%d commaCounter:%d num:%d c:%c\n", size, commasCounter, num, c);
             if (c && c != ',' && !isspace(c) && c != '.')
+            {
+                commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
+
                 isValid = yieldError(expectedNumber);
+            }
             else if (c == '.')
             {
+                commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
-
                 p += n - getNumberLength(num);
                 i += n - getNumberLength(num);
-
             }
-
-            if (commasCounter == size)
+            else
+            {
                 size++;
-
+            }
 
             minusOrPlusFlag = False;
         }
-        /*
-                if (c == ',')
-                    commasCounter++; */
+
+        /*    if (c == ',')
+               commasCounter++; */
 
         if (n)
         {
@@ -120,7 +120,6 @@ Bool countAndVerifyDataArguments(char* line, char* token)
         }
     }
 
-
     if (commasCounter > size)
         isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
 
@@ -130,7 +129,7 @@ Bool countAndVerifyDataArguments(char* line, char* token)
     return isValid;
 }
 
-Bool countAndVerifyStringArguments(char* token)
+Bool countAndVerifyStringArguments(char *token)
 {
 
     if (isInstruction(token))
@@ -145,7 +144,7 @@ Bool countAndVerifyStringArguments(char* token)
     return True;
 }
 
-ParseState handleState(char* token, char* line, ParseState state)
+ParseState handleState(char *token, char *line, ParseState state)
 
 {
     /*     printf("inside handle State, token:%s\n", token); */
@@ -187,7 +186,7 @@ ParseState handleState(char* token, char* line, ParseState state)
 
         else if (isOperation(token))
         {
-            char args[MAX_LINE_LEN] = { 0 };
+            char args[MAX_LINE_LEN] = {0};
             /*            line = line + strlen(token); */
             strcpy(args, (line + strlen(token)));
             return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
@@ -209,11 +208,11 @@ ParseState handleState(char* token, char* line, ParseState state)
     return lineParsedSuccessfully;
 }
 
-void parseSingleLine(char* line)
+void parseSingleLine(char *line)
 {
     ParseState state = newLine;
-    char lineCopy[MAX_LINE_LEN] = { 0 };
-    char* token;
+    char lineCopy[MAX_LINE_LEN] = {0};
+    char *token;
     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
     memcpy(lineCopy, line, strlen(line));
     if (globalState == firstRun)
@@ -262,11 +261,11 @@ void parseSingleLine(char* line)
     currentLine++;
 }
 
-Bool parseFile(FILE* fp, char* filename)
+Bool parseFile(FILE *fp, char *filename)
 {
     int c = 0;
     int i = 0;
-    char line[MAX_LINE_LEN + 1] = { 0 };
+    char line[MAX_LINE_LEN + 1] = {0};
     currentLine = 1;
 
     if (globalState == secondRun)

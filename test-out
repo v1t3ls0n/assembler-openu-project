@@ -1,0 +1,114 @@
+File copied successfully.
+
+		 ~ MACRO TABLE ~ 
+name	start	end	line count	
+
+
+
+
+First Run:
+
+inside parseSingleLine, Line Number (1):
+LIST1: .data 6, -9
+
+inside parseSingleLine, Line Number (2):
+LIST2: .data 6   , -9
+
+inside parseSingleLine, Line Number (3):
+LIST3: .data 6,-9
+
+inside parseSingleLine, Line Number (4):
+LIST4: .data 6   ,-9
+
+inside parseSingleLine, Line Number (5):
+LIST5: .data ,6   ,-9
+
+###################################
+Error!! occured on line 5 comma appearence on line is illegal!
+###################################
+
+inside parseSingleLine, Line Number (6):
+LIST6: .data 6 -9
+
+###################################
+Error!! occured on line 6 Missing Comma between operands
+###################################
+
+inside parseSingleLine, Line Number (7):
+LIST7: .data 6,, -9
+
+inside parseSingleLine, Line Number (8):
+LIST8: .data 6, -9,
+
+inside parseSingleLine, Line Number (9):
+LIST9: .data 6,a, -9,
+
+###################################
+Error!! occured on line 9 Illegal use of characters
+###################################
+
+inside parseSingleLine, Line Number (10):
+LIST9: .data 6, b, -9
+
+###################################
+Error!! occured on line 10 Illegal use of characters
+###################################
+DC:100 IC:100
+ICF:100 DCF:112
+
+		 ~ SYMBOL TABLE ~ 
+name	value	base	offset	attributes
+LIST8	110	96	14	data
+LIST7	108	96	12	data
+LIST4	106	96	10	data
+LIST3	104	96	8	data
+LIST2	102	96	6	data
+LIST1	100	96	4	data
+
+
+
+
+Second Run:
+
+inside parseSingleLine, Line Number (1):
+LIST1: .data 6, -9
+
+inside parseSingleLine, Line Number (2):
+LIST2: .data 6   , -9
+
+inside parseSingleLine, Line Number (3):
+LIST3: .data 6,-9
+
+inside parseSingleLine, Line Number (4):
+LIST4: .data 6   ,-9
+
+inside parseSingleLine, Line Number (5):
+LIST5: .data ,6   ,-9
+
+inside parseSingleLine, Line Number (6):
+LIST6: .data 6 -9
+
+inside parseSingleLine, Line Number (7):
+LIST7: .data 6,, -9
+
+inside parseSingleLine, Line Number (8):
+LIST8: .data 6, -9,
+
+inside parseSingleLine, Line Number (9):
+LIST9: .data 6,a, -9,
+
+inside parseSingleLine, Line Number (10):
+LIST9: .data 6, b, -9
+Finished Successfully, about to export files!
+0100  0100 0000 0000 0000 0110
+0101  0100 1111 1111 1111 0111
+0102  0100 0000 0000 0000 0110
+0103  0100 1111 1111 1111 0111
+0104  0100 0000 0000 0000 0110
+0105  0100 1111 1111 1111 0111
+0106  0100 0000 0000 0000 0110
+0107  0100 1111 1111 1111 0111
+0108  0100 0000 0000 0000 0110
+0109  0100 1111 1111 1111 0111
+0110  0100 0000 0000 0000 0110
+0111  0100 1111 1111 1111 0111
