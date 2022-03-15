@@ -1,1 +1,1 @@
- make && ./compiler.exe ./test
+make && ./compiler.exe test > test-out

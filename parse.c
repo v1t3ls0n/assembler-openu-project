@@ -69,37 +69,40 @@ Bool countAndVerifyDataArguments(char *line, char *token)
             while (!isdigit(*p) && *p != ',')
                 p++;
         }
-
         if (commasCounter < 1 && size > 1)
+        {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+        }
 
         else if (commasCounter > 0 && (size < commasCounter - 1))
+        {
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
+        }
         else if (size > commasCounter)
+        {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+        }
 
-        if (isdigit(*p))
+        else if (isdigit(*p))
         {
             i = len - strlen(p);
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
             printf("size:%d commaCounter:%d num:%d c:%c\n", size, commasCounter, num, c);
             if (c && c != ',' && !isspace(c) && c != '.')
             {
-                commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
-
+                /*      commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
+                 */
                 isValid = yieldError(expectedNumber);
             }
             else if (c == '.')
             {
-                commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
+                /*        commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter; */
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
                 p += n - getNumberLength(num);
                 i += n - getNumberLength(num);
             }
-            else
-            {
-                size++;
-            }
+
+            size++;
 
             minusOrPlusFlag = False;
         }
