@@ -52,7 +52,6 @@ void parseSourceFile(FILE *source, char *filename)
         {
             if (j > 0)
             {
-
                 state = evalToken;
             }
             if (i > 0 && state == parseMacroName)
@@ -77,7 +76,8 @@ void parseSourceFile(FILE *source, char *filename)
 
          */
 
-        /*         printf("token:%s\n", token);
+        /*
+         printf("token:%s\n", token);
          */
         switch (state)
         {
