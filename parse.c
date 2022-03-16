@@ -5,6 +5,7 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
+extern int countSpaceCharacters(char *s);
 int getNumberLength(int num)
 {
     int length = 1;
@@ -17,10 +18,11 @@ int getNumberLength(int num)
 int countConsecutiveCommasAndTrimSpaces(char *s)
 {
     int counter = 0;
-    memcpy(s, trimFromLeft(s), strlen(s));
+    s = trimFromLeft(s);
     for (; s && *s == ','; counter++, s++)
         ;
-    memcpy(s, trimFromLeft(s), strlen(s));
+
+    printf("s:%s counter:%d\n", s, counter);
     return counter;
 }
 
@@ -43,7 +45,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
      */
 
     char args[MAX_LINE_LEN + 1] = {0};
-    int size = 0, num = 0, n = 0, num2 = 0, n2 = 0, commasCounter = 0, i = 0, len = 0;
+    int size = 0, num = 0, n = 0, num2 = 0, n2 = 0, commasCounter = 0, i = 0, len = 0, skip = 0;
     char c = 0, *p = strstr(line, DATA) + strlen(DATA);
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
@@ -62,11 +64,14 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
     while (p && i < len)
     {
-        i = len - strlen(p);
-        commasCounter += countConsecutiveCommasAndTrimSpaces(p);
-        /*
-                printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
-         */
+        /*         skip = countSpaceCharacters(p);
+                commasCounter += countConsecutiveCommasAndTrimSpaces(p);
+                p += skip + commasCounter;
+                i += skip + commasCounter; */
+        /*         i = len - strlen(p); */
+
+        printf("args[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
+
         if (!isdigit(p[0]) && !isspace(*p))
         {
             if (*p == '-' || *p == '+')
@@ -81,22 +86,32 @@ Bool countAndVerifyDataArguments(char *line, char *token)
             }
             else if (*p != ',')
             {
-                int charCount = skipTokenNonDigitCharacters(p);
                 isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                i += charCount;
-                p += charCount;
+                skip = skipTokenNonDigitCharacters(p) + countSpaceCharacters(p);
+                p += skip;
+                i += skip;
+                commasCounter += countConsecutiveCommasAndTrimSpaces(p);
+                p += commasCounter;
+                i += commasCounter;
                 size++;
             }
             if (*p == ',')
+            {
                 commasCounter += countConsecutiveCommasAndTrimSpaces(p);
+                skip = countSpaceCharacters(p);
+                p += commasCounter + skip;
+                i += commasCounter + skip;
+                i = len - strlen(p);
+            }
         }
+
         if (commasCounter < 1 && size > 0)
         {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
             commasCounter = size;
         }
 
-        else if (commasCounter > 0 && (size < (commasCounter - 1)))
+        else if (commasCounter > 0 && size < (commasCounter - 1))
         {
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
             commasCounter = size;
@@ -121,8 +136,8 @@ Bool countAndVerifyDataArguments(char *line, char *token)
                 /*           int len = getNumberLength(num2);
                           printf("extra float number length::%d\n", len); */
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
-                p += n - getNumberLength(num);
-                i += n - getNumberLength(num);
+                p += n;
+                i += n;
                 sscanf(&args[i], "%d%n", &num, &n);
 
                 /*    n += getNumberLength(num2); */
@@ -132,7 +147,6 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         }
         if (n)
         {
-            printf("num:%d n:%d c:%c num:%d\n", num, n, c, num2);
             p += n;
             i += n;
             /*             i += n; */

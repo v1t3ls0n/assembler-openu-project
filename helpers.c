@@ -8,6 +8,14 @@ char *trimFromLeft(char *s)
         s++;
     return s;
 }
+int countSpaceCharacters(char *s)
+{
+    int i = 0;
+    for (i = 0; isspace(*s); s++, i++)
+        ;
+    return i;
+}
+
 char *decToHex(int num)
 {
     int i = num, size = 0;

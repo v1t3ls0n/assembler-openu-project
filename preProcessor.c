@@ -34,14 +34,18 @@ Bool isLegalMacroName(char *s)
 void parseSourceFile(FILE *source, char *filename)
 {
 
+    FILE *newFile = createCopyFromSourceFile(source, filename);
+    /* parseAll(newFile); */
+    fclose(newFile);
+}
+
+int parseAll(FILE *newFile)
+{
+    ParseState state = newLine;
     int c = 0, i = 0, j = 0;
     int start = 1, end = 1, current = 1;
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
-    ParseState state = newLine;
-    FILE *newFile = createCopyFromSourceFile(source, filename);
-    rewind(newFile);
-    currentLine = 1;
     while ((c = fgetc(newFile)) != EOF)
     {
         if (!isspace(c))
@@ -76,9 +80,6 @@ void parseSourceFile(FILE *source, char *filename)
 
          */
 
-        /*
-         printf("token:%s\n", token);
-         */
         switch (state)
         {
         case skipLine:
@@ -116,8 +117,6 @@ void parseSourceFile(FILE *source, char *filename)
 
         case newLine:
         {
-            /*             printf("in new line state\n");
-             */
 
             /*             if (isspace(c) && j > 0)
                         {
@@ -201,8 +200,10 @@ void parseSourceFile(FILE *source, char *filename)
             break;
         }
     }
+    rewind(newFile);
     printMacroTable();
-    fclose(newFile);
+
+    return 1;
 }
 
 int parseNextLine(int start, int end)
