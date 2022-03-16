@@ -15,6 +15,11 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case useOfNestedMacrosIsIllegal:
+    {
+        printf("useOfNestedMacrosIsIllegal\n");
+        break;
+    }
     case missinSpaceAfterInstruction:
     {
         printf("missin Space After Instruction");
