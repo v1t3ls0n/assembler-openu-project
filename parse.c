@@ -15,21 +15,21 @@ int getNumberLength(int num)
 
     return length; /*returns the amount of digits in the given number*/
 }
+
 int countConsecutiveCommasAndTrimSpaces(char *s)
 {
     int counter = 0;
-    s = trimFromLeft(s);
+    memcpy(s, trimFromLeft(s), strlen(s));
     for (; s && *s == ','; counter++, s++)
         ;
-
-    printf("s:%s counter:%d\n", s, counter);
+    memcpy(s, trimFromLeft(s), strlen(s));
     return counter;
 }
 
 int skipTokenNonDigitCharacters(char *s)
 {
     int count = 0;
-    for (; !isdigit(*s) && !isspace(*s) && *s != ','; s++, count++)
+    for (; (!isdigit(*s) || isspace(*s)) && *s != ','; s++, count++)
         ;
     return count;
 }
@@ -45,7 +45,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
      */
 
     char args[MAX_LINE_LEN + 1] = {0};
-    int size = 0, num = 0, n = 0, num2 = 0, n2 = 0, commasCounter = 0, i = 0, len = 0, skip = 0;
+    int size = 0, num = 0, n = 0, commasCounter = 0, i = 0, len = 0;
     char c = 0, *p = strstr(line, DATA) + strlen(DATA);
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
@@ -64,14 +64,11 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
     while (p && i < len)
     {
-        /*         skip = countSpaceCharacters(p);
-                commasCounter += countConsecutiveCommasAndTrimSpaces(p);
-                p += skip + commasCounter;
-                i += skip + commasCounter; */
-        /*         i = len - strlen(p); */
+        i = len - strlen(p);
+        commasCounter += countConsecutiveCommasAndTrimSpaces(p);
 
-        printf("args[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
-
+        /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
+         */
         if (!isdigit(p[0]) && !isspace(*p))
         {
             if (*p == '-' || *p == '+')
@@ -86,32 +83,22 @@ Bool countAndVerifyDataArguments(char *line, char *token)
             }
             else if (*p != ',')
             {
+                int charCount = skipTokenNonDigitCharacters(p);
                 isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                skip = skipTokenNonDigitCharacters(p) + countSpaceCharacters(p);
-                p += skip;
-                i += skip;
-                commasCounter += countConsecutiveCommasAndTrimSpaces(p);
-                p += commasCounter;
-                i += commasCounter;
+                i += charCount;
+                p += charCount;
                 size++;
             }
             if (*p == ',')
-            {
                 commasCounter += countConsecutiveCommasAndTrimSpaces(p);
-                skip = countSpaceCharacters(p);
-                p += commasCounter + skip;
-                i += commasCounter + skip;
-                i = len - strlen(p);
-            }
         }
-
         if (commasCounter < 1 && size > 0)
         {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
             commasCounter = size;
         }
 
-        else if (commasCounter > 0 && size < (commasCounter - 1))
+        else if (commasCounter > 0 && (size < (commasCounter - 1)))
         {
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
             commasCounter = size;
@@ -125,7 +112,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         if (isdigit(*p))
         {
             i = len - strlen(p);
-            sscanf(&args[i], "%d%n%c%d", &num, &n, &c, &num2);
+            sscanf(&args[i], "%d%c%n", &num, &c, &n);
             if (c && c == ',')
                 commasCounter++;
             else if (c && c != ',' && !isspace(c) && c != '.')
@@ -133,14 +120,12 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
             else if (c == '.')
             {
-                /*           int len = getNumberLength(num2);
-                          printf("extra float number length::%d\n", len); */
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
+                /*      p += n - getNumberLength(num);
+                     i += n - getNumberLength(num); */
                 p += n;
                 i += n;
                 sscanf(&args[i], "%d%n", &num, &n);
-
-                /*    n += getNumberLength(num2); */
             }
             size++;
             minusOrPlusFlag = False;
@@ -149,8 +134,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         {
             p += n;
             i += n;
-            /*             i += n; */
-            c = n = num = num2 = n2 = 0;
+            c = n = num = 0;
         }
         else
         {
