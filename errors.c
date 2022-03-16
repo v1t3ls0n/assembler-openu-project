@@ -15,6 +15,22 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case missinSpaceAfterInstruction:
+    {
+        printf("missin Space After Instruction");
+        break;
+    }
+    case illegalApearenceOfCommaBeforeFirstParameter:
+    {
+        printf("Illegal appearence of a comma between before the first parameter");
+        break;
+    }
+    case illegalApearenceOfCommaAfterLastParameter:
+    {
+        printf("Illegal appearence of a comma after the last parameter");
+        break;
+    }
+
     case wrongInstructionSyntaxIllegalCommaPosition:
     {
         printf("comma appearence on line is illegal!");
