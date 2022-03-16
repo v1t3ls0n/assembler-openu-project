@@ -16,15 +16,10 @@ int getNumberLength(int num)
 int countConsecutiveCommasAndTrimSpaces(char *s)
 {
     int counter = 0;
-    printf("before trim, s:%s ", s);
-    s = trimFromLeft(s);
-    printf("after trim, s:%s\n ", s);
+    memcpy(s, trimFromLeft(s), strlen(s));
     for (; s && *s == ','; counter++, s++)
         ;
-    printf("before skipping commas, s:%s ", s);
-    s = trimFromLeft(s);
-    printf("after trim after skipping commas, s:%s\n", s);
-
+    memcpy(s, trimFromLeft(s), strlen(s));
     return counter;
 }
 
@@ -57,9 +52,6 @@ Bool countAndVerifyDataArguments(char *line, char *token)
     p = trimFromLeft(p);
     i = len - strlen(p);
 
-    /*     if (!isspace(*p))
-            isValid = yieldError(missinSpaceAfterInstruction); */
-
     if (*p == ',')
     {
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
@@ -70,10 +62,10 @@ Bool countAndVerifyDataArguments(char *line, char *token)
     while (p && i < len)
     {
         i = len - strlen(p);
-        /*        printf("######\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n######\n", args[i], *p, size, commasCounter, num, c); */
-        commasCounter += countConsecutiveCommasAndTrimSpaces(&args[i]);
-        /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n", args[i], *p, size, commasCounter, num, c);
-         */
+        commasCounter += countConsecutiveCommasAndTrimSpaces(p);
+
+        printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
+
         if (!isdigit(p[0]) && !isspace(*p))
         {
             if (*p == '-' || *p == '+')
@@ -88,14 +80,15 @@ Bool countAndVerifyDataArguments(char *line, char *token)
             }
             else if (*p != ',')
             {
-
+                int charCount = skipTokenNonDigitCharacters(p);
                 isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                i += skipTokenNonDigitCharacters(&args[i]);
+                i += charCount;
+                p += charCount;
+                size++;
             }
             if (*p == ',')
-                commasCounter += countConsecutiveCommasAndTrimSpaces(&args[i]);
+                commasCounter += countConsecutiveCommasAndTrimSpaces(p);
         }
-        p = &args[i];
         if (commasCounter < 1 && size > 0)
         {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
@@ -116,10 +109,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         if (isdigit(*p))
         {
             i = len - strlen(p);
-
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
-            /*      printf("n:%d num:%d c:%c\n", n, num, c); */
-
             if (c && c == ',')
                 commasCounter++;
             else if (c && c != ',' && !isspace(c) && c != '.')
@@ -132,23 +122,12 @@ Bool countAndVerifyDataArguments(char *line, char *token)
                 i += n - getNumberLength(num);
                 sscanf(&args[i], "%d%n", &num, &n);
             }
-
-            /*             else
-                        {
-                            size++;
-                            printf("size %d\n", size);
-                        } */
             size++;
             minusOrPlusFlag = False;
         }
-
         if (n)
         {
             p += n;
-            /*
-            i = i + n;
-                p += n - getNumberLength(num);
-             */
             c = n = num = 0;
         }
         else
@@ -185,7 +164,6 @@ Bool countAndVerifyStringArguments(char *token)
 ParseState handleState(char *token, char *line, ParseState state)
 
 {
-    /*     printf("inside handle State, token:%s\n", token); */
 
     switch (state)
     {
