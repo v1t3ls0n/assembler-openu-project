@@ -8,6 +8,14 @@ char *trimFromLeft(char *s)
         s++;
     return s;
 }
+int countSpaceCharacters(char *s)
+{
+    int i = 0;
+    for (i = 0; isspace(*s); s++, i++)
+        ;
+    return i;
+}
+
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -118,39 +126,39 @@ char *numToBin(int num)
 
 int binary2Decimal(char binaryStr[4])
 {
-    /*
-        if (!strcmp(binaryStr, '0000'))
-            return 0;
-        if (!strcmp(binaryStr, '0001'))
-            return 1;
-        if (!strcmp(binaryStr, '0010'))
-            return 2;
-        if (!strcmp(binaryStr, '0011'))
-            return 3;
-        if (!strcmp(binaryStr, '0100'))
-            return 4;
-        if (!strcmp(binaryStr, '0101'))
-            return 5;
-        if (!strcmp(binaryStr, '0110'))
-            return 6;
-        if (!strcmp(binaryStr, '0111'))
-            return 7;
-        if (!strcmp(binaryStr, '1000'))
-            return 8;
-        if (!strcmp(binaryStr, '1001'))
-            return 9;
-        if (!strcmp(binaryStr, '1010'))
-            return 10;
-        if (!strcmp(binaryStr, '1011'))
-            return 11;
-        if (!strcmp(binaryStr, '1100'))
-            return 12;
-        if (!strcmp(binaryStr, '1101'))
-            return 13;
-        if (!strcmp(binaryStr, '1110'))
-            return 14;
-        if (!strcmp(binaryStr, '1111'))
-            return 15; */
+
+    if (!strcmp(binaryStr, "0000"))
+        return 0;
+    if (!strcmp(binaryStr, "0001"))
+        return 1;
+    if (!strcmp(binaryStr, "0010"))
+        return 2;
+    if (!strcmp(binaryStr, "0011"))
+        return 3;
+    if (!strcmp(binaryStr, "0100"))
+        return 4;
+    if (!strcmp(binaryStr, "0101"))
+        return 5;
+    if (!strcmp(binaryStr, "0110"))
+        return 6;
+    if (!strcmp(binaryStr, "0111"))
+        return 7;
+    if (!strcmp(binaryStr, "1000"))
+        return 8;
+    if (!strcmp(binaryStr, "1001"))
+        return 9;
+    if (!strcmp(binaryStr, "1010"))
+        return 10;
+    if (!strcmp(binaryStr, "1011"))
+        return 11;
+    if (!strcmp(binaryStr, "1100"))
+        return 12;
+    if (!strcmp(binaryStr, "1101"))
+        return 13;
+    if (!strcmp(binaryStr, "1110"))
+        return 14;
+    if (!strcmp(binaryStr, "1111"))
+        return 15;
 
     return 0;
 }

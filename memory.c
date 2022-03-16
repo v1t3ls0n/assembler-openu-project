@@ -75,10 +75,15 @@ void wordStringToWordObj(char *s, DataType type)
 
 void wordObjToBinStr(BinaryWord *word, char *s)
 {
-    /*     int j = 0; */
+    int j = 0;
+    for (j = 0; j < BINARY_WORD_SIZE + 5; j++)
+    {
+        if (j > 3 && j % 5 == 0)
+            strcat(s, " ");
 
-    /*   for (j = 0; j < BINARY_WORD_SIZE; j++)
-          strcat(s, word->digit[j].on ? "1" : "0"); */
+        else
+            strcat(s, word->digit[j].on ? "1" : "0");
+    }
 }
 
 void printWordBinary(unsigned index)
@@ -108,23 +113,21 @@ void printMemoryImgInRequiredObjFileFormat()
 {
     int i;
     int totalSize = DCF - MEMORY_START;
-    char wordStr[BINARY_WORD_SIZE] = {0};
-    char a[4] = {0}, b[4] = {0}, c[4] = {0}, d[4] = {0}, e[4] = {0};
-    printf("              %d   %d\n", ICF, DCF);
+    char wordStr[BINARY_WORD_SIZE + 5] = {0};
+    char *a, *b, *c, *d, *e;
+    a = b = c = d = e = 0;
+    printf("%d   %d\n", ICF, DCF);
     for (i = 0; i < totalSize; i++)
     {
         wordObjToBinStr(&binaryImg[i], wordStr);
-        memcpy(a, &wordStr[0], 4);
-        memcpy(b, &wordStr[4], 4);
-        memcpy(c, &wordStr[8], 4);
-        memcpy(d, &wordStr[12], 4);
-        memcpy(e, &wordStr[16], 4);
-        printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, binary2Decimal(a), binary2Decimal(b), binary2Decimal(c), binary2Decimal(d), binary2Decimal(e));
+        a = strtok(wordStr, " ");
+        b = strtok(NULL, " ");
+        c = strtok(NULL, " ");
+        d = strtok(NULL, " ");
+        e = strtok(NULL, " ");
+        printf("%04d A%X-B%X-C%X-D%X-E%X\n", MEMORY_START + i, binary2Decimal(a), binary2Decimal(b), binary2Decimal(c), binary2Decimal(d), binary2Decimal(e));
         memset(wordStr, 0, BINARY_WORD_SIZE);
-        memset(a, 0, 4);
-        memset(b, 0, 4);
-        memset(c, 0, 4);
-        memset(d, 0, 4);
-        memset(e, 0, 4);
+        strtok(NULL, " ");
+        a = b = c = d = e = 0;
     }
 }

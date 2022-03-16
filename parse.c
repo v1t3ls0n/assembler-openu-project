@@ -5,14 +5,17 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
+extern int countSpaceCharacters(char *s);
 int getNumberLength(int num)
 {
-    int length = 1;  /*counts the first digit of the given number*/
+    int length = 1;
+    /*counts the first digit of the given number*/
     while (num / 10) /*divides the number each time by 10 in order to remov digits its already counted*/
         length++;    /*increase the digit's counter by 1*/
 
     return length; /*returns the amount of digits in the given number*/
 }
+
 int countConsecutiveCommasAndTrimSpaces(char *s)
 {
     int counter = 0;
@@ -26,7 +29,7 @@ int countConsecutiveCommasAndTrimSpaces(char *s)
 int skipTokenNonDigitCharacters(char *s)
 {
     int count = 0;
-    for (; !isdigit(*s) && !isspace(*s) && *s != ','; s++, count++)
+    for (; (!isdigit(*s) || isspace(*s)) && *s != ','; s++, count++)
         ;
     return count;
 }
@@ -64,8 +67,8 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         i = len - strlen(p);
         commasCounter += countConsecutiveCommasAndTrimSpaces(p);
 
-        printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
-
+        /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
+         */
         if (!isdigit(p[0]) && !isspace(*p))
         {
             if (*p == '-' || *p == '+')
@@ -118,8 +121,10 @@ Bool countAndVerifyDataArguments(char *line, char *token)
             else if (c == '.')
             {
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
-                p += n - getNumberLength(num);
-                i += n - getNumberLength(num);
+                /*      p += n - getNumberLength(num);
+                     i += n - getNumberLength(num); */
+                p += n;
+                i += n;
                 sscanf(&args[i], "%d%n", &num, &n);
             }
             size++;
@@ -128,6 +133,7 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         if (n)
         {
             p += n;
+            i += n;
             c = n = num = 0;
         }
         else

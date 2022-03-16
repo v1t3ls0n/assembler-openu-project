@@ -109,7 +109,7 @@ int binary2Decimal(char binaryStr[4]);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
-
+int countSpaceCharacters(char *s);
 char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

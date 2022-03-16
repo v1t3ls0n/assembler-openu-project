@@ -1,6 +1,7 @@
 
 typedef enum
 {
+    useOfNestedMacrosIsIllegal,
     memoryAllocationFailure,
     undefinedOperation,
     undefinedInstruction,
@@ -92,7 +93,9 @@ typedef enum
     writingDataIntoMemoryImg,
     genFirstWord,
     genSecondWord,
-    endParsingOfMacroThatHaveNoEndingTag
+    endParsingOfMacroThatHaveNoEndingTag,
+    evalToken
+
 } ParseState;
 /* typedef enum
 {
