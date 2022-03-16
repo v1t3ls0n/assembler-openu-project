@@ -66,24 +66,29 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         {
 
             isValid = yieldError(illegalApearenceOfCharactersOnLine);
-            while (!isdigit(*p) && *p != ',')
+            while (!isdigit(*p) && !isspace(*p) && *p != ',')
                 p++;
+            if (*p == ',')
+                commasCounter++;
         }
         if (commasCounter < 1 && size > 1)
         {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+            commasCounter = size;
         }
 
-        else if (commasCounter > 0 && (size < commasCounter - 1))
+        else if (commasCounter > 0 && (size < commasCounter))
         {
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
+            commasCounter = size;
         }
         else if (size > commasCounter)
         {
             isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+            commasCounter = size;
         }
 
-        else if (isdigit(*p))
+        if (isdigit(*p))
         {
             i = len - strlen(p);
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
@@ -101,8 +106,11 @@ Bool countAndVerifyDataArguments(char *line, char *token)
                 p += n - getNumberLength(num);
                 i += n - getNumberLength(num);
             }
-
-            size++;
+            else
+            {
+                size++;
+                printf("size %d\n", size);
+            }
 
             minusOrPlusFlag = False;
         }
