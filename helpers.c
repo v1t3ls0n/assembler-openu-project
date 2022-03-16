@@ -269,7 +269,17 @@ int getInstructionType(char *s)
 
 Bool isInstruction(char *s)
 {
-    return (!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)) ? True : False;
+
+    if ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)))
+        return True;
+
+    else if (strstr(s, DATA) != NULL || strstr(s, STRING) != NULL || strstr(s, ENTRY) != NULL || strstr(s, EXTERNAL) != NULL)
+    {
+        yieldError(missinSpaceAfterInstruction);
+        return True;
+    }
+    else
+        return False;
 }
 
 Bool isRegistery(char *s)
@@ -362,13 +372,22 @@ char *getInstructionNameByType(int type)
 }
 char *getInstructionName(char *s)
 {
-    if (!strcmp(s, DATA))
+    if (strstr(s, DATA) != NULL)
         return DATA;
-    if (!strcmp(s, STRING))
+    if (strstr(s, STRING) != NULL)
         return STRING;
-    if (!strcmp(s, ENTRY))
+    if (strstr(s, ENTRY) != NULL)
         return ENTRY;
-    if (!strcmp(s, EXTERNAL))
+    if (strstr(s, EXTERNAL) != NULL)
         return EXTERNAL;
+    /*
+        if (!strcmp(s, DATA))
+            return DATA;
+        if (!strcmp(s, STRING))
+            return STRING;
+        if (!strcmp(s, ENTRY))
+            return ENTRY;
+        if (!strcmp(s, EXTERNAL))
+            return EXTERNAL; */
     return 0;
 }

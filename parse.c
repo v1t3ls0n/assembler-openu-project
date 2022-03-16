@@ -57,8 +57,8 @@ Bool countAndVerifyDataArguments(char *line, char *token)
     p = trimFromLeft(p);
     i = len - strlen(p);
 
-    if (!isspace(*p))
-        isValid = yieldError(missinSpaceAfterInstruction);
+    /*     if (!isspace(*p))
+            isValid = yieldError(missinSpaceAfterInstruction); */
 
     if (*p == ',')
     {

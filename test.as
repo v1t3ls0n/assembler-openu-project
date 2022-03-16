@@ -1,4 +1,4 @@
-LIST1: .data6, -9
+LIST12: .data6, -9
 LIST1: .data 6, -9
 LIST2: .data 6   , -9
 LIST3: .data 6,-9
@@ -8,4 +8,4 @@ LIST6: .data 6 -9
 LIST7: .data 6,, -9
 LIST8: .data 6, -9,
 LIST9: .data 6,a, -9,
-LIST9: .data 6, b, -9
+LIST99: .data 6, b, -9
