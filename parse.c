@@ -5,6 +5,14 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
+int getNumberLength(int num)
+{
+    int length = 1;  /*counts the first digit of the given number*/
+    while (num / 10) /*divides the number each time by 10 in order to remov digits its already counted*/
+        length++;    /*increase the digit's counter by 1*/
+
+    return length; /*returns the amount of digits in the given number*/
+}
 Bool countAndVerifyDataArguments(char *line, char *token)
 {
     /*
@@ -41,7 +49,14 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         while (*p == '-' || *p == '+')
         {
             if (!minusOrPlusFlag)
+            {
                 minusOrPlusFlag = True;
+                p++;
+                if (*p && !isdigit(p[0]))
+                    isValid = yieldError(illegalApearenceOfCharactersOnLine);
+                else
+                    --p;
+            }
             else
                 isValid = yieldError(illegalApearenceOfCharactersOnLine);
             p++;
@@ -49,46 +64,64 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
         if (isprint(*p) && !isdigit(p[0]) && !isspace(*p))
         {
+
             isValid = yieldError(illegalApearenceOfCharactersOnLine);
-            while (!isdigit(*p) && *p != ',')
+            while (!isdigit(*p) && !isspace(*p) && *p != ',')
                 p++;
+            if (*p == ',')
+                commasCounter++;
+        }
+        if (commasCounter < 1 && size > 1)
+        {
+            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+            commasCounter = size;
         }
 
-        if (commasCounter < 1 && size > 1)
-            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-
-        else if (commasCounter > 1)
+        else if (commasCounter > 0 && (size < commasCounter))
+        {
             isValid = yieldError(wrongInstructionSyntaxExtraCommas);
+            commasCounter = size;
+        }
+        else if (size > commasCounter)
+        {
+            isValid = yieldError(wrongInstructionSyntaxMissinCommas);
+            commasCounter = size;
+        }
 
         if (isdigit(*p))
         {
             i = len - strlen(p);
             sscanf(&args[i], "%d%c%n", &num, &c, &n);
-
+            printf("size:%d commaCounter:%d num:%d c:%c\n", size, commasCounter, num, c);
             if (c && c != ',' && !isspace(c) && c != '.')
+            {
+                /*      commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter;
+                 */
                 isValid = yieldError(expectedNumber);
+            }
             else if (c == '.')
             {
+                /*        commasCounter = commasCounter > 0 ? commasCounter - 1 : commasCounter; */
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
-                p += n;
-                i += n;
-                sscanf(&args[i], "%d%n", &num, &n);
+                p += n - getNumberLength(num);
+                i += n - getNumberLength(num);
+            }
+            else
+            {
+                size++;
+                printf("size %d\n", size);
             }
 
-            else if (commasCounter == 1 || (commasCounter == 0 && size == 0))
-                size++;
-
-            commasCounter = 0;
             minusOrPlusFlag = False;
         }
 
-        if (c == ',')
-            commasCounter++;
+        /*    if (c == ',')
+               commasCounter++; */
 
         if (n)
         {
-            p += n;
-            i += n;
+            p += n - getNumberLength(num);
+            i += n - getNumberLength(num);
             c = n = num = 0;
         }
         else
@@ -98,8 +131,9 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         }
     }
 
-    if (commasCounter > 0)
+    if (commasCounter > size)
         isValid = yieldError(wrongInstructionSyntaxIllegalCommaPosition);
+
     if (isValid)
         increaseDataCounter(size);
 
