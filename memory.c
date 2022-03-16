@@ -75,10 +75,10 @@ void wordStringToWordObj(char *s, DataType type)
 
 void wordObjToBinStr(BinaryWord *word, char *s)
 {
-    /*     int j = 0; */
+    int j = 0;
 
-    /*   for (j = 0; j < BINARY_WORD_SIZE; j++)
-          strcat(s, word->digit[j].on ? "1" : "0"); */
+    for (j = 0; j < BINARY_WORD_SIZE; j++)
+        strcat(s, word->digit[j].on ? "1" : "0");
 }
 
 void printWordBinary(unsigned index)
