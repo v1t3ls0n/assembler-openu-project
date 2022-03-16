@@ -215,15 +215,13 @@ int handleLabel(char *labelName, char *nextToken, char *line)
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
-        if (instruction)
-        {
-            if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
-                return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
-            else
-                return handleInstruction(instruction, labelName, nextToken, line);
-        }
+        /*         if (instruction)
+                { */
+        if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
+            return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
         else
-            return yieldError(undefinedInstruction);
+            return handleInstruction(instruction, labelName, nextToken, line);
+        /*        } */
     }
 
     else if (isOperation(nextToken))
