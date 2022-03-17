@@ -185,7 +185,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
             {
-                yieldError(illegalApearenceOfCharactersOnLine);
+                yieldError(illegalApearenceOfExtraCharactersOnLine);
                 return Err;
             }
             else
@@ -197,7 +197,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             }
         }
     }
-    else if (isLabel(firstToken))
+    else if (isLabelDeclaration(firstToken))
     {
         int dataCounter = getDC();
         Bool isLabelNameAvailable;
@@ -222,7 +222,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 
     return Err;
 }
-int handleLabel(char *labelName, char *nextToken, char *line)
+ParseState handleLabel(char *labelName, char *nextToken, char *line)
 {
 
     if (isInstruction(nextToken))

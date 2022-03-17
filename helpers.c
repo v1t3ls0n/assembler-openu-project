@@ -253,13 +253,9 @@ Bool isOperation(char *s)
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
-Bool isLabel(char *s)
+Bool isLabelDeclaration(char *s)
 {
-    int len = strlen(s);
-    if (len <= 1)
-        return yieldError(illegalLabelNameLength);
-
-    return s[len - 1] == ':' ? True : False;
+    return s[strlen(s) - 1] == ':' ? True : False;
 }
 
 int getInstructionType(char *s)

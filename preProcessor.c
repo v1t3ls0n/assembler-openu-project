@@ -2,7 +2,7 @@
 
 #include "data.h"
 extern State globalState;
-extern Bool isLabel(char *s);
+extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);
 extern Bool isComment(char *s);
 extern Bool isInstruction(char *s);

@@ -67,7 +67,7 @@ Bool countAndVerifyDataArguments(char *line)
                         minusOrPlusFlag = True;
                     else
                     {
-                        isValid = yieldError(illegalApearenceOfCharactersOnLine);
+                        isValid = yieldError(expectedNumber);
                         minusOrPlusFlag = False;
                     }
                     skip = 1;
@@ -79,7 +79,7 @@ Bool countAndVerifyDataArguments(char *line)
                 }
                 else
                 {
-                    isValid = yieldError(illegalApearenceOfCharactersOnLine);
+                    isValid = yieldError(expectedNumber);
                     skip = countLengthOfNonDigitToken(p);
                     size++;
                 }
@@ -169,12 +169,10 @@ ParseState handleState(char *token, char *line, ParseState state)
         if (isComment(token))
             return lineParsedSuccessfully;
 
-        if (isLabel(token))
+        if (isLabelDeclaration(token))
         {
             if (globalState == firstRun)
-            {
                 return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
-            }
             else
                 return skipToNextToken;
         }
@@ -212,11 +210,12 @@ ParseState handleState(char *token, char *line, ParseState state)
         }
         else
         {
-            if (globalState == firstRun)
-            {
-                yieldError(illegalLabelUseExpectedOperationOrInstruction);
-                return Err;
-            }
+            if (strlen(token) > 1)
+                yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            else
+                yieldError(illegalApearenceOfCharactersOnLine);
+
+            return Err;
         }
     }
 

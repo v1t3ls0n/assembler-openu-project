@@ -1,6 +1,7 @@
 
 typedef enum
 {
+    undefinedTokenNotOperationOrInstructionOrLabel,
     useOfNestedMacrosIsIllegal,
     memoryAllocationFailure,
     undefinedOperation,

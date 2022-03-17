@@ -154,6 +154,12 @@ Bool yieldError(Error err)
     case illegalApearenceOfCharactersOnLine:
         printf("Illegal use of characters");
         break;
+    case undefinedTokenNotOperationOrInstructionOrLabel:
+        printf("illegal token in begning of current line,  not operation nor instruction or label decleration");
+        break;
+    case illegalApearenceOfExtraCharactersOnLine:
+        printf("Illegal appearence of extra characters after the end or before begning of the line");
+        break;
 
     case expectedQuotes:
         printf("expected opening quotes before string decleration");
