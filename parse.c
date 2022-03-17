@@ -345,7 +345,9 @@ Bool parseFile(FILE *fp, char *filename)
 
     if (i > 0)
     {
-        isValidCode = isValidCode && parseSingleLine(line);
+        if (!parseSingleLine(line))
+            isValidCode = False;
+
         memset(line, 0, i);
     }
     if (!isValidCode)
