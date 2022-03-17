@@ -166,7 +166,7 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-
+    printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)

@@ -49,12 +49,14 @@ Bool countAndVerifyDataArguments(char *line, char *token)
     char c = 0, *p = strstr(line, DATA) + strlen(DATA);
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
+    printf("line 52\n");
+
     len = strlen(p);
     memcpy(args, p, len);
     p = args;
     p = trimFromLeft(p);
     i = len - strlen(p);
-
+    printf("line 57, args: %s\n", args);
     if (*p == ',')
     {
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
@@ -69,8 +71,10 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
         /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
          */
+        printf("line 72, p[0] : %c args[i] : %c\n", p[0], args[i]);
         if (!isdigit(p[0]) && !isspace(*p))
         {
+            printf("line 74\n");
             if (*p == '-' || *p == '+')
             {
 
@@ -112,7 +116,10 @@ Bool countAndVerifyDataArguments(char *line, char *token)
         if (isdigit(*p))
         {
             i = len - strlen(p);
-            sscanf(&args[i], "%d%c%n", &num, &c, &n);
+            sscanf(&args[i], "%d%n%c", &num, &n, &c);
+
+            printf("line 117, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
+
             if (c && c == ',')
                 commasCounter++;
             else if (c && c != ',' && !isspace(c) && c != '.')
@@ -120,11 +127,12 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
             else if (c == '.')
             {
+                printf("line 126, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
                 /*      p += n - getNumberLength(num);
                      i += n - getNumberLength(num); */
-                p += n;
-                i += n;
+                p += n + 1;
+                i += n + 1;
                 sscanf(&args[i], "%d%n", &num, &n);
             }
             size++;
