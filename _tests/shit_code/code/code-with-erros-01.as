@@ -1,13 +1,20 @@
-LIST1: .data 6, -9
-LIST2: .data 6   , -9
-LIST3: .data 6,-9
-LIST4: .data 6   ,-9
+; $$$$$$$$$$$$$$$$$ GOOOOD $$$$$$$$$$$$$$$$$$$
+LIST1: .data 6   ,-9
+LIST11: .data 12,-9
+LIST111: .data 13, -3
+LIST1111: .data 66, -9
+LIST11111: .data 66 , -9
+    
+; !!!!!!!!!!!!!!!!!!!! BAD !!!!!!!!!!!!!!!!!!!!!!!!!!
+LIST1: .data 6.354, -9
+LIST2: .data -6.435   , -9
+LIST3: .data +-6,-9
 LIST5: .data ,6   ,-9
 LIST6: .data 6 -9
 LIST7: .data 6,, -9
 LIST8: .data 6, -9,
 LIST9: .data 6,a, -9,
-LIST9: .data 6, b, -9
+LIST10: .data 6, b, -9
 
 ; file ps.am
 .entry LIST
