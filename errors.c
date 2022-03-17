@@ -17,9 +17,13 @@ Bool yieldError(Error err)
     {
     case useOfNestedMacrosIsIllegal:
     {
-        printf("useOfNestedMacrosIsIllegal\n");
+        printf("useOfNestedMacrosIsIllegal");
         break;
     }
+
+    case macroClosingWithoutAnyOpenedMacro:
+        printf("macroClosingWithoutAnyOpenedMacro");
+        break;
     case missinSpaceAfterInstruction:
     {
         printf("missin Space After Instruction");
@@ -49,12 +53,12 @@ Bool yieldError(Error err)
 
     case illegalOperand:
     {
-        printf("illegal Operand!\n");
+        printf("illegal Operand!");
         break;
     }
     case operandTypeDoNotMatch:
     {
-        printf("Operand type does not fit to current operation\n");
+        printf("Operand type does not fit to current operation");
         break;
     }
 

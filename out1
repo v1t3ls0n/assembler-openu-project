@@ -1,0 +1,27 @@
+gcc -ansi -Wall -pedantic -g preProcessor.c  variables.c errors.c helpers.c parse.c operations.c tables.c encode.c memory.c secondRun.c firstRun.c compiler.c -o compiler -lm
+File copied successfully.
+c:  i:0 j:5 macroName: token:macro
+c:  i:2 j:0 macroName:m1 token:
+inside addMacro, name:m1 start:1 end:-1 linesLen:-1
+c:  i:0 j:3 macroName:m1 token:inc
+c:  i:0 j:2 macroName:m1 token:r6
+c:  i:0 j:4 macroName:m1 token:move
+c:  i:0 j:4 macroName:m1 token:r3,W
+c:  i:0 j:7 macroName:m1 token:endmlea
+c:  i:0 j:4 macroName:m1 token:STR,
+c:  i:0 j:5 macroName:m1 token:r6inc
+c:  i:0 j:5 macroName:m1 token:r6mov
+c:  i:0 j:3 macroName:m1 token:r3,
+c:  i:0 j:4 macroName:m1 token:Wsub
+c:  i:0 j:3 macroName:m1 token:r1,
+c:  i:0 j:2 macroName:m1 token:r4
+c:  i:0 j:5 macroName:m1 token:macro
+
+###################################
+Error!! occured on line 0 useOfNestedMacrosIsIllegal
+###################################
+
+		 ~ MACRO TABLE ~ 
+name	start	end	line count	
+m1	1	-1	1668180256	
+

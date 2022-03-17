@@ -110,16 +110,6 @@ char *numToBin(int num)
         i++;
     }
 
-    /*     if (num < 0)
-        {
-            i = 3;
-            while (i < BINARY_WORD_SIZE)
-            {
-                i++;
-            }
-        } */
-    /*
-     */
     strcat(word, "\0");
     return word;
 }
