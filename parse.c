@@ -171,10 +171,15 @@ ParseState handleState(char *token, char *line, ParseState state)
 
         if (isLabelDeclaration(token))
         {
-            if (globalState == firstRun)
-                return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+            if (strlen(token) == 1)
+                yieldError(illegalLabelDeclaration);
             else
-                return skipToNextToken;
+            {
+                if (globalState == firstRun)
+                    return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+                else
+                    return skipToNextToken;
+            }
         }
 
         else if (isInstruction(token))

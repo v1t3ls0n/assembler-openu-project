@@ -113,8 +113,8 @@ Bool yieldError(Error err)
     case illegalLabelNameUseOfCharacters:
         printf("illegal Label Name Use Of Characters");
         break;
-    case illegalLabelNameLength:
-        printf("illegal Label Name Length");
+    case illegalLabelDeclaration:
+        printf("illegal Label Declaration");
         break;
     case illegalMacroNameLength:
         printf("illegal Macro Name Length");

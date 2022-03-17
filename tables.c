@@ -413,8 +413,6 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     int i = 0;
     int labelLength = strlen(s);
 
-    if (labelLength <= 1)
-        return yieldError(illegalLabelNameLength);
     /* if label name does not start with a alphabet letter */
     if (isalpha(s[0]) == 0)
         return yieldError(illegalLabelNameUseOfCharacters);
