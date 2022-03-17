@@ -66,7 +66,7 @@ extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
 /* from firstRun.c */
-extern void parseSingleLine(char *line);
+extern Bool parseSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
 extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 extern int getInstructionType(char *s);
@@ -92,7 +92,7 @@ extern void addWord(int value, DataType type);
 extern Bool parseFile(FILE *fp, char *filename);
 
 extern ParseState handleState(char *token, char *line, ParseState state);
-extern void parseSingleLine(char *line);
+extern Bool parseSingleLine(char *line);
 
 Bool writeOperationBinary(char *operationName, char *args)
 {
