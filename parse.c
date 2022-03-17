@@ -335,7 +335,8 @@ Bool parseSingleLine(char *line)
     }
 
     currentLine++;
-    return state == lineParsedSuccessfully ? True : False;
+    printf("state:%d\n", state);
+    return state ? True : False;
 }
 
 Bool parseFile(FILE *fp, char *filename)
@@ -365,7 +366,10 @@ Bool parseFile(FILE *fp, char *filename)
         if (c == '\n' && i > 0)
         {
             if (!parseSingleLine(line))
+            {
+                printf("line 369 in parse.c, parse single line returned false? line:%s\n", line);
                 isValidCode = False;
+            }
 
             memset(line, 0, MAX_LINE_LEN);
             i = 0;

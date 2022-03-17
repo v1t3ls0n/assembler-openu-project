@@ -17,7 +17,7 @@ extern unsigned currentLine;
 int main(int argc, char *argv[])
 {
     initTablesArrays();
-    globalState = replacingMacros;
+    globalState = parsingMacros;
     handleSourceFiles(argc, argv);
     globalState = firstRun;
     handleSourceFiles(argc, argv);
@@ -62,13 +62,13 @@ int handleSourceFiles(int argc, char *argv[])
     {
         fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
         sscanf(argv[i], "%s", fileName);
-        fileName = globalState == replacingMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
+        fileName = globalState == parsingMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
 
         if ((fptr = fopen(fileName, "r")) == NULL)
             yieldError(fileCouldNotBeOpened);
         else
         {
-            if (globalState == replacingMacros)
+            if (globalState == parsingMacros)
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
             {
