@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     initTablesArrays();
     globalState = parsingMacros;
     handleSourceFiles(argc, argv);
+
     globalState = firstRun;
     handleSourceFiles(argc, argv);
 
@@ -29,19 +30,18 @@ int main(int argc, char *argv[])
         initMemory();
         globalState = secondRun;
         handleSourceFiles(argc, argv);
+        if (globalState != collectErrors)
+        {
+            printf("Finished Successfully, about to export files!\n");
+            printBinaryImg();
+            printf("\n");
+            printMemoryImgInRequiredObjFileFormat();
+        }
+        else
+            printf("\nSecond Run Finished With Errors, files will not be exported!\n");
     }
     else
         printf("\nFinished First Run With Errors\n");
-
-    if (globalState != collectErrors)
-    {
-        printf("Finished Successfully, about to export files!\n");
-        printBinaryImg();
-        printf("\n");
-        printMemoryImgInRequiredObjFileFormat();
-    }
-    else
-        printf("\nSecond Run Finished With Errors, files will not be exported!\n");
 
     return 0;
 }

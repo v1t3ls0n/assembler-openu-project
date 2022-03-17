@@ -21,16 +21,14 @@ extern Bool parseFile(FILE *fp, char *filename);
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 
-Bool handleOperation(char *operationName, char *args)
+ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
     char comma = 0;
     char *first = 0, *second = 0, *inBetweenCharacters = 0, *extra = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-
     first = strtok(args, " \t \n");
     inBetweenCharacters = strtok(NULL, " \t \n");
-
     if (!first && !inBetweenCharacters)
     {
     }
@@ -62,7 +60,10 @@ Bool handleOperation(char *operationName, char *args)
     }
     extra = strtok(NULL, " \t \n");
     if (extra)
-        return yieldError(illegalApearenceOfExtraCharactersOnLine);
+    {
+        yieldError(illegalApearenceOfExtraCharactersOnLine);
+        return Err;
+    }
 
     if (parseOperands(first, comma, second, p, active))
     {
@@ -78,10 +79,10 @@ Bool handleOperation(char *operationName, char *args)
         active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
         active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
         increaseInstructionCounter(size);
-        return True;
+        return lineParsedSuccessfully;
     }
 
-    return False;
+    return Err;
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
@@ -164,30 +165,35 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
+ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    /*  printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line); */
+    printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
-            return countAndVerifyDataArguments(line);
+        {
+            printf("line 174\n");
+            return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
+        }
         else if (type == _TYPE_STRING)
-            return countAndVerifyStringArguments(nextTokens);
+            return countAndVerifyStringArguments(nextTokens) ? lineParsedSuccessfully : Err;
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
             char *labelName = calloc(strlen(nextTokens), sizeof(char *));
             strcpy(labelName, nextTokens);
-
             nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
-                return yieldError(illegalApearenceOfCharactersOnLine);
+            {
+                yieldError(illegalApearenceOfCharactersOnLine);
+                return Err;
+            }
             else
             {
                 if (type == _TYPE_ENTRY)
-                    return addSymbol(labelName, 0, 0, 0, 1, 0);
+                    return addSymbol(labelName, 0, 0, 0, 1, 0) ? lineParsedSuccessfully : Err;
                 if (type == _TYPE_EXTERNAL)
-                    return addSymbol(labelName, 0, 0, 0, 0, 1);
+                    return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
             }
         }
     }
@@ -201,13 +207,20 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
             yieldError(illegalSymbolNameAlreadyInUse);
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
-            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0);
-
+        {
+            printf("line 205 inside handle instruction\n");
+            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;
+        }
         else
+        {
+            printf("inside line 213 ,before returning Err!\n");
             return Err;
+        }
     }
+    else
+        yieldError(undefinedOperation);
 
-    return yieldError(undefinedOperation);
+    return Err;
 }
 int handleLabel(char *labelName, char *nextToken, char *line)
 {
@@ -221,6 +234,7 @@ int handleLabel(char *labelName, char *nextToken, char *line)
             return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
         else
             return handleInstruction(instruction, labelName, nextToken, line);
+        ;
         /*        } */
     }
 
@@ -236,12 +250,14 @@ int handleLabel(char *labelName, char *nextToken, char *line)
         /* printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
          */
         if (handleOperation(nextToken, args))
-            return addSymbol(labelName, icAddr, 1, 0, 0, 0);
+            return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? lineParsedSuccessfully : Err;
         else
-            return False;
+            return Err;
     }
 
     else
+    {
         yieldError(illegalLabelUseExpectedOperationOrInstruction);
-    return False;
+        return Err;
+    }
 }
