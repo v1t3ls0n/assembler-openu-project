@@ -3,7 +3,7 @@
 extern State globalState;
 extern void parseSourceFile(FILE *source, char *filename);
 extern int firstRunParsing(FILE *fp, char *filename);
-extern void parseSingleLine(char *line);
+extern Bool parseSingleLine(char *line);
 
 extern void initTablesArrays();
 extern void printBinaryImg();

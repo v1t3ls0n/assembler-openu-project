@@ -34,7 +34,7 @@ int skipTokenNonDigitCharacters(char *s)
     return count;
 }
 
-Bool countAndVerifyDataArguments(char *line, char *token)
+Bool countAndVerifyDataArguments(char *line)
 {
     /*
     token is only one  token at time connected to strtok, you can use it
@@ -127,13 +127,15 @@ Bool countAndVerifyDataArguments(char *line, char *token)
 
             else if (c == '.')
             {
-                printf("line 126, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
-                isValid = yieldError(wrongArgumentTypeNotAnInteger);
+                /*isValid = yieldError(wrongArgumentTypeNotAnInteger);*/
                 /*      p += n - getNumberLength(num);
                      i += n - getNumberLength(num); */
                 p += n + 1;
                 i += n + 1;
+                printf("line 126, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
+                isValid = yieldError(wrongArgumentTypeNotAnInteger);
                 sscanf(&args[i], "%d%n", &num, &n);
+                printf("line 138, num: %d n: %d", num, n);
             }
             size++;
             minusOrPlusFlag = False;
@@ -178,7 +180,7 @@ Bool countAndVerifyStringArguments(char *token)
 ParseState handleState(char *token, char *line, ParseState state)
 
 {
-
+    printf("inside handleState, token:%s line:%s\n", token, line);
     switch (state)
     {
     case skipLine:
@@ -190,10 +192,18 @@ ParseState handleState(char *token, char *line, ParseState state)
             return lineParsedSuccessfully;
 
         if (isLabel(token))
-            return skipToNextToken;
+        {
+            if (globalState == firstRun)
+            {
+                return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+            }
+            else
+                return skipToNextToken;
+        }
 
         else if (isInstruction(token))
         {
+            printf("line 205, is instruction\n");
             if (globalState == firstRun)
                 return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
             else
@@ -238,7 +248,7 @@ ParseState handleState(char *token, char *line, ParseState state)
     return lineParsedSuccessfully;
 }
 
-void parseSingleLine(char *line)
+Bool parseSingleLine(char *line)
 {
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
@@ -252,6 +262,8 @@ void parseSingleLine(char *line)
 
     while (token != NULL && state != lineParsedSuccessfully)
     {
+        printf("inside parseSingleLine while loop, token:%s\n", token);
+
         state = handleState(token, line, state);
         switch (state)
         {
@@ -259,10 +271,9 @@ void parseSingleLine(char *line)
             state = lineParsedSuccessfully;
         case skipToNextToken:
         {
+            printf("inside skip to next token\n");
 
-            if (globalState == firstRun)
-                state = handleLabel(token, strtok(NULL, " \t \n"), line);
-            else if (globalState == secondRun)
+            if (globalState == secondRun)
             {
                 line = line + strlen(token) + 1;
                 state = handleState(strtok(NULL, ", \t \n"), line, newLine);
@@ -285,10 +296,8 @@ void parseSingleLine(char *line)
             token = strtok(NULL, ", \t \n");
     }
 
-    if (!state)
-        globalState = collectErrors;
-
     currentLine++;
+    return state;
 }
 
 Bool parseFile(FILE *fp, char *filename)
@@ -296,8 +305,9 @@ Bool parseFile(FILE *fp, char *filename)
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
-    currentLine = 1;
+    Bool isValidCode = True;
 
+    currentLine = 1;
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
@@ -317,7 +327,7 @@ Bool parseFile(FILE *fp, char *filename)
         if (c == '\n')
         {
 
-            parseSingleLine(line);
+            isValidCode = isValidCode && parseSingleLine(line);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -337,6 +347,8 @@ Bool parseFile(FILE *fp, char *filename)
         parseSingleLine(line);
         memset(line, 0, i);
     }
+    if (!isValidCode)
+        globalState = collectErrors;
 
     return globalState != collectErrors ? True : False;
 }

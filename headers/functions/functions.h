@@ -117,7 +117,7 @@ char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
-void parseSingleLine(char *line);
+Bool parseSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 Bool handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
@@ -165,7 +165,7 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In parse.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-Bool countAndVerifyDataArguments(char *line, char *token);
+Bool countAndVerifyDataArguments(char *line);
 Bool countAndVerifyStringArguments(char *token);
 char *trimFromLeft(char *s);
 int getNumberLength(int num);
