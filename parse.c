@@ -49,14 +49,13 @@ Bool countAndVerifyDataArguments(char *line)
     char c = 0, *p = strstr(line, DATA) + strlen(DATA);
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
-    printf("line 52\n");
-
+    printf("\n\nline 52\n\n");
     len = strlen(p);
     memcpy(args, p, len);
     p = args;
     p = trimFromLeft(p);
     i = len - strlen(p);
-    printf("line 57, args: %s\n", args);
+
     if (*p == ',')
     {
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
@@ -297,7 +296,7 @@ Bool parseSingleLine(char *line)
     }
 
     currentLine++;
-    return state;
+    return state == lineParsedSuccessfully ? True : False;
 }
 
 Bool parseFile(FILE *fp, char *filename)
@@ -318,16 +317,17 @@ Bool parseFile(FILE *fp, char *filename)
         if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
 
-            globalState = collectErrors;
+            isValidCode = False;
             yieldError(maxLineLengthExceeded);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
 
-        if (c == '\n')
+        if (c == '\n' && i > 0)
         {
+            if (!parseSingleLine(line))
+                isValidCode = False;
 
-            isValidCode = isValidCode && parseSingleLine(line);
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }

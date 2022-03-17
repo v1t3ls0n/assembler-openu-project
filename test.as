@@ -1,3 +1,6 @@
-.data a
-.data -9.3, 5.56
-.data -1.3,2.56
+.data -9.345, 5
+.data -1,2
+.data -1, 2
+.data -1 , 2
+
+
