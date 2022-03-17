@@ -39,8 +39,6 @@ Bool countAndVerifyDataArguments(char *line)
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
 
-    /* printf("\n\nline 52\n\n");
-     */
     len = strlen(p);
     memcpy(args, p, len);
     p = args;
@@ -73,22 +71,16 @@ Bool countAndVerifyDataArguments(char *line)
                         minusOrPlusFlag = False;
                     }
                     skip = 1;
-                    /*                     p++;
-                                        i++; */
                 }
                 else if (*p == ',')
                 {
                     skip = countConsecutiveCommasAndTrimSpaces(p);
                     commasCounter += skip;
-                    /*                    p += skip;
-                                       i += skip; */
                 }
                 else
                 {
                     isValid = yieldError(illegalApearenceOfCharactersOnLine);
                     skip = countLengthOfNonDigitToken(p);
-                    /*                     i += skip;
-                                        p += skip; */
                     size++;
                 }
             }
@@ -127,27 +119,10 @@ Bool countAndVerifyDataArguments(char *line)
                 minusOrPlusFlag = False;
                 skip = n > 0 ? n : 1;
                 c = n = num = 0;
-                /*            if (skip)
-                           {
-                               p += skip;
-                               i += skip;
-                           }
-                           else
-                           {
-                               p++;
-                               i++;
-                           } */
-                /*                 p += skip;
-                                i += skip; */
             }
         }
-
         else
-        {
             skip = 1;
-            /*             p++;
-                        i++; */
-        }
 
         p += skip;
         i += skip;

@@ -1,3 +1,21 @@
+; $$$$$$$$$$$$$$$$$ GOOOOD $$$$$$$$$$$$$$$$$$$
+LIST1: .data 6   ,-9
+LIST11: .data 12,-9
+LIST111: .data 13, -3
+LIST1111: .data 66, -9
+LIST11111: .data 66 , -9
+    
+; !!!!!!!!!!!!!!!!!!!! BAD !!!!!!!!!!!!!!!!!!!!!!!!!!
+LIST1: .data 6.354, -9
+LIST2: .data -6.435   , -9
+LIST3: .data +-6,-9
+LIST5: .data ,6   ,-9
+LIST6: .data 6 -9
+LIST7: .data 6,, -9
+LIST8: .data 6, -9,
+LIST9: .data 6,a, -9,
+LIST10: .data 6, b, -9
+
 ; file ps.am
 .entry LIST
 .extern W
@@ -17,6 +35,9 @@ END: stop
 STR: .string "abcd"
 LIST: .data 6, -9
 .data -100
+.data 5.766349
+.data -9.3, 5.56
+.data -1.3,2.56
 .entry K
 K: .data 31
 .extern val1
