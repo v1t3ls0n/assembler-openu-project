@@ -65,15 +65,16 @@ Bool countAndVerifyDataArguments(char *line)
 
     while (p && i < len)
     {
-        i = len - strlen(p);
+
         commasCounter += countConsecutiveCommasAndTrimSpaces(p);
+        i = len - strlen(p);
 
         /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
          */
-        printf("line 72, p[0] : %c args[i] : %c\n", p[0], args[i]);
+        /*      printf("line 72, p[0] : %c args[i] : %c\n", p[0], args[i]); */
         if (!isdigit(p[0]) && !isspace(*p))
         {
-            printf("line 74\n");
+
             if (*p == '-' || *p == '+')
             {
 
@@ -117,7 +118,7 @@ Bool countAndVerifyDataArguments(char *line)
             i = len - strlen(p);
             sscanf(&args[i], "%d%n%c", &num, &n, &c);
 
-            printf("line 117, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
+            printf("line 117, commaCounter:%d num: %d c: %c n: %d args[i] : %c p: %s\n", commasCounter, num, c, n, args[i], p);
 
             if (c && c == ',')
                 commasCounter++;
@@ -131,10 +132,14 @@ Bool countAndVerifyDataArguments(char *line)
                      i += n - getNumberLength(num); */
                 p += n + 1;
                 i += n + 1;
+                /*
                 printf("line 126, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
+ */
                 isValid = yieldError(wrongArgumentTypeNotAnInteger);
                 sscanf(&args[i], "%d%n", &num, &n);
-                printf("line 138, num: %d n: %d", num, n);
+
+                /* printf("line 138, num: %d n: %d", num, n);
+                 */
             }
             size++;
             minusOrPlusFlag = False;
