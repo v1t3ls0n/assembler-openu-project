@@ -149,22 +149,19 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         }
     }
 
-    if (offsetCounter)
+    if (offsetCounter && (state == evalToken || state == parsingMacroName))
     {
-        if (state == evalToken)
+        if (isMacroOpening(token) || isMacroClosing(token))
         {
-            if (!(isMacroOpening(token) || isMacroClosing(token)) && isPossiblyUseOfMacro(token))
-            {
-                Item *p = getMacro(token);
-                popLastToken(target, token, j);
-                if (p != NULL)
-                    replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
-            }
-        }
-        else
-        {
-            popCharacters(target, position, offsetCounter);
             popLastToken(target, "", offsetCounter - j - i);
+        }
+
+        else if (isPossiblyUseOfMacro(token))
+        {
+            Item *p = getMacro(token);
+            popLastToken(target, token, offsetCounter - j - i);
+            if (p != NULL)
+                replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
         }
     }
 }
@@ -192,7 +189,7 @@ void popLastToken(FILE *target, char *token, int offset)
     if (offset)
     {
         fseek(target, -offset, SEEK_CUR);
-        while (offset--)
+        while (--offset)
             fputc(' ', target);
     }
 }
