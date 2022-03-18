@@ -3,22 +3,8 @@ extern Bool yieldError(Error err);
 extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLine;
-
-int countConsecutiveCommas(char *s)
-{
-    int counter = 0;
-    for (; s && *s == ','; counter++, s++)
-        ;
-    return counter;
-}
-
-int countLengthOfNonDigitToken(char *s)
-{
-    int count = 0;
-    for (; !isdigit(*s) && *s != ','; s++, count++)
-        ;
-    return count;
-}
+extern int countConsecutiveCommas(char *s);
+extern int countLengthOfNonDigitToken(char *s);
 
 Bool countAndVerifyDataArguments(char *line)
 {
@@ -125,11 +111,11 @@ Bool countAndVerifyDataArguments(char *line)
         i += skip;
     }
 
-    printf("line 189 commaCounter:%d size:%d\n", commasCounter, size);
+    /*     printf("line 189 commaCounter:%d size:%d\n", commasCounter, size); */
     if (commasCounter > (size - 1))
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    printf("isValid:%d\n", isValid);
+    /*     printf("isValid:%d\n", isValid); */
     if (isValid)
         increaseDataCounter(size);
 
@@ -233,7 +219,7 @@ Bool parseSingleLine(char *line)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+    /*     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line); */
     memcpy(lineCopy, line, strlen(line));
     if (globalState == firstRun)
         token = strtok(lineCopy, " \t \n");

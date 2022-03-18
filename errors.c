@@ -135,7 +135,7 @@ Bool yieldError(Error err)
         printf("Number must be an integer!");
         break;
     case expectedNumber:
-        printf("Only integer numbers allowed!");
+        printf("expected number but got letter instead, argument must be an integer number");
         break;
 
     case symbolCannotBeBothCurrentTypeAndRequestedType:

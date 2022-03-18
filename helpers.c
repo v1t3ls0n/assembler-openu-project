@@ -242,3 +242,19 @@ int hex2int(char ch)
         return ch - 'a' + 10;
     return -1;
 }
+
+int countConsecutiveCommas(char *s)
+{
+    int counter = 0;
+    for (; s && *s == ','; counter++, s++)
+        ;
+    return counter;
+}
+
+int countLengthOfNonDigitToken(char *s)
+{
+    int count = 0;
+    for (; !isdigit(*s) && *s != ','; s++, count++)
+        ;
+    return count;
+}
