@@ -28,9 +28,7 @@ FILE *createExpandedSourceFile(FILE *source, char *fileName);
 void parseSourceFile(FILE *source, char *filename)
 {
 
-    FILE *target = createExpandedSourceFile(source, filename);
-    rewind(target);
-    fclose(target);
+    createExpandedSourceFile(source, filename);
     printMacroTable();
 }
 
@@ -85,7 +83,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
             }
             else
             {
-                if (j > 0 || i > 0)
+                if ((j > 0) || i > 0)
                 {
 
                     if (state == evalToken)
@@ -161,6 +159,7 @@ void popLastToken(FILE *target, char *token)
     int len = strlen(token);
     /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
      */
+
     fseek(target, -len, SEEK_CUR);
     fputc(' ', target);
 }
@@ -190,7 +189,7 @@ FILE *createExpandedSourceFile(FILE *source, char *fileName)
         exit(1);
     }
     parseAndReplaceMacros(source, target);
-    printf("File copied successfully.\n");
+    rewind(target);
     fclose(source);
     return target;
 }
