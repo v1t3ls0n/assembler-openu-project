@@ -46,7 +46,7 @@ void parseSourceFile(FILE *source, char *filename)
 void saveMacros(FILE *newFile)
 {
     ParseState state = evalToken;
-    Bool isMacro = False;
+    Bool isMacroCurrentlyParsed = False;
     int c = 0, i = 0, j = 0;
     int start = 0, end = 0, current = 0;
     char token[MAX_LINE_LEN] = {0};
@@ -80,20 +80,20 @@ void saveMacros(FILE *newFile)
                 {
                     if (state == evalToken)
                     {
-                        if (!isMacro && isMacroOpening(token))
+                        if (!isMacroCurrentlyParsed && isMacroOpening(token))
                         {
                             state = parsingMacroName;
                             start = current;
-                            isMacro = True;
+                            isMacroCurrentlyParsed = True;
                         }
 
-                        else if (isMacro && isMacroClosing(token))
+                        else if (isMacroCurrentlyParsed && isMacroClosing(token))
                         {
                             end = current;
                             addMacro(macroName, start, end);
                             start = end = current;
                             memset(macroName, 0, i);
-                            isMacro = False;
+                            isMacroCurrentlyParsed = False;
                             state = skipLine;
                         }
                         else
@@ -110,7 +110,7 @@ void saveMacros(FILE *newFile)
                             yieldError(illegalMacroNameUseOfSavedKeywords);
                             memset(macroName, 0, i);
                             state = skipLine;
-                            isMacro = False;
+                            isMacroCurrentlyParsed = False;
                         }
                     }
                     memset(token, 0, j);
