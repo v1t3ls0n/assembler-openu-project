@@ -1,6 +1,8 @@
 
 typedef enum
 {
+    undefinedTokenNotOperationOrInstructionOrLabel,
+    illegalLabelDeclaration,
     useOfNestedMacrosIsIllegal,
     memoryAllocationFailure,
     undefinedOperation,
@@ -20,6 +22,7 @@ typedef enum
     symbolCannotBeBothCurrentTypeAndRequestedType,
     labelNameAlreadyInUseInsideSymbolTable,
     illegalMacroNameAlreadyInUse,
+    macroClosingWithoutAnyOpenedMacro,
     wrongArgumentTypeNotAnInteger,
     wrongInstructionSyntaxMissinCommas,
     wrongInstructionSyntaxExtraCommas,
@@ -58,7 +61,7 @@ typedef enum
 {
     firstRun,
     secondRun,
-    replacingMacros,
+    parsingMacros,
     writeFiles,
     collectErrors,
     stopProgram,
@@ -68,55 +71,32 @@ typedef enum
 
 typedef enum
 {
-    skipLine = 134,
-    newLine = 233,
-    skipToNextToken = 359,
-    parseLabel = 4364,
-    parseInstruction = 55,
-    parseOperation = 333,
-    returnFalse = 4678,
-    lineParsedSuccessfully = 11111111,
-    parsingLine = 112,
-    parsingMacro = 86,
-    replacingMacro = 11,
     Err = 0,
-    parseDataVariables = 3,
-    parseMacroName,
-    parseMacroContent,
-    parseStringVariables = 98,
-    parseEntryVariable = 97,
-    parseExternalVariable = 953,
-    parseSourceOperand = 77,
-    parseDestinationOperand = 93,
-    expectNewline = 92,
-    writingOperationIntoMemoryImg,
-    writingDataIntoMemoryImg,
-    genFirstWord,
-    genSecondWord,
-    endParsingOfMacroThatHaveNoEndingTag,
-    evalToken
+    lineParsedSuccessfully = 1,
+    skipLine = 2,
+    newLine = 3,
+    skipToNextToken = 4,
+    parseLabel = 5,
+    parseInstruction = 6,
+    parseOperation = 7,
+    parsingLine = 8,
+
+    parsingMacro,
+    parsingMacroName = 9,
+    parsingMacroContent = 10,
+    endParsingOfMacroThatHaveNoEndingTag = 11,
+    evalToken = 12,
+    parseDataVariables = 13,
+    parseStringVariables = 14,
+    parseEntryVariable = 15,
+    parseExternalVariable = 16,
+    parseSourceOperand = 17,
+    parseDestinationOperand = 18,
+    writingOperationIntoMemoryImg = 19,
+    writingDataIntoMemoryImg = 20
 
 } ParseState;
-/* typedef enum
-{
-    skipLine = 134,
-    newLine = 233,
-    parseLabel = 4364,
-    parseInstruction = 55,
-    parseOperation = 333,
-    Err = 0,
-    parseDataVariables = 3,
-    parseStringVariables = 98,
-    parseEntryVariable = 97,
-    parseExternalVariable = 953,
-    parseSourceOperand = 77,
-    parseDestinationOperand = 93,
-    expectNewline = 92,
-    writingOperationIntoMemoryImg,
-    writingDataIntoMemoryImg,
-    genFirstWord,
-    genSecondWord,
-} ParseState; */
+
 typedef enum
 {
     Binary,

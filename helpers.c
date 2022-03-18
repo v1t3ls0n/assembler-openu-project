@@ -16,6 +16,15 @@ int countSpaceCharacters(char *s)
     return i;
 }
 
+unsigned calcNumberCharactersLength(int num)
+{
+    unsigned count = 1;
+    while (num / 10)
+        count++;
+
+    return count;
+}
+
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -110,16 +119,6 @@ char *numToBin(int num)
         i++;
     }
 
-    /*     if (num < 0)
-        {
-            i = 3;
-            while (i < BINARY_WORD_SIZE)
-            {
-                i++;
-            }
-        } */
-    /*
-     */
     strcat(word, "\0");
     return word;
 }
@@ -253,13 +252,9 @@ Bool isOperation(char *s)
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
-Bool isLabel(char *s)
+Bool isLabelDeclaration(char *s)
 {
-    int len = strlen(s);
-    if (len <= 1)
-        return yieldError(illegalLabelNameLength);
-
-    return s[len - 1] == ':' ? True : False;
+    return s[strlen(s) - 1] == ':' ? True : False;
 }
 
 int getInstructionType(char *s)
@@ -288,6 +283,11 @@ Bool isInstruction(char *s)
     }
     else
         return False;
+}
+
+Bool isInstructionStrict(char *s)
+{
+    return ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL))) ? True : False;
 }
 
 Bool isRegistery(char *s)

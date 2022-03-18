@@ -5,34 +5,17 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
-extern int countSpaceCharacters(char *s);
-int getNumberLength(int num)
-{
-    int length = 1;
-    /*counts the first digit of the given number*/
-    while (num / 10) /*divides the number each time by 10 in order to remov digits its already counted*/
-        length++;    /*increase the digit's counter by 1*/
-
-    return length; /*returns the amount of digits in the given number*/
-}
-
-int countConsecutiveCommasAndTrimSpaces(char *s)
+int countConsecutiveCommas(char *s)
 {
     int counter = 0;
-    /*     memcpy(s, trimFromLeft(s), strlen(s)); */
     for (; s && *s == ','; counter++, s++)
         ;
-    /*     memcpy(s, trimFromLeft(s), strlen(s)); */
     return counter;
 }
 
-int skipTokenNonDigitCharacters(char *s)
+int countLengthOfNonDigitToken(char *s)
 {
     int count = 0;
-
-    /* for (; (!isdigit(*s) || isspace(*s)) && *s != ','; s++, count++)
-        ;
- */
     for (; !isdigit(*s) && *s != ','; s++, count++)
         ;
     return count;
@@ -54,8 +37,6 @@ Bool countAndVerifyDataArguments(char *line)
     Bool isValid = True;
     Bool minusOrPlusFlag = False;
 
-    /* printf("\n\nline 52\n\n");
-     */
     len = strlen(p);
     memcpy(args, p, len);
     p = args;
@@ -74,11 +55,6 @@ Bool countAndVerifyDataArguments(char *line)
 
         if (!isspace(p[0]))
         {
-            /*         commasCounter += countConsecutiveCommasAndTrimSpaces(p); */
-
-            /*         printf("After using  countConsecutiveCommasAndTrimSpaces(p)\nargs[i]:%c\np:%c\nsize:%d commaCounter:%d num:%d c:%c\n\n\n", args[i], *p, size, commasCounter, num, c);
-             */
-            /*      printf("line 72, p[0] : %c args[i] : %c\n", p[0], args[i]); */
             i = len - strlen(p);
             if (!isdigit(p[0]))
             {
@@ -89,26 +65,20 @@ Bool countAndVerifyDataArguments(char *line)
                         minusOrPlusFlag = True;
                     else
                     {
-                        isValid = yieldError(illegalApearenceOfCharactersOnLine);
+                        isValid = yieldError(expectedNumber);
                         minusOrPlusFlag = False;
                     }
-
-                    p++;
-                    i++;
+                    skip = 1;
                 }
                 else if (*p == ',')
                 {
-                    skip = countConsecutiveCommasAndTrimSpaces(p);
+                    skip = countConsecutiveCommas(p);
                     commasCounter += skip;
-                    p += skip;
-                    i += skip;
                 }
                 else
                 {
-                    isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                    skip = skipTokenNonDigitCharacters(p);
-                    i += skip;
-                    p += skip;
+                    isValid = yieldError(expectedNumber);
+                    skip = countLengthOfNonDigitToken(p);
                     size++;
                 }
             }
@@ -122,8 +92,6 @@ Bool countAndVerifyDataArguments(char *line)
 
                 else if (commasCounter > size)
                 {
-                    /* 1,3,,4 */
-                    /*       else if (commasCounter > 0 && (size < commasCounter)) */
                     isValid = yieldError(wrongInstructionSyntaxExtraCommas);
                     commasCounter = size;
                 }
@@ -133,66 +101,36 @@ Bool countAndVerifyDataArguments(char *line)
                     commasCounter = size;
                 }
 
-                /*                if (isdigit(*p))
-                               { */
                 i = len - strlen(p);
                 sscanf(&args[i], "%d%n%c", &num, &n, &c);
-
-                printf("line 130, commaCounter:%d size:%d num: %d c: %c n: %d args[i] : %c p: %s\n", commasCounter, size, num, c, n, args[i], p);
-
-                /*                 if (c && c == ',')
-                                {
-                                    commasCounter++;
-                                } */
                 if (c && c != ',' && !isspace(c) && c != '.')
                     isValid = yieldError(illegalApearenceOfCharactersOnLine);
 
                 else if (c == '.')
                 {
-                    /*isValid = yieldError(wrongArgumentTypeNotAnInteger);*/
-                    /*      p += n - getNumberLength(num);
-                         i += n - getNumberLength(num); */
+                    isValid = yieldError(wrongArgumentTypeNotAnInteger);
                     p += n + 1;
                     i += n + 1;
-                    /*
-                    printf("line 126, num: %d c: %c n: %d args[i] : %c p: %s\n", num, c, n, args[i], p);
-     */
-                    isValid = yieldError(wrongArgumentTypeNotAnInteger);
                     sscanf(&args[i], "%d%n", &num, &n);
-
-                    /* printf("line 138, num: %d n: %d", num, n);
-                     */
                 }
                 size++;
                 minusOrPlusFlag = False;
-
-                /* } */
-
-                if (n)
-                {
-                    p += n;
-                    i += n;
-                    c = n = num = 0;
-                }
-                else
-                {
-                    p++;
-                    i++;
-                }
+                skip = n > 0 ? n : 1;
+                c = n = num = 0;
             }
         }
-
         else
-        {
-            p++;
-            i++;
-        }
+            skip = 1;
+
+        p += skip;
+        i += skip;
     }
 
     printf("line 189 commaCounter:%d size:%d\n", commasCounter, size);
     if (commasCounter > (size - 1))
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
+    printf("isValid:%d\n", isValid);
     if (isValid)
         increaseDataCounter(size);
 
@@ -229,21 +167,24 @@ ParseState handleState(char *token, char *line, ParseState state)
         if (isComment(token))
             return lineParsedSuccessfully;
 
-        if (isLabel(token))
+        if (isLabelDeclaration(token))
         {
-            if (globalState == firstRun)
-            {
-                return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
-            }
+            if (strlen(token) == 1)
+                yieldError(illegalLabelDeclaration);
             else
-                return skipToNextToken;
+            {
+                if (globalState == firstRun)
+                    return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+                else
+                    return skipToNextToken;
+            }
         }
 
         else if (isInstruction(token))
         {
             /*           printf("line 205, is instruction\n"); */
             if (globalState == firstRun)
-                return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+                return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line);
             else
             {
                 int type = getInstructionType(token);
@@ -251,11 +192,11 @@ ParseState handleState(char *token, char *line, ParseState state)
 
                 if (type == _TYPE_DATA)
                 {
-                    return writeDataInstruction(token);
+                    return writeDataInstruction(token) ? lineParsedSuccessfully : Err;
                 }
                 else if (type == _TYPE_STRING)
                 {
-                    return writeStringInstruction(token);
+                    return writeStringInstruction(token) ? lineParsedSuccessfully : Err;
                 }
                 else
                     return lineParsedSuccessfully;
@@ -267,15 +208,17 @@ ParseState handleState(char *token, char *line, ParseState state)
             char args[MAX_LINE_LEN] = {0};
             /*            line = line + strlen(token); */
             strcpy(args, (line + strlen(token)));
-            return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
+            return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
+                                                                                                              : Err;
         }
         else
         {
-            if (globalState == firstRun)
-            {
-                yieldError(illegalLabelUseExpectedOperationOrInstruction);
-                return Err;
-            }
+            if (strlen(token) > 1)
+                yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            else
+                yieldError(illegalApearenceOfCharactersOnLine);
+
+            return Err;
         }
     }
 
@@ -283,7 +226,7 @@ ParseState handleState(char *token, char *line, ParseState state)
         break;
     }
 
-    return lineParsedSuccessfully;
+    return state;
 }
 
 Bool parseSingleLine(char *line)
@@ -309,14 +252,8 @@ Bool parseSingleLine(char *line)
             state = lineParsedSuccessfully;
         case skipToNextToken:
         {
-            /*             printf("inside skip to next token\n");
-             */
-            if (globalState == secondRun)
-            {
-                line = line + strlen(token) + 1;
-                state = handleState(strtok(NULL, ", \t \n"), line, newLine);
-            }
-
+            line = line + strlen(token) + 1;
+            state = handleState(strtok(NULL, ", \t \n"), line, newLine);
             break;
         }
 
@@ -335,7 +272,9 @@ Bool parseSingleLine(char *line)
     }
 
     currentLine++;
-    return state == lineParsedSuccessfully ? True : False;
+
+    printf("state:%d\n", state);
+    return state ? True : False;
 }
 
 Bool parseFile(FILE *fp, char *filename)
@@ -383,7 +322,9 @@ Bool parseFile(FILE *fp, char *filename)
 
     if (i > 0)
     {
-        parseSingleLine(line);
+        if (!parseSingleLine(line))
+            isValidCode = False;
+
         memset(line, 0, i);
     }
     if (!isValidCode)

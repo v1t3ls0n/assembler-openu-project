@@ -17,9 +17,13 @@ Bool yieldError(Error err)
     {
     case useOfNestedMacrosIsIllegal:
     {
-        printf("useOfNestedMacrosIsIllegal\n");
+        printf("useOfNestedMacrosIsIllegal");
         break;
     }
+
+    case macroClosingWithoutAnyOpenedMacro:
+        printf("macroClosingWithoutAnyOpenedMacro");
+        break;
     case missinSpaceAfterInstruction:
     {
         printf("missin Space After Instruction");
@@ -49,12 +53,12 @@ Bool yieldError(Error err)
 
     case illegalOperand:
     {
-        printf("illegal Operand!\n");
+        printf("illegal Operand!");
         break;
     }
     case operandTypeDoNotMatch:
     {
-        printf("Operand type does not fit to current operation\n");
+        printf("Operand type does not fit to current operation");
         break;
     }
 
@@ -69,7 +73,9 @@ Bool yieldError(Error err)
         printf("requiredDestinationOperandIsMissin");
         break;
     }
-
+    case illegalMacroNameUseOfSavedKeywords:
+        printf("illegal Macro Name Use Of Saved Keywords");
+        break;
     case wrongRegisteryReferenceUndefinedReg:
         printf("registery name passed as operand does not exist, registeries names are r0 - r15");
         break;
@@ -113,8 +119,8 @@ Bool yieldError(Error err)
     case illegalLabelNameUseOfCharacters:
         printf("illegal Label Name Use Of Characters");
         break;
-    case illegalLabelNameLength:
-        printf("illegal Label Name Length");
+    case illegalLabelDeclaration:
+        printf("illegal Label Declaration");
         break;
     case illegalMacroNameLength:
         printf("illegal Macro Name Length");
@@ -153,6 +159,12 @@ Bool yieldError(Error err)
         break;
     case illegalApearenceOfCharactersOnLine:
         printf("Illegal use of characters");
+        break;
+    case undefinedTokenNotOperationOrInstructionOrLabel:
+        printf("illegal token in begning of current line,  not operation nor instruction or label decleration");
+        break;
+    case illegalApearenceOfExtraCharactersOnLine:
+        printf("Illegal appearence of extra characters after the end or before begning of the line");
         break;
 
     case expectedQuotes:

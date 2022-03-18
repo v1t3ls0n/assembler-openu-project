@@ -70,7 +70,6 @@ typedef struct
 {
     int start;
     int end;
-    int linesLen;
 } MacroData;
 
 typedef struct
