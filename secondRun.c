@@ -100,7 +100,6 @@ Bool writeDataInstruction(char *token)
     int num;
     while (token != NULL)
     {
-        /*         printf("token:%s\n", token); */
         num = atoi(token);
         addWord((A << 16) | num, Data);
         token = strtok(NULL, ", \t \n");
@@ -140,7 +139,7 @@ void writeFirstWord(Operation *op)
 
 void writeDirectOperandWord(char *labelName)
 {
-    unsigned base = 0, offset = 0, value = 0;
+    unsigned base = 0, offset = 0;
     if (isExternal(labelName))
     {
         base = getIC();
@@ -203,5 +202,5 @@ int parseRegNumberFromIndexAddrOperand(char *s)
 void writeToExternalFile(char *name, unsigned base, unsigned offset)
 {
 
-    printf("use of external variable\nname:%s\nbase:%u\noffset:%u\n", name, base, offset);
+    printf("\nEXTERNAL VARIABLE\nNAME:%s\nBASE:%u\nOFFSET:%u\n\n", name, base, offset);
 }
