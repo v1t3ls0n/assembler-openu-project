@@ -2,7 +2,7 @@
 extern Bool yieldError(Error err);
 extern char *trimFromLeft(char *s);
 extern State globalState;
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
 
@@ -219,7 +219,7 @@ Bool parseSingleLine(char *line)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    /*     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line); */
+    /*     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLineNumber, line); */
     memcpy(lineCopy, line, strlen(line));
     if (globalState == firstRun)
         token = strtok(lineCopy, " \t \n");
@@ -266,7 +266,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-    currentLine = 1;
+    currentLineNumber = 1;
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
@@ -288,7 +288,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
             if (!parseSingleLine(line))
                 isValidCode = False;
 
-            currentLine++;
+            currentLineNumber++;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }

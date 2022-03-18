@@ -17,7 +17,7 @@ int parseAllStrict(FILE *target)
                 state = evalToken;
 
             current++;
-            currentLine++;
+            currentLineNumber++;
         }
 
         if (state != skipLine)
@@ -69,7 +69,7 @@ int parseAllStrict(FILE *target)
 
               else if (isMacroOpening(token))
               {
-                  if ((currentLine - start) < 2)
+                  if ((currentLineNumber - start) < 2)
                   {
                       yieldError(useOfNestedMacrosIsIllegal);
                   }

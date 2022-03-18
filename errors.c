@@ -1,11 +1,11 @@
 
 #include "data.h"
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 
 Bool yieldError(Error err)
 {
     printf("\n###################################\n");
-    printf("Error!! occured on line %d ", currentLine);
+    printf("Error!! occured on line %d ", currentLineNumber);
 
     /*     illegalLabelNameUseOfCharacters
 

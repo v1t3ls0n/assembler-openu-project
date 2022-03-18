@@ -7,12 +7,12 @@ extern Bool parseSingleLine(char *line);
 
 extern void initTablesArrays();
 extern void printBinaryImg();
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 extern void initMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 
 int main(int argc, char *argv[])
 {
