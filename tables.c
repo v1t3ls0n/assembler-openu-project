@@ -88,7 +88,7 @@ void printMacroTable()
 {
     int i = 0;
     printf("\n\t ~ MACRO TABLE ~ \n");
-    printf("name\tstart\tend\t");
+    printf("\tname\tstart\tend");
     while (i < HASHSIZE)
     {
         if (macros[i] != NULL)
@@ -101,7 +101,7 @@ void printMacroTable()
 int printMacroItem(Item *item)
 {
 
-    printf("\n%s\t\t%d\t\t%d\t", item->name, item->val.m.start, item->val.m.end);
+    printf("\n\t%s\t %5d\t%6d", item->name, item->val.m.start, item->val.m.end);
     if (item->next != NULL)
         printMacroItem(item->next);
     return 0;
