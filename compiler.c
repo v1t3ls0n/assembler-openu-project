@@ -11,7 +11,7 @@ extern unsigned currentLine;
 extern void initMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern Bool parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 extern unsigned currentLine;
 
 int main(int argc, char *argv[])

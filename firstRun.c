@@ -1,7 +1,4 @@
 #include "data.h"
-/* Shared global State variables*/
-extern State globalState;
-extern unsigned currentLine;
 
 extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
@@ -16,7 +13,7 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
-extern Bool parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);

@@ -270,19 +270,16 @@ Bool parseSingleLine(char *line)
             token = strtok(NULL, ", \t \n");
     }
 
-    currentLine++;
-
-    printf("state:%d\n", state);
+    /*     printf("state:%d\n", state); */
     return state ? True : False;
 }
 
-Bool parseAssemblyCode(FILE *fp, char *filename)
+void parseAssemblyCode(FILE *fp, char *filename)
 {
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-
     currentLine = 1;
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
@@ -305,6 +302,7 @@ Bool parseAssemblyCode(FILE *fp, char *filename)
             if (!parseSingleLine(line))
                 isValidCode = False;
 
+            currentLine++;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -323,11 +321,8 @@ Bool parseAssemblyCode(FILE *fp, char *filename)
     {
         if (!parseSingleLine(line))
             isValidCode = False;
-
-        memset(line, 0, i);
     }
+
     if (!isValidCode)
         globalState = collectErrors;
-
-    return globalState != collectErrors ? True : False;
 }

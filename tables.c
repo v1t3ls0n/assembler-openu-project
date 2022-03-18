@@ -1,6 +1,5 @@
 #include "data.h"
 /* Shared global State variables*/
-extern State globalState;
 Item *symbols[HASHSIZE] = {0};
 Item *macros[HASHSIZE] = {0};
 extern const char *regs[REGS_SIZE];

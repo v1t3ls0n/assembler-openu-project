@@ -1,7 +1,6 @@
 
 
 #include "data.h"
-extern State globalState;
 extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);
 extern Bool isComment(char *s);
