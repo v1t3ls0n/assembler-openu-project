@@ -1,69 +1,5 @@
 
-
-/*
-ignore for now:
-if first token is label -> check if external if so -> update symbol table and add IC/DC to field of places of use.
- */
-
-/*
-
-*binaryImg is an Array of BinaryWords in the size of instruction and data words we counted
-
-Pseudo-Code:
-1. read line:
-
-2.if first token is ; comment or empty space, skip next.
-
-3.if label -> check if data/string instruction or operation
-
-4. if data/string instruction? go to step 5, if entry/external ignore and and skip line
-
-5.if data/string instruction, with iterate through arguments,
-every letter/number inside the loop we convert it to binary,
-add it to binaryImg from index of current DC-100, AND THEN DC++
-number = strtok(arguments,", /t");
-when we finish we return True and go to next line;
-
-6. if it is operation we need to go through few steps
-6.1 build first word:
-from operation and Absolute value (A | operation->op) we convert to value to string and we:
-6.2 go to step 7
-
-7.writeWord(int value, int _ARE): convert number to binary and add to binaryImg[IC-100] word and IC++;
-
-8.3 build second word (A | operation->funct | src reg? | src addr? || des reg? | des addr?):
-8.3.1 check operands and get values for (src/des reg and addr)
-8.3.2 parse operands, we know addr for src/des, check regs
-8.3.3 if src/des have a index or reg addresing method, we need to get registery number and convert to binary
-8.3.3.1 after we get reg number numbers ,we connect all of:
-(A | operation->funct | src reg | src addr | des reg | des addr) and build from it second word
-8.4 go to step 7
-
-9. if src addresing have immediate addressing method go to step 7 and pass the number
-10. if src addressing have index/direct method, get label from symbol table , check if symbol
-is type of external, if so go to step 7, pass E else pass R and base and offset.
-- if label does not exist, yield error, change state to collect errors and move next line to check if there are more errors to print, when we finish second run
-in this case, we check if globalState == collectErrors, if so, we do not export compiled files.
-
-11. if des addressing have index/direct do the same as in step 10
-
-12. if src addresing have immediate addresing method, go to step 7 with A and the number
-converted already to binary.
-
-13. if des addresing have immediate addresing method, do the same as step 12.
-
-14. we done , go to next line.
-
-
-
-
- */
-
 #include "data.h"
-/* from variables.c (global Variables) */
-extern State globalState;
-extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
 
 /* from firstRun.c */
 extern Bool parseSingleLine(char *line);
@@ -89,7 +25,7 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern Bool parseFile(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 
 extern ParseState handleState(char *token, char *line, ParseState state);
 extern Bool parseSingleLine(char *line);
@@ -164,7 +100,6 @@ Bool writeDataInstruction(char *token)
     int num;
     while (token != NULL)
     {
-        /*         printf("token:%s\n", token); */
         num = atoi(token);
         addWord((A << 16) | num, Data);
         token = strtok(NULL, ", \t \n");
@@ -205,11 +140,22 @@ void writeFirstWord(Operation *op)
 void writeDirectOperandWord(char *labelName)
 {
     unsigned base = 0, offset = 0;
-    int _ARE = isExternal(labelName) ? E : R;
-    base = getSymbolBaseAddress(labelName);
-    offset = getSymbolOffset(labelName);
-    addWord((_ARE << 16) | base, Code);
-    addWord((_ARE << 16) | offset, Code);
+    if (isExternal(labelName))
+    {
+        base = getIC();
+        addWord((E << 16) | 0, Code);
+        offset = getIC();
+        addWord((E << 16) | 0, Code);
+        writeToExternalFile(labelName, base, offset);
+    }
+
+    else
+    {
+        base = getSymbolBaseAddress(labelName);
+        offset = getSymbolOffset(labelName);
+        addWord((R << 16) | base, Code);
+        addWord((R << 16) | offset, Code);
+    }
 }
 
 void writeImmediateOperandWord(char *n)
@@ -251,4 +197,10 @@ int parseRegNumberFromIndexAddrOperand(char *s)
     if (p)
         *p = 0;
     return getRegisteryNumber(s);
+}
+
+void writeToExternalFile(char *name, unsigned base, unsigned offset)
+{
+
+    printf("\nEXTERNAL VARIABLE\nNAME:%s\nBASE:%u\nOFFSET:%u\n\n", name, base, offset);
 }

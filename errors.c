@@ -1,11 +1,11 @@
 
 #include "data.h"
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 
 Bool yieldError(Error err)
 {
-    printf("\n###################################\n");
-    printf("Error!! occured on line %d ", currentLine);
+    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "Error!! occured on line %d ", currentLineNumber);
 
     /*     illegalLabelNameUseOfCharacters
 
@@ -15,175 +15,176 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+
     case useOfNestedMacrosIsIllegal:
     {
-        printf("useOfNestedMacrosIsIllegal");
+        fprintf(stderr, "useOfNestedMacrosIsIllegal");
         break;
     }
 
     case macroClosingWithoutAnyOpenedMacro:
-        printf("macroClosingWithoutAnyOpenedMacro");
+        fprintf(stderr, "macroClosingWithoutAnyOpenedMacro");
         break;
     case missinSpaceAfterInstruction:
     {
-        printf("missin Space After Instruction");
+        fprintf(stderr, "missin Space After Instruction");
         break;
     }
     case illegalApearenceOfCommaBeforeFirstParameter:
     {
-        printf("Illegal appearence of a comma between before the first parameter");
+        fprintf(stderr, "Illegal appearence of a comma between before the first parameter");
         break;
     }
     case illegalApearenceOfCommaAfterLastParameter:
     {
-        printf("Illegal appearence of a comma after the last parameter");
+        fprintf(stderr, "Illegal appearence of a comma after the last parameter");
         break;
     }
 
     case wrongInstructionSyntaxIllegalCommaPosition:
     {
-        printf("comma appearence on line is illegal!");
+        fprintf(stderr, "comma appearence on line is illegal!");
         break;
     }
     case labelNotExist:
     {
-        printf("undefined label name, label name was not found in symbol table, assembler compilation faild, not files were created");
+        fprintf(stderr, "undefined label name, label name was not found in symbol table, assembler compilation faild, not files were created");
         break;
     }
 
     case illegalOperand:
     {
-        printf("illegal Operand!");
+        fprintf(stderr, "illegal Operand!");
         break;
     }
     case operandTypeDoNotMatch:
     {
-        printf("Operand type does not fit to current operation");
+        fprintf(stderr, "Operand type does not fit to current operation");
         break;
     }
 
     case requiredSourceOperandIsMissin:
     {
-        printf("requiredSourceOperandIsMissin");
+        fprintf(stderr, "requiredSourceOperandIsMissin");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        printf("requiredDestinationOperandIsMissin");
+        fprintf(stderr, "requiredDestinationOperandIsMissin");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
-        printf("illegal Macro Name Use Of Saved Keywords");
+        fprintf(stderr, "illegal Macro Name Use Of Saved Keywords");
         break;
     case wrongRegisteryReferenceUndefinedReg:
-        printf("registery name passed as operand does not exist, registeries names are r0 - r15");
+        fprintf(stderr, "registery name passed as operand does not exist, registeries names are r0 - r15");
         break;
 
     case fileCouldNotBeOpened:
-        printf("file could not be  opened");
+        fprintf(stderr, "file could not be  opened");
         break;
     case AssemblerDidNotGetSourceFiles:
-        printf("You did not passed any source files to the assembler!");
+        fprintf(stderr, "You did not passed any source files to the assembler!");
         break;
     case illegalOverrideOfExternalSymbol:
-        printf("Overriding of external symbol exisiting in table is not allowed!");
+        fprintf(stderr, "Overriding of external symbol exisiting in table is not allowed!");
         break;
     case memoryAllocationFailure:
-        printf("memory allocation failed");
+        fprintf(stderr, "memory allocation failed");
         break;
     case undefinedOperation:
-        printf("undefined operation name");
+        fprintf(stderr, "undefined operation name");
         break;
     case undefinedInstruction:
-        printf("undefined instruction name");
+        fprintf(stderr, "undefined instruction name");
         break;
     case tooMuchArgumentsPassed:
-        printf("too Much Arguments Passed");
+        fprintf(stderr, "too Much Arguments Passed");
         break;
     case notEnoughArgumentsPassed:
-        printf("too little arguments passed");
+        fprintf(stderr, "too little arguments passed");
         break;
     case symbolDoesNotExist:
-        printf("symbol does not exist");
+        fprintf(stderr, "symbol does not exist");
         break;
     case macroDoesNotExist:
-        printf("macro does not exist");
+        fprintf(stderr, "macro does not exist");
         break;
     case wrongArgumentTypePassedAsParam:
-        printf("wrong Argument Type Passed As Param");
+        fprintf(stderr, "wrong Argument Type Passed As Param");
         break;
     case illegalMacroNameUseOfCharacters:
-        printf("illegal Macro Name Use Of Characters");
+        fprintf(stderr, "illegal Macro Name Use Of Characters");
         break;
     case illegalLabelNameUseOfCharacters:
-        printf("illegal Label Name Use Of Characters");
+        fprintf(stderr, "illegal Label Name Use Of Characters");
         break;
     case illegalLabelDeclaration:
-        printf("illegal Label Declaration");
+        fprintf(stderr, "illegal Label Declaration");
         break;
     case illegalMacroNameLength:
-        printf("illegal Macro Name Length");
+        fprintf(stderr, "illegal Macro Name Length");
         break;
     case illegalSymbolNameAlreadyInUse:
-        printf("Label Name Already In Use");
+        fprintf(stderr, "Label Name Already In Use");
         break;
     case illegalMacroNameAlreadyInUse:
-        printf("Macro Name Already In Use");
+        fprintf(stderr, "Macro Name Already In Use");
         break;
     case wrongArgumentTypeNotAnInteger:
-        printf("Number must be an integer!");
+        fprintf(stderr, "Number must be an integer!");
         break;
     case expectedNumber:
-        printf("Only integer numbers allowed!");
+        fprintf(stderr, "expected number but got letter instead, argument must be an integer number");
         break;
 
     case symbolCannotBeBothCurrentTypeAndRequestedType:
-        printf("symbol Cannot Be Both Current Type And Requested Type");
+        fprintf(stderr, "symbol Cannot Be Both Current Type And Requested Type");
         break;
     case illegalLabelUseExpectedOperationOrInstruction:
-        printf("illegal Label Use Expected Operation Or Instruction");
+        fprintf(stderr, "illegal Label Use Expected Operation Or Instruction");
         break;
     case wrongInstructionSyntaxMissinCommas:
     {
-        printf("Missing Comma between operands");
+        fprintf(stderr, "Missing Comma between operands");
         break;
     }
     case wrongInstructionSyntaxExtraCommas:
     {
-        printf("extra comma between operands");
+        fprintf(stderr, "extra comma between operands");
         break;
     }
     case expectedSingleCommaCharacter:
-        printf("Missing Comma");
+        fprintf(stderr, "Missing Comma");
         break;
     case illegalApearenceOfCharactersOnLine:
-        printf("Illegal use of characters");
+        fprintf(stderr, "Illegal use of characters");
         break;
     case undefinedTokenNotOperationOrInstructionOrLabel:
-        printf("illegal token in begning of current line,  not operation nor instruction or label decleration");
+        fprintf(stderr, "illegal token in begning of current line,  not operation nor instruction or label decleration");
         break;
     case illegalApearenceOfExtraCharactersOnLine:
-        printf("Illegal appearence of extra characters after the end or before begning of the line");
+        fprintf(stderr, "Illegal appearence of extra characters after the end or before begning of the line");
         break;
 
     case expectedQuotes:
-        printf("expected opening quotes before string decleration");
+        fprintf(stderr, "expected opening quotes before string decleration");
         break;
 
     case closingQuotesForStringIsMissing:
-        printf("missin closing quotes of string variable");
+        fprintf(stderr, "missin closing quotes of string variable");
         break;
 
     case maxLineLengthExceeded:
-        printf("line character length is illegal");
+        fprintf(stderr, "line character length is illegal");
 
         break;
     default:
         break;
     }
-    printf("\n");
-    printf("###################################\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "###################################\n");
 
     return False;
 }

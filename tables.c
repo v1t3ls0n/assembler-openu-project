@@ -1,15 +1,15 @@
 #include "data.h"
 /* Shared global State variables*/
-extern State globalState;
 Item *symbols[HASHSIZE] = {0};
 Item *macros[HASHSIZE] = {0};
-extern const char *regs[REGS_SIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
 extern unsigned calcNumberCharactersLength(int num);
+
+extern Bool isRegistery(char *s);
 
 void initTablesArrays()
 {
@@ -88,7 +88,7 @@ void printMacroTable()
 {
     int i = 0;
     printf("\n\t ~ MACRO TABLE ~ \n");
-    printf("name\tstart\tend\t");
+    printf("\tname\tstart\tend");
     while (i < HASHSIZE)
     {
         if (macros[i] != NULL)
@@ -101,7 +101,7 @@ void printMacroTable()
 int printMacroItem(Item *item)
 {
 
-    printf("\n%s\t\t%d\t\t%d\t", item->name, item->val.m.start, item->val.m.end);
+    printf("\n\t%s\t %5d\t%6d", item->name, item->val.m.start, item->val.m.end);
     if (item->next != NULL)
         printMacroItem(item->next);
     return 0;
@@ -181,7 +181,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
     {
         p = install(name, Symbol);
         offset = value % 16;
-        base = abs((unsigned)value - offset);
+        base = value - offset;
         p->val.s.value = value;
         p->val.s.base = base;
         p->val.s.offset = offset;
@@ -216,7 +216,7 @@ Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, uns
             unsigned base = 0;
             unsigned offset = 0;
             offset = value % 16;
-            base = abs((unsigned)value - offset);
+            base = value - offset;
             p->val.s.value = value;
             p->val.s.base = base;
             p->val.s.offset = offset;
@@ -319,10 +319,7 @@ Item *updateSymbolAddressValue(char *name, int newValue)
 
 Item *getMacro(char *s)
 {
-    Item *p = lookup(s, Macro);
-    if (p == NULL)
-        yieldError(macroDoesNotExist);
-    return p;
+    return lookup(s, Macro);
 }
 
 Item *addMacro(char *name, int start, int end)
@@ -371,16 +368,8 @@ Bool verifyLabelNaming(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return False;
 
-    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return False;
-
-            i++;
-        }
-    }
+    if (isRegistery(s))
+        return False;
 
     else if ((labelLength >= 3 && labelLength <= 4))
     {
@@ -420,16 +409,8 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return yieldError(illegalLabelNameLength);
 
-    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return yieldError(illegalLabelNameUseOfSavedKeywords);
-
-            i++;
-        }
-    }
+    if (isRegistery(s))
+        return yieldError(illegalLabelNameUseOfSavedKeywords);
 
     else if ((labelLength >= 3 && labelLength <= 4))
     {

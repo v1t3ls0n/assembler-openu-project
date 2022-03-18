@@ -7,12 +7,12 @@ extern Bool parseSingleLine(char *line);
 
 extern void initTablesArrays();
 extern void printBinaryImg();
-extern unsigned currentLine;
+extern unsigned currentLineNumber;
 extern void initMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern Bool parseFile(FILE *fp, char *filename);
-extern unsigned currentLine;
+extern void parseAssemblyCode(FILE *fp, char *filename);
+extern unsigned currentLineNumber;
 
 int main(int argc, char *argv[])
 {
@@ -20,29 +20,29 @@ int main(int argc, char *argv[])
     globalState = parsingMacros;
     handleSourceFiles(argc, argv);
 
-    /*     globalState = firstRun;
-        handleSourceFiles(argc, argv);
+    globalState = firstRun;
+    handleSourceFiles(argc, argv);
 
+    if (globalState != collectErrors)
+    {
+        updateFinalCountersValue();
+        printSymbolTable();
+        initMemory();
+        globalState = secondRun;
+        handleSourceFiles(argc, argv);
         if (globalState != collectErrors)
         {
-            updateFinalCountersValue();
-            printSymbolTable();
-            initMemory();
-            globalState = secondRun;
-            handleSourceFiles(argc, argv);
-            if (globalState != collectErrors)
-            {
-                printf("Finished Successfully, about to export files!\n");
-                printBinaryImg();
-                printf("\n");
-                printMemoryImgInRequiredObjFileFormat();
-            }
-            else
-                printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+            printf("Finished Successfully, about to export files!\n");
+            printBinaryImg();
+            printf("\n");
+            printMemoryImgInRequiredObjFileFormat();
         }
         else
-            printf("\nFinished First Run With Errors\n");
-     */
+            printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+    }
+    else
+        printf("\nFinished First Run With Errors\n");
+
     return 0;
 }
 
@@ -72,12 +72,12 @@ int handleSourceFiles(int argc, char *argv[])
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
             {
-                parseFile(fptr, fileName);
+                parseAssemblyCode(fptr, fileName);
             }
             else if (globalState == secondRun)
             {
                 rewind(fptr);
-                parseFile(fptr, fileName);
+                parseAssemblyCode(fptr, fileName);
             }
         }
 

@@ -1,7 +1,4 @@
 #include "data.h"
-/* Shared global State variables*/
-extern State globalState;
-extern unsigned currentLine;
 
 extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
@@ -16,7 +13,7 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
-extern Bool parseFile(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
@@ -61,6 +58,7 @@ ParseState handleOperation(char *operationName, char *args)
     extra = strtok(NULL, " \t \n");
     if (extra)
     {
+        /*     printf("line64\nextra:%s\nfirst:%s\nsecond:%s\n", extra, first, second); */
         yieldError(illegalApearenceOfExtraCharactersOnLine);
         return Err;
     }
@@ -89,7 +87,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 {
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
-    printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des);
+    /*     printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des); */
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
     if (src && strchr(src, ','))
     {
@@ -167,12 +165,13 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
+    /*     printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
+     */
     if (isInstruction(firstToken))
     {
         if (type == _TYPE_DATA)
         {
-            printf("line 174\n");
+
             return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
         }
         else if (type == _TYPE_STRING)
@@ -208,14 +207,11 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
         {
-            printf("line 205 inside handle instruction\n");
+
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;
         }
         else
-        {
-            printf("inside line 213 ,before returning Err!\n");
             return Err;
-        }
     }
     else
         yieldError(undefinedOperation);

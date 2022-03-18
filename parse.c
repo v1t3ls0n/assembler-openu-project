@@ -2,24 +2,9 @@
 extern Bool yieldError(Error err);
 extern char *trimFromLeft(char *s);
 extern State globalState;
-extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
-
-int countConsecutiveCommas(char *s)
-{
-    int counter = 0;
-    for (; s && *s == ','; counter++, s++)
-        ;
-    return counter;
-}
-
-int countLengthOfNonDigitToken(char *s)
-{
-    int count = 0;
-    for (; !isdigit(*s) && *s != ','; s++, count++)
-        ;
-    return count;
-}
+extern unsigned currentLineNumber;
+extern int countConsecutiveCommas(char *s);
+extern int countLengthOfNonDigitToken(char *s);
 
 Bool countAndVerifyDataArguments(char *line)
 {
@@ -126,11 +111,11 @@ Bool countAndVerifyDataArguments(char *line)
         i += skip;
     }
 
-    printf("line 189 commaCounter:%d size:%d\n", commasCounter, size);
+    /*     printf("line 189 commaCounter:%d size:%d\n", commasCounter, size); */
     if (commasCounter > (size - 1))
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    printf("isValid:%d\n", isValid);
+    /*     printf("isValid:%d\n", isValid); */
     if (isValid)
         increaseDataCounter(size);
 
@@ -234,7 +219,7 @@ Bool parseSingleLine(char *line)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLine, line);
+    /*     printf("\ninside parseSingleLine, Line Number (%d):\n%s\n", currentLineNumber, line); */
     memcpy(lineCopy, line, strlen(line));
     if (globalState == firstRun)
         token = strtok(lineCopy, " \t \n");
@@ -271,20 +256,17 @@ Bool parseSingleLine(char *line)
             token = strtok(NULL, ", \t \n");
     }
 
-    currentLine++;
-
-    printf("state:%d\n", state);
+    /*     printf("state:%d\n", state); */
     return state ? True : False;
 }
 
-Bool parseFile(FILE *fp, char *filename)
+void parseAssemblyCode(FILE *fp, char *filename)
 {
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-
-    currentLine = 1;
+    currentLineNumber = 1;
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
@@ -306,16 +288,17 @@ Bool parseFile(FILE *fp, char *filename)
             if (!parseSingleLine(line))
                 isValidCode = False;
 
+            currentLineNumber++;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
 
-        else if (isspace(c))
+        else if (isspace(c) && i > 0)
             line[i++] = ' ';
 
         else
         {
-            if (isprint(c))
+            if (isprint(c) && !isspace(c))
                 line[i++] = c;
         }
     }
@@ -324,11 +307,8 @@ Bool parseFile(FILE *fp, char *filename)
     {
         if (!parseSingleLine(line))
             isValidCode = False;
-
-        memset(line, 0, i);
     }
+
     if (!isValidCode)
         globalState = collectErrors;
-
-    return globalState != collectErrors ? True : False;
 }

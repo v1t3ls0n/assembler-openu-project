@@ -1,7 +1,4 @@
 #include "data.h"
-extern HexWord *convertNumToHexWord(int num);
-extern const char *regs[REGS_SIZE];
-extern Operation operations[OP_SIZE];
 char *trimFromLeft(char *s)
 {
     while (isspace(*s))
@@ -123,7 +120,7 @@ char *numToBin(int num)
     return word;
 }
 
-int binary2Decimal(char binaryStr[4])
+unsigned binaryStringToHexNumber(char binaryStr[4])
 {
 
     if (!strcmp(binaryStr, "0000"))
@@ -147,17 +144,17 @@ int binary2Decimal(char binaryStr[4])
     if (!strcmp(binaryStr, "1001"))
         return 9;
     if (!strcmp(binaryStr, "1010"))
-        return 10;
+        return 0xA;
     if (!strcmp(binaryStr, "1011"))
-        return 11;
+        return 0xB;
     if (!strcmp(binaryStr, "1100"))
-        return 12;
+        return 0xC;
     if (!strcmp(binaryStr, "1101"))
-        return 13;
+        return 0xD;
     if (!strcmp(binaryStr, "1110"))
-        return 14;
+        return 0xE;
     if (!strcmp(binaryStr, "1111"))
-        return 15;
+        return 0xF;
 
     return 0;
 }
@@ -246,156 +243,18 @@ int hex2int(char ch)
     return -1;
 }
 
-Bool isOperation(char *s)
+int countConsecutiveCommas(char *s)
 {
-
-    return (getOperationByName(s) != NULL) ? True : False;
+    int counter = 0;
+    for (; s && *s == ','; counter++, s++)
+        ;
+    return counter;
 }
 
-Bool isLabelDeclaration(char *s)
+int countLengthOfNonDigitToken(char *s)
 {
-    return s[strlen(s) - 1] == ':' ? True : False;
-}
-
-int getInstructionType(char *s)
-{
-    if (!strcmp(s, DATA))
-        return _TYPE_DATA;
-    if (!strcmp(s, STRING))
-        return _TYPE_STRING;
-    if (!strcmp(s, ENTRY))
-        return _TYPE_ENTRY;
-    if (!strcmp(s, EXTERNAL))
-        return _TYPE_EXTERNAL;
-    return False;
-}
-
-Bool isInstruction(char *s)
-{
-
-    if ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL)))
-        return True;
-
-    else if (strstr(s, DATA) != NULL || strstr(s, STRING) != NULL || strstr(s, ENTRY) != NULL || strstr(s, EXTERNAL) != NULL)
-    {
-        yieldError(missinSpaceAfterInstruction);
-        return True;
-    }
-    else
-        return False;
-}
-
-Bool isInstructionStrict(char *s)
-{
-    return ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL))) ? True : False;
-}
-
-Bool isRegistery(char *s)
-{
-    int len = strlen(s);
-    int i = 0;
-    if (s[0] == 'r' && len >= 2)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return True;
-            i++;
-        }
-    }
-    return False;
-}
-Bool isValidImmediateParamter(char *s)
-{
-    int i, len = strlen(s);
-    if (len < 2 || s[0] != '#' || (!(s[1] == '-' || s[1] == '+' || isdigit(s[1]))))
-        return False;
-    for (i = 2; i < len; i++)
-        if (!isdigit(s[i]))
-            return False;
-    return True;
-}
-Bool isValidIndexParameter(char *s)
-{
-    int len = strlen(s);
-    if (len < 6)
-        return False;
-    else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
-        return False;
-    else
-    {
-        s = strchr(s, '[');
-        s++;
-
-        s[strlen(s) - 1] = 0;
-
-        if (getRegisteryNumber(s) < 10)
-            return False;
-    }
-    return True;
-}
-
-Bool isComment(char *s)
-{
-    return s[0] == ';' ? True : False;
-}
-
-int getRegisteryNumber(char *s)
-{
-    int len = strlen(s);
-    int i = 0;
-    if (s[0] == 'r' && len >= 2)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(s, regs[i]) == 0))
-                return i;
-            i++;
-        }
-    }
-    return -1;
-}
-
-char *getInstructionNameByType(int type)
-{
-    switch (type)
-    {
-    case _TYPE_DATA:
-        return "DATA INSTRUCTION";
-
-    case _TYPE_STRING:
-        return "STRING INSTRUCTION";
-
-    case _TYPE_ENTRY:
-        return "ENTRY INSTRUCTION";
-
-    case _TYPE_EXTERNAL:
-        return "EXTERNAL INSTRUCTION";
-
-    default:
-        break;
-    }
-
-    return NULL;
-}
-char *getInstructionName(char *s)
-{
-    if (strstr(s, DATA) != NULL)
-        return DATA;
-    if (strstr(s, STRING) != NULL)
-        return STRING;
-    if (strstr(s, ENTRY) != NULL)
-        return ENTRY;
-    if (strstr(s, EXTERNAL) != NULL)
-        return EXTERNAL;
-    /*
-        if (!strcmp(s, DATA))
-            return DATA;
-        if (!strcmp(s, STRING))
-            return STRING;
-        if (!strcmp(s, ENTRY))
-            return ENTRY;
-        if (!strcmp(s, EXTERNAL))
-            return EXTERNAL; */
-    return 0;
+    int count = 0;
+    for (; !isdigit(*s) && *s != ','; s++, count++)
+        ;
+    return count;
 }

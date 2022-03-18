@@ -1,26 +1,28 @@
 /* FUNCTIONS THAT ARE COMMENTED OUT MEANS THAT THEY ARE NOT SHARED ACROSS FILES */
-/*---------------------------------------------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------------------------------------------*/
-/* --------------------------------------------In Second Run.c: ----------------------------------------------------*/
-/*---------------------------------------------------------------------------------------------------------------*/
 
-int secondRunParsing(FILE *fp, char *filename);
-void writeDirectOperandWord(char *labelName);
-void writeFirstWord(Operation *operation);
-void writeSecondWord();
-Bool writeOperationBinary(char *operationName, char *line);
-Bool writeInstructionBinary(char *instructionName, char *line);
-void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line, ParseState state);
-Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
-void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
-void writeFirstWord(Operation *op);
-void writeImmediateOperandWord(char *n);
-char *parseLabelNameFromIndexAddrOperand(char *s);
-int parseRegNumberFromIndexAddrOperand(char *s);
-Bool writeStringInstruction(char *s);
-Bool writeDataInstruction(char *s);
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------In memory.c -------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+void writeIntoDataStack(Word *word);
+void writeIntoCodeStack(Word *word);
+int writeToMemory(Word *word, DataType type);
+void increaseDataCounter(int amount);
+void increaseInstructionCounter(int amount);
+void updateFinalCountersValue();
+unsigned getDC();
+unsigned getIC();
+unsigned getICF();
+unsigned getDCF();
+void printMemoryStacks(EncodingFormat format);
+void initMemory();
+void printBinaryImg();
+void printWordBinary(unsigned index);
+void wordStringToWordObj(char *s, DataType type);
+void addWordToDataImage(char *s);
+void addWordToCodeImage(char *s);
+void addWord(int value, DataType type);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -28,7 +30,7 @@ Bool writeDataInstruction(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-Bool parseFile(FILE *fp, char *filename);
+void parseAssemblyCode(FILE *fp, char *filename);
 ParseState handleState(char *token, char *line, ParseState state);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -105,12 +107,15 @@ Word *convertNumberToWord(int n, EncodingFormat format);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In helpers.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int binary2Decimal(char binaryStr[4]);
+unsigned binaryStringToHexNumber(char binaryStr[4]);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);
 int countSpaceCharacters(char *s);
 char *numToBin(int num);
+int countConsecutiveCommas(char *s);
+int countLengthOfNonDigitToken(char *s);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In firstRun.c -------------------------------------------------------*/
@@ -140,32 +145,33 @@ Bool isComment(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-/* --------------------------------------------In memory.c -------------------------------------------------------*/
-/*---------------------------------------------------------------------------------------------------------------*/
-void writeIntoDataStack(Word *word);
-void writeIntoCodeStack(Word *word);
-int writeToMemory(Word *word, DataType type);
-void increaseDataCounter(int amount);
-void increaseInstructionCounter(int amount);
-void updateFinalCountersValue();
-unsigned getDC();
-unsigned getIC();
-unsigned getICF();
-unsigned getDCF();
-void printMemoryStacks(EncodingFormat format);
-void initMemory();
-void printBinaryImg();
-void printWordBinary(unsigned index);
-void wordStringToWordObj(char *s, DataType type);
-void addWordToDataImage(char *s);
-void addWordToCodeImage(char *s);
-void addWord(int value, DataType type);
-
-/*---------------------------------------------------------------------------------------------------------------*/
-/*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In parse.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 Bool countAndVerifyDataArguments(char *line);
 Bool countAndVerifyStringArguments(char *token);
 char *trimFromLeft(char *s);
+
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------In Second Run.c: ----------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+
+int secondRunParsing(FILE *fp, char *filename);
+void writeDirectOperandWord(char *labelName);
+void writeFirstWord(Operation *operation);
+void writeSecondWord();
+Bool writeOperationBinary(char *operationName, char *line);
+Bool writeInstructionBinary(char *instructionName, char *line);
+void parseSingleLinesecondRunParsing(char *line);
+ParseState handleState(char *token, char *line, ParseState state);
+Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
+void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
+void writeFirstWord(Operation *op);
+void writeImmediateOperandWord(char *n);
+char *parseLabelNameFromIndexAddrOperand(char *s);
+int parseRegNumberFromIndexAddrOperand(char *s);
+Bool writeStringInstruction(char *s);
+Bool writeDataInstruction(char *s);
+void writeToExternalFile(char *name, unsigned base, unsigned offset);
