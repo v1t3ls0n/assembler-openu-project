@@ -93,7 +93,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
 
                         if (isMacroOpening(token))
                         {
-                            printf("\nisMacroOpening\ntoken:%s\n", token);
+                            /*          printf("\nisMacroOpening\ntoken:%s\n", token); */
                             popLastToken(target, token);
                             state = parsingMacroName;
                             isMacroStartFoundYet = False;
@@ -102,7 +102,8 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                         {
                             if (isMacroClosing(token))
                             {
-                                printf("\nisMacroClosing\ntoken:%s\n", token);
+                                /*                                 printf("\nisMacroClosing\ntoken:%s\n", token);
+                                 */
                                 popLastToken(target, token);
                                 addMacro(macroName, start, (ftell(source) - strlen(token) - 1));
                                 memset(macroName, 0, i);
@@ -158,7 +159,8 @@ void popLastToken(FILE *target, char *token)
 {
 
     int len = strlen(token);
-    printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
+    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
+     */
     fseek(target, -len, SEEK_CUR);
     fputc(' ', target);
 }
@@ -183,6 +185,7 @@ FILE *createExpandedSourceFile(FILE *source, char *fileName)
     if (target == NULL)
     {
         fclose(source);
+        printf("failed to create new .am file for the source expanded source code\n");
         printf("Press any key to exit...\n");
         exit(1);
     }

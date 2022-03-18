@@ -15,6 +15,7 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+
     case useOfNestedMacrosIsIllegal:
     {
         printf("useOfNestedMacrosIsIllegal");

@@ -55,6 +55,7 @@ typedef enum
     wrongInstructionSyntaxIllegalCommaPosition,
     secondRunFailed,
     illegalMacroNameUseOfSavedKeywords
+
 } Error;
 
 typedef enum
