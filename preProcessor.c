@@ -94,8 +94,8 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
 
                         if (isMacroOpening(token))
                         {
+                            printf("\nisMacroOpening\ntoken:%s\n", token);
                             popLastToken(target, token);
-
                             state = parsingMacroName;
                             isMacroStartFoundYet = False;
                         }
@@ -117,10 +117,10 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                                 if (p != NULL)
                                 {
                                     popLastToken(target, token);
-                                    current = ftell(source);
+                                    current = ftell(source) - 1;
                                     fseek(target, 0 - strlen(token), SEEK_CUR);
                                     replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
-                                    fseek(source, current - 1, SEEK_SET);
+                                    fseek(source, current, SEEK_SET);
                                 }
                             }
 
@@ -161,6 +161,7 @@ void popLastToken(FILE *target, char *token)
     int len = strlen(token);
     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
     fseek(target, -len, SEEK_CUR);
+    fputc(' ', target);
 }
 void replaceWithMacro(FILE *target, FILE *source, int start, int end)
 {
@@ -169,7 +170,9 @@ void replaceWithMacro(FILE *target, FILE *source, int start, int end)
     fseek(target, 0, SEEK_CUR);
 
     for (i = end - start; i > 0 && (c = fgetc(source)) != EOF; i--)
+    {
         fputc(c, target);
+    }
 }
 
 FILE *createExpandedSourceFile(FILE *source, char *fileName)

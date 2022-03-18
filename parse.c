@@ -310,12 +310,12 @@ Bool parseAssemblyCode(FILE *fp, char *filename)
             i = 0;
         }
 
-        else if (isspace(c))
+        else if (isspace(c) && i > 0)
             line[i++] = ' ';
 
         else
         {
-            if (isprint(c))
+            if (isprint(c) && !isspace(c))
                 line[i++] = c;
         }
     }

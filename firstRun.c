@@ -61,6 +61,7 @@ ParseState handleOperation(char *operationName, char *args)
     extra = strtok(NULL, " \t \n");
     if (extra)
     {
+        printf("line64\nextra:%s\nfirst:%s\nsecond:%s\n", extra, first, second);
         yieldError(illegalApearenceOfExtraCharactersOnLine);
         return Err;
     }
