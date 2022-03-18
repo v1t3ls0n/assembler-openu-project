@@ -3,7 +3,6 @@ extern Bool yieldError(Error err);
 extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
 
 int countConsecutiveCommas(char *s)
 {

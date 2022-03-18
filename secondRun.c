@@ -63,7 +63,6 @@ converted already to binary.
 /* from variables.c (global Variables) */
 extern State globalState;
 extern unsigned currentLine;
-extern const char *regs[REGS_SIZE];
 
 /* from firstRun.c */
 extern Bool parseSingleLine(char *line);
