@@ -120,7 +120,7 @@ char *numToBin(int num)
     return word;
 }
 
-int binary2Decimal(char binaryStr[4])
+unsigned binaryStringToHexNumber(char binaryStr[4])
 {
 
     if (!strcmp(binaryStr, "0000"))
@@ -144,17 +144,17 @@ int binary2Decimal(char binaryStr[4])
     if (!strcmp(binaryStr, "1001"))
         return 9;
     if (!strcmp(binaryStr, "1010"))
-        return 10;
+        return 0xA;
     if (!strcmp(binaryStr, "1011"))
-        return 11;
+        return 0xB;
     if (!strcmp(binaryStr, "1100"))
-        return 12;
+        return 0xC;
     if (!strcmp(binaryStr, "1101"))
-        return 13;
+        return 0xD;
     if (!strcmp(binaryStr, "1110"))
-        return 14;
+        return 0xE;
     if (!strcmp(binaryStr, "1111"))
-        return 15;
+        return 0xF;
 
     return 0;
 }

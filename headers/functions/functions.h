@@ -105,7 +105,7 @@ Word *convertNumberToWord(int n, EncodingFormat format);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In helpers.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int binary2Decimal(char binaryStr[4]);
+unsigned binaryStringToHexNumber(char binaryStr[4]);
 char *decToHex(int num);
 char *hexToBin(char *hex);
 int hex2int(char ch);

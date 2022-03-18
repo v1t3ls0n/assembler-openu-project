@@ -5,8 +5,13 @@ unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
+
 extern char *numToBin(int num);
+extern char *decToHex(int num);
+
 static BinaryWord *binaryImg;
+HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word);
+
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }
 unsigned getICF() { return ICF; }
@@ -78,7 +83,7 @@ void wordObjToBinStr(BinaryWord *word, char *s)
     int j = 0;
     for (j = 0; j < BINARY_WORD_SIZE + 5; j++)
     {
-        if (j > 3 && j % 5 == 0)
+        if (j > 0 && j % 4 == 0)
             strcat(s, " ");
 
         else
@@ -105,29 +110,60 @@ void updateFinalCountersValue()
     DCF = ICF + DC;
     DC = IC;
     IC = MEMORY_START;
-    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
+    /*     printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF); */
     updateFinalMemoryAddressesInSymbolTable();
 }
 
 void printMemoryImgInRequiredObjFileFormat()
 {
+
     int i;
     int totalSize = DCF - MEMORY_START;
-    char wordStr[BINARY_WORD_SIZE + 5] = {0};
-    char *a, *b, *c, *d, *e;
-    a = b = c = d = e = 0;
-    printf("%d   %d\n", ICF, DCF);
+    HexWord *p;
+    printf("%d %d\n", ICF - MEMORY_START, DCF - ICF);
+
     for (i = 0; i < totalSize; i++)
     {
-        wordObjToBinStr(&binaryImg[i], wordStr);
-        a = strtok(wordStr, " ");
-        b = strtok(NULL, " ");
-        c = strtok(NULL, " ");
-        d = strtok(NULL, " ");
-        e = strtok(NULL, " ");
-        printf("%04d A%X-B%X-C%X-D%X-E%X\n", MEMORY_START + i, binary2Decimal(a), binary2Decimal(b), binary2Decimal(c), binary2Decimal(d), binary2Decimal(e));
-        memset(wordStr, 0, BINARY_WORD_SIZE);
-        strtok(NULL, " ");
-        a = b = c = d = e = 0;
+        p = convertBinaryWordToRequiredObjWordFormat(&binaryImg[i]);
+        printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, p->_A, p->_B, p->_C, p->_D, p->_E);
+        free(p);
     }
+}
+
+HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word)
+{
+    int i = 0;
+    char hexDigits[4] = {0};
+    HexWord *newHex = (HexWord *)calloc(1, sizeof(HexWord *));
+    for (i = BINARY_WORD_SIZE - 1; i >= 0; i--)
+    {
+        hexDigits[i % 4] = word->digit[i].on ? '1' : '0';
+        if (i % 4 == 0)
+        {
+            switch (i)
+            {
+            case 16:
+                newHex->_A = binaryStringToHexNumber(hexDigits);
+                break;
+            case 12:
+                newHex->_B = binaryStringToHexNumber(hexDigits);
+                break;
+            case 8:
+                newHex->_C = binaryStringToHexNumber(hexDigits);
+                break;
+            case 4:
+                newHex->_D = binaryStringToHexNumber(hexDigits);
+                break;
+            case 0:
+                newHex->_E = binaryStringToHexNumber(hexDigits);
+                break;
+            default:
+                break;
+            }
+
+            memset(hexDigits, 0, 4);
+        }
+    }
+
+    return newHex;
 }
