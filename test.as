@@ -3,11 +3,13 @@
 .extern W
 MAIN: add r3, LIST
 LOOP: prn #48
+
 macro m1
-            inc r6
- mov r3, W
+ inc r1
+    inc r2
+         inc r3
 endm
-m1
+
 
 lea STR, r6
 inc r6
