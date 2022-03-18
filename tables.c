@@ -181,7 +181,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
     {
         p = install(name, Symbol);
         offset = value % 16;
-        base = abs((unsigned)value - offset);
+        base = value - offset;
         p->val.s.value = value;
         p->val.s.base = base;
         p->val.s.offset = offset;
@@ -216,7 +216,7 @@ Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, uns
             unsigned base = 0;
             unsigned offset = 0;
             offset = value % 16;
-            base = abs((unsigned)value - offset);
+            base = value - offset;
             p->val.s.value = value;
             p->val.s.base = base;
             p->val.s.offset = offset;

@@ -140,12 +140,23 @@ void writeFirstWord(Operation *op)
 
 void writeDirectOperandWord(char *labelName)
 {
-    unsigned base = 0, offset = 0;
-    int _ARE = isExternal(labelName) ? E : R;
-    base = getSymbolBaseAddress(labelName);
-    offset = getSymbolOffset(labelName);
-    addWord((_ARE << 16) | base, Code);
-    addWord((_ARE << 16) | offset, Code);
+    unsigned base = 0, offset = 0, value = 0;
+    if (isExternal(labelName))
+    {
+        base = getIC();
+        addWord((E << 16) | 0, Code);
+        offset = getIC();
+        addWord((E << 16) | 0, Code);
+        writeToExternalFile(labelName, base, offset);
+    }
+
+    else
+    {
+        base = getSymbolBaseAddress(labelName);
+        offset = getSymbolOffset(labelName);
+        addWord((R << 16) | base, Code);
+        addWord((R << 16) | offset, Code);
+    }
 }
 
 void writeImmediateOperandWord(char *n)
@@ -187,4 +198,10 @@ int parseRegNumberFromIndexAddrOperand(char *s)
     if (p)
         *p = 0;
     return getRegisteryNumber(s);
+}
+
+void writeToExternalFile(char *name, unsigned base, unsigned offset)
+{
+
+    printf("use of external variable\nname:%s\nbase:%u\noffset:%u\n", name, base, offset);
 }
