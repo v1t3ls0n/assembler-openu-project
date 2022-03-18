@@ -28,7 +28,7 @@ Bool writeDataInstruction(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-Bool parseFile(FILE *fp, char *filename);
+Bool parseAssemblyCode(FILE *fp, char *filename);
 ParseState handleState(char *token, char *line, ParseState state);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

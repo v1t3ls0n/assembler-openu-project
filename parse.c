@@ -277,7 +277,7 @@ Bool parseSingleLine(char *line)
     return state ? True : False;
 }
 
-Bool parseFile(FILE *fp, char *filename)
+Bool parseAssemblyCode(FILE *fp, char *filename)
 {
     int c = 0;
     int i = 0;

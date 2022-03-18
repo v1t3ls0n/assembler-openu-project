@@ -89,7 +89,7 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern Bool parseFile(FILE *fp, char *filename);
+extern Bool parseAssemblyCode(FILE *fp, char *filename);
 
 extern ParseState handleState(char *token, char *line, ParseState state);
 extern Bool parseSingleLine(char *line);

@@ -319,10 +319,7 @@ Item *updateSymbolAddressValue(char *name, int newValue)
 
 Item *getMacro(char *s)
 {
-    Item *p = lookup(s, Macro);
-    if (p == NULL)
-        yieldError(macroDoesNotExist);
-    return p;
+    return lookup(s, Macro);
 }
 
 Item *addMacro(char *name, int start, int end)

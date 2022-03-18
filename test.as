@@ -11,10 +11,17 @@ macro m1
 endm
 
 
+
 lea STR, r6
 inc r6
 mov r3, W
 sub r1, r4
+        macro m2
+inc 4
+int 5
+int 6
+endm
+
 bne END
 cmp val1, #-6
 
@@ -32,5 +39,5 @@ LIST: .data 6, -9
 K: .data 31
 .extern val1
 
-m1
+m2
 

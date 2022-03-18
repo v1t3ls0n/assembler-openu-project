@@ -104,9 +104,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                             if (isMacroClosing(token))
                             {
                                 printf("\nisMacroClosing\ntoken:%s\n", token);
-
                                 popLastToken(target, token);
-
                                 addMacro(macroName, start, (ftell(source) - strlen(token) - 1));
                                 memset(macroName, 0, i);
                                 isMacroCurrentlyParsed = False;
@@ -118,8 +116,6 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                                 Item *p = getMacro(token);
                                 if (p != NULL)
                                 {
-                                    /*                           fseek(target, -strlen(token), SEEK_CUR);
-                                     */
                                     popLastToken(target, token);
                                     current = ftell(source);
                                     fseek(target, 0 - strlen(token), SEEK_CUR);

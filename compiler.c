@@ -11,7 +11,7 @@ extern unsigned currentLine;
 extern void initMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern Bool parseFile(FILE *fp, char *filename);
+extern Bool parseAssemblyCode(FILE *fp, char *filename);
 extern unsigned currentLine;
 
 int main(int argc, char *argv[])
@@ -72,12 +72,12 @@ int handleSourceFiles(int argc, char *argv[])
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
             {
-                parseFile(fptr, fileName);
+                parseAssemblyCode(fptr, fileName);
             }
             else if (globalState == secondRun)
             {
                 rewind(fptr);
-                parseFile(fptr, fileName);
+                parseAssemblyCode(fptr, fileName);
             }
         }
 
