@@ -16,6 +16,15 @@ int countSpaceCharacters(char *s)
     return i;
 }
 
+unsigned calcNumberCharactersLength(int num)
+{
+    unsigned count = 1;
+    while (num / 10)
+        count++;
+
+    return count;
+}
+
 char *decToHex(int num)
 {
     int i = num, size = 0;

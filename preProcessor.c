@@ -7,13 +7,13 @@ extern Bool isOperation(char *s);
 extern Bool isComment(char *s);
 extern Bool isInstruction(char *s);
 extern Bool verifyLabelNaming(char *s);
-extern Item *addMacro(char *name, int start, int end, int linesLen);
-extern Item *updateMacro(char *name, int start, int end, int linesLen);
+extern Item *addMacro(char *name, int start, int end);
+extern Item *updateMacro(char *name, int start, int end);
 extern void printMacroTable();
 extern int printMacroItem(Item *item);
 extern unsigned currentLine;
 
-int parseAll(FILE *newFile);
+void saveMacros(FILE *newFile);
 
 Bool isMacroOpening(char *s)
 {
@@ -38,120 +38,87 @@ void parseSourceFile(FILE *source, char *filename)
 
     FILE *newFile = createCopyFromSourceFile(source, filename);
     rewind(newFile);
-    parseAll(newFile);
+    saveMacros(newFile);
     fclose(newFile);
     printMacroTable();
 }
 
-int parseAll(FILE *newFile)
+void saveMacros(FILE *newFile)
 {
     ParseState state = evalToken;
     Bool isMacro = False;
     int c = 0, i = 0, j = 0;
-    int start = 1, end = 1, current = 1;
+    int start = 0, end = 0, current = 0;
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
     while ((c = fgetc(newFile)) != EOF)
     {
-        if (c == '\n' && state == skipLine)
+        current++;
+        if (c == '\n')
         {
-            printf("line 58 macroName:%s token:%s\n", macroName, token);
-            state = evalToken;
+            currentLine++;
+            if (state == skipLine)
+                state = evalToken;
         }
-
         if (state != skipLine)
         {
 
-            if (!isspace(c) && j < MAX_LABEL_LEN && i < MAX_LABEL_LEN)
+            if (!isspace(c))
             {
-                if (state == parsingMacroName)
-                    macroName[i++] = c;
-
-                else
-                    token[j++] = c;
-            }
-            else if (isspace(c) && (j > 0 || i > 0))
-            {
-
-                if (i > 0)
-                    macroName[i] = '\0';
-                if (j > 0)
-                    token[j] = '\0';
-
-                printf("c:%c i:%d j:%d macroName:%s token:%s\n", c, i, j, macroName, token);
-
-                if (state == evalToken)
+                if (j < MAX_LABEL_LEN && i < MAX_LABEL_LEN)
                 {
-                    if (!isMacro && isMacroClosing(token))
-                    {
-                        yieldError(macroClosingWithoutAnyOpenedMacro);
-                        state = skipLine;
-                    }
+                    if (state == parsingMacroName)
+                        macroName[i++] = c;
 
-                    else if (!isMacro && isMacroOpening(token))
-                    {
-                        state = parsingMacroName;
-                        isMacro = True;
-                    }
-                    else if (isMacro)
-                    {
-
-                        if (isMacroClosing(token))
-                        {
-                            end = c == '\n' ? currentLine + 1 : currentLine;
-                            updateMacro(macroName, start, end, end - start);
-                            memset(macroName, 0, i);
-                            i = 0;
-                            isMacro = False;
-                            state = skipLine;
-                        }
-                        else if (isMacroOpening(token))
-                        {
-                            yieldError(useOfNestedMacrosIsIllegal);
-                            updateMacro(macroName, -1, -1, -1);
-                            memset(macroName, 0, i);
-                            i = 0;
-                            isMacro = False;
-                            state = skipLine;
-                        }
-                    }
-
-                    memset(token, 0, j);
-                    j = 0;
-                }
-
-                else if (state == parsingMacroName)
-                {
-
-                    if (isLegalMacroName(macroName))
-                    {
-                        start = current;
-                        addMacro(macroName, start, -1, -1);
-                        i = 0;
-                        state = evalToken;
-                    }
                     else
-                    {
-                        yieldError(illegalMacroNameUseOfSavedKeywords);
-                        memset(macroName, 0, i);
-                        i = 0;
-                        state = skipLine;
-                        isMacro = False;
-                    }
+                        token[j++] = c;
                 }
             }
-        }
-        if (c == '\n')
-        {
-            current++;
-            currentLine++;
-            /*             state = evalToken;
-                        memset(token, 0, j);
-                        j = 0; */
+            else
+            {
+                if (j > 0 || i > 0)
+                {
+                    if (state == evalToken)
+                    {
+                        if (!isMacro && isMacroOpening(token))
+                        {
+                            state = parsingMacroName;
+                            start = current;
+                            isMacro = True;
+                        }
+
+                        else if (isMacro && isMacroClosing(token))
+                        {
+                            end = current;
+                            addMacro(macroName, start, end);
+                            start = end = current;
+                            memset(macroName, 0, i);
+                            isMacro = False;
+                            state = skipLine;
+                        }
+                        else
+                            state = skipLine;
+                    }
+
+                    else if (state == parsingMacroName)
+                    {
+
+                        if (isLegalMacroName(macroName))
+                            state = evalToken;
+                        else
+                        {
+                            yieldError(illegalMacroNameUseOfSavedKeywords);
+                            memset(macroName, 0, i);
+                            state = skipLine;
+                            isMacro = False;
+                        }
+                    }
+                    memset(token, 0, j);
+                    i = j = 0;
+                }
+            }
         }
     }
-
-    return 1;
 }
 
 int parseNextLine(int start, int end)
@@ -206,3 +173,116 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName)
 
     return target;
 }
+/*
+int parseAllStrict(FILE *newFile)
+{
+    ParseState state = evalToken;
+    Bool isMacro = False;
+    int c = 0, i = 0, j = 0;
+    int start = 1, end = 1, current = 1;
+    char token[MAX_LINE_LEN] = {0};
+    char macroName[MAX_LABEL_LEN] = {0};
+    while ((c = fgetc(newFile)) != EOF)
+    {
+        current++;
+        if (c == '\n' && state == skipLine)
+        {
+            if (state == skipLine)
+                state = evalToken;
+
+            current++;
+            currentLine++;
+        }
+
+        if (state != skipLine)
+        {
+
+            if (!isspace(c) && j < MAX_LABEL_LEN && i < MAX_LABEL_LEN)
+            {
+                if (state == parsingMacroName)
+                    macroName[i++] = c;
+
+                else
+                    token[j++] = c;
+            }
+            else if (isspace(c) && (j > 0 || i > 0))
+            {
+
+                if (i > 0)
+                    macroName[i] = '\0';
+                if (j > 0)
+                    token[j] = '\0';
+
+
+                if (state == evalToken)
+                {
+                    if (!isMacro && isMacroOpening(token))
+                    {
+                        state = parsingMacroName;
+                        isMacro = True;
+                    }
+                    if (!isMacro && isMacroClosing(token))
+                    {
+                        yieldError(macroClosingWithoutAnyOpenedMacro);
+             state = skipLine;
+          }
+
+          else if (isMacro)
+          {
+
+              if (isMacroClosing(token))
+              {
+                  end = current;
+
+                  updateMacro(macroName, start, end);
+                  memset(macroName, 0, i);
+                  i = 0;
+                  isMacro = False;
+                  state = skipLine;
+              }
+
+              else if (isMacroOpening(token))
+              {
+                  if ((currentLine - start) < 2)
+                  {
+                      yieldError(useOfNestedMacrosIsIllegal);
+                  }
+                  updateMacro(macroName, -1, -1);
+                  memset(macroName, 0, i);
+                  i = 0;
+                  isMacro = False;
+                  state = skipLine;
+              }
+          }
+
+          memset(token, 0, j);
+          j = 0;
+      }
+
+      else if (state == parsingMacroName)
+      {
+
+          if (isLegalMacroName(macroName))
+          {
+              start = current;
+              addMacro(macroName, start, -1);
+              i = 0;
+              state = evalToken;
+          }
+          else
+          {
+              yieldError(illegalMacroNameUseOfSavedKeywords);
+              memset(macroName, 0, i);
+              i = 0;
+              state = skipLine;
+              isMacro = False;
+          }
+      }
+  }
+}
+}
+
+return 1;
+}
+
+*/

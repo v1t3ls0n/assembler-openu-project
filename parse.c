@@ -5,9 +5,7 @@ extern State globalState;
 extern unsigned currentLine;
 extern const char *regs[REGS_SIZE];
 
-extern int countSpaceCharacters(char *s);
-
-int countConsecutiveCommasAndTrimSpaces(char *s)
+int countConsecutiveCommas(char *s)
 {
     int counter = 0;
     for (; s && *s == ','; counter++, s++)
@@ -74,7 +72,7 @@ Bool countAndVerifyDataArguments(char *line)
                 }
                 else if (*p == ',')
                 {
-                    skip = countConsecutiveCommasAndTrimSpaces(p);
+                    skip = countConsecutiveCommas(p);
                     commasCounter += skip;
                 }
                 else

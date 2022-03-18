@@ -9,6 +9,7 @@ extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
+extern unsigned calcNumberCharactersLength(int num);
 
 void initTablesArrays()
 {
@@ -86,8 +87,8 @@ Item *install(char *name, ItemType type)
 void printMacroTable()
 {
     int i = 0;
-    printf("\n\t\t ~ MACRO TABLE ~ \n");
-    printf("name\tstart\tend\tline count\t");
+    printf("\n\t ~ MACRO TABLE ~ \n");
+    printf("name\tstart\tend\t");
     while (i < HASHSIZE)
     {
         if (macros[i] != NULL)
@@ -99,7 +100,8 @@ void printMacroTable()
 
 int printMacroItem(Item *item)
 {
-    printf("\n%s\t%d\t%d\t%d\t", item->name, item->val.m.start, item->val.m.end, item->val.m.linesLen);
+
+    printf("\n%s\t\t%d\t\t%d\t", item->name, item->val.m.start, item->val.m.end);
     if (item->next != NULL)
         printMacroItem(item->next);
     return 0;
@@ -111,6 +113,7 @@ void printSymbolTable()
 
     printf("\n\t\t ~ SYMBOL TABLE ~ \n");
     printf("name\tvalue\tbase\toffset\tattributes");
+
     while (i < HASHSIZE)
     {
         if (symbols[i] != NULL)
@@ -124,6 +127,7 @@ int printSymbolItem(Item *item)
 {
     /*  printf("line 94, inside printSymbolItem \n");
      */
+
     printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
     if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
         printf("   ");
@@ -321,10 +325,9 @@ Item *getMacro(char *s)
     return p;
 }
 
-Item *addMacro(char *name, int start, int end, int linesLen)
+Item *addMacro(char *name, int start, int end)
 {
     Item *macro = lookup(name, Macro);
-    printf("inside addMacro, name:%s start:%d end:%d linesLen:%d\n", name, start, end, linesLen);
     if (macro != NULL)
     {
         yieldError(illegalMacroNameAlreadyInUse);
@@ -338,13 +341,11 @@ Item *addMacro(char *name, int start, int end, int linesLen)
             macro->val.m.start = start;
         if (end != -1)
             macro->val.m.end = end;
-        if (linesLen != -1)
-            macro->val.m.linesLen = linesLen;
     }
 
     return macro;
 }
-Item *updateMacro(char *name, int start, int end, int linesLen)
+Item *updateMacro(char *name, int start, int end)
 {
     Item *macro = getMacro(name);
     if (!macro)
@@ -353,8 +354,6 @@ Item *updateMacro(char *name, int start, int end, int linesLen)
         macro->val.m.start = start;
     if (end != -1)
         macro->val.m.end = end;
-    if (linesLen != -1)
-        macro->val.m.linesLen = linesLen;
 
     return macro;
 }
