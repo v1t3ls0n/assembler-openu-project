@@ -19,7 +19,7 @@ dec K
 sub LOOP[r10] ,r14
 END: stop
 STR: .string "abcd"
-LIST: .data 664344643647, -9
+LIST: .data -664344643647, -9
 .data -100
 .entry K
 K: .data 31
