@@ -7,6 +7,7 @@ macro m1
             inc r6
  mov r3, W
 endm
+m1
 
 lea STR, r6
 inc r6
@@ -28,3 +29,6 @@ LIST: .data 6, -9
 .entry K
 K: .data 31
 .extern val1
+
+m1
+
