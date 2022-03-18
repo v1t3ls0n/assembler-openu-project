@@ -204,7 +204,6 @@ void replaceWithMacro(FILE *target, FILE *source, int start, int end)
     for (i = end - start - 1; i > 0 && (c = fgetc(source)) != EOF; i--)
         fputc(c, target);
 }
-}
 
 FILE *createExpandedSourceFile(FILE *source, char *fileName)
 {
