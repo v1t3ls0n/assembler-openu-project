@@ -4,7 +4,7 @@
 MAIN: add r3, LIST
 LOOP: prn #48
 macro m1
- inc r6
+            inc r6
  mov r3, W
 endm
 
@@ -15,10 +15,7 @@ sub r1, r4
 bne END
 cmp val1, #-6
 
-macro .data
- inc r6
- mov r3, W
-endm
+m1
 
 bne END[r15]
 dec K

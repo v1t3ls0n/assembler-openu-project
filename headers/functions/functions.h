@@ -37,11 +37,11 @@ ParseState handleState(char *token, char *line, ParseState state);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 void parseSourceFile(FILE *source, char *filename);
-void replaceWithMacro(FILE *p, int macroStart, int macroEnd, int currentIndex);
+void parseAndReplaceMacros(FILE *source, FILE *target);
+void replaceWithMacro(FILE *target, FILE *source, int start, int end);
+FILE *createExpandedSourceFile(FILE *source, char *fileName);
 void parseMacro(FILE *fp);
-int readFromFileByIndexes(FILE *fptr, char *filename, int start, int end);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
-int parseNextLine(int start, int end);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
