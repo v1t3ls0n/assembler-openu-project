@@ -20,11 +20,11 @@ extern Bool isMacroClosing(char *s);
 extern Bool isLegalMacroName(char *s);
 
 void saveMacros(FILE *target);
-void popLastToken(FILE *target, char *token);
+void popLastToken(FILE *target, char *token, int amount);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
 FILE *createExpandedSourceFile(FILE *source, char *fileName);
-
+void popLastLine(FILE *target);
 void parseSourceFile(FILE *source, char *filename)
 {
 
@@ -37,19 +37,23 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     ParseState state = evalToken;
     Bool isMacroCurrentlyParsed = False;
     Bool isMacroStartFoundYet = False;
-    int c = 0, i = 0, j = 0, current = 0;
+    int c = 0, i = 0, j = 0, counter = 0, current = 0;
     int start = 0, end = 0;
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
     while ((c = fgetc(source)) != EOF)
     {
-        if (!isMacroCurrentlyParsed)
-            fputc(c, target);
 
+        if (!isMacroCurrentlyParsed)
+        {
+            fputc(c, target);
+            counter++;
+        }
         if (isMacroCurrentlyParsed && isMacroStartFoundYet)
             end++;
         if (c == '\n')
         {
+            counter = 0;
             currentLine++;
             if (state == skipLine)
                 state = evalToken;
@@ -75,93 +79,115 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                     else
                         token[j++] = c;
                 }
-                else
-                {
-                    state = evalToken;
-                    i = j = 0;
-                }
             }
-            else
+            else if (j > 0 || i > 0)
             {
-                if ((j > 0) || i > 0)
+
+                if (state == evalToken)
                 {
 
-                    if (state == evalToken)
+                    if (isMacroOpening(token))
                     {
-
-                        if (isMacroOpening(token))
-                        {
-                            /*          printf("\nisMacroOpening\ntoken:%s\n", token); */
-                            popLastToken(target, token);
-                            state = parsingMacroName;
-                            isMacroStartFoundYet = False;
-                        }
-                        else
-                        {
-                            if (isMacroClosing(token))
-                            {
-                                /*                                 printf("\nisMacroClosing\ntoken:%s\n", token);
-                                 */
-                                popLastToken(target, token);
-                                addMacro(macroName, start, (ftell(source) - strlen(token) - 1));
-                                memset(macroName, 0, i);
-                                isMacroCurrentlyParsed = False;
-                                start = end = 0;
-                            }
-
-                            else if (isPossiblyUseOfMacro(token))
-                            {
-                                Item *p = getMacro(token);
-                                if (p != NULL)
-                                {
-                                    popLastToken(target, token);
-                                    current = ftell(source) - 1;
-                                    fseek(target, 0 - strlen(token), SEEK_CUR);
-                                    replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
-                                    fseek(source, current, SEEK_SET);
-                                }
-                            }
-
-                            state = skipLine;
-                        }
+                        popLastToken(target, token, 0);
+                        state = parsingMacroName;
+                        isMacroStartFoundYet = False;
                     }
-
-                    else if (state == parsingMacroName)
+                    else
                     {
-                        popLastToken(target, macroName);
-
-                        if (isLegalMacroName(macroName))
+                        if (isMacroClosing(token))
                         {
+                            /*                                 printf("\nisMacroClosing\ntoken:%s\n", token);
+                             */
+                            popLastToken(target, token, 0);
 
-                            isMacroCurrentlyParsed = True;
-                            state = evalToken;
+                            addMacro(macroName, start, (ftell(source) - strlen(token) - 1));
+                            memset(macroName, 0, MAX_LABEL_LEN);
+                            isMacroCurrentlyParsed = False;
+                            i = start = end = 0;
                         }
-                        else
+
+                        else if (isPossiblyUseOfMacro(token))
                         {
-                            yieldError(illegalMacroNameUseOfSavedKeywords);
-                            memset(macroName, 0, i);
-                            isMacroCurrentlyParsed = isMacroStartFoundYet = False;
-                            i = 0;
-                            state = skipLine;
+                            Item *p = getMacro(token);
+                            popLastToken(target, token, 0);
+
+                            if (p != NULL)
+                            {
+                                current = ftell(source) - 1;
+                                fseek(target, 0 - strlen(token), SEEK_CUR);
+                                replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
+                                fseek(source, current, SEEK_SET);
+                            }
                         }
+
+                        state = skipLine;
                     }
-                    memset(token, 0, j);
-                    i = j = 0;
                 }
+
+                else if (state == parsingMacroName)
+                {
+                    popLastToken(target, macroName, 0);
+
+                    if (isLegalMacroName(macroName))
+                    {
+
+                        isMacroCurrentlyParsed = True;
+                        state = evalToken;
+                    }
+                    else
+                    {
+                        yieldError(illegalMacroNameUseOfSavedKeywords);
+                        memset(macroName, 0, MAX_LABEL_LEN);
+                        isMacroCurrentlyParsed = isMacroStartFoundYet = False;
+                        state = skipLine;
+                    }
+                }
+                memset(token, 0, MAX_LABEL_LEN);
+                i = j = 0;
             }
         }
     }
-}
 
-void popLastToken(FILE *target, char *token)
+    if (counter)
+    {
+        if (state == evalToken)
+        {
+            if (!(isMacroOpening(token) || isMacroClosing(token)) && isPossiblyUseOfMacro(token))
+            {
+                Item *p = getMacro(token);
+
+                popLastToken(target, token, j);
+                if (p != NULL)
+                {
+                    current = ftell(source) - 1;
+                    fseek(target, 0 - strlen(token), SEEK_CUR);
+                    replaceWithMacro(target, source, p->val.m.start, p->val.m.end);
+                    fseek(source, current, SEEK_SET);
+                }
+            }
+        }
+        else
+            popLastToken(target, "", counter - j - i);
+    }
+}
+void popLastLine(FILE *target)
+{
+}
+void popLastToken(FILE *target, char *token, int amount)
 {
 
     int len = strlen(token);
-    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
-     */
-
+    printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLine, token, len);
     fseek(target, -len, SEEK_CUR);
     fputc(' ', target);
+    if (amount)
+    {
+        fseek(target, -amount, SEEK_CUR);
+        while (amount--)
+        {
+            fputc(' ', target);
+        }
+    }
 }
 void replaceWithMacro(FILE *target, FILE *source, int start, int end)
 {
