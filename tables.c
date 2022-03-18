@@ -2,13 +2,14 @@
 /* Shared global State variables*/
 Item *symbols[HASHSIZE] = {0};
 Item *macros[HASHSIZE] = {0};
-extern const char *regs[REGS_SIZE];
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
 extern unsigned calcNumberCharactersLength(int num);
+
+extern Bool isRegistery(char *s);
 
 void initTablesArrays()
 {
@@ -367,16 +368,8 @@ Bool verifyLabelNaming(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return False;
 
-    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return False;
-
-            i++;
-        }
-    }
+    if (isRegistery(s))
+        return False;
 
     else if ((labelLength >= 3 && labelLength <= 4))
     {
@@ -416,16 +409,8 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     if (strlen(s) > MAX_LABEL_LEN)
         return yieldError(illegalLabelNameLength);
 
-    if (s[0] == 'r' && labelLength >= 2 && labelLength <= 3)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(regs[i], s) == 0))
-                return yieldError(illegalLabelNameUseOfSavedKeywords);
-
-            i++;
-        }
-    }
+    if (isRegistery(s))
+        return yieldError(illegalLabelNameUseOfSavedKeywords);
 
     else if ((labelLength >= 3 && labelLength <= 4))
     {
