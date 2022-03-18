@@ -37,7 +37,7 @@ ParseState handleState(char *token, char *line, ParseState state);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 void parseSourceFile(FILE *source, char *filename);
-void replaceWithMacro(FILE *p, int startIndex, int endIndex);
+void replaceWithMacro(FILE *p, int macroStart, int macroEnd, int currentIndex);
 void parseMacro(FILE *fp);
 int readFromFileByIndexes(FILE *fptr, char *filename, int start, int end);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
@@ -117,6 +117,7 @@ char *numToBin(int num);
 /*---------------------------------------------------------------------------------------------------------------*/
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
+Bool isInstructionStrict(char *s);
 Bool parseSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);

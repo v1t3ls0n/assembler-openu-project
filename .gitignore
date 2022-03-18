@@ -4,7 +4,8 @@ compiler
 *.am
 # Prerequisites
 *.d
-
+*.am
+*out
 .editorconfig
 
 # Object files

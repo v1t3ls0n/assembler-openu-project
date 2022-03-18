@@ -5,10 +5,12 @@ extern State globalState;
 extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);
 extern Bool isComment(char *s);
-extern Bool isInstruction(char *s);
+extern Bool isInstructionStrict(char *s);
 extern Bool verifyLabelNaming(char *s);
 extern Item *addMacro(char *name, int start, int end);
 extern Item *updateMacro(char *name, int start, int end);
+extern Item *getMacro(char *s);
+
 extern void printMacroTable();
 extern int printMacroItem(Item *item);
 extern unsigned currentLine;
@@ -27,10 +29,14 @@ Bool isMacroClosing(char *s)
     /*     printf("in is macro closing, s:%s\n", s); */
     return !strcmp(s, "endm") ? True : False;
 }
+Bool isPossiblyUseOfMacro(char *s)
+{
+    return !isLabelDeclaration(s) && !isOperation(s) && !isComment(s) && !isInstructionStrict(s);
+}
 
 Bool isLegalMacroName(char *s)
 {
-    return (strcmp(s, DATA) && strcmp(s, STRING) && strcmp(s, EXTERNAL) && strcmp(s, ENTRY)) && !isOperation(s) ? True : False;
+    return !isInstructionStrict(s) && !isOperation(s) ? True : False;
 }
 
 void parseSourceFile(FILE *source, char *filename)
@@ -96,6 +102,14 @@ void saveMacros(FILE *newFile)
                             isMacroCurrentlyParsed = False;
                             state = skipLine;
                         }
+
+                        else if (isPossiblyUseOfMacro(token))
+                        {
+                            Item *p = getMacro(token);
+                            printf("token:%s\n", token);
+                            if (p != NULL)
+                                replaceWithMacro(newFile, p->val.m.start, p->val.m.end, current);
+                        }
                         else
                             state = skipLine;
                     }
@@ -141,8 +155,9 @@ int readFromFileByIndexes(FILE *fptr, char *filename, int start, int end)
 
     return 1;
 }
-void replaceWithMacro(FILE *p, int startIndex, int endIndex)
+void replaceWithMacro(FILE *p, int macroStart, int macroEnd, int currentIndex)
 {
+    printf("macro Start:%d macro End:%d currentIndex:%d\n", macroStart, macroEnd, currentIndex);
 }
 
 void parseMacro(FILE *fp)

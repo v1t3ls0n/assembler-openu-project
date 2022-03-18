@@ -285,6 +285,11 @@ Bool isInstruction(char *s)
         return False;
 }
 
+Bool isInstructionStrict(char *s)
+{
+    return ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL))) ? True : False;
+}
+
 Bool isRegistery(char *s)
 {
     int len = strlen(s);

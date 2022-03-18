@@ -73,7 +73,9 @@ Bool yieldError(Error err)
         printf("requiredDestinationOperandIsMissin");
         break;
     }
-
+    case illegalMacroNameUseOfSavedKeywords:
+        printf("illegal Macro Name Use Of Saved Keywords");
+        break;
     case wrongRegisteryReferenceUndefinedReg:
         printf("registery name passed as operand does not exist, registeries names are r0 - r15");
         break;
