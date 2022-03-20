@@ -1,5 +1,7 @@
 #include "data.h"
 extern Bool yieldError(Error err);
+extern Bool yieldWarning(Error err);
+
 extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLineNumber;
@@ -25,7 +27,7 @@ Bool countAndVerifyDataArguments(char *line)
     len = strlen(p);
     memcpy(args, p, len);
     if (!strlen(args))
-        return yieldError(emptyDataDeclaretion);
+        return yieldWarning(emptyDataDeclaretion);
     p = args;
     p = trimFromLeft(p);
     i = len - strlen(p);
@@ -148,7 +150,7 @@ Bool countAndVerifyStringArguments(char *token)
         increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
     }
     else
-        return yieldError(emptyStringDeclatretion);
+        return yieldWarning(emptyStringDeclatretion);
 
     return True;
 }
@@ -194,7 +196,7 @@ ParseState handleState(char *token, char *line, ParseState state)
             {
                 char *next = strtok(NULL, " \t \n");
                 if (!next)
-                    return yieldError(instructionHasNoArguments);
+                    return yieldWarning(instructionHasNoArguments);
                 else
                     return handleInstruction(getInstructionType(token), token, next, line);
             }
@@ -203,8 +205,14 @@ ParseState handleState(char *token, char *line, ParseState state)
 
                 int type = getInstructionType(token);
                 char *next = strtok(NULL, ", \t \n");
-                if (!next || !strlen(next))
-                    return type == _TYPE_DATA ? yieldError(emptyDataDeclaretion) : yieldError(emptyStringDeclatretion);
+
+                if (!next)
+                {
+                    if (type == _TYPE_DATA || type == _TYPE_STRING)
+                        return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+                    else
+                        return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
+                }
                 else
                 {
                     if (type == _TYPE_DATA)
@@ -295,6 +303,8 @@ Bool parseSingleLine(char *line)
     }
 
     /*     printf("state:%d\n", state); */
+    currentLineNumber++;
+
     return state ? True : False;
 }
 
@@ -326,7 +336,6 @@ void parseAssemblyCode(FILE *fp, char *filename)
             if (!parseSingleLine(line))
                 isValidCode = False;
 
-            currentLineNumber++;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }

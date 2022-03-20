@@ -9,7 +9,7 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern Bool writeOperationBinary(char *operationName, char *args);
-
+extern Bool yieldWarning(Error err);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
@@ -165,7 +165,6 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
 
     if (isInstruction(firstToken))
     {
@@ -228,7 +227,6 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 }
 ParseState handleLabel(char *labelName, char *nextToken, char *line)
 {
-    printf("inside handle label, labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
     if (!labelName || !nextToken || !line)
         return Err;
     if (isInstruction(nextToken))
@@ -240,13 +238,11 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
             if (next)
                 return handleInstruction(instruction, nextToken, next, line);
             else
-                return yieldError(emptyLabelDecleration);
+                return yieldWarning(emptyLabelDecleration);
         }
         else
-        {
-            printf("line 245\n");
+
             return handleInstruction(instruction, labelName, nextToken, line);
-        }
     }
 
     else if (isOperation(nextToken))

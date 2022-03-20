@@ -2,17 +2,10 @@
 #include "data.h"
 extern unsigned currentLineNumber;
 
-Bool yieldError(Error err)
+Bool yieldWarning(Warning err)
 {
     fprintf(stderr, "\n###################################\n");
-    fprintf(stderr, "Error!! occured on line %d ", currentLineNumber);
-
-    /*     illegalLabelNameUseOfCharacters
-
-            illegalLabelNameLength
-
-                illegalLabelNameUseOfSavedKeywords
-                    illegalLabelNameUseOfCharacters */
+    fprintf(stderr, "Warning!! line %d ", currentLineNumber);
     switch (err)
     {
     case emptyLabelDecleration:
@@ -25,10 +18,36 @@ Bool yieldError(Error err)
     case emptyStringDeclatretion:
         fprintf(stderr, "empty String Declatretion");
         break;
+    case emptyExternalDeclaretion:
+        fprintf(stderr, "empty external Declatretion");
+        break;
 
+    case emptyEntryDeclaretion:
+        fprintf(stderr, "empty entry Declatretion");
+        break;
     case emptyDeclaretionOfEntryOrExternalVariables:
         fprintf(stderr, "empty Declaretion Of Entry Or External Variables");
         break;
+    case instructionHasNoArguments:
+        fprintf(stderr, "instruction Has No Arguments");
+        break;
+
+    default:
+        break;
+    }
+
+    fprintf(stderr, "\n");
+    fprintf(stderr, "###################################\n\n");
+    return True;
+}
+
+Bool yieldError(Error err)
+{
+    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "Error!! occured on line %d ", currentLineNumber);
+
+    switch (err)
+    {
 
     case afterPlusOrMinusSignThereMustBeANumber:
         fprintf(stderr, "after Plus Or Minus Sign There Must Be A Number without any spaces between");
@@ -39,9 +58,7 @@ Bool yieldError(Error err)
         fprintf(stderr, "useOfNestedMacrosIsIllegal");
         break;
     }
-    case instructionHasNoArguments:
-        fprintf(stderr, "instruction Has No Arguments");
-        break;
+
     case macroClosingWithoutAnyOpenedMacro:
         fprintf(stderr, "macroClosingWithoutAnyOpenedMacro");
         break;
@@ -197,7 +214,7 @@ Bool yieldError(Error err)
         break;
 
     case expectedQuotes:
-        fprintf(stderr, "expected opening quotes before string decleration");
+        fprintf(stderr, "expected opening quotes before string");
         break;
 
     case closingQuotesForStringIsMissing:
