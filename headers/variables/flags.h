@@ -27,6 +27,8 @@ typedef enum
     wrongInstructionSyntaxMissinCommas,
     wrongInstructionSyntaxExtraCommas,
     wrongInstructionSyntaxMissinQuotes,
+    wrongOperationSyntaxMissingCommas,
+    wrongOperationSyntaxExtraCommas,
     illegalApearenceOfCharactersOnLine,
     illegalApearenceOfExtraCharactersOnLine,
     illegalApearenceOfCommaBeforeFirstParameter,

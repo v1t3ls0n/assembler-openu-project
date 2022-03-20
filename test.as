@@ -25,7 +25,7 @@ END: stop
 m1
 STR: .string "abcd"
 LIST: .data 6, -9
-.data -s 100
+.data s 100
 m1
 .entry K
 K: .data 31
