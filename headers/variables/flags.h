@@ -57,7 +57,11 @@ typedef enum
     wrongInstructionSyntaxIllegalCommaPosition,
     secondRunFailed,
     illegalMacroNameUseOfSavedKeywords,
-    afterPlusOrMinusSignThereMustBeANumber
+    afterPlusOrMinusSignThereMustBeANumber,
+    emptyDeclaretionOfEntryOrExternalVariables,
+    emptyStringDeclatretion,
+    instructionHasNoArguments,
+    emptyDataDeclaretion
 
 } Error;
 

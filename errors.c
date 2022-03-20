@@ -15,9 +15,23 @@ Bool yieldError(Error err)
                     illegalLabelNameUseOfCharacters */
     switch (err)
     {
+    case emptyLabelDecleration:
+        fprintf(stderr, "empty Label Declaretion");
+        break;
+
+    case emptyDataDeclaretion:
+        fprintf(stderr, "empty Data Declaretion");
+        break;
+    case emptyStringDeclatretion:
+        fprintf(stderr, "empty String Declatretion");
+        break;
+
+    case emptyDeclaretionOfEntryOrExternalVariables:
+        fprintf(stderr, "empty Declaretion Of Entry Or External Variables");
+        break;
 
     case afterPlusOrMinusSignThereMustBeANumber:
-        fprintf(stderr, "after Plus Or Minus Sign There Must Be A Number");
+        fprintf(stderr, "after Plus Or Minus Sign There Must Be A Number without any spaces between");
         break;
 
     case useOfNestedMacrosIsIllegal:
@@ -25,7 +39,9 @@ Bool yieldError(Error err)
         fprintf(stderr, "useOfNestedMacrosIsIllegal");
         break;
     }
-
+    case instructionHasNoArguments:
+        fprintf(stderr, "instruction Has No Arguments");
+        break;
     case macroClosingWithoutAnyOpenedMacro:
         fprintf(stderr, "macroClosingWithoutAnyOpenedMacro");
         break;
