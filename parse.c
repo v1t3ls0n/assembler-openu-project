@@ -1,5 +1,7 @@
 #include "data.h"
 extern Bool yieldError(Error err);
+extern Bool yieldWarning(Error err);
+
 extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLineNumber;
@@ -24,6 +26,8 @@ Bool countAndVerifyDataArguments(char *line)
 
     len = strlen(p);
     memcpy(args, p, len);
+    if (!strlen(args))
+        return yieldWarning(emptyDataDeclaretion);
     p = args;
     p = trimFromLeft(p);
     i = len - strlen(p);
@@ -48,7 +52,7 @@ Bool countAndVerifyDataArguments(char *line)
                 {
                     if (!minusOrPlusFlag)
                     {
-                        if (!isdigit(p[1]))
+                        if (isspace(p[1]))
                         {
                             isValid = yieldError(afterPlusOrMinusSignThereMustBeANumber);
                             minusOrPlusFlag = False;
@@ -135,12 +139,18 @@ Bool countAndVerifyStringArguments(char *token)
 
     if (isInstruction(token))
         token = strtok(NULL, " \t \n");
-    if (token[0] == '\"' && token[strlen(token) - 1] != '\"')
-        return yieldError(closingQuotesForStringIsMissing);
-    else if (token[0] != '\"')
-        return yieldError(expectedQuotes);
 
-    increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    if (token)
+    {
+        if (token[0] == '\"' && (token[strlen(token) - 1] != '\"' || strlen(token) < 2))
+            return yieldError(closingQuotesForStringIsMissing);
+        else if (token[0] != '\"')
+            return yieldError(expectedQuotes);
+
+        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    }
+    else
+        return yieldWarning(emptyStringDeclatretion);
 
     return True;
 }
@@ -167,7 +177,14 @@ ParseState handleState(char *token, char *line, ParseState state)
             else
             {
                 if (globalState == firstRun)
-                    return handleLabel(token, strtok(NULL, " \t \n"), line) ? lineParsedSuccessfully : Err;
+                {
+                    char *next = strtok(NULL, " \t \n");
+
+                    if (!next)
+                        return yieldError(emptyLabelDecleration);
+                    else
+                        return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
+                }
                 else
                     return skipToNextToken;
             }
@@ -175,24 +192,40 @@ ParseState handleState(char *token, char *line, ParseState state)
 
         else if (isInstruction(token))
         {
-            /*           printf("line 205, is instruction\n"); */
             if (globalState == firstRun)
-                return handleInstruction(getInstructionType(token), token, strtok(NULL, " \t \n"), line);
+            {
+                char *next = strtok(NULL, " \t \n");
+                if (!next)
+                    return yieldWarning(instructionHasNoArguments);
+                else
+                    return handleInstruction(getInstructionType(token), token, next, line);
+            }
             else
             {
-                int type = getInstructionType(token);
-                token = strtok(NULL, ", \t \n");
 
-                if (type == _TYPE_DATA)
+                int type = getInstructionType(token);
+                char *next = strtok(NULL, ", \t \n");
+
+                if (!next)
                 {
-                    return writeDataInstruction(token) ? lineParsedSuccessfully : Err;
-                }
-                else if (type == _TYPE_STRING)
-                {
-                    return writeStringInstruction(token) ? lineParsedSuccessfully : Err;
+                    if (type == _TYPE_DATA || type == _TYPE_STRING)
+                        return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+                    else
+                        return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
                 }
                 else
-                    return lineParsedSuccessfully;
+                {
+                    if (type == _TYPE_DATA)
+                    {
+                        return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
+                    }
+                    else if (type == _TYPE_STRING)
+                    {
+                        return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
+                    }
+                    else
+                        return lineParsedSuccessfully;
+                }
             }
         }
 
@@ -245,8 +278,13 @@ Bool parseSingleLine(char *line)
             state = lineParsedSuccessfully;
         case skipToNextToken:
         {
-            line = line + strlen(token) + 1;
-            state = handleState(strtok(NULL, ", \t \n"), line, newLine);
+            char *next = strtok(NULL, ", \t \n");
+            if (next)
+            {
+                line = line + strlen(token) + 1;
+                state = handleState(next, line, newLine);
+            }
+
             break;
         }
 
@@ -265,6 +303,8 @@ Bool parseSingleLine(char *line)
     }
 
     /*     printf("state:%d\n", state); */
+    currentLineNumber++;
+
     return state ? True : False;
 }
 
@@ -296,7 +336,6 @@ void parseAssemblyCode(FILE *fp, char *filename)
             if (!parseSingleLine(line))
                 isValidCode = False;
 
-            currentLineNumber++;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }

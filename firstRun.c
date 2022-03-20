@@ -9,7 +9,7 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern Bool writeOperationBinary(char *operationName, char *args);
-
+extern Bool yieldWarning(Error err);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
@@ -165,13 +165,12 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    /*     printf("line 169, type: %s\nfirst token: %s\nnexttoken: %s\nline: %s\n", getInstructionNameByType(type), firstToken, nextTokens, line);
-     */
+
     if (isInstruction(firstToken))
     {
+
         if (type == _TYPE_DATA)
         {
-
             return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
         }
         else if (type == _TYPE_STRING)
@@ -179,20 +178,28 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
-            char *labelName = calloc(strlen(nextTokens), sizeof(char *));
-            strcpy(labelName, nextTokens);
-            nextTokens = strtok(NULL, " \t \n");
             if (nextTokens)
             {
-                yieldError(illegalApearenceOfExtraCharactersOnLine);
-                return Err;
+                char *labelName = calloc(strlen(nextTokens), sizeof(char *));
+                strcpy(labelName, nextTokens);
+                nextTokens = strtok(NULL, " \t \n");
+                if (nextTokens)
+                {
+                    yieldError(illegalApearenceOfExtraCharactersOnLine);
+                    return Err;
+                }
+                else
+                {
+                    if (type == _TYPE_ENTRY)
+                        return addSymbol(labelName, 0, 0, 0, 1, 0) ? lineParsedSuccessfully : Err;
+                    if (type == _TYPE_EXTERNAL)
+                        return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
+                }
             }
             else
             {
-                if (type == _TYPE_ENTRY)
-                    return addSymbol(labelName, 0, 0, 0, 1, 0) ? lineParsedSuccessfully : Err;
-                if (type == _TYPE_EXTERNAL)
-                    return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
+                yieldError(emptyDeclaretionOfEntryOrExternalVariables);
+                return Err;
             }
         }
     }
@@ -220,18 +227,22 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 }
 ParseState handleLabel(char *labelName, char *nextToken, char *line)
 {
-
+    if (!labelName || !nextToken || !line)
+        return Err;
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
-        /*         if (instruction)
-                { */
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
-            return handleInstruction(instruction, nextToken, strtok(NULL, " \t \n"), line);
+        {
+            char *next = strtok(NULL, " \t \n");
+            if (next)
+                return handleInstruction(instruction, nextToken, next, line);
+            else
+                return yieldWarning(emptyLabelDecleration);
+        }
         else
+
             return handleInstruction(instruction, labelName, nextToken, line);
-        ;
-        /*        } */
     }
 
     else if (isOperation(nextToken))
@@ -252,8 +263,7 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
     }
 
     else
-    {
         yieldError(illegalLabelUseExpectedOperationOrInstruction);
-        return Err;
-    }
+
+    return Err;
 }

@@ -35,7 +35,6 @@ typedef enum
     illegalApearenceOfCommaAfterLastParameter,
     missinSpaceAfterInstruction,
     maxLineLengthExceeded,
-    emptyLabelDecleration,
     illegalOperand,
     none,
     noErrors,
@@ -60,6 +59,18 @@ typedef enum
     afterPlusOrMinusSignThereMustBeANumber
 
 } Error;
+
+typedef enum
+{
+    emptyDeclaretionOfEntryOrExternalVariables,
+    emptyStringDeclatretion,
+    emptyEntryDeclaretion,
+    emptyExternalDeclaretion,
+    instructionHasNoArguments,
+    emptyDataDeclaretion,
+    emptyLabelDecleration
+
+} Warning;
 
 typedef enum
 {

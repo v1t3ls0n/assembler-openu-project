@@ -28,7 +28,7 @@ Bool isInstruction(char *s)
 
     else if (strstr(s, DATA) != NULL || strstr(s, STRING) != NULL || strstr(s, ENTRY) != NULL || strstr(s, EXTERNAL) != NULL)
     {
-        yieldError(missinSpaceAfterInstruction);
+        /*         yieldError(missinSpaceAfterInstruction); */
         return True;
     }
     else
