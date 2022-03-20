@@ -25,7 +25,14 @@ ParseState handleOperation(char *operationName, char *args)
     char *first = 0, *second = 0, *inBetweenCharacters = 0, *extra = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     first = strtok(args, " \t \n");
-    inBetweenCharacters = strtok(NULL, " \t \n");
+    if (!first)
+        first = 0;
+    else
+        inBetweenCharacters = strtok(NULL, " \t \n");
+
+    if (!inBetweenCharacters)
+        second = 0;
+
     if (!first && !inBetweenCharacters)
     {
     }
@@ -55,10 +62,9 @@ ParseState handleOperation(char *operationName, char *args)
             first = 0;
         }
     }
-    extra = strtok(NULL, " \t \n");
+
     if (extra)
     {
-        /*     printf("line64\nextra:%s\nfirst:%s\nsecond:%s\n", extra, first, second); */
         yieldError(illegalApearenceOfExtraCharactersOnLine);
         return Err;
     }
@@ -85,17 +91,19 @@ ParseState handleOperation(char *operationName, char *args)
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
 {
+
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
-    /*     printf("inside parse operands\nsrc:%s\ndes:%s\n", src, des); */
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
+
     if (src && strchr(src, ','))
     {
         char *p = strchr(src, ',');
-        *p = '\0';
 
+        *p = '\0';
         commasCount++;
     }
+
     if (des && strchr(des, ','))
     {
         commasCount++;
@@ -116,21 +124,23 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
             return True;
         else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
         {
-            if (!strlen(src))
-                return yieldError(requiredSourceOperandIsMissin);
-            if (!strlen(des))
+
+            if (!des)
                 return yieldError(requiredDestinationOperandIsMissin);
+            if (!src)
+                return yieldError(requiredSourceOperandIsMissin);
+
             return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
         }
         else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
         {
-            if (!strlen(src))
+            if (!src)
                 return yieldError(requiredSourceOperandIsMissin);
             return validateOperandMatch(op->src, active, src, 0);
         }
         else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
         {
-            if (!strlen(des))
+            if (!des)
                 return yieldError(requiredDestinationOperandIsMissin);
             return validateOperandMatch(op->des, active, des, 1);
         }
