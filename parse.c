@@ -47,7 +47,13 @@ Bool countAndVerifyDataArguments(char *line)
                 if (*p == '-' || *p == '+')
                 {
                     if (!minusOrPlusFlag)
-                        minusOrPlusFlag = True;
+                    {
+                        if (!isdigit(p[1]))
+
+                            isValid = yieldError(afterPlusOrMinusSignThereMustBeANumber);
+                        else
+                            minusOrPlusFlag = True;
+                    }
                     else
                     {
                         isValid = yieldError(expectedNumber);

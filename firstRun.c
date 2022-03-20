@@ -105,10 +105,10 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
         commasCount++;
 
     if (commasCount > expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongInstructionSyntaxExtraCommas);
+        return yieldError(wrongOperationSyntaxExtraCommas);
 
     else if (commasCount < expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongInstructionSyntaxMissinCommas);
+        return yieldError(wrongOperationSyntaxMissingCommas);
 
     else if (commasCount == expectedCommasBasedOnNumberOfOperands)
     {

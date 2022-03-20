@@ -27,6 +27,8 @@ typedef enum
     wrongInstructionSyntaxMissinCommas,
     wrongInstructionSyntaxExtraCommas,
     wrongInstructionSyntaxMissinQuotes,
+    wrongOperationSyntaxMissingCommas,
+    wrongOperationSyntaxExtraCommas,
     illegalApearenceOfCharactersOnLine,
     illegalApearenceOfExtraCharactersOnLine,
     illegalApearenceOfCommaBeforeFirstParameter,
@@ -54,7 +56,8 @@ typedef enum
     labelNotExist,
     wrongInstructionSyntaxIllegalCommaPosition,
     secondRunFailed,
-    illegalMacroNameUseOfSavedKeywords
+    illegalMacroNameUseOfSavedKeywords,
+    afterPlusOrMinusSignThereMustBeANumber
 
 } Error;
 

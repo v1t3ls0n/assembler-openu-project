@@ -16,6 +16,10 @@ Bool yieldError(Error err)
     switch (err)
     {
 
+    case afterPlusOrMinusSignThereMustBeANumber:
+        fprintf(stderr, "after Plus Or Minus Sign There Must Be A Number");
+        break;
+
     case useOfNestedMacrosIsIllegal:
     {
         fprintf(stderr, "useOfNestedMacrosIsIllegal");
@@ -147,12 +151,20 @@ Bool yieldError(Error err)
         break;
     case wrongInstructionSyntaxMissinCommas:
     {
-        fprintf(stderr, "Missing Comma between operands");
+        fprintf(stderr, "Missing Comma between argumentes");
         break;
     }
+
+    case wrongOperationSyntaxMissingCommas:
+        fprintf(stderr, "Missing Comma between operands");
+        break;
+    case wrongOperationSyntaxExtraCommas:
+        fprintf(stderr, "Missing Comma between operands");
+        break;
+
     case wrongInstructionSyntaxExtraCommas:
     {
-        fprintf(stderr, "extra comma between operands");
+        fprintf(stderr, "extra comma between arguments");
         break;
     }
     case expectedSingleCommaCharacter:
