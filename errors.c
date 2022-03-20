@@ -16,6 +16,10 @@ Bool yieldError(Error err)
     switch (err)
     {
 
+    case afterPlusOrMinusSignThereMustBeANumber:
+        printf("after Plus Or Minus Sign There Must Be A Number");
+        break;
+
     case useOfNestedMacrosIsIllegal:
     {
         fprintf(stderr, "useOfNestedMacrosIsIllegal");

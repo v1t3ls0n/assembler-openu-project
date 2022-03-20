@@ -54,7 +54,8 @@ typedef enum
     labelNotExist,
     wrongInstructionSyntaxIllegalCommaPosition,
     secondRunFailed,
-    illegalMacroNameUseOfSavedKeywords
+    illegalMacroNameUseOfSavedKeywords,
+    afterPlusOrMinusSignThereMustBeANumber
 
 } Error;
 
