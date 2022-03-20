@@ -102,7 +102,7 @@ Bool yieldError(Error err)
 
     case requiredSourceOperandIsMissin:
     {
-        fprintf(stderr, "requiredSourceOperandIsMissin");
+        fprintf(stderr, "required operand Is Missing");
         break;
     }
 
