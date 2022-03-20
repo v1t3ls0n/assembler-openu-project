@@ -134,7 +134,7 @@ HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word)
 {
     int i = 0;
     char hexDigits[4] = {0};
-    HexWord *newHex = (HexWord *)calloc(1, sizeof(HexWord *));
+    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord));
     for (i = BINARY_WORD_SIZE - 1; i >= 0; i--)
     {
         hexDigits[i % 4] = word->digit[i].on ? '1' : '0';
