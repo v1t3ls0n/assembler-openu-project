@@ -1,9 +1,9 @@
 #include "data.h"
 /* Shared global State variables*/
-extern State globalState;
-extern void parseSourceFile(FILE *source, char *filename);
+
 extern int firstRunParsing(FILE *fp, char *filename);
 extern Bool parseSingleLine(char *line);
+extern State createExpandedSourceFile(FILE *source, char *fileName);
 
 extern void initTablesArrays();
 extern void printBinaryImg();
@@ -11,26 +11,15 @@ extern unsigned currentLineNumber;
 extern void initMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern State parseAssemblyCode(FILE *fp, char *filename, State globalState);
 extern unsigned currentLineNumber;
+
+State globalState = startProgram;
 
 int main(int argc, char *argv[])
 {
-    initTablesArrays();
-    globalState = parsingMacros;
+
     handleSourceFiles(argc, argv);
-    globalState = firstRun;
-    handleSourceFiles(argc, argv);
-    if (globalState != collectErrors)
-    {
-        globalState = secondRun;
-        updateFinalCountersValue();
-        printSymbolTable();
-        initMemory();
-        handleSourceFiles(argc, argv);
-    }
-    else
-        printf("\nFinished First Run With Errors\n");
 
     return 0;
 }
@@ -57,24 +46,29 @@ int handleSourceFiles(int argc, char *argv[])
             yieldError(fileCouldNotBeOpened);
         else
         {
-            if (globalState == parsingMacros)
-                parseSourceFile(fptr, fileName);
-            else if (globalState == firstRun)
-                parseAssemblyCode(fptr, fileName);
-
-            else if (globalState == secondRun)
+            initTablesArrays();
+            globalState = createExpandedSourceFile(fptr, fileName);
+            if (globalState == firstRun)
             {
-                rewind(fptr);
-                parseAssemblyCode(fptr, fileName);
-                if (globalState != collectErrors)
+                printMacroTable();
+                initMemory();
+                globalState = parseAssemblyCode(fptr, fileName, firstRun);
+                if (globalState == secondRun)
                 {
-                    printf("Finished Successfully, about to export files!\n");
-                    printBinaryImg();
-                    printf("\n");
-                    printMemoryImgInRequiredObjFileFormat();
+                    rewind(fptr);
+                    updateFinalCountersValue();
+                    printSymbolTable();
+                    parseAssemblyCode(fptr, fileName, secondRun);
+                    if (globalState == exportFiles)
+                    {
+                        printf("Finished Successfully, about to export files!\n");
+                        printBinaryImg();
+                        printf("\n");
+                        printMemoryImgInRequiredObjFileFormat();
+                    }
+                    else
+                        printf("\nSecond Run Finished With Errors, files will not be exported!\n");
                 }
-                else
-                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
         }
 

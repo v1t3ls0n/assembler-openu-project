@@ -30,7 +30,7 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-void parseAssemblyCode(FILE *fp, char *filename);
+State parseAssemblyCode(FILE *fp, char *filename, State globalState);
 ParseState handleState(char *token, char *line, ParseState state);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -38,10 +38,9 @@ ParseState handleState(char *token, char *line, ParseState state);
 /* --------------------------------------------In preProcessor.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void parseSourceFile(FILE *source, char *filename);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-FILE *createExpandedSourceFile(FILE *source, char *fileName);
+State createExpandedSourceFile(FILE *source, char *fileName);
 void parseMacro(FILE *fp);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -84,8 +83,7 @@ Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
-void initTablesArrays();
-void updateFinalMemoryAddressesInSymbolTable();
+void initTables void updateFinalMemoryAddressesInSymbolTable();
 int updateSingleItemAddress(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);

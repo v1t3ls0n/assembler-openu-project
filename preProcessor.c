@@ -23,14 +23,8 @@ void saveMacros(FILE *target);
 void popLastToken(FILE *target, char *token, int offset);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-FILE *createExpandedSourceFile(FILE *source, char *fileName);
+State createExpandedSourceFile(FILE *source, char *fileName);
 void popCharacters(FILE *target, fpos_t position, int amount);
-void parseSourceFile(FILE *source, char *filename)
-{
-
-    createExpandedSourceFile(source, filename);
-    printMacroTable();
-}
 
 void parseAndReplaceMacros(FILE *source, FILE *target)
 {
@@ -202,21 +196,19 @@ void replaceWithMacro(FILE *target, FILE *source, int start, int end)
         fputc(c, target);
 }
 
-FILE *createExpandedSourceFile(FILE *source, char *fileName)
+State createExpandedSourceFile(FILE *source, char *fileName)
 {
     FILE *target;
-    /*     int c = 0; */
     fileName[strlen(fileName) - 1] = 'm';
     target = fopen(fileName, "w+");
     if (target == NULL)
     {
         fclose(source);
-        printf("failed to create new .am file for the source expanded source code\n");
-        printf("Press any key to exit...\n");
-        exit(1);
+        printf("failed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist", fileName);
+        return goToNextFileOrEndProgram;
     }
     parseAndReplaceMacros(source, target);
     rewind(target);
     fclose(source);
-    return target;
+    return firstRun;
 }

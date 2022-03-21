@@ -25,7 +25,7 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern State parseAssemblyCode(FILE *fp, char *filename, State globalState);
 
 extern ParseState handleState(char *token, char *line, ParseState state);
 extern Bool parseSingleLine(char *line);

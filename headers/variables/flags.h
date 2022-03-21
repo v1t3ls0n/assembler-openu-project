@@ -82,6 +82,7 @@ typedef enum
     writeFiles,
     collectErrors,
     exportFiles,
+    goToNextFileOrEndProgram,
     stopProgram,
     endProgram,
     startProgram
