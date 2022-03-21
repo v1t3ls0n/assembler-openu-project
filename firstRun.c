@@ -57,11 +57,12 @@ ParseState handleOperation(char *operationName, char *args)
                 first = 0;
             }
         }
+
+        areOperandsLegal = parseOperands(first, comma, second, p, active);
+
         extra = strtok(NULL, " \t \n");
         if (extra)
             areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-        else
-            areOperandsLegal = parseOperands(first, comma, second, p, active);
     }
 
     if (areOperandsLegal)
