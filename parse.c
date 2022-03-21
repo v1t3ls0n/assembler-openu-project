@@ -1,12 +1,15 @@
 #include "data.h"
 extern Bool yieldError(Error err);
 extern Bool yieldWarning(Error err);
-
 extern char *trimFromLeft(char *s);
-extern State globalState;
-extern unsigned currentLineNumber;
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
+static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
+static void (*setFileName)(char *) = &setCurrentFileName;
+static void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
+
+/* extern State getGlobalState();
+ */
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -158,8 +161,9 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
-ParseState handleState(char *token, char *line, ParseState state)
+ParseState handleState(char *token, char *line)
 {
+    State (*globalState)() = &getGlobalState;
 
     if (isComment(token))
         return lineParsedSuccessfully;
@@ -170,21 +174,21 @@ ParseState handleState(char *token, char *line, ParseState state)
             yieldError(illegalLabelDeclaration);
         else
         {
-            char *next = globalState == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
             if (!next)
                 return yieldError(emptyLabelDecleration);
 
-            if (globalState == firstRun)
+            if ((*globalState)() == firstRun)
                 return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
             else
-                return handleState(next, line + strlen(token) + 1, newLine);
+                return handleState(next, line + strlen(token) + 1);
         }
     }
 
     else if (isInstruction(token))
     {
 
-        char *next = globalState == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
         int type = getInstructionType(token);
         if (!next)
         {
@@ -195,7 +199,7 @@ ParseState handleState(char *token, char *line, ParseState state)
         }
         else
         {
-            if (globalState == firstRun)
+            if ((*globalState)() == firstRun)
                 return handleInstruction(type, token, next, line);
             else
             {
@@ -213,8 +217,8 @@ ParseState handleState(char *token, char *line, ParseState state)
     {
         char args[MAX_LINE_LEN] = {0};
         strcpy(args, (line + strlen(token)));
-        return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
-                                                                                                          : Err;
+        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
+                                                                                                               : Err;
     }
     else
     {
@@ -229,32 +233,39 @@ ParseState handleState(char *token, char *line, ParseState state)
 
 Bool parseSingleLine(char *line)
 {
+    State (*globalState)() = &getGlobalState;
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
     memcpy(lineCopy, line, strlen(line));
-    token = globalState == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
-    state = handleState(token, line, newLine);
-    currentLineNumber++;
+    token = (*globalState)() == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    state = handleState(token, line);
+    (*currentLineIsNextLine)();
 
-    return state == lineParsedSuccessfully ? True : False;
+    return state == lineParsedSuccessfully
+               ? True
+               : False;
 }
 
 void parseAssemblyCode(FILE *fp, char *filename)
 {
+    State (*globalState)() = &getGlobalState;
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-    currentLineNumber = 1;
-    if (globalState == secondRun)
+    State nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
+    (*setFileName)(filename);
+    (*setCurrentLineToStart)();
+
+    if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
         printf("\n\n\nFirst Run:\n");
 
     while (((c = fgetc(fp)) != EOF))
     {
-        if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
+        if ((*globalState)() != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
 
             isValidCode = False;
@@ -289,5 +300,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
     }
 
     if (!isValidCode)
-        globalState = collectErrors;
+        nextState = collectErrors;
+
+    updateGlobalState(nextState);
 }

@@ -17,6 +17,8 @@ extern int getSymbolBaseAddress(char *name);
 extern int getSymbolOffset(char *name);
 extern Bool isExternal(char *name);
 extern Item *getSymbol(char *name);
+extern Bool isEntry(char *name);
+extern Bool isNonEmptyEntry(char *name);
 
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
@@ -27,7 +29,7 @@ extern unsigned getIC();
 extern void addWord(int value, DataType type);
 extern void parseAssemblyCode(FILE *fp, char *filename);
 
-extern ParseState handleState(char *token, char *line, ParseState state);
+extern ParseState handleState(char *token, char *line);
 extern Bool parseSingleLine(char *line);
 
 Bool writeOperationBinary(char *operationName, char *args)
@@ -151,6 +153,7 @@ void writeDirectOperandWord(char *labelName)
 
     else
     {
+
         base = getSymbolBaseAddress(labelName);
         offset = getSymbolOffset(labelName);
         addWord((R << 16) | base, Code);
@@ -175,7 +178,12 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
     else
     {
         if (getSymbol(operand) != NULL)
+        {
+            if (isEntry(operand) && !isNonEmptyEntry(operand))
+                return yieldError(entryDeclaredButNotDefined);
+
             active[type].direct = 1;
+        }
         else
             return yieldError(labelNotExist);
     }

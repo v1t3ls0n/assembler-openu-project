@@ -1,55 +1,33 @@
 #include "data.h"
 /* Shared global State variables*/
-extern State globalState;
-extern void parseSourceFile(FILE *source, char *filename);
+
 extern int firstRunParsing(FILE *fp, char *filename);
 extern Bool parseSingleLine(char *line);
+void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 
 extern void initTablesArrays();
 extern void printBinaryImg();
-extern unsigned currentLineNumber;
 extern void initMemory();
+extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
-extern unsigned currentLineNumber;
+
+extern State getGlobalState();
+extern void updateGlobalState(State new);
+
+void handleSingleSourceFile(char *arg);
 
 int main(int argc, char *argv[])
 {
-    initTablesArrays();
-    globalState = parsingMacros;
     handleSourceFiles(argc, argv);
-
-    globalState = firstRun;
-    handleSourceFiles(argc, argv);
-
-    if (globalState != collectErrors)
-    {
-        updateFinalCountersValue();
-        printSymbolTable();
-        initMemory();
-        globalState = secondRun;
-        handleSourceFiles(argc, argv);
-        if (globalState != collectErrors)
-        {
-            printf("Finished Successfully, about to export files!\n");
-            printBinaryImg();
-            printf("\n");
-            printMemoryImgInRequiredObjFileFormat();
-        }
-        else
-            printf("\nSecond Run Finished With Errors, files will not be exported!\n");
-    }
-    else
-        printf("\nFinished First Run With Errors\n");
 
     return 0;
 }
 
 int handleSourceFiles(int argc, char *argv[])
 {
-    FILE *fptr;
-    char *fileName;
+
     int filesCount = argc - 1;
     int i = 1;
     if (filesCount < 1)
@@ -60,29 +38,65 @@ int handleSourceFiles(int argc, char *argv[])
 
     while (--argc)
     {
-        fileName = calloc(strlen(argv[i]) + 3, sizeof(char *));
-        sscanf(argv[i], "%s", fileName);
-        fileName = globalState == parsingMacros ? strcat(fileName, ".as") : strcat(fileName, ".am");
-
-        if ((fptr = fopen(fileName, "r")) == NULL)
-            yieldError(fileCouldNotBeOpened);
-        else
-        {
-            if (globalState == parsingMacros)
-                parseSourceFile(fptr, fileName);
-            else if (globalState == firstRun)
-            {
-                parseAssemblyCode(fptr, fileName);
-            }
-            else if (globalState == secondRun)
-            {
-                rewind(fptr);
-                parseAssemblyCode(fptr, fileName);
-            }
-        }
-
-        free(fileName);
+        updateGlobalState(parsingMacros);
+        handleSingleSourceFile(argv[i]);
+        i++;
     }
 
     return True;
+}
+
+void handleSingleSourceFile(char *arg)
+{
+    State (*globalState)() = &getGlobalState;
+    FILE *fptr, *expandedSrc;
+    char *fileName = calloc(strlen(arg) + 3, sizeof(char *));
+    sscanf(arg, "%s", fileName);
+    if ((fptr = fopen(strcat(fileName, ".as"), "r")) == NULL)
+    {
+        yieldError(fileCouldNotBeOpened);
+        return;
+    }
+    initTablesArrays();
+    fileName[strlen(fileName) - 1] = 'm';
+    expandedSrc = fopen(fileName, "w+");
+    if (expandedSrc == NULL)
+    {
+        fclose(fptr);
+        updateGlobalState(goToNextFileOrEndProgram);
+    }
+    else
+    {
+        createExpandedSourceFile(fptr, expandedSrc, fileName);
+        rewind(expandedSrc);
+        if ((*globalState)() == firstRun)
+        {
+            printMacroTable();
+            parseAssemblyCode(expandedSrc, fileName);
+            if ((*globalState)() == secondRun)
+            {
+                rewind(expandedSrc);
+                updateFinalCountersValue();
+                printSymbolTable();
+                initMemory();
+                parseAssemblyCode(expandedSrc, fileName);
+                if ((*globalState)() == exportFiles)
+                {
+                    printf("Finished Successfully, about to export files!\n");
+                    printBinaryImg();
+                    printf("\n");
+                    printMemoryImgInRequiredObjFileFormat();
+                    resetMemory();
+                }
+                else
+                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+            }
+        }
+        else
+            printf("failed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist", fileName);
+    }
+
+    free(fileName);
+    fclose(fptr);
+    fclose(expandedSrc);
 }

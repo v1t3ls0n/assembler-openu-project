@@ -176,7 +176,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
         return False;
     p = lookup(name, Symbol);
     if (p != NULL)
-        updateSymbol(p, value, isCode, isData, isEntry, isExternal);
+        return updateSymbol(p, value, isCode, isData, isEntry, isExternal);
     else
     {
         p = install(name, Symbol);
@@ -201,11 +201,12 @@ Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, uns
      */
     /*     printf("inside updateSymbol\n");
      */
-    if (p->val.s.attrs.external && isExternal && (value || isData || isEntry || isCode))
+    if (((p->val.s.attrs.external) && (value || isData || isEntry || isCode)))
         return yieldError(illegalOverrideOfExternalSymbol);
 
-    else if (p->val.s.attrs.entry && isExternal)
-        return yieldError(symbolCannotBeBothCurrentTypeAndRequestedType);
+    else if ((p->val.s.attrs.code || p->val.s.attrs.data || p->val.s.attrs.entry) && isExternal)
+        return yieldError(illegalOverrideOfLocalSymbolWithExternalSymbol);
+
     else
     {
         if ((isData && isCode) || (isCode && p->val.s.attrs.data) || (isData && p->val.s.attrs.code))
@@ -260,8 +261,31 @@ Bool isExternal(char *name)
 {
     Item *p = lookup(name, Symbol);
     if (p == NULL)
-        return -1;
+        return False;
     return p->val.s.attrs.external;
+}
+Bool isEntry(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return False;
+    return p->val.s.attrs.entry;
+}
+
+Bool isNonEmptyExternal(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return False;
+    return (p->val.s.attrs.code || p->val.s.attrs.data) ? True : False;
+}
+
+Bool isNonEmptyEntry(char *name)
+{
+    Item *p = lookup(name, Symbol);
+    if (p == NULL)
+        return False;
+    return (p->val.s.attrs.code || p->val.s.attrs.data) ? True : False;
 }
 
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)

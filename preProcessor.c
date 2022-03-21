@@ -12,7 +12,7 @@ extern Item *getMacro(char *s);
 
 extern void printMacroTable();
 extern int printMacroItem(Item *item);
-extern unsigned currentLineNumber;
+extern void updateGlobalState(State new);
 
 extern Bool isPossiblyUseOfMacro(char *s);
 extern Bool isMacroOpening(char *s);
@@ -23,17 +23,12 @@ void saveMacros(FILE *target);
 void popLastToken(FILE *target, char *token, int offset);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-FILE *createExpandedSourceFile(FILE *source, char *fileName);
+void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 void popCharacters(FILE *target, fpos_t position, int amount);
-void parseSourceFile(FILE *source, char *filename)
-{
-
-    createExpandedSourceFile(source, filename);
-    printMacroTable();
-}
 
 void parseAndReplaceMacros(FILE *source, FILE *target)
 {
+    void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
     ParseState state = evalToken;
     Bool isMacroCurrentlyParsed = False;
     Bool isMacroStartFoundYet = False;
@@ -43,6 +38,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
     fgetpos(target, &position);
+
     while ((c = fgetc(source)) != EOF)
     {
 
@@ -56,7 +52,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         if (c == '\n')
         {
             offsetCounter = 0;
-            currentLineNumber++;
+            (*currentLineIsNextLine)();
             if (state == skipLine)
                 state = evalToken;
         }
@@ -182,7 +178,7 @@ void popLastToken(FILE *target, char *token, int offset)
 {
 
     int len = strlen(token);
-    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLineNumber, token, len);
+    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", , token, len);
      */
     fseek(target, -len, SEEK_CUR);
     fputc(' ', target);
@@ -202,21 +198,9 @@ void replaceWithMacro(FILE *target, FILE *source, int start, int end)
         fputc(c, target);
 }
 
-FILE *createExpandedSourceFile(FILE *source, char *fileName)
+void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 {
-    FILE *target;
-    /*     int c = 0; */
-    fileName[strlen(fileName) - 1] = 'm';
-    target = fopen(fileName, "w+");
-    if (target == NULL)
-    {
-        fclose(source);
-        printf("failed to create new .am file for the source expanded source code\n");
-        printf("Press any key to exit...\n");
-        exit(1);
-    }
+
     parseAndReplaceMacros(source, target);
-    rewind(target);
-    fclose(source);
-    return target;
+    updateGlobalState(firstRun);
 }

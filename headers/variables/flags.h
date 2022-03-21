@@ -3,6 +3,7 @@ typedef enum
 {
     undefinedTokenNotOperationOrInstructionOrLabel,
     illegalLabelDeclaration,
+    entryDeclaredButNotDefined,
     useOfNestedMacrosIsIllegal,
     memoryAllocationFailure,
     undefinedOperation,
@@ -20,6 +21,7 @@ typedef enum
     illegalMacroNameLength,
     illegalSymbolNameAlreadyInUse,
     symbolCannotBeBothCurrentTypeAndRequestedType,
+    illegalOverrideOfLocalSymbolWithExternalSymbol,
     labelNameAlreadyInUseInsideSymbolTable,
     illegalMacroNameAlreadyInUse,
     macroClosingWithoutAnyOpenedMacro,
@@ -81,6 +83,8 @@ typedef enum
     parsingMacros,
     writeFiles,
     collectErrors,
+    exportFiles,
+    goToNextFileOrEndProgram,
     stopProgram,
     endProgram,
     startProgram

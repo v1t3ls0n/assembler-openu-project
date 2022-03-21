@@ -1,4 +1,18 @@
 /* FUNCTIONS THAT ARE COMMENTED OUT MEANS THAT THEY ARE NOT SHARED ACROSS FILES */
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------In globalVariables.c -------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+
+void updateGlobalState(State new);
+State getGlobalState();
+
+void setCurrentFileName(char *s);
+char *getCurrentFileName();
+
+int getCurrentLineNumber();
+void increaseCurrentLineNumber();
+void resetCurrentLineNumber();
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -31,17 +45,16 @@ void addWord(int value, DataType type);
 
 int handleSourceFiles(int argc, char *argv[]);
 void parseAssemblyCode(FILE *fp, char *filename);
-ParseState handleState(char *token, char *line, ParseState state);
+ParseState handleState(char *token, char *line);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In preProcessor.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void parseSourceFile(FILE *source, char *filename);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-FILE *createExpandedSourceFile(FILE *source, char *fileName);
+void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 void parseMacro(FILE *fp);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -84,12 +97,14 @@ Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
-void initTablesArrays();
+void initTables();
 void updateFinalMemoryAddressesInSymbolTable();
 int updateSingleItemAddress(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
 Bool isExternal(char *name);
+Bool isEntry(char *name);
+Bool isNonEmptyEntry(char *name);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -165,7 +180,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line, ParseState state);
+ParseState handleState(char *token, char *line);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);
