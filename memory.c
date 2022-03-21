@@ -4,7 +4,6 @@ extern void updateFinalMemoryAddressesInSymbolTable();
 extern HexWord *convertBinaryWordToHex(BinaryWord *word);
 extern char *numToBin(int num);
 extern char *decToHex(int num);
-
 static BinaryWord *binaryImg;
 static HexWord *hexImg;
 void covertBinaryMemoryImageToHexImageForObFile();
@@ -29,6 +28,7 @@ void initMemory()
     const int totalSize = DCF - MEMORY_START;
     int i, j;
     binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
+
     for (i = 0; i < totalSize; i++)
     {
         for (j = 0; j < BINARY_WORD_SIZE; j++)
@@ -78,19 +78,6 @@ void wordStringToWordObj(char *s, DataType type)
     int index = type == Code ? IC - MEMORY_START : DC - MEMORY_START;
     for (j = 0; j < BINARY_WORD_SIZE; j++)
         binaryImg[index].digit[j].on = s[j] == '1' ? 1 : 0;
-}
-
-void wordObjToBinStr(BinaryWord *word, char *s)
-{
-    int j = 0;
-    for (j = 0; j < BINARY_WORD_SIZE + 5; j++)
-    {
-        if (j > 0 && j % 4 == 0)
-            strcat(s, " ");
-
-        else
-            strcat(s, word->digit[j].on ? "1" : "0");
-    }
 }
 
 void printWordBinary(unsigned index)
