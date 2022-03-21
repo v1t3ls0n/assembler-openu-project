@@ -138,161 +138,161 @@ Bool countAndVerifyDataArguments(char *line)
         /*     printf("isValid:%d\n", isValid); */
         if (isValid)
             increaseDataCounter(size);
-
-        return isValid;
     }
+    return isValid;
+}
 
-    Bool countAndVerifyStringArguments(char *token)
+Bool countAndVerifyStringArguments(char *token)
+{
+
+    if (isInstruction(token))
+        token = strtok(NULL, " \t \n");
+
+    if (token)
     {
+        if (token[0] == '\"' && (token[strlen(token) - 1] != '\"' || strlen(token) < 2))
+            return yieldError(closingQuotesForStringIsMissing);
+        else if (token[0] != '\"')
+            return yieldError(expectedQuotes);
 
-        if (isInstruction(token))
-            token = strtok(NULL, " \t \n");
+        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+    }
+    else
+        return yieldWarning(emptyStringDeclatretion);
 
-        if (token)
-        {
-            if (token[0] == '\"' && (token[strlen(token) - 1] != '\"' || strlen(token) < 2))
-                return yieldError(closingQuotesForStringIsMissing);
-            else if (token[0] != '\"')
-                return yieldError(expectedQuotes);
+    return True;
+}
 
-            increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
-        }
+ParseState handleState(char *token, char *line, ParseState state)
+{
+
+    if (isComment(token))
+        return lineParsedSuccessfully;
+
+    if (isLabelDeclaration(token))
+    {
+        if (strlen(token) == 1)
+            yieldError(illegalLabelDeclaration);
         else
-            return yieldWarning(emptyStringDeclatretion);
-
-        return True;
-    }
-
-    ParseState handleState(char *token, char *line, ParseState state)
-    {
-
-        if (isComment(token))
-            return lineParsedSuccessfully;
-
-        if (isLabelDeclaration(token))
         {
-            if (strlen(token) == 1)
-                yieldError(illegalLabelDeclaration);
-            else
-            {
-                char *next = globalState == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-                if (!next)
-                    return yieldError(emptyLabelDecleration);
-
-                if (globalState == firstRun)
-                    return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
-                else
-                    return handleState(next, line + strlen(token) + 1, newLine);
-            }
-        }
-
-        else if (isInstruction(token))
-        {
-
             char *next = globalState == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-            int type = getInstructionType(token);
             if (!next)
-            {
-                if (type == _TYPE_DATA || type == _TYPE_STRING)
-                    return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
-                else
-                    return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
-            }
-            else
-            {
-                if (globalState == firstRun)
-                    return handleInstruction(type, token, next, line);
-                else
-                {
-                    if (type == _TYPE_DATA)
-                        return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
-                    else if (type == _TYPE_STRING)
-                        return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
-                    else
-                        return lineParsedSuccessfully;
-                }
-            }
-        }
+                return yieldError(emptyLabelDecleration);
 
-        else if (isOperation(token))
+            if (globalState == firstRun)
+                return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
+            else
+                return handleState(next, line + strlen(token) + 1, newLine);
+        }
+    }
+
+    else if (isInstruction(token))
+    {
+
+        char *next = globalState == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+        int type = getInstructionType(token);
+        if (!next)
         {
-            char args[MAX_LINE_LEN] = {0};
-            strcpy(args, (line + strlen(token)));
-            return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
-                                                                                                              : Err;
+            if (type == _TYPE_DATA || type == _TYPE_STRING)
+                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+            else
+                return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
         }
         else
         {
-            if (strlen(token) > 1)
-                yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            if (globalState == firstRun)
+                return handleInstruction(type, token, next, line);
             else
-                yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+            {
+                if (type == _TYPE_DATA)
+                    return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
+                else if (type == _TYPE_STRING)
+                    return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
+                else
+                    return lineParsedSuccessfully;
+            }
         }
-
-        return Err;
     }
 
-    Bool parseSingleLine(char *line)
+    else if (isOperation(token))
     {
-        ParseState state = newLine;
-        char lineCopy[MAX_LINE_LEN] = {0};
-        char *token;
-        memcpy(lineCopy, line, strlen(line));
-        token = globalState == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
-        state = handleState(token, line, newLine);
-        currentLineNumber++;
-
-        return state == lineParsedSuccessfully ? True : False;
+        char args[MAX_LINE_LEN] = {0};
+        strcpy(args, (line + strlen(token)));
+        return globalState == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
+                                                                                                          : Err;
     }
-
-    void parseAssemblyCode(FILE * fp, char *filename)
+    else
     {
-        int c = 0;
-        int i = 0;
-        char line[MAX_LINE_LEN + 1] = {0};
-        Bool isValidCode = True;
-        currentLineNumber = 1;
-        if (globalState == secondRun)
-            printf("\n\n\nSecond Run:\n");
+        if (strlen(token) > 1)
+            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-            printf("\n\n\nFirst Run:\n");
+            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+    }
 
-        while (((c = fgetc(fp)) != EOF))
+    return Err;
+}
+
+Bool parseSingleLine(char *line)
+{
+    ParseState state = newLine;
+    char lineCopy[MAX_LINE_LEN] = {0};
+    char *token;
+    memcpy(lineCopy, line, strlen(line));
+    token = globalState == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    state = handleState(token, line, newLine);
+    currentLineNumber++;
+
+    return state == lineParsedSuccessfully ? True : False;
+}
+
+void parseAssemblyCode(FILE *fp, char *filename)
+{
+    int c = 0;
+    int i = 0;
+    char line[MAX_LINE_LEN + 1] = {0};
+    Bool isValidCode = True;
+    currentLineNumber = 1;
+    if (globalState == secondRun)
+        printf("\n\n\nSecond Run:\n");
+    else
+        printf("\n\n\nFirst Run:\n");
+
+    while (((c = fgetc(fp)) != EOF))
+    {
+        if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
-            if (globalState != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
-            {
 
-                isValidCode = False;
-                yieldError(maxLineLengthExceeded);
-                memset(line, 0, MAX_LINE_LEN);
-                i = 0;
-            }
-
-            if (c == '\n' && i > 0)
-            {
-                if (!parseSingleLine(line))
-                    isValidCode = False;
-
-                memset(line, 0, MAX_LINE_LEN);
-                i = 0;
-            }
-
-            else if (isspace(c) && i > 0)
-                line[i++] = ' ';
-
-            else
-            {
-                if (isprint(c) && !isspace(c))
-                    line[i++] = c;
-            }
+            isValidCode = False;
+            yieldError(maxLineLengthExceeded);
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
         }
 
-        if (i > 0)
+        if (c == '\n' && i > 0)
         {
             if (!parseSingleLine(line))
                 isValidCode = False;
+
+            memset(line, 0, MAX_LINE_LEN);
+            i = 0;
         }
 
-        if (!isValidCode)
-            globalState = collectErrors;
+        else if (isspace(c) && i > 0)
+            line[i++] = ' ';
+
+        else
+        {
+            if (isprint(c) && !isspace(c))
+                line[i++] = c;
+        }
     }
+
+    if (i > 0)
+    {
+        if (!parseSingleLine(line))
+            isValidCode = False;
+    }
+
+    if (!isValidCode)
+        globalState = collectErrors;
+}
