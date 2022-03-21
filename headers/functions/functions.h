@@ -40,7 +40,7 @@ ParseState handleState(char *token, char *line, ParseState state, State globalSt
 
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-void createExpandedSourceFile(FILE *source, char *fileName);
+void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 void parseMacro(FILE *fp);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/

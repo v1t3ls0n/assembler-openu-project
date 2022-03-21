@@ -6,7 +6,7 @@ extern char *numToBin(int num);
 extern char *decToHex(int num);
 
 static BinaryWord *binaryImg;
-HexWord *hexImg;
+static HexWord *hexImg;
 void covertBinaryMemoryImageToHexImageForObFile();
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
@@ -29,7 +29,6 @@ void initMemory()
     const int totalSize = DCF - MEMORY_START;
     int i, j;
     binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
-
     for (i = 0; i < totalSize; i++)
     {
         for (j = 0; j < BINARY_WORD_SIZE; j++)
@@ -41,6 +40,8 @@ void initMemory()
 
 void resetMemory()
 {
+    free(binaryImg);
+    free(hexImg);
 }
 void printBinaryImg()
 {

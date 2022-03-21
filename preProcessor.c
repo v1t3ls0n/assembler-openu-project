@@ -201,7 +201,5 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 {
 
     parseAndReplaceMacros(source, target);
-    rewind(target);
-    fclose(source);
     updateGlobalState(firstRun);
 }

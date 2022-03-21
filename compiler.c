@@ -9,6 +9,7 @@ extern void initTablesArrays();
 extern void printBinaryImg();
 extern unsigned currentLineNumber;
 extern void initMemory();
+extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename, State globalState);
@@ -61,19 +62,20 @@ void handleSingleSourceFile(char *arg)
     {
         fclose(fptr);
         updateGlobalState(goToNextFileOrEndProgram);
-        return NULL;
+        return;
     }
     createExpandedSourceFile(fptr, expandedSrc, fileName);
+    rewind(expandedSrc);
     if ((*globalState)() == firstRun)
     {
         printMacroTable();
-        initMemory();
         parseAssemblyCode(expandedSrc, fileName, firstRun);
         if ((*globalState)() == secondRun)
         {
-            rewind(fptr);
+            rewind(expandedSrc);
             updateFinalCountersValue();
             printSymbolTable();
+            initMemory();
             parseAssemblyCode(expandedSrc, fileName, secondRun);
             if ((*globalState)() == exportFiles)
             {
@@ -81,6 +83,7 @@ void handleSingleSourceFile(char *arg)
                 printBinaryImg();
                 printf("\n");
                 printMemoryImgInRequiredObjFileFormat();
+                resetMemory();
             }
             else
                 printf("\nSecond Run Finished With Errors, files will not be exported!\n");
@@ -90,4 +93,6 @@ void handleSingleSourceFile(char *arg)
         printf("failed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist", fileName);
 
     free(fileName);
+    fclose(fptr);
+    fclose(expandedSrc);
 }
