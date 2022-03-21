@@ -2,7 +2,7 @@
 /* Shared global State variables*/
 
 extern int firstRunParsing(FILE *fp, char *filename);
-extern Bool parseSingleLine(char *line, State globalState);
+extern Bool parseSingleLine(char *line);
 void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 
 extern void initTablesArrays();
@@ -11,7 +11,7 @@ extern void initMemory();
 extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern void parseAssemblyCode(FILE *fp, char *filename, State globalState);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 
 extern State getGlobalState();
 extern void updateGlobalState(State new);
@@ -72,14 +72,14 @@ void handleSingleSourceFile(char *arg)
         if ((*globalState)() == firstRun)
         {
             printMacroTable();
-            parseAssemblyCode(expandedSrc, fileName, firstRun);
+            parseAssemblyCode(expandedSrc, fileName);
             if ((*globalState)() == secondRun)
             {
                 rewind(expandedSrc);
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();
-                parseAssemblyCode(expandedSrc, fileName, secondRun);
+                parseAssemblyCode(expandedSrc, fileName);
                 if ((*globalState)() == exportFiles)
                 {
                     printf("Finished Successfully, about to export files!\n");

@@ -1,1 +1,1 @@
- make && ./compiler.exe test && rm compiler.exe
+ make && ./compiler.exe test test2 test3 && rm compiler.exe

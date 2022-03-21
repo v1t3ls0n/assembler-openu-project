@@ -13,7 +13,7 @@ extern Bool yieldWarning(Error err);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
-extern void parseAssemblyCode(FILE *fp, char *filename, State globalState);
+extern void parseAssemblyCode(FILE *fp, char *filename);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
