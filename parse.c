@@ -6,7 +6,7 @@ extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
 static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
 static void (*setFileName)(char *) = &setCurrentFileName;
-static void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
+static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 
 /* extern State getGlobalState();
  */
@@ -240,7 +240,7 @@ Bool parseSingleLine(char *line)
     memcpy(lineCopy, line, strlen(line));
     token = (*globalState)() == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = handleState(token, line);
-    (*currentLineIsNextLine)();
+    (*currentLineNumberPlusPlus)();
 
     return state == lineParsedSuccessfully
                ? True
