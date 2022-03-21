@@ -3,6 +3,7 @@ typedef enum
 {
     undefinedTokenNotOperationOrInstructionOrLabel,
     illegalLabelDeclaration,
+    entryDeclaredButNotDefined,
     useOfNestedMacrosIsIllegal,
     memoryAllocationFailure,
     undefinedOperation,

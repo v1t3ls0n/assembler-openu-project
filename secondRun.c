@@ -17,6 +17,8 @@ extern int getSymbolBaseAddress(char *name);
 extern int getSymbolOffset(char *name);
 extern Bool isExternal(char *name);
 extern Item *getSymbol(char *name);
+extern Bool isEntry(char *name);
+extern Bool isNonEmptyEntry(char *name);
 
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
@@ -151,6 +153,8 @@ void writeDirectOperandWord(char *labelName)
 
     else
     {
+        if (isEntry(labelName) && !isNonEmptyEntry(labelName))
+            return yieldError(entryDeclaredButNotDefined);
         base = getSymbolBaseAddress(labelName);
         offset = getSymbolOffset(labelName);
         addWord((R << 16) | base, Code);

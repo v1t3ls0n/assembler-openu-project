@@ -89,6 +89,8 @@ int updateSingleItemAddress(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
 Bool isExternal(char *name);
+Bool isEntry(char *name);
+Bool isNonEmptyEntry(char *name);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/

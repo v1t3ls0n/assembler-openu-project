@@ -109,7 +109,9 @@ Bool yieldError(Error err)
         fprintf(stderr, "Operand type does not fit to current operation");
         break;
     }
-
+    case entryDeclaredButNotDefined:
+        fprintf(stderr, "operand is registered as .entry in table but is not defined in the file");
+        break;
     case requiredSourceOperandIsMissin:
     {
         fprintf(stderr, "required operand Is Missing");
