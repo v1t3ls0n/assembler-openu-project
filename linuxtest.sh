@@ -1,1 +1,1 @@
-clear && rm -f compiler && rm -f *.am && make && ./compiler test && rm -f compiler 
+clear && rm -f compiler && rm -f *.am && make && ./compiler test test2 && rm -f compiler 
