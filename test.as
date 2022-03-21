@@ -16,7 +16,7 @@ cmp val1 ,#-6
 bne END[r15]
 dec K
 .entry MAIN
-sub LOOP[r10] ,12 fdsg
+sub LOOP[r10] ,r12
 END: stop
 STR: .string "abcd"
 LIST: .data 6, -9

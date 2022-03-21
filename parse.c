@@ -219,11 +219,9 @@ ParseState handleState(char *token, char *line, ParseState state)
             yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
             yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
-
-        return Err;
     }
 
-    return state;
+    return Err;
 }
 
 Bool parseSingleLine(char *line)
