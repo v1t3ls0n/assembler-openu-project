@@ -30,8 +30,8 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-State parseAssemblyCode(FILE *fp, char *filename, State globalState);
-ParseState handleState(char *token, char *line, ParseState state);
+void parseAssemblyCode(FILE *fp, char *filename, State globalState);
+ParseState handleState(char *token, char *line, ParseState state, State globalState);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -40,7 +40,7 @@ ParseState handleState(char *token, char *line, ParseState state);
 
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-State createExpandedSourceFile(FILE *source, char *fileName);
+void createExpandedSourceFile(FILE *source, char *fileName);
 void parseMacro(FILE *fp);
 FILE *createCopyFromSourceFile(FILE *source, char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -83,7 +83,8 @@ Bool verifyLabelNaming(char *s);
 Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
-void initTables void updateFinalMemoryAddressesInSymbolTable();
+void initTables();
+void updateFinalMemoryAddressesInSymbolTable();
 int updateSingleItemAddress(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
@@ -121,7 +122,7 @@ int countLengthOfNonDigitToken(char *s);
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
-Bool parseSingleLine(char *line);
+Bool parseSingleLine(char *line, State globalState);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
@@ -163,7 +164,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line, ParseState state);
+ParseState handleState(char *token, char *line, ParseState state, State globalState);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);
