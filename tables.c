@@ -260,14 +260,14 @@ Bool isExternal(char *name)
 {
     Item *p = lookup(name, Symbol);
     if (p == NULL)
-        return NULL;
+        return False;
     return p->val.s.attrs.external;
 }
 Bool isEntry(char *name)
 {
     Item *p = lookup(name, Symbol);
     if (p == NULL)
-        return NULL;
+        return False;
     return p->val.s.attrs.entry;
 }
 

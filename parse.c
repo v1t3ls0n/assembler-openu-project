@@ -7,6 +7,8 @@ extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
 extern State getGlobalState();
 extern void updateGlobalState(State new);
+extern char *currentFileName;
+
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
    @ Description: The function extracts the argument string of the .data instruction, than the function analyses\ parses the string.
@@ -249,6 +251,8 @@ void parseAssemblyCode(FILE *fp, char *filename, State globalState)
     Bool isValidCode = True;
     State nextState = globalState == firstRun ? secondRun : exportFiles;
     currentLineNumber = 1;
+    currentFileName = filename;
+
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");
     else

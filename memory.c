@@ -42,6 +42,10 @@ void resetMemory()
 {
     free(binaryImg);
     free(hexImg);
+    IC = MEMORY_START;
+    DC = 0;
+    ICF = 0;
+    DCF = 0;
 }
 void printBinaryImg()
 {

@@ -1,11 +1,12 @@
 
 #include "data.h"
 extern unsigned currentLineNumber;
+extern char *currentFileName;
 
 Bool yieldWarning(Warning err)
 {
     fprintf(stderr, "\n###################################\n");
-    fprintf(stderr, "Warning!! line %d ", currentLineNumber);
+    fprintf(stderr, "Warning!! in %s on line number %d\n", currentFileName, currentLineNumber);
     switch (err)
     {
     case emptyLabelDecleration:
@@ -44,7 +45,7 @@ Bool yieldWarning(Warning err)
 Bool yieldError(Error err)
 {
     fprintf(stderr, "\n###################################\n");
-    fprintf(stderr, "Error!! occured on line %d ", currentLineNumber);
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", currentFileName, currentLineNumber);
 
     switch (err)
     {
