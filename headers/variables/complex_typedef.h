@@ -21,12 +21,8 @@ typedef struct
 
 typedef struct
 {
-    union
-    {
-        HexWord *hex;
-        BinaryWord *binary;
-    } * value;
-    void *next;
+    HexWord hex;
+    BinaryWord binary;
 } Word;
 
 typedef struct
