@@ -1,18 +1,17 @@
 
 #include "data.h"
 extern void updateFinalMemoryAddressesInSymbolTable();
-unsigned static IC = MEMORY_START;
-unsigned static DC = 0;
-unsigned static ICF = 0;
-unsigned static DCF = 0;
-
+extern HexWord *convertBinaryWordToHex(BinaryWord *word);
 extern char *numToBin(int num);
 extern char *decToHex(int num);
 
 static BinaryWord *binaryImg;
-static HexWord *hexImg;
-HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word);
-
+HexWord *hexImg;
+void covertBinaryMemoryImageToHexImageForObFile();
+unsigned static IC = MEMORY_START;
+unsigned static DC = 0;
+unsigned static ICF = 0;
+unsigned static DCF = 0;
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }
 unsigned getICF() { return ICF; }
@@ -38,6 +37,10 @@ void initMemory()
             binaryImg[i].digit[j].on = 0;
         }
     }
+}
+
+void resetMemory()
+{
 }
 void printBinaryImg()
 {
@@ -112,6 +115,15 @@ void updateFinalCountersValue()
     updateFinalMemoryAddressesInSymbolTable();
 }
 
+void covertBinaryMemoryImageToHexImageForObFile()
+{
+    int i;
+    int totalSize = DCF - MEMORY_START;
+    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
+    for (i = 0; i < totalSize; i++)
+        hexImg[i] = *convertBinaryWordToHex(&binaryImg[i]);
+}
+
 void printMemoryImgInRequiredObjFileFormat()
 {
 
@@ -121,45 +133,7 @@ void printMemoryImgInRequiredObjFileFormat()
     printf("%d %d\n", ICF - MEMORY_START, DCF - ICF);
     for (i = 0; i < totalSize; i++)
     {
-        hexImg[i] = *convertBinaryWordToRequiredObjWordFormat(&binaryImg[i]);
+        hexImg[i] = *convertBinaryWordToHex(&binaryImg[i]);
         printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, hexImg[i]._A, hexImg[i]._B, hexImg[i]._C, hexImg[i]._D, hexImg[i]._E);
     }
-}
-
-HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word)
-{
-    int i = 0;
-    char hexDigits[4] = {0};
-    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord));
-    for (i = BINARY_WORD_SIZE - 1; i >= 0; i--)
-    {
-        hexDigits[i % 4] = word->digit[i].on ? '1' : '0';
-        if (i % 4 == 0)
-        {
-            switch (i)
-            {
-            case 16:
-                newHex->_A = binaryStringToHexNumber(hexDigits);
-                break;
-            case 12:
-                newHex->_B = binaryStringToHexNumber(hexDigits);
-                break;
-            case 8:
-                newHex->_C = binaryStringToHexNumber(hexDigits);
-                break;
-            case 4:
-                newHex->_D = binaryStringToHexNumber(hexDigits);
-                break;
-            case 0:
-                newHex->_E = binaryStringToHexNumber(hexDigits);
-                break;
-            default:
-                break;
-            }
-
-            memset(hexDigits, 0, 4);
-        }
-    }
-
-    return newHex;
 }

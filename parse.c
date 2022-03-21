@@ -1,7 +1,6 @@
 #include "data.h"
 extern Bool yieldError(Error err);
 extern Bool yieldWarning(Error err);
-
 extern char *trimFromLeft(char *s);
 extern State globalState;
 extern unsigned currentLineNumber;

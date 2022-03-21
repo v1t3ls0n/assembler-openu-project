@@ -120,6 +120,43 @@ char *numToBin(int num)
     return word;
 }
 
+HexWord *convertBinaryWordToHex(BinaryWord *word)
+{
+    int i = 0;
+    char hexDigits[4] = {0};
+    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord));
+    for (i = BINARY_WORD_SIZE - 1; i >= 0; i--)
+    {
+        hexDigits[i % 4] = word->digit[i].on ? '1' : '0';
+        if (i % 4 == 0)
+        {
+            switch (i)
+            {
+            case 16:
+                newHex->_A = binaryStringToHexNumber(hexDigits);
+                break;
+            case 12:
+                newHex->_B = binaryStringToHexNumber(hexDigits);
+                break;
+            case 8:
+                newHex->_C = binaryStringToHexNumber(hexDigits);
+                break;
+            case 4:
+                newHex->_D = binaryStringToHexNumber(hexDigits);
+                break;
+            case 0:
+                newHex->_E = binaryStringToHexNumber(hexDigits);
+                break;
+            default:
+                break;
+            }
+
+            memset(hexDigits, 0, 4);
+        }
+    }
+
+    return newHex;
+}
 unsigned binaryStringToHexNumber(char binaryStr[4])
 {
 

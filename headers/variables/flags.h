@@ -81,6 +81,7 @@ typedef enum
     parsingMacros,
     writeFiles,
     collectErrors,
+    exportFiles,
     stopProgram,
     endProgram,
     startProgram

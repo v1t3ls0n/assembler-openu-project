@@ -19,26 +19,15 @@ int main(int argc, char *argv[])
     initTablesArrays();
     globalState = parsingMacros;
     handleSourceFiles(argc, argv);
-
     globalState = firstRun;
     handleSourceFiles(argc, argv);
-
     if (globalState != collectErrors)
     {
+        globalState = secondRun;
         updateFinalCountersValue();
         printSymbolTable();
         initMemory();
-        globalState = secondRun;
         handleSourceFiles(argc, argv);
-        if (globalState != collectErrors)
-        {
-            printf("Finished Successfully, about to export files!\n");
-            printBinaryImg();
-            printf("\n");
-            printMemoryImgInRequiredObjFileFormat();
-        }
-        else
-            printf("\nSecond Run Finished With Errors, files will not be exported!\n");
     }
     else
         printf("\nFinished First Run With Errors\n");
@@ -71,13 +60,21 @@ int handleSourceFiles(int argc, char *argv[])
             if (globalState == parsingMacros)
                 parseSourceFile(fptr, fileName);
             else if (globalState == firstRun)
-            {
                 parseAssemblyCode(fptr, fileName);
-            }
+
             else if (globalState == secondRun)
             {
                 rewind(fptr);
                 parseAssemblyCode(fptr, fileName);
+                if (globalState != collectErrors)
+                {
+                    printf("Finished Successfully, about to export files!\n");
+                    printBinaryImg();
+                    printf("\n");
+                    printMemoryImgInRequiredObjFileFormat();
+                }
+                else
+                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
         }
 
