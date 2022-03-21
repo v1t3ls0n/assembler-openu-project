@@ -48,7 +48,17 @@ Bool yieldError(Error err)
 
     switch (err)
     {
+    case desOperandTypeIsNotAllowed:
+        fprintf(stderr, "illegal input passed as destination operand!");
+        break;
 
+    case srcOperandTypeIsNotAllowed:
+        fprintf(stderr, "illegal input passed as source operand!");
+        break;
+
+    case illegalApearenceOfCharactersInTheEndOfTheLine:
+        fprintf(stderr, "illegal apearence of extra characters in the end of the line");
+        break;
     case afterPlusOrMinusSignThereMustBeANumber:
         fprintf(stderr, "after Plus Or Minus Sign There Must Be A Number without any spaces between");
         break;
@@ -115,7 +125,7 @@ Bool yieldError(Error err)
         fprintf(stderr, "illegal Macro Name Use Of Saved Keywords");
         break;
     case wrongRegisteryReferenceUndefinedReg:
-        fprintf(stderr, "registery name passed as operand does not exist, registeries names are r0 - r15");
+        fprintf(stderr, "undefined registery, registeries names are r0 - r15");
         break;
 
     case fileCouldNotBeOpened:
@@ -200,6 +210,7 @@ Bool yieldError(Error err)
         fprintf(stderr, "extra comma between arguments");
         break;
     }
+
     case expectedSingleCommaCharacter:
         fprintf(stderr, "Missing Comma");
         break;
@@ -207,10 +218,14 @@ Bool yieldError(Error err)
         fprintf(stderr, "Illegal use of characters");
         break;
     case undefinedTokenNotOperationOrInstructionOrLabel:
-        fprintf(stderr, "illegal token in begning of current line,  not operation nor instruction or label decleration");
+        fprintf(stderr, "illegal token in beginning of current line,  not operation nor instruction or label decleration");
         break;
     case illegalApearenceOfExtraCharactersOnLine:
         fprintf(stderr, "Illegal appearence of extra characters after the end or before begning of the line");
+        break;
+
+    case illegalApearenceOfCharacterInTheBegningOfTheLine:
+        fprintf(stderr, "Illegal appearence of characters at beginning of the line");
         break;
 
     case expectedQuotes:

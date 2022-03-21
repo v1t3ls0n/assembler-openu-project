@@ -22,56 +22,50 @@ ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
     char comma = 0;
-    char *first = 0, *second = 0, *inBetweenCharacters = 0, *extra = 0;
+    char *first = 0, *second = 0, *inBetweenOperands = 0, *extra = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+    Bool areOperandsLegal = True;
     first = strtok(args, " \t \n");
+    if (first)
+        inBetweenOperands = strtok(NULL, " \t \n");
+
     if (!first)
-        first = 0;
-    else
-        inBetweenCharacters = strtok(NULL, " \t \n");
-
-    if (!inBetweenCharacters)
-        second = 0;
-
-    if (!first && !inBetweenCharacters)
-    {
-    }
-    else if (first && inBetweenCharacters != NULL && strlen(inBetweenCharacters) == 1 && inBetweenCharacters[0] == ',')
-    {
-        comma = ',';
-        second = strtok(NULL, " \t \n");
-    }
-    else if (inBetweenCharacters != NULL)
-        second = inBetweenCharacters;
-
+        areOperandsLegal = parseOperands(first, comma, second, p, active);
     else
     {
-        if (strchr(first, ','))
+        if ((first && inBetweenOperands) && strlen(inBetweenOperands) == 1 && inBetweenOperands[0] == ',')
         {
-            char *p = strchr(first, ',');
-            second = p;
-            second++;
             comma = ',';
-            *p = '\0';
-            /*
-                     printf("line 208, first:%s, second:%s\n", first, second); */
+            second = strtok(NULL, " \t \n");
         }
+        else if (first && inBetweenOperands)
+            second = inBetweenOperands;
+
         else
         {
-            second = first;
-            first = 0;
+            if (strchr(first, ','))
+            {
+                char *p = strchr(first, ',');
+                second = p;
+                second++;
+                comma = ',';
+                *p = '\0';
+            }
+            else
+            {
+                second = first;
+                first = 0;
+            }
         }
+        extra = strtok(NULL, " \t \n");
+        if (extra)
+            areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
+        else
+            areOperandsLegal = parseOperands(first, comma, second, p, active);
     }
 
-    if (extra)
+    if (areOperandsLegal)
     {
-        yieldError(illegalApearenceOfExtraCharactersOnLine);
-        return Err;
-    }
-
-    if (parseOperands(first, comma, second, p, active))
-    {
-
         int size = 2;
         if (active[0].immediate || active[1].immediate)
             size++;
@@ -83,10 +77,9 @@ ParseState handleOperation(char *operationName, char *args)
         active[0].direct = active[0].immediate = active[0].index = active[0].reg = 0;
         active[1].direct = active[1].immediate = active[1].index = active[1].reg = 0;
         increaseInstructionCounter(size);
-        return lineParsedSuccessfully;
     }
 
-    return Err;
+    return areOperandsLegal ? lineParsedSuccessfully : Err;
 }
 
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
@@ -95,11 +88,9 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
     int commasCount = 0;
     int expectedCommasBasedOnNumberOfOperands = 0;
     expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
-
     if (src && strchr(src, ','))
     {
         char *p = strchr(src, ',');
-
         *p = '\0';
         commasCount++;
     }
@@ -150,12 +141,13 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
     Bool isImmediate = isValidImmediateParamter(operand);
-    Bool isDirectIndex = isValidIndexParameter(operand);
-    Bool isReg = isRegistery(operand);
-    Bool isDirect = verifyLabelNaming(operand);
+    Bool isDirectIndex = !isImmediate && isValidIndexParameter(operand);
+    Bool isReg = !isDirectIndex && !isImmediate && isRegistery(operand);
+    Bool isDirect = !isReg && !isDirectIndex && !isImmediate && verifyLabelNaming(operand);
 
     if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
-        return yieldError(notEnoughArgumentsPassed);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
+
     else if (!allowedAddrs.reg && isReg)
         return yieldError(operandTypeDoNotMatch);
     else if (!allowedAddrs.immediate && isImmediate)
@@ -195,7 +187,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
                 nextTokens = strtok(NULL, " \t \n");
                 if (nextTokens)
                 {
-                    yieldError(illegalApearenceOfExtraCharactersOnLine);
+                    yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
                     return Err;
                 }
                 else
@@ -261,11 +253,6 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
         char args[MAX_LINE_LEN] = {0};
         int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
         strcpy(args, &line[offset]);
-
-        /* printf("args:%s\noffset:%d\n", args, offset);
-         */
-        /* printf("labelName:%s nextToken:%s line:%s\n", labelName, nextToken, line);
-         */
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? lineParsedSuccessfully : Err;
         else

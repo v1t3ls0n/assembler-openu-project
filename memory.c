@@ -10,6 +10,7 @@ extern char *numToBin(int num);
 extern char *decToHex(int num);
 
 static BinaryWord *binaryImg;
+static HexWord *hexImg;
 HexWord *convertBinaryWordToRequiredObjWordFormat(BinaryWord *word);
 
 unsigned getDC() { return DC; }
@@ -29,14 +30,11 @@ void initMemory()
     const int totalSize = DCF - MEMORY_START;
     int i, j;
     binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
-    /*
-        printf("inside initMemory\n");
-     */
+
     for (i = 0; i < totalSize; i++)
     {
         for (j = 0; j < BINARY_WORD_SIZE; j++)
         {
-
             binaryImg[i].digit[j].on = 0;
         }
     }
@@ -119,14 +117,12 @@ void printMemoryImgInRequiredObjFileFormat()
 
     int i;
     int totalSize = DCF - MEMORY_START;
-    HexWord *p;
+    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
     printf("%d %d\n", ICF - MEMORY_START, DCF - ICF);
-
     for (i = 0; i < totalSize; i++)
     {
-        p = convertBinaryWordToRequiredObjWordFormat(&binaryImg[i]);
-        printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, p->_A, p->_B, p->_C, p->_D, p->_E);
-        free(p);
+        hexImg[i] = *convertBinaryWordToRequiredObjWordFormat(&binaryImg[i]);
+        printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, hexImg[i]._A, hexImg[i]._B, hexImg[i]._C, hexImg[i]._D, hexImg[i]._E);
     }
 }
 
