@@ -43,49 +43,35 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
     fgetpos(target, &position);
-    /*
-
-    macro m1
-    inc r6
-    cmp r1,r9
-
-    endm
-
-    */
-
     while ((c = fgetc(source)) != EOF)
     {
+
+        if (!isMacroCurrentlyParsed)
+        {
+            fputc(c, target);
+            offsetCounter++;
+        }
+        if (isMacroCurrentlyParsed && isMacroStartFoundYet)
+            end++;
         if (c == '\n')
         {
-            if (isMacroCurrentlyParsed && !isMacroStartFoundYet)
-            {
-                popLastToken(target, "", offsetCounter);
-                start = ftell(source) - 1;
-                isMacroStartFoundYet = True;
-            }
-
             offsetCounter = 0;
+            currentLineNumber++;
             if (state == skipLine)
                 state = evalToken;
         }
 
-        currentLineNumber++;
-        offsetCounter++;
-
-        if (!isMacroCurrentlyParsed)
-            fputc(c, target);
-
-        if (isMacroCurrentlyParsed && isMacroStartFoundYet)
-        {
-            start++;
-            end++;
-        }
-
         if (state != skipLine)
         {
+            if (isMacroCurrentlyParsed && !isMacroStartFoundYet)
+            {
+                start = ftell(source) - 1;
+                isMacroStartFoundYet = True;
+            }
 
             if (!isspace(c))
             {
+
                 if (j < MAX_LABEL_LEN && i < MAX_LABEL_LEN)
                 {
 
