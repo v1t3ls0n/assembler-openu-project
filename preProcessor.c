@@ -28,7 +28,7 @@ void popCharacters(FILE *target, fpos_t position, int amount);
 
 void parseAndReplaceMacros(FILE *source, FILE *target)
 {
-    void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
+    void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
     ParseState state = evalToken;
     Bool isMacroCurrentlyParsed = False;
     Bool isMacroStartFoundYet = False;
@@ -52,7 +52,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         if (c == '\n')
         {
             offsetCounter = 0;
-            (*currentLineIsNextLine)();
+            (*currentLineNumberPlusPlus)();
             if (state == skipLine)
                 state = evalToken;
         }
