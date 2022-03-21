@@ -5,5 +5,7 @@ X: .data -2, 4, 36, 19
 dec STR[r13]
 .entry D
 prn #99
+.entry D
+
 D: .data 3
 STR: .string "AVgghT"

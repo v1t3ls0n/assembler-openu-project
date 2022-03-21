@@ -1,18 +1,5 @@
 #include "data.h"
 
-void wordObjToBinStr(BinaryWord *word, char *s)
-{
-    int j = 0;
-    for (j = 0; j < BINARY_WORD_SIZE + 5; j++)
-    {
-        if (j > 0 && j % 4 == 0)
-            strcat(s, " ");
-
-        else
-            strcat(s, word->digit[j].on ? "1" : "0");
-    }
-}
-
 char *numToBin(int num)
 {
     int i = 0;
