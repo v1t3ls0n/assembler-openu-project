@@ -2,12 +2,14 @@
 extern Bool yieldError(Error err);
 extern Bool yieldWarning(Error err);
 extern char *trimFromLeft(char *s);
-extern unsigned currentLineNumber;
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
-extern State getGlobalState();
-extern void updateGlobalState(State new);
-extern char *currentFileName;
+static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
+static void (*setFileName)(char *) = &setCurrentFileName;
+static void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
+
+/* extern State getGlobalState();
+ */
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -233,14 +235,14 @@ Bool parseSingleLine(char *line, State globalState)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    /*     printf("inside parse single line, line:%s\n", line);
-     */
     memcpy(lineCopy, line, strlen(line));
     token = globalState == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = handleState(token, line, state, globalState);
-    currentLineNumber++;
+    (*currentLineIsNextLine)();
 
-    return state == lineParsedSuccessfully ? True : False;
+    return state == lineParsedSuccessfully
+               ? True
+               : False;
 }
 
 void parseAssemblyCode(FILE *fp, char *filename, State globalState)
@@ -250,8 +252,8 @@ void parseAssemblyCode(FILE *fp, char *filename, State globalState)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState = globalState == firstRun ? secondRun : exportFiles;
-    currentLineNumber = 1;
-    currentFileName = filename;
+    (*setFileName)(filename);
+    (*setCurrentLineToStart)();
 
     if (globalState == secondRun)
         printf("\n\n\nSecond Run:\n");

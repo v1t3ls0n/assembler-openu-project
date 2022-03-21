@@ -1,12 +1,12 @@
 
 #include "data.h"
-extern unsigned currentLineNumber;
-extern char *currentFileName;
-
+int (*line)() = &getCurrentLineNumber;
+char *(*file)() = &getCurrentFileName;
 Bool yieldWarning(Warning err)
 {
+
     fprintf(stderr, "\n###################################\n");
-    fprintf(stderr, "Warning!! in %s on line number %d\n", currentFileName, currentLineNumber);
+    fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -45,7 +45,7 @@ Bool yieldWarning(Warning err)
 Bool yieldError(Error err)
 {
     fprintf(stderr, "\n###################################\n");
-    fprintf(stderr, "Error!! occured in %s on line number %d\n", currentFileName, currentLineNumber);
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
     switch (err)
     {
@@ -56,7 +56,9 @@ Bool yieldError(Error err)
     case srcOperandTypeIsNotAllowed:
         fprintf(stderr, "illegal input passed as source operand!");
         break;
-
+    case illegalOverrideOfLocalSymbolWithExternalSymbol:
+        fprintf(stderr, "symbol already declared and defined locally,\nso it could not be re-declared as external variable.");
+        break;
     case illegalApearenceOfCharactersInTheEndOfTheLine:
         fprintf(stderr, "illegal apearence of extra characters in the end of the line");
         break;

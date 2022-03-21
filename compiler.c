@@ -7,15 +7,15 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 
 extern void initTablesArrays();
 extern void printBinaryImg();
-extern unsigned currentLineNumber;
 extern void initMemory();
 extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename, State globalState);
-extern unsigned currentLineNumber;
+
 extern State getGlobalState();
 extern void updateGlobalState(State new);
+
 void handleSingleSourceFile(char *arg);
 
 int main(int argc, char *argv[])

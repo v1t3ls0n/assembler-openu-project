@@ -181,8 +181,8 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
         {
             if (isEntry(operand) && !isNonEmptyEntry(operand))
                 return yieldError(entryDeclaredButNotDefined);
-            else
-                active[type].direct = 1;
+
+            active[type].direct = 1;
         }
         else
             return yieldError(labelNotExist);

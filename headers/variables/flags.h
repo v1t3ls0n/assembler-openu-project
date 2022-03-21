@@ -21,6 +21,7 @@ typedef enum
     illegalMacroNameLength,
     illegalSymbolNameAlreadyInUse,
     symbolCannotBeBothCurrentTypeAndRequestedType,
+    illegalOverrideOfLocalSymbolWithExternalSymbol,
     labelNameAlreadyInUseInsideSymbolTable,
     illegalMacroNameAlreadyInUse,
     macroClosingWithoutAnyOpenedMacro,

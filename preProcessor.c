@@ -12,7 +12,6 @@ extern Item *getMacro(char *s);
 
 extern void printMacroTable();
 extern int printMacroItem(Item *item);
-extern unsigned currentLineNumber;
 extern void updateGlobalState(State new);
 
 extern Bool isPossiblyUseOfMacro(char *s);
@@ -29,6 +28,7 @@ void popCharacters(FILE *target, fpos_t position, int amount);
 
 void parseAndReplaceMacros(FILE *source, FILE *target)
 {
+    void (*currentLineIsNextLine)() = &increaseCurrentLineNumber;
     ParseState state = evalToken;
     Bool isMacroCurrentlyParsed = False;
     Bool isMacroStartFoundYet = False;
@@ -38,6 +38,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     char token[MAX_LINE_LEN] = {0};
     char macroName[MAX_LABEL_LEN] = {0};
     fgetpos(target, &position);
+
     while ((c = fgetc(source)) != EOF)
     {
 
@@ -51,7 +52,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         if (c == '\n')
         {
             offsetCounter = 0;
-            currentLineNumber++;
+            (*currentLineIsNextLine)();
             if (state == skipLine)
                 state = evalToken;
         }
@@ -177,7 +178,7 @@ void popLastToken(FILE *target, char *token, int offset)
 {
 
     int len = strlen(token);
-    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", currentLineNumber, token, len);
+    /*     printf("\n\ninside popLastToken,\nline:%d\ntoken:%s\nlen:%d\n", , token, len);
      */
     fseek(target, -len, SEEK_CUR);
     fputc(' ', target);
