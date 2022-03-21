@@ -142,14 +142,11 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 {
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = !isImmediate && isValidIndexParameter(operand);
-    Bool isReg = !isDirectIndex && isRegistery(operand);
-    Bool isDirect = !isReg && verifyLabelNaming(operand);
+    Bool isReg = !isDirectIndex && !isImmediate && isRegistery(operand);
+    Bool isDirect = !isReg && !isDirectIndex && !isImmediate && verifyLabelNaming(operand);
 
     if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
-    {
-
         return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
-    }
 
     else if (!allowedAddrs.reg && isReg)
         return yieldError(operandTypeDoNotMatch);
