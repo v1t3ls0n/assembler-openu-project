@@ -12,11 +12,11 @@ inc r6
 mov r3, W
 sub r1, r4
 bne END
-cmp val1, #-6
+cmp val1 ,#-6
 bne END[r15]
 dec K
 .entry MAIN
-sub LOOP[r10] ,r14
+sub LOOP[r10] ,r12
 END: stop
 STR: .string "abcd"
 LIST: .data 6, -9

@@ -1,3 +1,13 @@
+/*
+int num = 0;
+char *p = s;
+p++;
+num = atoi(p);
+
+printf("inside getRegisteryNumber, number:%d\n", num);
+if (operand[0] == 'r' && isdigit(operand[strlen(operand) - 1]))
+    yieldError(wrongRegisteryReferenceUndefinedReg);
+ */
 
 /*
 int parseAllStrict(FILE *target)

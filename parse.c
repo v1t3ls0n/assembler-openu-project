@@ -218,7 +218,7 @@ ParseState handleState(char *token, char *line, ParseState state)
         if (strlen(token) > 1)
             yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-            yieldError(illegalApearenceOfCharactersOnLine);
+            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
 
         return Err;
     }
