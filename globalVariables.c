@@ -40,3 +40,33 @@ int getCurrentLineNumber()
 {
     return currentLineNumber;
 }
+
+FILE *ext;
+void initExternalsFile(char *fileName)
+{
+    char *p, *name = calloc(strlen(fileName) + 3, sizeof(char *));
+    strcat(name, fileName);
+    p = strstr(name, ".am");
+    p[2] = '\0';
+    p[1] = '\0';
+    strcat(name, "ext");
+    printf("ext filename:%s\n", name);
+    ext = fopen(name, "w+");
+    if (ext == NULL)
+    {
+        printf("failed to create .ext compiled file\n");
+        return;
+    }
+    free(name);
+}
+
+void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset)
+{
+    fprintf(ext, "%s BASE %d\n", name, base);
+    fprintf(ext, "%s OFFSET %d\n", name, offset);
+}
+
+void closeExternalFile()
+{
+    fclose(ext);
+}

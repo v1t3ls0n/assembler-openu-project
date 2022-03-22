@@ -1,6 +1,9 @@
 
 #include "data.h"
 
+extern void setCurrentFileName(char *s);
+extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
+
 /* from firstRun.c */
 extern Bool parseSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
@@ -19,6 +22,7 @@ extern Bool isExternal(char *name);
 extern Item *getSymbol(char *name);
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
+extern Bool areExternalsExist();
 
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
@@ -142,13 +146,13 @@ void writeFirstWord(Operation *op)
 void writeDirectOperandWord(char *labelName)
 {
     unsigned base = 0, offset = 0;
-    if (isExternal(labelName))
+    if (areExternalsExist() && isExternal(labelName))
     {
         base = getIC();
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        writeToExternalFile(labelName, base, offset);
+        writeToCurrentExternalsFile(labelName, base, offset);
     }
 
     else
@@ -205,10 +209,4 @@ int parseRegNumberFromIndexAddrOperand(char *s)
     if (p)
         *p = 0;
     return getRegisteryNumber(s);
-}
-
-void writeToExternalFile(char *name, unsigned base, unsigned offset)
-{
-
-    printf("\nEXTERNAL VARIABLE\nNAME:%s\nBASE:%u\nOFFSET:%u\n\n", name, base, offset);
 }

@@ -1,4 +1,6 @@
 #include "data.h"
+extern Bool yieldError(Error err);
+extern Bool yieldWarning(Warning err);
 
 extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
@@ -9,7 +11,7 @@ extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
 extern Bool writeOperationBinary(char *operationName, char *args);
-extern Bool yieldWarning(Error err);
+
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);

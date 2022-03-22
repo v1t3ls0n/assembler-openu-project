@@ -1,7 +1,10 @@
 #include "data.h"
 /* Shared global State variables*/
-Item *symbols[HASHSIZE] = {0};
-Item *macros[HASHSIZE] = {0};
+static Item *symbols[HASHSIZE] = {0};
+static Item *macros[HASHSIZE] = {0};
+static unsigned entriesCount = 0;
+static unsigned externalCount = 0;
+
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
@@ -461,19 +464,23 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
     return True;
 }
 
-void updateFinalMemoryAddressesInSymbolTable()
+void updateFinalSymbolTableValuesAndCountEntriesAndExternals()
 {
     int i = 0;
     while (i < HASHSIZE)
     {
         if (symbols[i] != NULL)
-            updateSingleItemAddress(symbols[i]);
+            updateFinalValueOfSingleItem(symbols[i]);
         i++;
     }
 }
 
-int updateSingleItemAddress(Item *item)
+int updateFinalValueOfSingleItem(Item *item)
 {
+    if (item->val.s.attrs.entry)
+        entriesCount++;
+    if (item->val.s.attrs.external)
+        externalCount++;
     if (item->val.s.attrs.data)
     {
         unsigned base = 0, offset = 0, newValue = item->val.s.value + getICF();
@@ -485,6 +492,41 @@ int updateSingleItemAddress(Item *item)
     }
 
     if (item->next != NULL)
-        updateSingleItemAddress(item->next);
+        updateFinalValueOfSingleItem(item->next);
     return 0;
+}
+
+Bool areEntriesExist()
+{
+    return entriesCount > 0 ? True : False;
+}
+Bool areExternalsExist()
+{
+    return externalCount > 0 ? True : False;
+}
+
+Bool writeEntriesToFile(FILE *fp)
+{
+    int i = 0;
+    int totalCount = 0;
+    while (i < HASHSIZE)
+    {
+        if (symbols[i] != NULL && totalCount <= entriesCount)
+            totalCount += writeSingleEntry(symbols[i], fp, 0);
+        i++;
+    }
+    return totalCount > 0 ? True : False;
+}
+
+int writeSingleEntry(Item *item, FILE *fp, int count)
+{
+    if (item->val.s.attrs.entry)
+    {
+        fprintf(fp, "%s,%d,%d\n", item->name, item->val.s.base, item->val.s.offset);
+        count++;
+    }
+    if (item->next != NULL)
+        writeSingleEntry(item->next, fp, count);
+
+    return count;
 }

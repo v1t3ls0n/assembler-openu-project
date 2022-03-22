@@ -1,1 +1,1 @@
-clear && rm -f compiler && rm -f *.am && make && ./compiler test test2 test3 && rm -f compiler 
+clear && rm -rf *.am *.ob *.ent *.ext *.warnings *.warnings.warnings *.errors *.errors.errors   && make && ./compiler test && rm -f compiler
