@@ -2,13 +2,18 @@
 #include "data.h"
 int (*line)() = &getCurrentLineNumber;
 char *(*file)() = &getCurrentFileName;
+static FILE *warningsFile, *errorsFile;
 
 void yieldWarningIntoFile(Warning err)
 {
-    static FILE *warningsFile;
-    char *warningFileName = strcat((*file)(), ".warnings");
-    warningsFile = fopen(warningFileName, "w+");
-    free(warningFileName);
+    static Bool isWarningFileExist = False;
+    if (!isWarningFileExist)
+    {
+        char *warningFileName = strcat((*file)(), ".warnings");
+        warningsFile = fopen(warningFileName, "w+");
+        free(warningFileName);
+        isWarningFileExist = True;
+    }
 
     fprintf(warningsFile, "\n###################################\n");
     fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
@@ -47,11 +52,14 @@ void yieldWarningIntoFile(Warning err)
 }
 void yieldErrorIntoFile(Error err)
 {
-    static FILE *errorsFile;
-    char *errorsFileName = strcat((*file)(), ".errors");
-    errorsFile = fopen(errorsFileName, "w+");
-    free(errorsFileName);
-
+    static Bool isErrorFileExist = False;
+    if (!isErrorFileExist)
+    {
+        char *errorsFileName = strcat((*file)(), ".errors");
+        errorsFile = fopen(errorsFileName, "w+");
+        free(errorsFileName);
+        isErrorFileExist = True;
+    }
     fprintf(errorsFile, "\n###################################\n");
     fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 

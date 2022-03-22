@@ -13,7 +13,6 @@ extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
 extern void exportFilesMainHandler(char *baseFileName);
-
 extern void initExternalOperandsList();
 
 extern State getGlobalState();
@@ -73,7 +72,6 @@ void handleSingleSourceFile(char *arg)
         createExpandedSourceFile(fptr, expandedSrc, fileName);
         rewind(expandedSrc);
         (*setFileName)(fileName);
-
         if ((*globalState)() == firstRun)
         {
             initTablesArrays();

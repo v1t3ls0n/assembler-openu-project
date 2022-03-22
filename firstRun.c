@@ -119,10 +119,10 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
         else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
         {
 
-            if (!des)
-                return yieldError(requiredDestinationOperandIsMissin);
             if (!src)
                 return yieldError(requiredSourceOperandIsMissin);
+            if (!des)
+                return yieldError(requiredDestinationOperandIsMissin);
 
             return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
         }
