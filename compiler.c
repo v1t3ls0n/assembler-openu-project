@@ -83,8 +83,8 @@ void handleSingleSourceFile(char *arg)
                 if ((*globalState)() == exportFiles)
                 {
                     printf("Finished Successfully, about to export files!\n");
-                    printBinaryImg();
-                    printf("\n");
+                    /*             printBinaryImg(); */
+                    /*               printf("\n"); */
                     printMemoryImgInRequiredObjFileFormat();
                     exportFilesMainHandler(arg);
                     resetMemory();

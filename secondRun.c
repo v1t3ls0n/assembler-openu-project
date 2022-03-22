@@ -215,10 +215,15 @@ void writeSingleExternalsFile(char *name, unsigned base, unsigned offset)
 {
 
     FILE *extSingle;
-    char *fileName = calloc(strlen(name) + 4, sizeof(char));
-    strcpy(fileName, name);
+    char *fileName = calloc(strlen(name) + 3, sizeof(char));
+    sscanf(name, "%s", fileName);
     strcat(fileName, ".ext");
     extSingle = fopen(fileName, "w+");
+    if (extSingle == NULL)
+    {
+        printf("failed to create %s compiled file\n", fileName);
+        return;
+    }
     fprintf(extSingle, "%s BASE %d\n", name, base);
     fprintf(extSingle, "%s OFFSET %d\n", name, offset);
     fclose(extSingle);
