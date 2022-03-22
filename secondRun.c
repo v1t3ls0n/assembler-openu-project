@@ -23,7 +23,7 @@ extern Item *getSymbol(char *name);
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
 extern Bool areExternalsExist();
-
+extern void updateExternalOperandList(char *name, unsigned base, unsigned offset);
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
 
@@ -153,7 +153,9 @@ void writeDirectOperandWord(char *labelName)
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        writeToCurrentExternalsFile(labelName, base, offset);
+        updateExternalOperandList(labelName, base, offset);
+
+        /*         writeToCurrentExternalsFile(labelName, base, offset); */
     }
 
     else

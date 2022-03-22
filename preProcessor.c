@@ -41,29 +41,35 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
 
     while ((c = fgetc(source)) != EOF)
     {
-
         if (!isMacroCurrentlyParsed)
         {
             fputc(c, target);
             offsetCounter++;
         }
+
         if (isMacroCurrentlyParsed && isMacroStartFoundYet)
             end++;
+
         if (c == '\n')
         {
             offsetCounter = 0;
             (*currentLineNumberPlusPlus)();
-            if (state == skipLine)
-                state = evalToken;
-        }
 
-        if (state != skipLine)
-        {
             if (isMacroCurrentlyParsed && !isMacroStartFoundYet)
             {
                 start = ftell(source) - 1;
                 isMacroStartFoundYet = True;
             }
+
+            if (state == skipLine)
+                state = evalToken;
+        }
+        /*
+         macro m1
+         inc
+         */
+        if (state != skipLine)
+        {
 
             if (!isspace(c))
             {

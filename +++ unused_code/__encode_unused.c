@@ -1,3 +1,9 @@
+typedef struct
+{
+    HexWord hex;
+    BinaryWord binary;
+} Word;
+
 /*
 #include "data.h"
 

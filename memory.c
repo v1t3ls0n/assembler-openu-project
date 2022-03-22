@@ -135,7 +135,7 @@ void writeMemoryImageToObFile(FILE *fp)
     int i;
     int totalSize = DCF - MEMORY_START;
     hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
-    printf("%d %d\n", ICF - MEMORY_START, DCF - ICF);
+    fprintf(fp, "%d %d\n", ICF - MEMORY_START, DCF - ICF);
     for (i = 0; i < totalSize; i++)
     {
         hexImg[i] = *convertBinaryWordToHex(&binaryImg[i]);

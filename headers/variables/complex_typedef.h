@@ -21,12 +21,6 @@ typedef struct
 
 typedef struct
 {
-    HexWord hex;
-    BinaryWord binary;
-} Word;
-
-typedef struct
-{
     unsigned int immediate : 1;
     unsigned int direct : 1;
     unsigned int index : 1;
@@ -67,6 +61,18 @@ typedef struct
     int start;
     int end;
 } MacroData;
+typedef struct
+{
+    unsigned base;
+    unsigned offset;
+    void *next;
+} ExtPositionData;
+
+typedef struct
+{
+    char *name;
+    ExtPositionData value;
+} ExtListItem;
 
 typedef struct
 {

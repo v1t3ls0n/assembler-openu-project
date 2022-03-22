@@ -22,15 +22,14 @@ void initExternalsFile(char *name);
 /* --------------------------------------------In exportFiles.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 void exportFilesMainHandler(char *baseFileName);
-
+void createEnternalsFile(char *baseFileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 int writeSingleEntry(Item *item, FILE *fp, int count);
-Bool writeEntriesToFile(FILE *fp);
+void writeEntriesToFile(FILE *fp);
 void writeMemoryImageToObFile(FILE *fp);
-int writeToMemory(Word *word, DataType type);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
 void updateFinalCountersValue();
@@ -38,7 +37,6 @@ unsigned getDC();
 unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
-void printMemoryStacks(EncodingFormat format);
 void initMemory();
 void printBinaryImg();
 void printWordBinary(unsigned index);
@@ -120,6 +118,13 @@ Bool isNonEmptyEntry(char *name);
 
 Bool areEntriesExist();
 Bool areExternalsExist();
+
+void writeExternalsToFile(FILE *fp);
+void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
+
+void initExternalOperandsList();
+ExtListItem *findExternalOperandListItem(char *name);
+void updateExternalOperandList(char *name, unsigned base, unsigned offset);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -129,9 +134,6 @@ void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 HexWord *convertNumToHexWord(int num);
 BinaryWord *convertNumberToBinaryWord(int num);
-char *generateFirstWordEncodedToBinary(Operation *op);
-HexWord *generateFirstWordEncodedHex(Operation *op);
-Word *convertNumberToWord(int n, EncodingFormat format);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
