@@ -28,7 +28,7 @@ void exportFilesMainHandler(char *baseFileName);
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 int writeSingleEntry(Item *item, FILE *fp, int count);
-Bool writeEntriesToFile(FILE *fp);
+void writeEntriesToFile(FILE *fp);
 void writeMemoryImageToObFile(FILE *fp);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);

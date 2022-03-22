@@ -1,7 +1,7 @@
 #include "data.h"
 
 extern void writeMemoryImageToObFile(FILE *fp);
-extern Bool writeEntriesToFile(FILE *fp);
+extern void writeEntriesToFile(FILE *fp);
 extern Bool areEntriesExist();
 extern Bool areExternalsExist();
 void generateObFile(char *baseFileName);

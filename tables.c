@@ -17,7 +17,8 @@ extern Bool isRegistery(char *s);
 void initTablesArrays()
 {
     int i = 0;
-
+    externalCount = 0;
+    entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
@@ -563,7 +564,28 @@ Bool areExternalsExist()
     return externalCount > 0 ? True : False;
 }
 
-Bool writeEntriesToFile(FILE *fp)
+void writeExternalsToFile(FILE *fp)
+{
+    int i = 0;
+    int totalCount = 0;
+
+    while (i < externalCount && externalsOperandsList[i].name)
+    {
+        writeSingleExternal(fp, externalsOperandsList[i].name, &externalsOperandsList[i].value);
+        i++;
+    }
+    return totalCount > 0 ? True : False;
+}
+
+void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
+{
+    fprintf(fp, "%s BASE %d\n", name, value->base);
+    fprintf(fp, "%s OFFSET %d\n", name, value->offset);
+    if (value->next != NULL)
+        writeSingleExternal(fp, name, value->next);
+}
+
+void writeEntriesToFile(FILE *fp)
 {
     int i = 0;
     int totalCount = 0;
