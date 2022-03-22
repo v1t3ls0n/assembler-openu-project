@@ -242,7 +242,8 @@ Bool parseSingleLine(char *line)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    printf("inside parse single line, line:%s\n", line);
+    /*     printf("inside parse single line, line:%s\n", line);
+     */
     memcpy(lineCopy, line, strlen(line));
     token = (*globalState)() == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = handleState(token, line);

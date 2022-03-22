@@ -47,17 +47,19 @@ void updateExternalOperandList(char *name, unsigned base, unsigned offset)
             i++;
         externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char *));
         strncpy(externalsOperandsList[i].name, name, strlen(name));
-        externalsOperandsList[i].value.offset = offset;
-        externalsOperandsList[i].value.base = base;
+        externalsOperandsList[i].value->offset = offset;
+        externalsOperandsList[i].value->base = base;
+        externalsOperandsList[i].value->next = NULL;
     }
     else
     {
-        ExtPositionData *last = &np->value, *positionData = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-        positionData->base = base;
-        positionData->offset = offset;
+        ExtPositionData *last = np->value, *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+        new->base = base;
+        new->offset = offset;
+        new->next = NULL;
         while (last->next != NULL)
             last = last->next;
-        last->next = positionData;
+        last->next = new;
     }
 }
 
@@ -68,9 +70,10 @@ void initExternalOperandsList()
     while (i < size)
     {
         externalsOperandsList[i].name = NULL;
-        externalsOperandsList[i].value.base = 0;
-        externalsOperandsList[i].value.offset = 0;
-        externalsOperandsList[i].value.next = NULL;
+        externalsOperandsList[i].value = (ExtPositionData *)malloc(sizeof(ExtPositionData));
+        externalsOperandsList[i].value->base = 0;
+        externalsOperandsList[i].value->offset = 0;
+        externalsOperandsList[i].value->next = NULL;
         i++;
     }
 }
@@ -560,7 +563,7 @@ void writeExternalsToFile(FILE *fp)
     int i = 0;
     while (i < externalCount && externalsOperandsList[i].name)
     {
-        writeSingleExternal(fp, externalsOperandsList[i].name, &externalsOperandsList[i].value);
+        writeSingleExternal(fp, externalsOperandsList[i].name, externalsOperandsList[i].value);
         i++;
     }
 }
