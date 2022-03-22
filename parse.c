@@ -1,6 +1,6 @@
 #include "data.h"
 extern Bool yieldError(Error err);
-extern Bool yieldWarning(Error err);
+extern Bool yieldWarning(Warning err);
 extern char *trimFromLeft(char *s);
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
@@ -107,7 +107,12 @@ Bool countAndVerifyDataArguments(char *line)
                 i = len - strlen(p);
                 sscanf(&args[i], "%d%n%c", &num, &n, &c);
                 if (c && c != ',' && !isspace(c) && c != '.')
+                {
                     isValid = yieldError(illegalApearenceOfCharactersOnLine);
+                    n++;
+                    p++;
+                    i++;
+                }
 
                 else if (c == '.')
                 {

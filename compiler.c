@@ -12,10 +12,10 @@ extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
+extern void exportFilesMainHandler(char *baseFileName);
 
 extern State getGlobalState();
 extern void updateGlobalState(State new);
-
 void handleSingleSourceFile(char *arg);
 
 int main(int argc, char *argv[])
@@ -86,6 +86,7 @@ void handleSingleSourceFile(char *arg)
                     printBinaryImg();
                     printf("\n");
                     printMemoryImgInRequiredObjFileFormat();
+                    exportFilesMainHandler(arg);
                     resetMemory();
                 }
                 else

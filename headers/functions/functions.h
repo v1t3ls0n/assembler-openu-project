@@ -16,10 +16,17 @@ void resetCurrentLineNumber();
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
+/* --------------------------------------------In exportFiles.c -------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
+void exportFilesMainHandler(char *baseFileName);
+
+/*---------------------------------------------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-void writeIntoDataStack(Word *word);
-void writeIntoCodeStack(Word *word);
+int writeSingleEntry(Item *item, FILE *fp, int count);
+Bool writeEntriesToFile(FILE *fp);
+void writeMemoryImageToObFile(FILE *fp);
 int writeToMemory(Word *word, DataType type);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
@@ -64,7 +71,9 @@ FILE *createCopyFromSourceFile(FILE *source, char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 Bool yieldError(Error err);
-
+Bool yieldWarning(Warning err);
+void yieldWarningIntoFile(Warning err);
+void yieldErrorIntoFile(Error err);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/
@@ -98,13 +107,16 @@ Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 void initTables();
-void updateFinalMemoryAddressesInSymbolTable();
-int updateSingleItemAddress(Item *item);
+void updateFinalSymbolTableValuesAndCountEntriesAndExternals();
+int updateFinalValueOfSingleItem(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
 Bool isExternal(char *name);
 Bool isEntry(char *name);
 Bool isNonEmptyEntry(char *name);
+
+Bool areEntries();
+Bool areExternals();
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
