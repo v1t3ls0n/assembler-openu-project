@@ -264,9 +264,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
     (*setCurrentLineToStart)();
 
     if ((*globalState)() == secondRun)
-    {
         printf("\n\n\nSecond Run:\n");
-    }
     else
         printf("\n\n\nFirst Run:\n");
 

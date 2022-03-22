@@ -145,8 +145,9 @@ void writeFirstWord(Operation *op)
 
 void writeDirectOperandWord(char *labelName)
 {
+
     unsigned base = 0, offset = 0;
-    if (areExternalsExist() && isExternal(labelName))
+    if (isExternal(labelName))
     {
         base = getIC();
         addWord((E << 16) | 0, Code);
@@ -157,7 +158,6 @@ void writeDirectOperandWord(char *labelName)
 
     else
     {
-
         base = getSymbolBaseAddress(labelName);
         offset = getSymbolOffset(labelName);
         addWord((R << 16) | base, Code);
@@ -209,4 +209,23 @@ int parseRegNumberFromIndexAddrOperand(char *s)
     if (p)
         *p = 0;
     return getRegisteryNumber(s);
+}
+
+void writeSingleExternalsFile(char *name, unsigned base, unsigned offset)
+{
+
+    FILE *extSingle;
+    char *fileName = calloc(strlen(name) + 3, sizeof(char));
+    sscanf(name, "%s", fileName);
+    strcat(fileName, ".ext");
+    extSingle = fopen(fileName, "w+");
+    if (extSingle == NULL)
+    {
+        printf("failed to create %s compiled file\n", fileName);
+        return;
+    }
+    fprintf(extSingle, "%s BASE %d\n", name, base);
+    fprintf(extSingle, "%s OFFSET %d\n", name, offset);
+    fclose(extSingle);
+    free(fileName);
 }

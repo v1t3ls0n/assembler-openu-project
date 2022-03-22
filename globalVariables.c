@@ -42,6 +42,7 @@ int getCurrentLineNumber()
 }
 
 FILE *ext;
+
 void initExternalsFile(char *fileName)
 {
     char *p, *name = calloc(strlen(fileName) + 3, sizeof(char *));
@@ -68,5 +69,6 @@ void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset)
 
 void closeExternalFile()
 {
-    fclose(ext);
+    if (ext)
+        fclose(ext);
 }
