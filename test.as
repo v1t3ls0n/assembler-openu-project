@@ -1,9 +1,9 @@
 ; file ps.am
 .entry LIST
 .extern W
-MAIN: add r3, LIST
+MAIN: add r3, W
 LOOP: prn #48
-lea STR, r6
+lea STR, W
 inc r6
 mov r3, W
 sub r1, r4

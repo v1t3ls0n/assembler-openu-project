@@ -15,8 +15,7 @@ void exportFilesMainHandler(char *baseFileName)
     if (areEntriesExist())
         createEntriesFile(baseFileName);
     if (areExternalsExist())
-    {
-    }
+        createEnternalsFile(baseFileName);
 }
 
 void generateObFile(char *baseFileName)

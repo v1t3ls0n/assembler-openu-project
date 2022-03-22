@@ -567,14 +567,11 @@ Bool areExternalsExist()
 void writeExternalsToFile(FILE *fp)
 {
     int i = 0;
-    int totalCount = 0;
-
     while (i < externalCount && externalsOperandsList[i].name)
     {
         writeSingleExternal(fp, externalsOperandsList[i].name, &externalsOperandsList[i].value);
         i++;
     }
-    return totalCount > 0 ? True : False;
 }
 
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
@@ -595,7 +592,6 @@ void writeEntriesToFile(FILE *fp)
             totalCount += writeSingleEntry(symbols[i], fp, 0);
         i++;
     }
-    return totalCount > 0 ? True : False;
 }
 
 int writeSingleEntry(Item *item, FILE *fp, int count)
