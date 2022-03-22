@@ -6,10 +6,9 @@ char *(*file)() = &getCurrentFileName;
 void yieldWarningIntoFile(Warning err)
 {
     static FILE *warningsFile;
-    char *warningFileName = (char *)calloc(strlen((*file)()), sizeof(char));
-    strcpy(warningFileName, (*file)());
-    strcat(warningFileName, ".warnings");
+    char *warningFileName = strcat((*file)(), ".warnings");
     warningsFile = fopen(warningFileName, "w+");
+    free(warningFileName);
 
     fprintf(warningsFile, "\n###################################\n");
     fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
@@ -49,10 +48,9 @@ void yieldWarningIntoFile(Warning err)
 void yieldErrorIntoFile(Error err)
 {
     static FILE *errorsFile;
-    char *errorsFileName = (char *)calloc(strlen((*file)()), sizeof(char));
-    strcpy(errorsFileName, (*file)());
-    strcat(errorsFileName, ".errors");
+    char *errorsFileName = strcat((*file)(), ".errors");
     errorsFile = fopen(errorsFileName, "w+");
+    free(errorsFileName);
 
     fprintf(errorsFile, "\n###################################\n");
     fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());

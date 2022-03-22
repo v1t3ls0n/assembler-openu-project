@@ -20,12 +20,17 @@ void setCurrentFileName(char *s)
     else
         currentFileName = 0;
 }
+
 char *getCurrentFileName()
 {
     if (currentFileName && *currentFileName)
-        return currentFileName;
+    {
+        char *copy = calloc(strlen(currentFileName), sizeof(char));
+        strcpy(copy, currentFileName);
+        return copy;
+    }
     else
-        return "";
+        return NULL;
 }
 
 static unsigned currentLineNumber = 1;
