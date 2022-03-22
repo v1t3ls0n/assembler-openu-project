@@ -5,7 +5,7 @@ extern char *trimFromLeft(char *s);
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
 static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
-static void (*setFileName)(char *) = &setCurrentFileName;
+/* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 
 /* extern State getGlobalState();
@@ -242,6 +242,7 @@ Bool parseSingleLine(char *line)
     ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
+    printf("inside parse single line, line:%s\n", line);
     memcpy(lineCopy, line, strlen(line));
     token = (*globalState)() == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = handleState(token, line);
@@ -260,9 +261,9 @@ void parseAssemblyCode(FILE *fp, char *filename)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
-    (*setFileName)(filename);
+    /*     (*setFileName)(filename);
+     */
     (*setCurrentLineToStart)();
-
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
@@ -289,8 +290,9 @@ void parseAssemblyCode(FILE *fp, char *filename)
         }
 
         else if (isspace(c) && i > 0)
+        {
             line[i++] = ' ';
-
+        }
         else
         {
             if (isprint(c) && !isspace(c))
