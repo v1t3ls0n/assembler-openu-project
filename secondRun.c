@@ -2,6 +2,7 @@
 #include "data.h"
 
 extern void setCurrentFileName(char *s);
+extern void addToExternalsFile(char *name, unsigned base, unsigned offset);
 
 /* from firstRun.c */
 extern Bool parseSingleLine(char *line);
@@ -151,7 +152,7 @@ void writeDirectOperandWord(char *labelName)
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        writeToExternalFile(labelName, base, offset);
+        addToExternalsFile(labelName, base, offset);
     }
 
     else
@@ -210,9 +211,9 @@ int parseRegNumberFromIndexAddrOperand(char *s)
     return getRegisteryNumber(s);
 }
 
-void writeToExternalFile(char *name, unsigned base, unsigned offset)
+void addToExternalsFile(char *name, unsigned base, unsigned offset)
 {
-    static FILE *ext;
+    FILE *ext;
     char *(*file)() = &getCurrentFileName;
     char *p, *fileName = calloc(strlen((*file)()) + 3, sizeof(char *));
     strcat(fileName, (*file)());
@@ -226,7 +227,6 @@ void writeToExternalFile(char *name, unsigned base, unsigned offset)
     }
 
     strcat(fileName, ".ext");
-    printf("fileName:%s\n", fileName);
     ext = fopen(fileName, "w+");
     if (ext == NULL)
     {
@@ -235,5 +235,5 @@ void writeToExternalFile(char *name, unsigned base, unsigned offset)
     }
     fprintf(ext, "%s BASE %d\n", name, base);
     fprintf(ext, "%s OFFSET %d\n", name, offset);
-    /*  fclose(ext); */
+    /*     fclose(ext); */
 }

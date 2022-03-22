@@ -13,6 +13,7 @@ extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
 extern void exportFilesMainHandler(char *baseFileName);
+extern void initExternalsFile();
 
 extern State getGlobalState();
 extern void updateGlobalState(State new);
@@ -79,7 +80,9 @@ void handleSingleSourceFile(char *arg)
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();
+
                 parseAssemblyCode(expandedSrc, fileName);
+
                 if ((*globalState)() == exportFiles)
                 {
                     printf("Finished Successfully, about to export files!\n");
