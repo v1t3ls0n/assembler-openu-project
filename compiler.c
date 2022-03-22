@@ -1,5 +1,7 @@
 #include "data.h"
 /* Shared global State variables*/
+extern void initExternalsFile(char *name);
+extern void closeExternalFile();
 
 extern int firstRunParsing(FILE *fp, char *filename);
 extern Bool parseSingleLine(char *line);
@@ -13,7 +15,6 @@ extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
 extern void exportFilesMainHandler(char *baseFileName);
-extern void initExternalsFile();
 
 extern State getGlobalState();
 extern void updateGlobalState(State new);
@@ -73,16 +74,16 @@ void handleSingleSourceFile(char *arg)
         if ((*globalState)() == firstRun)
         {
             printMacroTable();
-            parseAssemblyCode(expandedSrc, fileName);
+
             if ((*globalState)() == secondRun)
             {
                 rewind(expandedSrc);
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();
-
+                if (areExternalsExist())
+                    initExternalsFile(fileName);
                 parseAssemblyCode(expandedSrc, fileName);
-
                 if ((*globalState)() == exportFiles)
                 {
                     printf("Finished Successfully, about to export files!\n");
@@ -103,4 +104,6 @@ void handleSingleSourceFile(char *arg)
     free(fileName);
     fclose(fptr);
     fclose(expandedSrc);
+    if (areExternalsExist())
+        closeExternalFile();
 }

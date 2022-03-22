@@ -14,6 +14,9 @@ int getCurrentLineNumber();
 void increaseCurrentLineNumber();
 void resetCurrentLineNumber();
 
+void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
+void closeExternalFile();
+void initExternalsFile(char *name);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In exportFiles.c -------------------------------------------------------*/

@@ -48,7 +48,7 @@ void createEntriesFile(char *baseFileName)
     free(fileName);
 }
 
-/* FILE *initExternalsFile()
+/* void *initExternalsFile()
 {
     FILE *ext;
     char *(*file)() = &getCurrentFileName;
