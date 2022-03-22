@@ -4,7 +4,7 @@ static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
-
+static ExtListItem *externalsOperandsList;
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
@@ -23,6 +23,46 @@ void initTablesArrays()
         symbols[i] = NULL;
         macros[i] = NULL;
         i++;
+    }
+}
+
+ExtListItem *findExternalOperandListItem(char *name)
+{
+    int size = externalCount, i;
+    for (i = 0; i < size && externalsOperandsList[i].name != NULL; i++)
+        if (strcmp(externalsOperandsList[i].name, name) == 0)
+            return &externalsOperandsList[i];
+
+    return NULL;
+}
+
+void *updateExternalOperandList(char *name, unsigned base, unsigned offset)
+{
+    int size = externalCount, i = 0;
+    ExtListItem *p = findExternalOperandListItem(name);
+    if (p == NULL)
+    {
+        while (i < size && externalsOperandsList[i].name != NULL)
+            i++;
+
+        externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char *));
+        strncpy(externalsOperandsList[i].name, name, strlen(name));
+
+        externalsOperandsList[i].value.base = base;
+        externalsOperandsList[i].value.base = offset;
+    }
+}
+
+void initExternalOperandsList()
+{
+    int size = externalCount, i = 0;
+    externalsOperandsList = (ExtListItem *)malloc(size * sizeof(ExtListItem));
+    while (i < size)
+    {
+        externalsOperandsList[i].name = NULL;
+        externalsOperandsList[i].value.base = 0;
+        externalsOperandsList[i].value.offset = 0;
+        externalsOperandsList[i].value.next = NULL;
     }
 }
 
@@ -481,6 +521,7 @@ int updateFinalValueOfSingleItem(Item *item)
         entriesCount++;
     if (item->val.s.attrs.external)
         externalCount++;
+
     if (item->val.s.attrs.data)
     {
         unsigned base = 0, offset = 0, newValue = item->val.s.value + getICF();

@@ -120,6 +120,10 @@ Bool isNonEmptyEntry(char *name);
 
 Bool areEntriesExist();
 Bool areExternalsExist();
+
+void initExternalOperandsList();
+ExtListItem *findExternalOperandListItem(char *name);
+void *updateExternalOperandList(char *name, unsigned base, unsigned offset);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -129,9 +133,6 @@ void printObjectFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 void printBinaryFile(HexWord *words[], unsigned int ICF, unsigned int DCF);
 HexWord *convertNumToHexWord(int num);
 BinaryWord *convertNumberToBinaryWord(int num);
-char *generateFirstWordEncodedToBinary(Operation *op);
-HexWord *generateFirstWordEncodedHex(Operation *op);
-Word *convertNumberToWord(int n, EncodingFormat format);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
