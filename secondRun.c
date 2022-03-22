@@ -153,7 +153,7 @@ void writeDirectOperandWord(char *labelName)
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        writeToCurrentExternalsFile(labelName, base, offset);
+        /*         writeToCurrentExternalsFile(labelName, base, offset); */
     }
 
     else
