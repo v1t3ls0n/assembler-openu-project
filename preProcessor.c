@@ -41,21 +41,21 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     while ((c = fgetc(source)) != EOF)
     {
         offsetCounter++;
-
-        if (!isMacroCurrentlyParsed)
-            fputc(c, target);
-
+        fputc(c, target);
         if (c == '\n')
         {
             (*currentLineNumberPlusPlus)();
+
             if (isMacroCurrentlyParsed)
             {
+                popLastToken(target, "", offsetCounter);
                 if (!isMacroStartFoundYet)
                 {
-                    start = ftell(source) - 1;
+                    start = ftell(source);
                     isMacroStartFoundYet = True;
                 }
             }
+            offsetCounter = 0;
 
             if (state == skipLine)
                 state = evalToken;
@@ -85,21 +85,22 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                     {
                         if (isMacroClosing(token))
                         {
-                            end = ftell(source) - offsetCounter - 1;
+                            end = ftell(source) - offsetCounter;
                             addMacro(macroName, start, end);
                             memset(macroName, 0, MAX_LABEL_LEN);
                             isMacroCurrentlyParsed = False;
                             isMacroStartFoundYet = False;
                             i = start = end = 0;
                             state = skipLine;
+                            /*                           popLastToken(target, "", offsetCounter);
+                                                      offsetCounter = 0; */
                         }
                     }
                     else
                     {
                         if (isMacroOpening(token))
                         {
-                            popLastToken(target, "", offsetCounter);
-                            offsetCounter = 0;
+
                             state = parsingMacroName;
                             isMacroStartFoundYet = False;
                             isMacroCurrentlyParsed = True;
@@ -111,6 +112,8 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
 
                             if (p != NULL)
                             {
+                                /*               popLastToken(target, "", offsetCounter);
+                                              offsetCounter = 0; */
                                 current = ftell(source) - 1;
                                 fseek(target, -offsetCounter, SEEK_CUR);
                                 replaceWithMacro(target, source, p->val.m.start, p->val.m.end);

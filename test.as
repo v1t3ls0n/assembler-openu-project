@@ -14,3 +14,7 @@ endm
 ; before (mov r3, r1)
 
 mov r3, r1
+
+m1
+
+m2
