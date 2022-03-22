@@ -53,6 +53,8 @@ void handleSingleSourceFile(char *arg)
     State (*globalState)() = &getGlobalState;
     FILE *fptr, *expandedSrc;
     char *fileName = calloc(strlen(arg) + 3, sizeof(char *));
+    void (*setFileName)(char *) = &setCurrentFileName;
+
     sscanf(arg, "%s", fileName);
     if ((fptr = fopen(strcat(fileName, ".as"), "r")) == NULL)
     {
@@ -71,6 +73,7 @@ void handleSingleSourceFile(char *arg)
     {
         createExpandedSourceFile(fptr, expandedSrc, fileName);
         rewind(expandedSrc);
+        (*setFileName)(fileName);
         if ((*globalState)() == firstRun)
         {
             printMacroTable();

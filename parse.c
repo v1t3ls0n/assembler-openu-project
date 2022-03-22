@@ -5,7 +5,7 @@ extern char *trimFromLeft(char *s);
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
 static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
-static void (*setFileName)(char *) = &setCurrentFileName;
+/* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 
 /* extern State getGlobalState();
@@ -260,9 +260,9 @@ void parseAssemblyCode(FILE *fp, char *filename)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
-    (*setFileName)(filename);
+    /*     (*setFileName)(filename);
+     */
     (*setCurrentLineToStart)();
-
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
     else
