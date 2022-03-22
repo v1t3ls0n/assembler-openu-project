@@ -86,20 +86,11 @@ void handleSingleSourceFile(char *arg)
                 printSymbolTable();
                 initMemory();
                 if (areExternalsExist())
-                {
                     initExternalOperandsList();
-                }
-
                 parseAssemblyCode(expandedSrc, fileName);
+                resetMemory();
                 if ((*globalState)() == exportFiles)
-                {
-                    printf("Finished Successfully, about to export files!\n");
-                    /*             printBinaryImg(); */
-                    /*               printf("\n"); */
-                    /*                printMemoryImgInRequiredObjFileFormat(); */
                     exportFilesMainHandler(arg);
-                    resetMemory();
-                }
                 else
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
