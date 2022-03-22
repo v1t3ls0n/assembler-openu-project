@@ -496,11 +496,11 @@ int updateFinalValueOfSingleItem(Item *item)
     return 0;
 }
 
-Bool areEntries()
+Bool areEntriesExist()
 {
     return entriesCount > 0 ? True : False;
 }
-Bool areExternals()
+Bool areExternalsExist()
 {
     return externalCount > 0 ? True : False;
 }

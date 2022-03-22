@@ -2,15 +2,15 @@
 
 extern void writeMemoryImageToObFile(FILE *fp);
 extern Bool writeEntriesToFile(FILE *fp);
-extern Bool areEntries();
-extern Bool areExternals();
+extern Bool areEntriesExist();
+extern Bool areExternalsExist();
 void generateObFile(char *baseFileName);
 void createEntriesFile(char *baseFileName);
 
 void exportFilesMainHandler(char *baseFileName)
 {
     generateObFile(baseFileName);
-    if (areEntries())
+    if (areEntriesExist())
         createEntriesFile(baseFileName);
 }
 
