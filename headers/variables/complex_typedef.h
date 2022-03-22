@@ -71,7 +71,7 @@ typedef struct
 typedef struct
 {
     char *name;
-    ExtPositionData value;
+    ExtPositionData *value;
 } ExtListItem;
 
 typedef struct

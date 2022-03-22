@@ -61,7 +61,6 @@ void handleSingleSourceFile(char *arg)
         yieldError(fileCouldNotBeOpened);
         return;
     }
-    initTablesArrays();
     fileName[strlen(fileName) - 1] = 'm';
     expandedSrc = fopen(fileName, "w+");
     if (expandedSrc == NULL)
@@ -74,8 +73,10 @@ void handleSingleSourceFile(char *arg)
         createExpandedSourceFile(fptr, expandedSrc, fileName);
         rewind(expandedSrc);
         (*setFileName)(fileName);
+
         if ((*globalState)() == firstRun)
         {
+            initTablesArrays();
             printMacroTable();
             parseAssemblyCode(expandedSrc, fileName);
             if ((*globalState)() == secondRun)
@@ -85,7 +86,9 @@ void handleSingleSourceFile(char *arg)
                 printSymbolTable();
                 initMemory();
                 if (areExternalsExist())
+                {
                     initExternalOperandsList();
+                }
 
                 parseAssemblyCode(expandedSrc, fileName);
                 if ((*globalState)() == exportFiles)
@@ -93,7 +96,7 @@ void handleSingleSourceFile(char *arg)
                     printf("Finished Successfully, about to export files!\n");
                     /*             printBinaryImg(); */
                     /*               printf("\n"); */
-                    printMemoryImgInRequiredObjFileFormat();
+                    /*                printMemoryImgInRequiredObjFileFormat(); */
                     exportFilesMainHandler(arg);
                     resetMemory();
                 }

@@ -2,13 +2,13 @@
 .entry LIST
 .extern W
 MAIN: add r3, W
-LOOP: prn #48
+LOOP: prn W
 lea STR, W
 inc r6
 mov r3, W
-sub r1, r4
+sub r1, W
 bne END
-cmp val1, #-6
+cmp val1, W
 bne END[r15]
 dec K
 .entry MAIN

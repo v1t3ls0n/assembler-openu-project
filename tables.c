@@ -29,8 +29,8 @@ void initTablesArrays()
 
 ExtListItem *findExternalOperandListItem(char *name)
 {
-    int size = externalCount, i;
-    for (i = 0; i < size && externalsOperandsList[i].name != NULL; i++)
+    int i;
+    for (i = 0; i < externalCount && externalsOperandsList[i].name != NULL; i++)
         if (strcmp(externalsOperandsList[i].name, name) == 0)
             return &externalsOperandsList[i];
 
@@ -39,34 +39,27 @@ ExtListItem *findExternalOperandListItem(char *name)
 
 void updateExternalOperandList(char *name, unsigned base, unsigned offset)
 {
-    int size = externalCount, i = 0;
-    ExtListItem *p = findExternalOperandListItem(name);
-    if (p == NULL)
+    int i = 0;
+    ExtListItem *np = findExternalOperandListItem(name);
+    if (np == NULL)
     {
-        while (i < size && externalsOperandsList[i].name != NULL)
+        while (i < externalCount && externalsOperandsList[i].name != NULL)
             i++;
-
         externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char *));
         strncpy(externalsOperandsList[i].name, name, strlen(name));
-        externalsOperandsList[i].value.base = base ? base : 0;
-        externalsOperandsList[i].value.offset = offset ? offset : 0;
+        externalsOperandsList[i].value->offset = offset;
+        externalsOperandsList[i].value->base = base;
+        externalsOperandsList[i].value->next = NULL;
     }
     else
     {
-        if ((!p->value.base || !p->value.offset))
-        {
-            p->value.base = base;
-            p->value.offset = offset;
-            p->value.next = NULL;
-        }
-        else
-        {
-            ExtPositionData *pos = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-            pos->base = base;
-            pos->offset = offset;
-            pos->next = NULL;
-            p->value.next = pos;
-        }
+        ExtPositionData *last = np->value, *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+        new->base = base;
+        new->offset = offset;
+        new->next = NULL;
+        while (last->next != NULL)
+            last = last->next;
+        last->next = new;
     }
 }
 
@@ -77,9 +70,10 @@ void initExternalOperandsList()
     while (i < size)
     {
         externalsOperandsList[i].name = NULL;
-        externalsOperandsList[i].value.base = 0;
-        externalsOperandsList[i].value.offset = 0;
-        externalsOperandsList[i].value.next = NULL;
+        externalsOperandsList[i].value = (ExtPositionData *)malloc(sizeof(ExtPositionData));
+        externalsOperandsList[i].value->base = 0;
+        externalsOperandsList[i].value->offset = 0;
+        externalsOperandsList[i].value->next = NULL;
         i++;
     }
 }
@@ -569,7 +563,7 @@ void writeExternalsToFile(FILE *fp)
     int i = 0;
     while (i < externalCount && externalsOperandsList[i].name)
     {
-        writeSingleExternal(fp, externalsOperandsList[i].name, &externalsOperandsList[i].value);
+        writeSingleExternal(fp, externalsOperandsList[i].name, externalsOperandsList[i].value);
         i++;
     }
 }
