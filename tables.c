@@ -4,7 +4,7 @@ static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
-static ExtListItem *externalsOperandsList;
+static ExtListItem *externalsOperandsList = NULL;
 /* Complex Struct Constant Variables: */
 extern Operation operations[OP_SIZE];
 extern unsigned getDC();
@@ -17,8 +17,14 @@ extern Bool isRegistery(char *s);
 void initTablesArrays()
 {
     int i = 0;
-    externalCount = 0;
-    entriesCount = 0;
+
+    if (externalsOperandsList != NULL)
+    {
+        free(externalsOperandsList);
+        externalCount = 0;
+        entriesCount = 0;
+    }
+
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;

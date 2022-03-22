@@ -11,6 +11,7 @@ void createEntriesFile(char *baseFileName);
 
 void exportFilesMainHandler(char *baseFileName)
 {
+    printf("Finished Successfully, about to export files!\n");
     generateObFile(baseFileName);
     if (areEntriesExist())
         createEntriesFile(baseFileName);
