@@ -30,7 +30,6 @@ void exportFilesMainHandler(char *baseFileName);
 int writeSingleEntry(Item *item, FILE *fp, int count);
 Bool writeEntriesToFile(FILE *fp);
 void writeMemoryImageToObFile(FILE *fp);
-int writeToMemory(Word *word, DataType type);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
 void updateFinalCountersValue();
@@ -38,7 +37,6 @@ unsigned getDC();
 unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
-void printMemoryStacks(EncodingFormat format);
 void initMemory();
 void printBinaryImg();
 void printWordBinary(unsigned index);
@@ -123,7 +121,7 @@ Bool areExternalsExist();
 
 void initExternalOperandsList();
 ExtListItem *findExternalOperandListItem(char *name);
-void *updateExternalOperandList(char *name, unsigned base, unsigned offset);
+void updateExternalOperandList(char *name, unsigned base, unsigned offset);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/

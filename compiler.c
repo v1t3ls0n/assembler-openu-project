@@ -14,6 +14,8 @@ extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *fp, char *filename);
 extern void exportFilesMainHandler(char *baseFileName);
 
+extern void initExternalOperandsList();
+
 extern State getGlobalState();
 extern void updateGlobalState(State new);
 void handleSingleSourceFile(char *arg);
@@ -79,6 +81,9 @@ void handleSingleSourceFile(char *arg)
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();
+                if (areExternalsExist())
+                    initExternalOperandsList();
+
                 parseAssemblyCode(expandedSrc, fileName);
                 if ((*globalState)() == exportFiles)
                 {

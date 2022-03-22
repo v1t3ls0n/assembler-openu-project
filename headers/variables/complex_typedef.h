@@ -47,7 +47,7 @@ typedef struct
 typedef enum
 {
     Macro,
-    Symbol,
+    Symbol
 } ItemType;
 
 typedef enum
