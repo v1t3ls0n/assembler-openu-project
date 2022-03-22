@@ -48,28 +48,6 @@ void createEntriesFile(char *baseFileName)
     free(fileName);
 }
 
-/* void *initExternalsFile()
+void writeIntoExternalsFile(char *filename)
 {
-    FILE *ext;
-    char *(*file)() = &getCurrentFileName;
-    char *p, *fileName = calloc(strlen((*file)()) + 3, sizeof(char *));
-    strcat(fileName, (*file)());
-    p = strstr(fileName, "am");
-    if (p)
-    {
-        p++;
-        p = '\0';
-        p--;
-        p = '\0';
-    }
-
-    strcat(fileName, ".ext");
-    ext = fopen(fileName, "w+");
-    if (ext == NULL)
-    {
-        printf("failed to create .ext compiled file\n");
-        return;
-    }
-    return ext;
 }
- */

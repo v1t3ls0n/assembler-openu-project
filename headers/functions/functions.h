@@ -204,4 +204,4 @@ char *parseLabelNameFromIndexAddrOperand(char *s);
 int parseRegNumberFromIndexAddrOperand(char *s);
 Bool writeStringInstruction(char *s);
 Bool writeDataInstruction(char *s);
-void writeToExternalFile(char *name, unsigned base, unsigned offset);
+void writeSingleExternalsFile(char *name, unsigned base, unsigned offset);

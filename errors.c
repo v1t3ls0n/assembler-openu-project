@@ -256,8 +256,7 @@ void yieldErrorIntoFile(Error err)
 }
 Bool yieldWarning(Warning err)
 {
-    /*     yieldWarningIntoFile(err);
-     */
+    yieldWarningIntoFile(err);
     fprintf(stderr, "\n###################################\n");
     fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
@@ -297,7 +296,7 @@ Bool yieldWarning(Warning err)
 
 Bool yieldError(Error err)
 {
-    /*     yieldErrorIntoFile(err); */
+    yieldErrorIntoFile(err);
     fprintf(stderr, "\n###################################\n");
     fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
