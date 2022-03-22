@@ -22,7 +22,7 @@ void initExternalsFile(char *name);
 /* --------------------------------------------In exportFiles.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 void exportFilesMainHandler(char *baseFileName);
-
+void createEnternalsFile(char *baseFileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
@@ -118,6 +118,9 @@ Bool isNonEmptyEntry(char *name);
 
 Bool areEntriesExist();
 Bool areExternalsExist();
+
+void writeExternalsToFile(FILE *fp);
+void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
 
 void initExternalOperandsList();
 ExtListItem *findExternalOperandListItem(char *name);

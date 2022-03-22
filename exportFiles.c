@@ -4,6 +4,8 @@ extern void writeMemoryImageToObFile(FILE *fp);
 extern void writeEntriesToFile(FILE *fp);
 extern Bool areEntriesExist();
 extern Bool areExternalsExist();
+extern void writeExternalsToFile(FILE *fp);
+
 void generateObFile(char *baseFileName);
 void createEntriesFile(char *baseFileName);
 
@@ -12,6 +14,9 @@ void exportFilesMainHandler(char *baseFileName)
     generateObFile(baseFileName);
     if (areEntriesExist())
         createEntriesFile(baseFileName);
+    if (areExternalsExist())
+    {
+    }
 }
 
 void generateObFile(char *baseFileName)
@@ -40,7 +45,7 @@ void createEntriesFile(char *baseFileName)
     ent = fopen(fileName, "w+");
     if (ent == NULL)
     {
-        printf("failed to create .ent compiled file\n");
+        printf("failed to create .ent file\n");
         return;
     }
     writeEntriesToFile(ent);
@@ -48,6 +53,19 @@ void createEntriesFile(char *baseFileName)
     free(fileName);
 }
 
-void writeIntoExternalsFile(char *filename)
+void createEnternalsFile(char *baseFileName)
 {
+    FILE *ext;
+    char *fileName = calloc(strlen(baseFileName) + 3, sizeof(char *));
+    sscanf(baseFileName, "%s", fileName);
+    strcat(fileName, ".ext");
+    ext = fopen(fileName, "w+");
+    if (ext == NULL)
+    {
+        printf("failed to create .ext file\n");
+        return;
+    }
+    writeExternalsToFile(ext);
+    fclose(ext);
+    free(fileName);
 }
