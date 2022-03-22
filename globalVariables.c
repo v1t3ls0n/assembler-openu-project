@@ -14,11 +14,10 @@ State getGlobalState()
 static char *currentFileName;
 void setCurrentFileName(char *s)
 {
-    printf("inside setCurrentFileName, s:%s\n", s);
-    if (s != NULL && *s)
-        currentFileName = s;
-    else
-        currentFileName = 0;
+    if (!*s)
+        return;
+    currentFileName = (char *)realloc(currentFileName, strlen(s) * sizeof(char));
+    strcpy(currentFileName, s);
 }
 
 char *getCurrentFileName()
