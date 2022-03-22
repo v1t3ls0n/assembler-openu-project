@@ -1,0 +1,1 @@
+clear && rm -f  *.am *.ob *.ent *.ext *.warnings *.errors 

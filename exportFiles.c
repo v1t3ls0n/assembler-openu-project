@@ -48,6 +48,6 @@ void createEntriesFile(char *baseFileName)
     free(fileName);
 }
 
-void createExternalFile(char *filename)
+void writeIntoExternalsFile(char *filename)
 {
 }

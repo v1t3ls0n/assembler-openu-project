@@ -1,6 +1,8 @@
 
 #include "data.h"
 
+extern void setCurrentFileName(char *s);
+
 /* from firstRun.c */
 extern Bool parseSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
@@ -210,6 +212,28 @@ int parseRegNumberFromIndexAddrOperand(char *s)
 
 void writeToExternalFile(char *name, unsigned base, unsigned offset)
 {
+    static FILE *ext;
+    char *(*file)() = &getCurrentFileName;
+    char *p, *fileName = calloc(strlen((*file)()) + 3, sizeof(char *));
+    strcat(fileName, (*file)());
+    p = strstr(fileName, "am");
+    if (p)
+    {
+        p++;
+        p = '\0';
+        p--;
+        p = '\0';
+    }
 
-    printf("\nEXTERNAL VARIABLE\nNAME:%s\nBASE:%u\nOFFSET:%u\n\n", name, base, offset);
+    strcat(fileName, ".ext");
+    printf("fileName:%s\n", fileName);
+    ext = fopen(fileName, "w+");
+    if (ext == NULL)
+    {
+        printf("failed to create .ext compiled file\n");
+        return;
+    }
+    fprintf(ext, "%s BASE %d\n", name, base);
+    fprintf(ext, "%s OFFSET %d\n", name, offset);
+    /*  fclose(ext); */
 }
