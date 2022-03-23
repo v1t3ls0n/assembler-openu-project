@@ -17,6 +17,8 @@ END: stop
 STR: .string "abcd"
 LIST: .data 6, -9
 .data -100
-.entry K
+.entry cmp
+r1: .data 34
+mov: .data 3,4
 K: .data 31
 .extern val1

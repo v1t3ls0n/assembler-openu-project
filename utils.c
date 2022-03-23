@@ -169,3 +169,70 @@ char *getInstructionName(char *s)
 
     return 0;
 }
+
+Bool verifyLabelNaming(char *s)
+{
+    int i = 0;
+    int labelLength = strlen(s);
+
+    /* if label name does not start with a alphabet letter */
+    if (isalpha(s[0]) == 0)
+        return False;
+
+    /* maximum label name length is 31 characters */
+    if (strlen(s) > MAX_LABEL_LEN)
+        return False;
+
+    if (isRegistery(s))
+        return False;
+
+    else if (isOperationName(s))
+        return False;
+    else
+    {
+
+        while (i < labelLength)
+        {
+            if (!isalnum(s[i]))
+                return False;
+
+            i++;
+        }
+    }
+
+    return True;
+}
+
+Bool verifyLabelNamingAndPrintErrors(char *s)
+{
+    int i = 0;
+    int labelLength = strlen(s);
+
+    /* if label name does not start with a alphabet letter */
+    if (isalpha(s[0]) == 0)
+        return yieldError(illegalLabelNameUseOfCharacters);
+
+    /* maximum label name length is 31 characters */
+    else if (strlen(s) > MAX_LABEL_LEN)
+        return yieldError(illegalLabelNameLength);
+
+    else if (isRegistery(s))
+        return yieldError(illegalLabelNameUseOfSavedKeywordUsingRegisteryName);
+
+    else if (isOperationName(s))
+        return yieldError(illegalLabelNameUseOfSavedKeywordUsingOperationName);
+
+    else
+    {
+
+        while (i < labelLength)
+        {
+            if (!isalnum(s[i]))
+                return yieldError(illegalLabelNameUseOfCharacters);
+
+            i++;
+        }
+    }
+
+    return True;
+}

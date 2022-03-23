@@ -61,6 +61,20 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case illegalLabelNameLength:
+        fprintf(errorsFile, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
+        break;
+    case illegalLabelNameUseOfSavedKeywordUsingOperationName:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywordUsingRegisteryName:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\nUsing Registery Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywords:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\n");
+        break;
     case desOperandTypeIsNotAllowed:
         fprintf(errorsFile, "illegal input passed as destination operand!");
         break;
@@ -184,6 +198,7 @@ void yieldErrorIntoFile(Error err)
     case illegalLabelNameUseOfCharacters:
         fprintf(errorsFile, "illegal Label Name Use Of Characters");
         break;
+
     case illegalLabelDeclaration:
         fprintf(errorsFile, "illegal Label Declaration");
         break;
@@ -311,6 +326,20 @@ Bool yieldError(Error err)
 
     switch (err)
     {
+    case illegalLabelNameLength:
+        fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
+        break;
+    case illegalLabelNameUseOfSavedKeywordUsingOperationName:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywordUsingRegisteryName:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Registery Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywords:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\n");
+        break;
     case desOperandTypeIsNotAllowed:
         fprintf(stderr, "illegal input passed as destination operand!");
         break;

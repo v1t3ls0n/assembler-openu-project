@@ -84,6 +84,7 @@ void yieldErrorIntoFile(Error err);
 Operation *getOperationByName(char *s);
 Operation *getOperationByIndex(unsigned int i);
 int getOpIndex(char *s);
+Bool isOperationName(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

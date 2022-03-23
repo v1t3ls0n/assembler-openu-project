@@ -60,7 +60,9 @@ typedef enum
     secondRunFailed,
     illegalMacroNameUseOfSavedKeywords,
     afterPlusOrMinusSignThereMustBeANumber,
-    illegalApearenceOfCharacterInTheBegningOfTheLine
+    illegalApearenceOfCharacterInTheBegningOfTheLine,
+    illegalLabelNameUseOfSavedKeywordUsingOperationName,
+    illegalLabelNameUseOfSavedKeywordUsingRegisteryName
 
 } Error;
 
