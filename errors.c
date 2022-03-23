@@ -9,9 +9,7 @@ void yieldWarningIntoFile(Warning err)
     static Bool isWarningFileExist = False;
     if (!isWarningFileExist)
     {
-        char *warningFileName = strcat((*file)(), ".warnings");
-        warningsFile = fopen(warningFileName, "w+");
-        free(warningFileName);
+        warningsFile = fopen("warnings.log", "w+");
         isWarningFileExist = True;
     }
 
@@ -55,9 +53,7 @@ void yieldErrorIntoFile(Error err)
     static Bool isErrorFileExist = False;
     if (!isErrorFileExist)
     {
-        char *errorsFileName = strcat((*file)(), ".errors");
-        errorsFile = fopen(errorsFileName, "w+");
-        free(errorsFileName);
+        errorsFile = fopen("errors.log", "w+");
         isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n###################################\n");
