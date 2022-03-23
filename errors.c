@@ -13,7 +13,7 @@ void yieldWarningIntoFile(Warning err)
         isWarningFileExist = True;
     }
 
-    fprintf(warningsFile, "\n###################################\n");
+    fprintf(warningsFile, "\n######################################################################\n");
     fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
     {
@@ -46,7 +46,7 @@ void yieldWarningIntoFile(Warning err)
     }
 
     fprintf(warningsFile, "\n");
-    fprintf(warningsFile, "###################################\n\n");
+    fprintf(warningsFile, "######################################################################\n\n");
 }
 void yieldErrorIntoFile(Error err)
 {
@@ -56,11 +56,25 @@ void yieldErrorIntoFile(Error err)
         errorsFile = fopen("errors.log", "w+");
         isErrorFileExist = True;
     }
-    fprintf(errorsFile, "\n###################################\n");
+    fprintf(errorsFile, "\n######################################################################\n");
     fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
     switch (err)
     {
+    case illegalLabelNameLength:
+        fprintf(errorsFile, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
+        break;
+    case illegalLabelNameUseOfSavedKeywordUsingOperationName:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywordUsingRegisteryName:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\nUsing Registery Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywords:
+        fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\n");
+        break;
     case desOperandTypeIsNotAllowed:
         fprintf(errorsFile, "illegal input passed as destination operand!");
         break;
@@ -184,6 +198,7 @@ void yieldErrorIntoFile(Error err)
     case illegalLabelNameUseOfCharacters:
         fprintf(errorsFile, "illegal Label Name Use Of Characters");
         break;
+
     case illegalLabelDeclaration:
         fprintf(errorsFile, "illegal Label Declaration");
         break;
@@ -261,12 +276,12 @@ void yieldErrorIntoFile(Error err)
         break;
     }
     fprintf(errorsFile, "\n");
-    fprintf(errorsFile, "###################################\n");
+    fprintf(errorsFile, "######################################################################\n");
 }
 Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
-    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "\n######################################################################\n");
     fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
     {
@@ -299,18 +314,32 @@ Bool yieldWarning(Warning err)
     }
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "###################################\n\n");
+    fprintf(stderr, "######################################################################\n\n");
     return True;
 }
 
 Bool yieldError(Error err)
 {
     yieldErrorIntoFile(err);
-    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "\n######################################################################\n");
     fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
     switch (err)
     {
+    case illegalLabelNameLength:
+        fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
+        break;
+    case illegalLabelNameUseOfSavedKeywordUsingOperationName:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywordUsingRegisteryName:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Registery Name is not allowed");
+        break;
+
+    case illegalLabelNameUseOfSavedKeywords:
+        fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\n");
+        break;
     case desOperandTypeIsNotAllowed:
         fprintf(stderr, "illegal input passed as destination operand!");
         break;
@@ -511,7 +540,7 @@ Bool yieldError(Error err)
         break;
     }
     fprintf(stderr, "\n");
-    fprintf(stderr, "###################################\n");
+    fprintf(stderr, "######################################################################\n");
 
     return False;
 }

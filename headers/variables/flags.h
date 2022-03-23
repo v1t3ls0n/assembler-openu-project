@@ -60,7 +60,9 @@ typedef enum
     secondRunFailed,
     illegalMacroNameUseOfSavedKeywords,
     afterPlusOrMinusSignThereMustBeANumber,
-    illegalApearenceOfCharacterInTheBegningOfTheLine
+    illegalApearenceOfCharacterInTheBegningOfTheLine,
+    illegalLabelNameUseOfSavedKeywordUsingOperationName,
+    illegalLabelNameUseOfSavedKeywordUsingRegisteryName
 
 } Error;
 
@@ -82,7 +84,7 @@ typedef enum
     secondRun,
     parsingMacros,
     writeFiles,
-    collectErrors,
+    assemblyCodeFailedToCompile,
     exportFiles,
     goToNextFileOrEndProgram,
     stopProgram,
