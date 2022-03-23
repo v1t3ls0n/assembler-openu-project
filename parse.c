@@ -307,7 +307,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
     }
 
     if (!isValidCode)
-        nextState = collectErrors;
+        nextState = assemblyCodeFailedToCompile;
     else
         nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 

@@ -82,7 +82,7 @@ typedef enum
     secondRun,
     parsingMacros,
     writeFiles,
-    collectErrors,
+    assemblyCodeFailedToCompile,
     exportFiles,
     goToNextFileOrEndProgram,
     stopProgram,
