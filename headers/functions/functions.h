@@ -14,9 +14,8 @@ int getCurrentLineNumber();
 void increaseCurrentLineNumber();
 void resetCurrentLineNumber();
 
-void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
-void closeExternalFile();
-void initExternalsFile(char *name);
+void setFileNamePath(char *s);
+char *getFileNamePath(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In exportFiles.c -------------------------------------------------------*/
@@ -150,6 +149,7 @@ int countSpaceCharacters(char *s);
 char *numToBin(int num);
 int countConsecutiveCommas(char *s);
 int countLengthOfNonDigitToken(char *s);
+char *cloneString(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

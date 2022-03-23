@@ -2,6 +2,8 @@
 #include "data.h"
 int (*line)() = &getCurrentLineNumber;
 char *(*file)() = &getCurrentFileName;
+char *(*path)() = &getFileNamePath;
+
 static FILE *warningsFile, *errorsFile;
 
 void yieldWarningIntoFile(Warning err)
@@ -54,6 +56,7 @@ void yieldErrorIntoFile(Error err)
     if (!isErrorFileExist)
     {
         errorsFile = fopen("errors.log", "w+");
+
         isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");

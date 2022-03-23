@@ -17,6 +17,8 @@ extern void initExternalOperandsList();
 
 extern State getGlobalState();
 extern void updateGlobalState(State new);
+extern void setFileNamePath(char *s);
+
 void handleSingleSourceFile(char *arg);
 
 int main(int argc, char *argv[])
@@ -53,15 +55,30 @@ void handleSingleSourceFile(char *arg)
     FILE *fptr, *expandedSrc;
     char *fileName = calloc(strlen(arg) + 3, sizeof(char *));
     void (*setFileName)(char *) = &setCurrentFileName;
+    void (*setPath)(char *) = &setFileNamePath;
+    if (strrchr(arg, '/'))
+    {
+        char *s;
+        s = strrchr(arg, '/');
+        s++;
+        sscanf(s, "%s", fileName);
+        (*setFileName)(fileName);
+        s = strchr(arg, '.');
+        (*setPath)(s);
+    }
+    else
+    {
+        sscanf(arg, "%s", fileName);
+        (*setFileName)(fileName);
+    }
 
-    sscanf(arg, "%s", fileName);
-    if ((fptr = fopen(strcat(fileName, ".as"), "r")) == NULL)
+    if ((fptr = fopen(strcat(arg, ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
         return;
     }
-    fileName[strlen(fileName) - 1] = 'm';
-    expandedSrc = fopen(fileName, "w+");
+    arg[strlen(arg) - 1] = 'm';
+    expandedSrc = fopen(arg, "w+");
     if (expandedSrc == NULL)
     {
         fclose(fptr);
@@ -71,7 +88,6 @@ void handleSingleSourceFile(char *arg)
     {
         createExpandedSourceFile(fptr, expandedSrc, fileName);
         rewind(expandedSrc);
-        (*setFileName)(fileName);
         if ((*globalState)() == firstRun)
         {
             initTablesArrays();
