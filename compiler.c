@@ -88,10 +88,11 @@ void handleSingleSourceFile(char *arg)
     {
         createExpandedSourceFile(fptr, expandedSrc, fileName);
         rewind(expandedSrc);
+        printMacroTable();
+
         if ((*globalState)() == firstRun)
         {
             initTablesArrays();
-            printMacroTable();
             parseAssemblyCode(expandedSrc, fileName);
             if ((*globalState)() == secondRun)
             {

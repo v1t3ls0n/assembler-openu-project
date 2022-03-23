@@ -1,5 +1,5 @@
 clear
 rm -rf  *.log ./_tests/good_code/code/*.log ./_tests/good_code/code/*.am ./_tests/good_code/code/*.ob ./_tests/good_code/code/*.ent ./_tests/good_code/code/*.ext ./_tests/good_code/code/*.warnings ./_tests/good_code/code/*.warnings.warnings ./_tests/good_code/code/*.errors ./_tests/good_code/code/*.errors.errors  
 make 
-./compiler  ./_tests/good_code/code/test-with-macros3
+./compiler  ./_tests/good_code/code/test-with-macros2
 rm -f compiler

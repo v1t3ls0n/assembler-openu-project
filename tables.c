@@ -108,7 +108,7 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     np = (Item *)malloc(sizeof(Item));
-    np->name = calloc(strlen(name) + 1, sizeof(char *));
+    np->name = (char *)calloc(strlen(name) + 1, sizeof(char));
     if (np == NULL || np->name == NULL)
     {
         yieldError(memoryAllocationFailure);
@@ -133,7 +133,6 @@ Item *install(char *name, ItemType type)
             np->val.m.end = -1;
         }
 
-        np->next = (Item *)malloc(sizeof(Item *));
         hashval = hash(name);
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)

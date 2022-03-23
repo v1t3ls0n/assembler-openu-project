@@ -113,14 +113,19 @@ typedef enum
 
     skipLine,
     evalToken,
+    readToken,
     saveCharToToken,
     deleteMacroFromTarget,
     deleteLastLine,
-    parsingMacroName,
+    getMacroName,
     searchingMacroStart,
     searchingMacroEnd,
     addMacroToTable,
-    replaceMacro
+    replaceMacro,
+    readingMacro,
+    readingToken,
+    replacingMacro
+
 } ParseState;
 
 typedef enum
