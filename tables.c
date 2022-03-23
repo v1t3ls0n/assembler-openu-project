@@ -11,7 +11,7 @@ extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
 extern unsigned calcNumberCharactersLength(int num);
-
+extern Bool verifyLabelNaming(char *s);
 extern Bool isRegistery(char *s);
 
 void initTablesArrays()
@@ -371,17 +371,6 @@ Bool isLabelNameAlreadyTaken(char *name, ItemType type)
     return False;
 }
 
-Item *removeFromTable(char *name, ItemType type)
-{
-    Item *p = lookup(name, type);
-    if (p->next)
-        p = p->next;
-    else
-        p = NULL;
-
-    return p;
-}
-
 Item *updateSymbolAddressValue(char *name, int newValue)
 {
     Item *p = getSymbol(name);
@@ -438,88 +427,6 @@ Item *updateMacro(char *name, int start, int end)
         macro->val.m.end = end;
 
     return macro;
-}
-
-Bool verifyLabelNaming(char *s)
-{
-    int i = 0;
-    int labelLength = strlen(s);
-
-    /* if label name does not start with a alphabet letter */
-    if (isalpha(s[0]) == 0)
-        return False;
-
-    /* maximum label name length is 31 characters */
-    if (strlen(s) > MAX_LABEL_LEN)
-        return False;
-
-    if (isRegistery(s))
-        return False;
-
-    else if ((labelLength >= 3 && labelLength <= 4))
-    {
-        while (i < OP_SIZE)
-        {
-            if ((strcmp(operations[i].keyword, s) == 0))
-                return False;
-
-            i++;
-        }
-    }
-    else
-    {
-
-        while (i < labelLength)
-        {
-            if (!isalnum(s[i]))
-                return False;
-
-            i++;
-        }
-    }
-
-    return True;
-}
-
-Bool verifyLabelNamingAndPrintErrors(char *s)
-{
-    int i = 0;
-    int labelLength = strlen(s);
-
-    /* if label name does not start with a alphabet letter */
-    if (isalpha(s[0]) == 0)
-        return yieldError(illegalLabelNameUseOfCharacters);
-
-    /* maximum label name length is 31 characters */
-    if (strlen(s) > MAX_LABEL_LEN)
-        return yieldError(illegalLabelNameLength);
-
-    if (isRegistery(s))
-        return yieldError(illegalLabelNameUseOfSavedKeywords);
-
-    else if ((labelLength >= 3 && labelLength <= 4))
-    {
-        while (i < OP_SIZE)
-        {
-            if ((strcmp(operations[i].keyword, s) == 0))
-                return yieldError(illegalLabelNameUseOfSavedKeywords);
-
-            i++;
-        }
-    }
-    else
-    {
-
-        while (i < labelLength)
-        {
-            if (!isalnum(s[i]))
-                return yieldError(illegalLabelNameUseOfCharacters);
-
-            i++;
-        }
-    }
-
-    return True;
 }
 
 void updateFinalSymbolTableValuesAndCountEntriesAndExternals()

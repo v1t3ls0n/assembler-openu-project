@@ -257,13 +257,12 @@ Bool parseSingleLine(char *line)
 void parseAssemblyCode(FILE *fp, char *filename)
 {
     State (*globalState)() = &getGlobalState;
+    void (*setGlobalState)() = &updateGlobalState;
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-    State nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
-    /*     (*setFileName)(filename);
-     */
+    State nextState;
     (*setCurrentLineToStart)();
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
@@ -308,7 +307,9 @@ void parseAssemblyCode(FILE *fp, char *filename)
     }
 
     if (!isValidCode)
-        nextState = collectErrors;
+        nextState = assemblyCodeFailedToCompile;
+    else
+        nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
-    updateGlobalState(nextState);
+    (*setGlobalState)(nextState);
 }
