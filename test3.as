@@ -8,7 +8,7 @@ inc r6
 mov r3, W
 sub r1, r4
 bne END
-cmp 53.5,$$%
+cmp #53 ,    #43
 bne END[r15]
 dec K
 .entry MAIN

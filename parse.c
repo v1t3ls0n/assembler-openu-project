@@ -257,6 +257,7 @@ Bool parseSingleLine(char *line)
 void parseAssemblyCode(FILE *fp, char *filename)
 {
     State (*globalState)() = &getGlobalState;
+    void (*setGlobalState)() = &updateGlobalState;
     int c = 0;
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
@@ -310,5 +311,5 @@ void parseAssemblyCode(FILE *fp, char *filename)
     if (!isValidCode)
         nextState = collectErrors;
 
-    updateGlobalState(nextState);
+    (*setGlobalState)(nextState);
 }
