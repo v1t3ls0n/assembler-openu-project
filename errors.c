@@ -13,7 +13,7 @@ void yieldWarningIntoFile(Warning err)
         isWarningFileExist = True;
     }
 
-    fprintf(warningsFile, "\n###################################\n");
+    fprintf(warningsFile, "\n######################################################################\n");
     fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
     {
@@ -46,7 +46,7 @@ void yieldWarningIntoFile(Warning err)
     }
 
     fprintf(warningsFile, "\n");
-    fprintf(warningsFile, "###################################\n\n");
+    fprintf(warningsFile, "######################################################################\n\n");
 }
 void yieldErrorIntoFile(Error err)
 {
@@ -56,7 +56,7 @@ void yieldErrorIntoFile(Error err)
         errorsFile = fopen("errors.log", "w+");
         isErrorFileExist = True;
     }
-    fprintf(errorsFile, "\n###################################\n");
+    fprintf(errorsFile, "\n######################################################################\n");
     fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
     switch (err)
@@ -261,12 +261,12 @@ void yieldErrorIntoFile(Error err)
         break;
     }
     fprintf(errorsFile, "\n");
-    fprintf(errorsFile, "###################################\n");
+    fprintf(errorsFile, "######################################################################\n");
 }
 Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
-    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "\n######################################################################\n");
     fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
     switch (err)
     {
@@ -299,14 +299,14 @@ Bool yieldWarning(Warning err)
     }
 
     fprintf(stderr, "\n");
-    fprintf(stderr, "###################################\n\n");
+    fprintf(stderr, "######################################################################\n\n");
     return True;
 }
 
 Bool yieldError(Error err)
 {
     yieldErrorIntoFile(err);
-    fprintf(stderr, "\n###################################\n");
+    fprintf(stderr, "\n######################################################################\n");
     fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
 
     switch (err)
@@ -511,7 +511,7 @@ Bool yieldError(Error err)
         break;
     }
     fprintf(stderr, "\n");
-    fprintf(stderr, "###################################\n");
+    fprintf(stderr, "######################################################################\n");
 
     return False;
 }

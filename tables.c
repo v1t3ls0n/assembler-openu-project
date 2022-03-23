@@ -371,17 +371,6 @@ Bool isLabelNameAlreadyTaken(char *name, ItemType type)
     return False;
 }
 
-Item *removeFromTable(char *name, ItemType type)
-{
-    Item *p = lookup(name, type);
-    if (p->next)
-        p = p->next;
-    else
-        p = NULL;
-
-    return p;
-}
-
 Item *updateSymbolAddressValue(char *name, int newValue)
 {
     Item *p = getSymbol(name);
