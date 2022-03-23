@@ -262,9 +262,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
     int i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
-    State nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
-    /*     (*setFileName)(filename);
-     */
+    State nextState;
     (*setCurrentLineToStart)();
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
@@ -310,6 +308,8 @@ void parseAssemblyCode(FILE *fp, char *filename)
 
     if (!isValidCode)
         nextState = collectErrors;
+    else
+        nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
     (*setGlobalState)(nextState);
 }
