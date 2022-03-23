@@ -1,5 +1,5 @@
 clear
-rm -rf *.log *.am *.ob *.ent *.ext *.warnings *.warnings.warnings *.errors *.errors.errors  
+rm -rf ./_tests/good_code/code/*.log ./_tests/good_code/code/*.am ./_tests/good_code/code/*.ob ./_tests/good_code/code/*.ent ./_tests/good_code/code/*.ext ./_tests/good_code/code/*.warnings ./_tests/good_code/code/*.warnings.warnings ./_tests/good_code/code/*.errors ./_tests/good_code/code/*.errors.errors  
 make 
-./compiler test test2 test3 
+./compiler ./_tests/good_code/code/test1 ./_tests/good_code/code/test2 ./_tests/good_code/code/test3 
 rm -f compiler

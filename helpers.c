@@ -1,4 +1,14 @@
 #include "data.h"
+char *cloneString(char *s)
+{
+    char *copy;
+    if (!(*s))
+        return "";
+    copy = calloc(strlen(s), sizeof(char));
+    strcpy(copy, s);
+    return copy;
+}
+
 char *trimFromLeft(char *s)
 {
     while (isspace(*s))
