@@ -86,9 +86,12 @@ void handleSingleSourceFile(char *arg)
                 if (areExternalsExist())
                     initExternalOperandsList();
                 parseAssemblyCode(expandedSrc, fileName);
-                resetMemory();
+
                 if ((*globalState)() == exportFiles)
+                {
                     exportFilesMainHandler(arg);
+                    resetMemory();
+                }
                 else
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
