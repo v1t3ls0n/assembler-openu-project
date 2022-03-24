@@ -2,7 +2,7 @@
 /* Shared global State variables*/
 
 extern int firstRunParsing(FILE *fp, char *filename);
-extern Bool parseSingleLine(char *line);
+extern Bool parseSingleLine(char *line, FILE *fp);
 void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 
 extern void initTablesArrays();

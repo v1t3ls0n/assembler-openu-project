@@ -13,6 +13,10 @@ extern Bool isMacroOpening(char *s);
 extern Bool isMacroClosing(char *s);
 extern Bool isLegalMacroName(char *s);
 
+extern Item *addMacro(char *name, int start, int end);
+extern Item *updateMacro(char *name, int start, int end);
+extern Item *getMacro(char *s);
+
 /* extern State getGlobalState();
  */
 
@@ -171,20 +175,32 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
-ParseState handleState(char *token, char *line)
+ParseState handleState(char *token, char *line, FILE *fp)
 {
     State (*globalState)() = &getGlobalState;
 
     if ((*globalState)() == parsingMacros)
     {
+        static char macroName[MAX_LABEL_LEN] = {0};
         printf("inside handleState while parsingMacros\n");
         if (isMacroOpening(token))
         {
+            char *next = strtok(NULL, " \t \n");
+            long start;
             printf("is macro opening!\n");
+            if (!*next)
+                return Err;
+            start = ftell(fp) + strlen(next);
+            strcpy(macroName, token);
+            addMacro(macroName, start, -1);
         }
         else if (isMacroClosing(token))
         {
+            long end = ftell(fp);
             printf("is macro closing!\n");
+            end += strlen(token) + 1;
+            updateMacro(macroName, -1, end);
+            memset(macroName, 0, MAX_LABEL_LEN);
         }
         else if (isPossiblyUseOfMacro(token))
         {
@@ -192,7 +208,7 @@ ParseState handleState(char *token, char *line)
         }
         else
         {
-            printf("is lineParsedSuccessfully!\n");
+            /* printf("is lineParsedSuccessfully!\n"); */
             return lineParsedSuccessfully;
         }
     }
@@ -215,7 +231,7 @@ ParseState handleState(char *token, char *line)
                 if ((*globalState)() == firstRun)
                     return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
                 else
-                    return handleState(next, line + strlen(token) + 1);
+                    return handleState(next, line + strlen(token) + 1, fp);
             }
         }
 
@@ -266,7 +282,7 @@ ParseState handleState(char *token, char *line)
     return Err;
 }
 
-Bool parseSingleLine(char *line)
+Bool parseSingleLine(char *line, FILE *fp)
 {
     State (*globalState)() = &getGlobalState;
     ParseState state = newLine;
@@ -274,7 +290,7 @@ Bool parseSingleLine(char *line)
     char *token;
     memcpy(lineCopy, line, strlen(line));
     token = ((*globalState)() == firstRun || (*globalState)() == parsingMacros) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
-    state = handleState(token, line);
+    state = handleState(token, line, fp);
     (*currentLineNumberPlusPlus)();
 
     return state == lineParsedSuccessfully
@@ -313,7 +329,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
 
         if (c == '\n' && i > 0)
         {
-            if (!parseSingleLine(line))
+            if (!parseSingleLine(line, fp))
                 isValidCode = False;
 
             memset(line, 0, MAX_LINE_LEN);
@@ -333,7 +349,7 @@ void parseAssemblyCode(FILE *fp, char *filename)
 
     if (i > 0)
     {
-        if (!parseSingleLine(line))
+        if (!parseSingleLine(line, fp))
             isValidCode = False;
     }
 

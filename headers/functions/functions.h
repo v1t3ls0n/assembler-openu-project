@@ -52,7 +52,7 @@ void addWord(int value, DataType type);
 
 int handleSourceFiles(int argc, char *argv[]);
 void parseAssemblyCode(FILE *fp, char *filename);
-ParseState handleState(char *token, char *line);
+ParseState handleState(char *token, char *line, FILE *fp);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -158,7 +158,7 @@ char *cloneString(char *s);
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
-Bool parseSingleLine(char *line);
+Bool parseSingleLine(char *line, FILE *fp);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
@@ -200,7 +200,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line);
+ParseState handleState(char *token, char *line, FILE *fp);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);
