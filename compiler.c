@@ -23,6 +23,7 @@ void handleSingleSourceFile(char *arg);
 
 int main(int argc, char *argv[])
 {
+
     handleSourceFiles(argc, argv);
 
     return 0;
@@ -71,7 +72,6 @@ void handleSingleSourceFile(char *arg)
         sscanf(arg, "%s", fileName);
         (*setFileName)(fileName);
     }
-    printf("inside compiler line 74\n");
     if ((fptr = fopen(strcat(arg, ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
@@ -81,7 +81,7 @@ void handleSingleSourceFile(char *arg)
     expandedSrc = fopen(arg, "w+");
     if (expandedSrc == NULL)
     {
-        /* fclose(fptr); */
+        fclose(fptr);
         /*         updateGlobalState(goToNextFileOrEndProgram); */
     }
     else
@@ -97,7 +97,7 @@ void handleSingleSourceFile(char *arg)
             parseAssemblyCode(expandedSrc, fileName);
             if ((*globalState)() == secondRun)
             {
-                /*        rewind(expandedSrc); */
+                rewind(expandedSrc);
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();
