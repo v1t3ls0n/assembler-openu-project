@@ -3,9 +3,8 @@
 .extern W
                                 MAIN: add r3, LIST                                                  
 LOOP: prn #48
-macro m1
- inc r6
- mov r3, W
+macro m1dsfs
+    ; macro m1 content
 endm
 lea STR, r6
 inc r6
@@ -19,12 +18,11 @@ dec K
 sub LOOP[r10] ,r14
 END: stop
 STR: .string "abcd"
+m1
 LIST: .data 6, -9
 .data -100
 .entry K
 K: .data 31
 .extern val1
 
-m1
-
-m1
+m1dsfs

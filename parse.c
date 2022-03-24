@@ -186,28 +186,23 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
         /*     if ((d = fgetc((*source)()) != EOF))
                 fgetc((*source)()); */
         if (!isReadingMacro)
-        {
-            fprintf(fptrs->expanded, "%s", token);
-            fputc(fgetc(fptrs->src), fptrs->expanded);
-        }
+            fprintf(fptrs->expanded, "%s\n", line);
+
         if (isMacroOpening(token))
         {
-            long start = ftell(fptrs->src) + strlen(token);
-            char *next = strtok(NULL, " \t \n");
+            long start = ftell(fptrs->src) + strlen(token) - 1;
+            char *next = strtok(NULL, " \t \n"), c;
             if (!*next)
                 return Err;
-            printf("start:%d\n", (int)start);
-            /*      fseek((*source)(), start, SEEK_SET); */
             strcpy(macroName, next);
             addMacro(macroName, start, -1);
             isReadingMacro = True;
+            fseek(fptrs->expanded, -strlen(line) - 1, SEEK_END);
         }
         else if (isMacroClosing(token))
         {
-            long end = ftell(fptrs->src) - strlen(token);
-            printf("is macro closing!\n");
-            printf("end:%d\n", (int)end);
-            /*             fseek(fp, lastPos, SEEK_SET); */
+            long end = ftell(fptrs->src) - strlen(token) - 1;
+            int c, toDelete = 0;
             updateMacro(macroName, -1, end);
             memset(macroName, 0, MAX_LABEL_LEN);
             isReadingMacro = False;
@@ -218,26 +213,24 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
             printf("is Possibly Use Of Macro!\n");
             if (p != NULL)
             {
-                /*           int c, d, toCopy = p->val.m.start - p->val.m.end;
-                          long lastPosition; */
-                /*          lastPosition = ftell((*source)()); */
-                printf("use of macro!\nmacro name:%s\n", p->name);
-                /*                 fseek((*source)(), p->val.m.start, SEEK_SET);
-                                fseek(fp, -strlen(token), SEEK_CUR);
-                                while ((c = fgetc((*source)()) != EOF) && (d = fgetc(fp) != EOF) && toCopy--)
-                                {
-                                    printf("inside line 229\n");
-                                    putc(c, fp);
-                                }
+                int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
+                long lastPosition;
+                lastPosition = ftell(fptrs->src);
+                fseek(fptrs->src, p->val.m.start, SEEK_SET);
+                fseek(fptrs->expanded, -toDelete - 1, SEEK_CUR);
 
-                                fseek((*source)(), lastPosition, SEEK_SET); */
+                while (toCopy > 0)
+                {
+                    c = fgetc(fptrs->src);
+                    fputc(c, fptrs->expanded);
+                    --toCopy;
+                }
+
+                fseek(fptrs->src, lastPosition, SEEK_SET);
             }
         }
         else
-        {
-            /* printf("is lineParsedSuccessfully!\n"); */
-        }
-        return lineParsedSuccessfully;
+            return lineParsedSuccessfully;
     }
 
     else
@@ -341,13 +334,14 @@ void parseAssemblyCode(assemblyCode *fptrs)
     else if ((*globalState)() == firstRun)
         printf("\n\n\nFirst Run:\n");
     else
-    {
         printf("\n\n\nParsing Macros:\n");
-    }
 
-    while (((c = fgetc(fptrs->src)) != EOF))
+    while (((c = (*globalState)() == parsingMacros ? fgetc(fptrs->src) : fgetc(fptrs->expanded)) != EOF))
     {
-
+        /*         if ((*globalState)() == parsingMacros)
+                {
+                    fputc(c, fptrs->expanded);
+                } */
         if ((*globalState)() == firstRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
 

@@ -86,9 +86,9 @@ void handleSingleSourceFile(char *arg)
     {
 
         initTablesArrays();
-        copyToNewFile(fptrs->src, fptrs->expanded);
-        rewind(fptrs->src);
-        rewind(fptrs->expanded);
+        /*         copyToNewFile(fptrs->src, fptrs->expanded);
+                rewind(fptrs->src);
+                rewind(fptrs->expanded); */
         parseAssemblyCode(fptrs);
         printMacroTable();
 
