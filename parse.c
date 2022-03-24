@@ -352,16 +352,15 @@ void parseAssemblyCode(assemblyCode *fptrs)
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
+        /*         if ((*globalState)() == parsingMacros)
+                    line[i++] = c;
+             */
 
-        else if (isspace(c) && i > 0)
-        {
+        if (isspace(c) && i > 0)
             line[i++] = ' ';
-        }
-        else
-        {
-            if (isprint(c) && !isspace(c))
-                line[i++] = c;
-        }
+
+        else if (isprint(c) && !isspace(c))
+            line[i++] = c;
     }
 
     if (i > 0)
