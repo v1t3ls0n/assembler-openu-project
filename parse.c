@@ -181,13 +181,8 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
     {
         static char macroName[MAX_LABEL_LEN] = {0};
         static Bool isReadingMacro = False;
-        /*         fseek((*source)(), start, SEEK_SET); */
-        /*     printf("inside handleState while parsingMacros\ntoken:%s\n", token); */
-        /*     if ((d = fgetc((*source)()) != EOF))
-                fgetc((*source)()); */
         if (!isReadingMacro)
             fprintf(fptrs->expanded, "%s\n", line);
-
         if (isMacroOpening(token))
         {
             long start = ftell(fptrs->src) + strlen(token) - 1;
@@ -210,7 +205,6 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
         else if (isPossiblyUseOfMacro(token))
         {
             Item *p = getMacro(token);
-            printf("is Possibly Use Of Macro!\n");
             if (p != NULL)
             {
                 int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
@@ -218,7 +212,6 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
                 lastPosition = ftell(fptrs->src);
                 fseek(fptrs->src, p->val.m.start, SEEK_SET);
                 fseek(fptrs->expanded, -toDelete - 1, SEEK_CUR);
-
                 while (toCopy > 0)
                 {
                     c = fgetc(fptrs->src);
