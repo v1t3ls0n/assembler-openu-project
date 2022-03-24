@@ -182,35 +182,44 @@ ParseState handleState(char *token, char *line, FILE *fp)
     if ((*globalState)() == parsingMacros)
     {
         static char macroName[MAX_LABEL_LEN] = {0};
-        printf("inside handleState while parsingMacros\n");
+        printf("inside handleState while parsingMacros\ntoken:%s\n", token);
         if (isMacroOpening(token))
         {
             char *next = strtok(NULL, " \t \n");
             long start;
-            printf("is macro opening!\n");
+            /*             printf("is macro opening!\n");
+             */
             if (!*next)
                 return Err;
             start = ftell(fp) + strlen(next);
-            strcpy(macroName, token);
+            strcpy(macroName, next);
             addMacro(macroName, start, -1);
         }
         else if (isMacroClosing(token))
         {
             long end = ftell(fp);
-            printf("is macro closing!\n");
+            /*            printf("is macro closing!\n"); */
             end += strlen(token) + 1;
             updateMacro(macroName, -1, end);
             memset(macroName, 0, MAX_LABEL_LEN);
         }
         else if (isPossiblyUseOfMacro(token))
         {
+            Item *p = getMacro(token);
             printf("is Possibly Use Of Macro!\n");
+            if (p != NULL)
+            {
+                long current = ftell(fp);
+                printf("use of macro!\nmacro name:%s\n", p->name);
+                /*             fseek(fp, start, SEEK_SET);
+                            fseek(target, 0, SEEK_CUR); */
+            }
         }
         else
         {
             /* printf("is lineParsedSuccessfully!\n"); */
-            return lineParsedSuccessfully;
         }
+        return lineParsedSuccessfully;
     }
 
     else
