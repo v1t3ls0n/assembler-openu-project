@@ -87,8 +87,8 @@ void handleSingleSourceFile(char *arg)
     else
     {
         createExpandedSourceFile(fptr, expandedSrc, fileName);
-        rewind(expandedSrc);
-        printMacroTable();
+        /*         rewind(expandedSrc);
+                printMacroTable(); */
 
         if ((*globalState)() == firstRun)
         {

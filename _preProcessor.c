@@ -45,7 +45,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         if (c == '\n')
         {
             (*currentLineNumberPlusPlus)();
-            if ((state == findStartOfMacroContent || state == getMacroName))
+            if ((state == findStartOfMacroContent || state == parsingMacroName))
             {
                 start = ftell(source) - 1;
                 state = findEndOfMacroContent;
@@ -84,7 +84,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                     }
                 }
 
-                if (state == getMacroName)
+                if (state == parsingMacroName)
                 {
                     if (isLegalMacroName(macroName))
                     {
@@ -106,7 +106,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
                     if (isMacroOpening(token))
                     {
                         printf("inside is macro opening\n");
-                        state = getMacroName;
+                        state = parsingMacroName;
                     }
 
                     else if (isPossiblyUseOfMacro(token))
@@ -136,7 +136,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
         }
         else if (!isspace(c))
         {
-            if (state == getMacroName)
+            if (state == parsingMacroName)
                 macroName[i++] = c;
             if (state == evalToken)
                 token[j++] = c;
@@ -146,7 +146,7 @@ void parseAndReplaceMacros(FILE *source, FILE *target)
     }
 
     /*
-        if (offsetCounter && (state == evalToken || state == getMacroName))
+        if (offsetCounter && (state == evalToken || state == parsingMacroName))
         {
             if (isMacroOpening(token) || isMacroClosing(token))
             {

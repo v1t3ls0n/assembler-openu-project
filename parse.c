@@ -169,74 +169,77 @@ Bool countAndVerifyStringArguments(char *token)
 ParseState handleState(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-
-    if (isComment(token))
-        return lineParsedSuccessfully;
-
-    if (isLabelDeclaration(token))
-    {
-        if (strlen(token) == 1)
-            yieldError(illegalLabelDeclaration);
-        else
-        {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-            if (!next)
-                return yieldError(emptyLabelDecleration);
-
-            if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
-            else
-                return handleState(next, line + strlen(token) + 1);
-        }
-    }
-
-    else if (isInstruction(token))
-    {
-
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-        int type = getInstructionType(token);
-        if (!next)
-        {
-            if (type == _TYPE_DATA || type == _TYPE_STRING)
-                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
-            else
-                return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
-        }
-        else
-        {
-            if ((*globalState)() == firstRun)
-                return handleInstruction(type, token, next, line);
-            else
-            {
-                if (type == _TYPE_DATA)
-                    return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
-                else if (type == _TYPE_STRING)
-                    return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
-                else
-                    return lineParsedSuccessfully;
-            }
-        }
-    }
-
-    else if (isOperation(token))
-    {
-        char args[MAX_LINE_LEN] = {0};
-        strcpy(args, (line + strlen(token)));
-        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
-                                                                                                               : Err;
-    }
-
-    else if ((*globalState)() == parsingMacros)
+    if ((*globalState)() == parsingMacros)
     {
         printf("inside handleState while parsingMacros\nline:%s\ntoken:%s\n", line, token);
     }
+
     else
     {
+        if (isComment(token))
+            return lineParsedSuccessfully;
 
-        if (strlen(token) > 1)
-            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+        if (isLabelDeclaration(token))
+        {
+            if (strlen(token) == 1)
+                yieldError(illegalLabelDeclaration);
+            else
+            {
+                char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+                if (!next)
+                    return yieldError(emptyLabelDecleration);
+
+                if ((*globalState)() == firstRun)
+                    return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
+                else
+                    return handleState(next, line + strlen(token) + 1);
+            }
+        }
+
+        else if (isInstruction(token))
+        {
+
+            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+            int type = getInstructionType(token);
+            if (!next)
+            {
+                if (type == _TYPE_DATA || type == _TYPE_STRING)
+                    return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+                else
+                    return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
+            }
+            else
+            {
+                if ((*globalState)() == firstRun)
+                    return handleInstruction(type, token, next, line);
+                else
+                {
+                    if (type == _TYPE_DATA)
+                        return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
+                    else if (type == _TYPE_STRING)
+                        return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
+                    else
+                        return lineParsedSuccessfully;
+                }
+            }
+        }
+
+        else if (isOperation(token))
+        {
+            char args[MAX_LINE_LEN] = {0};
+            strcpy(args, (line + strlen(token)));
+            return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
+                                                                                                                   : Err;
+        }
+
         else
-            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+        {
+
+            if (strlen(token) > 1)
+                yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            else
+                yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+        }
     }
 
     return Err;
