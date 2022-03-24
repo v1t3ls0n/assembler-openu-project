@@ -20,23 +20,24 @@ void setFileNamePath(char *s)
     printf("inside setFileNamePath, s:%s\n", s);
     if (!(*s))
     {
-        /*      memset(path, 0, strlen(path)); */
+        memset(path, 0, strlen(path));
         return;
     }
     /*     length = strlen(s) - strlen(currentFileName); */
-    path = (char *)realloc(path, strlen(s) * sizeof(char));
+    path = (char *)realloc(path, strlen(s) * sizeof(char *));
     strcpy(path, cloneString(s));
 }
 
 char *getFileNamePath(char *s)
 {
-    if (!(*s))
-        return "";
+    /*     if (!(*s))
+            return ""; */
     return cloneString(path);
 }
 
 void setCurrentFileName(char *s)
 {
+    printf("s:%s\n", s);
     currentFileName = (char *)realloc(currentFileName, strlen(s) * sizeof(char));
     strcpy(currentFileName, cloneString(s));
 }

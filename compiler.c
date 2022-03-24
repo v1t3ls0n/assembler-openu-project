@@ -57,23 +57,23 @@ void handleSingleSourceFile(char *arg)
     char *fileName = calloc(strlen(arg) + 3, sizeof(char *));
     void (*setFileName)(char *) = &setCurrentFileName;
     void (*setPath)(char *) = &setFileNamePath;
-    if (strrchr(arg, '/'))
+    if (strstr(arg, "./"))
     {
         char *s;
         s = strrchr(arg, '/');
         s++;
         sscanf(s, "%s", fileName);
-        (*setFileName)(fileName);
+        (*setFileName)(strcat(fileName, ".as"));
         s = strchr(arg, '.');
         (*setPath)(s);
     }
     else
     {
-        sscanf(arg, "%s", fileName);
-        (*setPath)(arg);
-        (*setFileName)(fileName);
+        (*setPath)(strcat(arg, ".as"));
     }
-    if ((fptr = fopen(strcat(arg, ".as"), "r")) == NULL)
+    sscanf(arg, "%s", fileName);
+
+    if ((fptr = fopen(strcat(fileName, ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
         return;
