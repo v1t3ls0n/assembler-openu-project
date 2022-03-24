@@ -14,29 +14,32 @@ State getGlobalState()
 static char *currentFileName;
 static char *path;
 
-FILE *getSourceFilePointer()
+void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode)
 {
-    FILE *source;
-    if ((source = fopen(strcat(getFileNamePath(), ".as"), "r")) == NULL)
+
+    if ((userCode->src = fopen(strcat(cloneString(fileName), ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
-        return NULL;
+        return;
     }
-    return source;
+
+    if ((userCode->expanded = fopen(strcat(cloneString(fileName), ".am"), "w+")) == NULL)
+    {
+        yieldError(fileCouldNotBeOpened);
+        return;
+    }
 }
 
 void setFileNamePath(char *s)
 {
     /*    size_t length; */
     printf("inside setFileNamePath, s:%s\n", s);
-    if (!(*s))
-    {
-        memset(path, 0, strlen(path));
-        return;
-    }
+
     /*     length = strlen(s) - strlen(currentFileName); */
-    path = (char *)realloc(path, strlen(s) * sizeof(char *));
+
+    path = (char *)realloc(path, strlen(s) * sizeof(char));
     strcpy(path, cloneString(s));
+    printf("inside setFileNamePath, path:%s\n", path);
 }
 
 char *getFileNamePath()

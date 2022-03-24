@@ -173,37 +173,44 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
-ParseState handleState(char *token, char *line, FILE *fp)
+ParseState handleState(char *token, char *line, assemblyCode *fptrs)
 {
     State (*globalState)() = &getGlobalState;
 
     if ((*globalState)() == parsingMacros)
     {
         static char macroName[MAX_LABEL_LEN] = {0};
-        FILE *(*source)() = &getSourceFilePointer;
-
-        printf("inside handleState while parsingMacros\ntoken:%s\n", token);
+        static Bool isReadingMacro = False;
+        /*         fseek((*source)(), start, SEEK_SET); */
+        /*     printf("inside handleState while parsingMacros\ntoken:%s\n", token); */
+        /*     if ((d = fgetc((*source)()) != EOF))
+                fgetc((*source)()); */
+        if (!isReadingMacro)
+        {
+            fprintf(fptrs->expanded, "%s", token);
+            fputc(fgetc(fptrs->src), fptrs->expanded);
+        }
         if (isMacroOpening(token))
         {
+            long start = ftell(fptrs->src) + strlen(token);
             char *next = strtok(NULL, " \t \n");
-            long start;
-            /*             printf("is macro opening!\n");
-             */
             if (!*next)
                 return Err;
-            start = ftell(fp) + strlen(next);
-            fseek((*source)(), start, SEEK_SET);
+            printf("start:%d\n", (int)start);
+            /*      fseek((*source)(), start, SEEK_SET); */
             strcpy(macroName, next);
             addMacro(macroName, start, -1);
+            isReadingMacro = True;
         }
         else if (isMacroClosing(token))
         {
-            long end = ftell(fp);
-            /*            printf("is macro closing!\n"); */
-            end += strlen(token) + 1;
-            fseek((*source)(), end, SEEK_SET);
+            long end = ftell(fptrs->src) - strlen(token);
+            printf("is macro closing!\n");
+            printf("end:%d\n", (int)end);
+            /*             fseek(fp, lastPos, SEEK_SET); */
             updateMacro(macroName, -1, end);
             memset(macroName, 0, MAX_LABEL_LEN);
+            isReadingMacro = False;
         }
         else if (isPossiblyUseOfMacro(token))
         {
@@ -211,10 +218,19 @@ ParseState handleState(char *token, char *line, FILE *fp)
             printf("is Possibly Use Of Macro!\n");
             if (p != NULL)
             {
-                long current = ftell((*source)());
+                /*           int c, d, toCopy = p->val.m.start - p->val.m.end;
+                          long lastPosition; */
+                /*          lastPosition = ftell((*source)()); */
                 printf("use of macro!\nmacro name:%s\n", p->name);
-                /*             fseek(fp, start, SEEK_SET);
-                            fseek(target, 0, SEEK_CUR); */
+                /*                 fseek((*source)(), p->val.m.start, SEEK_SET);
+                                fseek(fp, -strlen(token), SEEK_CUR);
+                                while ((c = fgetc((*source)()) != EOF) && (d = fgetc(fp) != EOF) && toCopy--)
+                                {
+                                    printf("inside line 229\n");
+                                    putc(c, fp);
+                                }
+
+                                fseek((*source)(), lastPosition, SEEK_SET); */
             }
         }
         else
@@ -242,7 +258,7 @@ ParseState handleState(char *token, char *line, FILE *fp)
                 if ((*globalState)() == firstRun)
                     return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
                 else
-                    return handleState(next, line + strlen(token) + 1, fp);
+                    return handleState(next, line + strlen(token) + 1, fptrs);
             }
         }
 
@@ -293,7 +309,7 @@ ParseState handleState(char *token, char *line, FILE *fp)
     return Err;
 }
 
-Bool parseSingleLine(char *line, FILE *fp)
+Bool parseSingleLine(char *line, assemblyCode *fptrs)
 {
     State (*globalState)() = &getGlobalState;
     ParseState state = newLine;
@@ -301,7 +317,7 @@ Bool parseSingleLine(char *line, FILE *fp)
     char *token;
     memcpy(lineCopy, line, strlen(line));
     token = ((*globalState)() == firstRun || (*globalState)() == parsingMacros) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
-    state = handleState(token, line, fp);
+    state = handleState(token, line, fptrs);
     (*currentLineNumberPlusPlus)();
 
     return state == lineParsedSuccessfully
@@ -309,17 +325,14 @@ Bool parseSingleLine(char *line, FILE *fp)
                : False;
 }
 
-void parseAssemblyCode(FILE *fp)
+void parseAssemblyCode(assemblyCode *fptrs)
 {
     State (*globalState)() = &getGlobalState;
     void (*setGlobalState)() = &updateGlobalState;
-    int c = 0;
-    int i = 0;
+    int c = 0, i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState;
-    char *(*file)() = &getCurrentFileName;
-    char *(*path)() = &getFileNamePath;
 
     (*setCurrentLineToStart)();
 
@@ -330,12 +343,11 @@ void parseAssemblyCode(FILE *fp)
     else
     {
         printf("\n\n\nParsing Macros:\n");
-        printf("filePath:%s\n", (*path)());
-        printf("fileName:%s\n", (*file)());
     }
 
-    while (((c = fgetc(fp)) != EOF))
+    while (((c = fgetc(fptrs->src)) != EOF))
     {
+
         if ((*globalState)() == firstRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
 
@@ -347,7 +359,7 @@ void parseAssemblyCode(FILE *fp)
 
         if (c == '\n' && i > 0)
         {
-            if (!parseSingleLine(line, fp))
+            if (!parseSingleLine(line, fptrs))
                 isValidCode = False;
 
             memset(line, 0, MAX_LINE_LEN);
@@ -367,7 +379,7 @@ void parseAssemblyCode(FILE *fp)
 
     if (i > 0)
     {
-        if (!parseSingleLine(line, fp))
+        if (!parseSingleLine(line, fptrs))
             isValidCode = False;
     }
 

@@ -1,4 +1,5 @@
 #include "constants.h"
+#include "../lib/lib.h"
 
 typedef struct
 {
@@ -93,3 +94,9 @@ typedef struct
     } val;
     void *next;
 } Item;
+
+typedef struct
+{
+    FILE *src;
+    FILE *expanded;
+} assemblyCode;

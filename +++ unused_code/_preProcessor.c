@@ -1,7 +1,7 @@
 
 
 #include "data.h"
-extern void parseAssemblyCode(FILE *fp);
+extern void parseAssemblyCode(assemblyCode *fptrs);
 
 extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);
@@ -269,7 +269,8 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 
     /*     parseAndReplaceMacros(source, target); */
     copyToNewFile(source, target);
-    fclose(source);
+    /*  fclose(source); */
+    rewind(source);
     rewind(target);
     parseAssemblyCode(target);
     /*     rewind(target); */
