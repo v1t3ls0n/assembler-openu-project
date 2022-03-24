@@ -1,7 +1,7 @@
 
 
 #include "data.h"
-extern void parseAssemblyCode(assemblyCode *fptrs);
+extern void parseAssemblyCode(FILE *src, ...);
 
 extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);

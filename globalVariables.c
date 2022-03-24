@@ -1,4 +1,5 @@
 #include "data.h"
+
 extern char *cloneString(char *s);
 static State globalState = startProgram;
 void updateGlobalState(State new)
@@ -18,6 +19,8 @@ void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode)
 {
     userCode->src = (FILE *)malloc(sizeof(FILE *));
     userCode->expanded = (FILE *)malloc(sizeof(FILE *));
+
+    printf("fileName:%s\n", fileName);
     if ((userCode->src = fopen(strcat(cloneString(fileName), ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
@@ -45,8 +48,7 @@ void setFileNamePath(char *s)
 
 char *getFileNamePath()
 {
-    /*     if (!(*s))
-            return ""; */
+
     return cloneString(path);
 }
 

@@ -9,6 +9,7 @@ static FILE *warningsFile, *errorsFile;
 void yieldWarningIntoFile(Warning err)
 {
     static Bool isWarningFileExist = False;
+    printf("in errors.c line 12\n");
     if (!isWarningFileExist)
     {
         warningsFile = fopen("warnings.log", "w+");
@@ -56,7 +57,6 @@ void yieldErrorIntoFile(Error err)
     if (!isErrorFileExist)
     {
         errorsFile = fopen("errors.log", "w+");
-
         isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");

@@ -5,7 +5,7 @@ extern void setCurrentFileName(char *s);
 extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
 
 /* from firstRun.c */
-extern Bool parseSingleLine(char *line, assemblyCode *fptrs);
+extern Bool parseSingleLine(char *line, ...);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
 extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 extern int getInstructionType(char *s);
@@ -31,10 +31,10 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern void parseAssemblyCode(assemblyCode *fptrs);
+extern void parseAssemblyCode(FILE *src, ...);
 
-extern ParseState handleState(char *token, char *line, assemblyCode *fptrs);
-extern Bool parseSingleLine(char *line, assemblyCode *fptrs);
+extern ParseState handleState(char *token, char *line, ...);
+extern Bool parseSingleLine(char *line, ...);
 
 Bool writeOperationBinary(char *operationName, char *args)
 {
