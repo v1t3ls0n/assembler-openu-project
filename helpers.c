@@ -15,6 +15,15 @@ char *trimFromLeft(char *s)
         s++;
     return s;
 }
+
+char *trimFromRight(char *s)
+{
+    long offset = strlen(s) - 1;
+    s += offset;
+    while (isspace(*s))
+        s--;
+    return s;
+}
 int countSpaceCharacters(char *s)
 {
     int i = 0;

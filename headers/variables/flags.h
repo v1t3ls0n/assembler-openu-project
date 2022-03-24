@@ -112,18 +112,19 @@ typedef enum
     writingDataIntoMemoryImg = 20,
 
     skipLine,
+    writeToTargetFile,
     evalToken,
     readToken,
     saveCharToToken,
     deleteMacroFromTarget,
     deleteLastLine,
-    getMacroName,
+    parsingMacroName,
     searchingMacroStart,
     searchingMacroEnd,
     addMacroToTable,
     replaceMacro,
-    readingMacro,
-    readingToken,
+    parsingMacroContent,
+    parsingToken,
     replacingMacro
 
 } ParseState;

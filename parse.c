@@ -225,8 +225,14 @@ ParseState handleState(char *token, char *line)
         return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
                                                                                                                : Err;
     }
+
+    else if ((*globalState)() == parsingMacros)
+    {
+        printf("inside handleState while parsingMacros\nline:%s\ntoken:%s\n", line, token);
+    }
     else
     {
+
         if (strlen(token) > 1)
             yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
@@ -245,7 +251,7 @@ Bool parseSingleLine(char *line)
     /*     printf("inside parse single line, line:%s\n", line);
      */
     memcpy(lineCopy, line, strlen(line));
-    token = (*globalState)() == firstRun ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    token = ((*globalState)() == firstRun || (*globalState)() == parsingMacros) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = handleState(token, line);
     (*currentLineNumberPlusPlus)();
 
@@ -266,12 +272,14 @@ void parseAssemblyCode(FILE *fp, char *filename)
     (*setCurrentLineToStart)();
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
-    else
+    else if ((*globalState)() == firstRun)
         printf("\n\n\nFirst Run:\n");
+    else
+        printf("\n\n\nParsing Macros:\n");
 
     while (((c = fgetc(fp)) != EOF))
     {
-        if ((*globalState)() != secondRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
+        if ((*globalState)() == firstRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
         {
 
             isValidCode = False;
@@ -306,8 +314,10 @@ void parseAssemblyCode(FILE *fp, char *filename)
             isValidCode = False;
     }
 
-    if (!isValidCode)
+    if (!isValidCode && (*globalState)() != parsingMacros)
         nextState = assemblyCodeFailedToCompile;
+    else if ((*globalState)() == parsingMacros)
+        nextState = firstRun;
     else
         nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
