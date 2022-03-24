@@ -14,6 +14,17 @@ State getGlobalState()
 static char *currentFileName;
 static char *path;
 
+FILE *getSourceFilePointer()
+{
+    FILE *source;
+    if ((source = fopen(strcat(getFileNamePath(), ".as"), "r")) == NULL)
+    {
+        yieldError(fileCouldNotBeOpened);
+        return NULL;
+    }
+    return source;
+}
+
 void setFileNamePath(char *s)
 {
     /*    size_t length; */
@@ -28,7 +39,7 @@ void setFileNamePath(char *s)
     strcpy(path, cloneString(s));
 }
 
-char *getFileNamePath(char *s)
+char *getFileNamePath()
 {
     /*     if (!(*s))
             return ""; */

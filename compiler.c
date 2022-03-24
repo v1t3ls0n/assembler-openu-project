@@ -120,6 +120,6 @@ void handleSingleSourceFile(char *arg)
     }
 
     free(fileName);
-    fclose(fptr);
+    /*     fclose(fptr); */
     fclose(expandedSrc);
 }

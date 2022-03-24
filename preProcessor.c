@@ -269,6 +269,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 
     /*     parseAndReplaceMacros(source, target); */
     copyToNewFile(source, target);
+    fclose(source);
     rewind(target);
     parseAssemblyCode(target);
     /*     rewind(target); */

@@ -7,6 +7,7 @@ extern int countLengthOfNonDigitToken(char *s);
 static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
 /* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
+extern FILE *getSourceFilePointer();
 
 extern Bool isPossiblyUseOfMacro(char *s);
 extern Bool isMacroOpening(char *s);
@@ -179,6 +180,8 @@ ParseState handleState(char *token, char *line, FILE *fp)
     if ((*globalState)() == parsingMacros)
     {
         static char macroName[MAX_LABEL_LEN] = {0};
+        FILE *(*source)() = &getSourceFilePointer;
+
         printf("inside handleState while parsingMacros\ntoken:%s\n", token);
         if (isMacroOpening(token))
         {
@@ -189,6 +192,7 @@ ParseState handleState(char *token, char *line, FILE *fp)
             if (!*next)
                 return Err;
             start = ftell(fp) + strlen(next);
+            fseek((*source)(), start, SEEK_SET);
             strcpy(macroName, next);
             addMacro(macroName, start, -1);
         }
@@ -197,6 +201,7 @@ ParseState handleState(char *token, char *line, FILE *fp)
             long end = ftell(fp);
             /*            printf("is macro closing!\n"); */
             end += strlen(token) + 1;
+            fseek((*source)(), end, SEEK_SET);
             updateMacro(macroName, -1, end);
             memset(macroName, 0, MAX_LABEL_LEN);
         }
@@ -206,7 +211,7 @@ ParseState handleState(char *token, char *line, FILE *fp)
             printf("is Possibly Use Of Macro!\n");
             if (p != NULL)
             {
-                long current = ftell(fp);
+                long current = ftell((*source)());
                 printf("use of macro!\nmacro name:%s\n", p->name);
                 /*             fseek(fp, start, SEEK_SET);
                             fseek(target, 0, SEEK_CUR); */
@@ -315,6 +320,7 @@ void parseAssemblyCode(FILE *fp)
     State nextState;
     char *(*file)() = &getCurrentFileName;
     char *(*path)() = &getFileNamePath;
+
     (*setCurrentLineToStart)();
 
     if ((*globalState)() == secondRun)
