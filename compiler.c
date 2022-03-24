@@ -71,7 +71,7 @@ void handleSingleSourceFile(char *arg)
         sscanf(arg, "%s", fileName);
         (*setFileName)(fileName);
     }
-
+    printf("inside compiler line 74\n");
     if ((fptr = fopen(strcat(arg, ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);
@@ -81,22 +81,23 @@ void handleSingleSourceFile(char *arg)
     expandedSrc = fopen(arg, "w+");
     if (expandedSrc == NULL)
     {
-        fclose(fptr);
-        updateGlobalState(goToNextFileOrEndProgram);
+        /* fclose(fptr); */
+        /*         updateGlobalState(goToNextFileOrEndProgram); */
     }
     else
     {
+        initTablesArrays();
         createExpandedSourceFile(fptr, expandedSrc, fileName);
-        /*         rewind(expandedSrc);
-                printMacroTable(); */
+        rewind(expandedSrc);
+        printMacroTable();
 
         if ((*globalState)() == firstRun)
         {
-            initTablesArrays();
+            /*    initTablesArrays(); */
             parseAssemblyCode(expandedSrc, fileName);
             if ((*globalState)() == secondRun)
             {
-                rewind(expandedSrc);
+                /*        rewind(expandedSrc); */
                 updateFinalCountersValue();
                 printSymbolTable();
                 initMemory();

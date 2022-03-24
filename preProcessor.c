@@ -52,70 +52,70 @@ void copyToNewFile(FILE *source, FILE *target)
 }
 void handleMacros(FILE *source, FILE *target)
 {
-    ParseState state = parsingToken;
-    char line[MAX_LINE_LEN + 1] = {0};
-    char macroName[MAX_LABEL_LEN + 1] = {0};
-    char *s = 0, *e = 0, *first, *token;
-    int start = 0, end = 0;
-    int *c, offset = 0, i = 0;
+    /*    ParseState state = parsingToken;
+       char line[MAX_LINE_LEN + 1] = {0};
+       char macroName[MAX_LABEL_LEN + 1] = {0};
+       char *s = 0, *e = 0, *first, *token;
+       int start = 0, end = 0;
+       int *c, offset = 0, i = 0;
 
-    while ((fgets(line, MAX_LINE_LEN, source)) != NULL)
-    {
-        token = strtok(line, " \t \n");
+       while ((fgets(line, MAX_LINE_LEN, source)) != NULL)
+       {
+           token = strtok(line, " \t \n");
 
-        /*         i = strlen(token) - 1;
-                c = token[i];
-                printf("c:%d\n", c);
+                   i = strlen(token) - 1;
+                   c = token[i];
+                   printf("c:%d\n", c);
 
-                while (i > 0 && isprint(token[i]) && !isspace(token[i]))
-                {
-                    i--;
-                    offset++;
-                    ungetc(c, source);
-                }
-                printf("offset:%d\n", offset);
-                fgets(token, offset, source);
-                printf("token clean:%s\n", token);
-                offset = 0; */
-        s = token;
-        s = trimFromLeft(s);
-        state = evaluateToken(s, state);
-        if ((state == writeToTargetFile || state == skipLine))
-        {
-            fputs(token, target);
-            /*             memset(token, 0, MAX_LINE_LEN + 1); */
-        }
-        else
-        {
-            fseek(source, strlen(s), SEEK_CUR);
-
-            /*             if (parsingMacroName)
-                        {
-                            s = strstr(s, "macro ");
-
-                            fseek(source, strlen(s), SEEK_CUR);
-                            start = ftell(source);
-                            state = parsingMacroName;
-                            s = trimFromLeft(s);
-                            if (*s && strlen(s))
-                            {
-                                sscanf(s, "%s", macroName);
-                                start += strlen(macroName);
-                                s = 0;
-                                state = parsingMacroContent;
-                            }
-                        } */
-            /*        if ((s = strstr(s, "endm ")) != NULL)
+                   while (i > 0 && isprint(token[i]) && !isspace(token[i]))
                    {
-                       fseek(source, strlen(token) - strlen(s), SEEK_CUR);
-                       end = ftell(source);
-                       addMacro(macroName, start, end);
-                       start = end = 0;
-                       s = 0;
-                       state = skipLine;
-                   } */
+                       i--;
+                       offset++;
+                       ungetc(c, source);
+                   }
+                   printf("offset:%d\n", offset);
+                   fgets(token, offset, source);
+                   printf("token clean:%s\n", token);
+                   offset = 0;
+    s = token;
+    s = trimFromLeft(s);
+    state = evaluateToken(s, state);
+    if ((state == writeToTargetFile || state == skipLine))
+    {
+        fputs(token, target);
+                    memset(token, 0, MAX_LINE_LEN + 1);
+}
+else
+{
+    fseek(source, strlen(s), SEEK_CUR);
+
+    if (parsingMacroName)
+    {
+        s = strstr(s, "macro ");
+
+        fseek(source, strlen(s), SEEK_CUR);
+        start = ftell(source);
+        state = parsingMacroName;
+        s = trimFromLeft(s);
+        if (*s && strlen(s))
+        {
+            sscanf(s, "%s", macroName);
+            start += strlen(macroName);
+            s = 0;
+            state = parsingMacroContent;
+        }
+        if ((s = strstr(s, "endm ")) != NULL)
+        {
+            fseek(source, strlen(token) - strlen(s), SEEK_CUR);
+            end = ftell(source);
+            addMacro(macroName, start, end);
+            start = end = 0;
+            s = 0;
+            state = skipLine;
         }
     }
+}
+*/
 }
 
 ParseState evaluateToken(char *token, ParseState state)
@@ -215,21 +215,21 @@ void removeLastMacroDeclarition(FILE *fp)
 
 long getLineStart(FILE *fp, unsigned direction)
 {
+    long result = 0;
+    /*     int c;
+        long current = ftell(fp) - 1, result;
+        while ((c = fgetc(fp)) != EOF && c != '\n')
+        {
+            if (direction)
+                printf("search next new line\n");
+            else
+                printf("search previous new line\n");
 
-    int c;
-    long current = ftell(fp) - 1, result;
-    while ((c = fgetc(fp)) != EOF && c != '\n')
-    {
-        if (direction)
-            printf("search next new line\n");
-        else
-            printf("search previous new line\n");
+            fseek(fp, direction ? 1L : -1L, direction ? SEEK_CUR : SEEK_END);
+        }
+        result = ftell(fp) - 1;
 
-        fseek(fp, direction ? 1L : -1L, direction ? SEEK_CUR : SEEK_END);
-    }
-    result = ftell(fp) - 1;
-    /*
-        fseek(fp, current, SEEK_SET); */
+            fseek(fp, current, SEEK_SET); */
     return result;
 }
 
@@ -269,9 +269,11 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 
     /*     parseAndReplaceMacros(source, target); */
     copyToNewFile(source, target);
-    rewind(target);
+    /*     rewind(target); */
     parseAssemblyCode(target, fileName);
-    printMacroTable();
+    /*     rewind(target); */
+
+    /*     printMacroTable(); */
     /*     handleMacros(source, target); */
     /*     updateGlobalState(firstRun); */
 }
