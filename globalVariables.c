@@ -16,7 +16,8 @@ static char *path;
 
 void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode)
 {
-
+    userCode->src = (FILE *)malloc(sizeof(FILE *));
+    userCode->expanded = (FILE *)malloc(sizeof(FILE *));
     if ((userCode->src = fopen(strcat(cloneString(fileName), ".as"), "r")) == NULL)
     {
         yieldError(fileCouldNotBeOpened);

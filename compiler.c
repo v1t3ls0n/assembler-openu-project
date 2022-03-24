@@ -75,8 +75,7 @@ void handleSingleSourceFile(char *arg)
         (*setPath)(arg);
     }
     sscanf(arg, "%s", fileName);
-    fptrs->src = (FILE *)malloc(sizeof(FILE *));
-    fptrs->expanded = (FILE *)malloc(sizeof(FILE *));
+
     initAssemblyCodeFiles(arg, fptrs);
     if (!fptrs)
     {
@@ -86,15 +85,14 @@ void handleSingleSourceFile(char *arg)
     {
 
         initTablesArrays();
-        /*         copyToNewFile(fptrs->src, fptrs->expanded);
-                rewind(fptrs->src);
-                rewind(fptrs->expanded); */
         parseAssemblyCode(fptrs);
         printMacroTable();
 
+        fclose(fptrs->src);
+
         if ((*globalState)() == firstRun)
         {
-            /*    initTablesArrays(); */
+            rewind(fptrs->expanded);
             parseAssemblyCode(fptrs);
             if ((*globalState)() == secondRun)
             {
@@ -119,9 +117,11 @@ void handleSingleSourceFile(char *arg)
             printf("failed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist", fileName);
     }
 
-    /*     free(fileName); */
-    fclose(fptrs->src);
-    fclose(fptrs->expanded);
+    free(fptrs);
+    free(fptrs->src);
+    free(fptrs->expanded);
+    free(fileName);
+    /*     fclose(fptrs->expanded); */
 }
 
 void copyToNewFile(FILE *source, FILE *target)

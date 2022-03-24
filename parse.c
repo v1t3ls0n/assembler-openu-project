@@ -186,7 +186,7 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
         if (isMacroOpening(token))
         {
             long start = ftell(fptrs->src) + strlen(token) - 1;
-            char *next = strtok(NULL, " \t \n"), c;
+            char *next = strtok(NULL, " \t \n");
             if (!*next)
                 return Err;
             strcpy(macroName, next);
@@ -197,7 +197,6 @@ ParseState handleState(char *token, char *line, assemblyCode *fptrs)
         else if (isMacroClosing(token))
         {
             long end = ftell(fptrs->src) - strlen(token) - 1;
-            int c, toDelete = 0;
             updateMacro(macroName, -1, end);
             memset(macroName, 0, MAX_LABEL_LEN);
             isReadingMacro = False;
@@ -377,5 +376,4 @@ void parseAssemblyCode(assemblyCode *fptrs)
         nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
     (*setGlobalState)(nextState);
-    /* rewind(fp); */
 }
