@@ -61,3 +61,4 @@ Mkfile.old
 dkms.conf
 out
 compiler
+errors.log
