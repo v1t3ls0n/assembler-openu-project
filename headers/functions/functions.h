@@ -51,7 +51,7 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-void parseAssemblyCode(FILE *fp, char *filename);
+void parseAssemblyCode(FILE *fp);
 ParseState handleState(char *token, char *line, FILE *fp);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

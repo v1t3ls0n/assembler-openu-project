@@ -17,9 +17,6 @@ extern Item *addMacro(char *name, int start, int end);
 extern Item *updateMacro(char *name, int start, int end);
 extern Item *getMacro(char *s);
 
-/* extern State getGlobalState();
- */
-
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
    @ Description: The function extracts the argument string of the .data instruction, than the function analyses\ parses the string.
@@ -307,7 +304,7 @@ Bool parseSingleLine(char *line, FILE *fp)
                : False;
 }
 
-void parseAssemblyCode(FILE *fp, char *filename)
+void parseAssemblyCode(FILE *fp)
 {
     State (*globalState)() = &getGlobalState;
     void (*setGlobalState)() = &updateGlobalState;
@@ -316,6 +313,8 @@ void parseAssemblyCode(FILE *fp, char *filename)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState;
+    char *(*file)() = &getCurrentFileName;
+    char *(*path)() = &getFileNamePath;
     (*setCurrentLineToStart)();
 
     if ((*globalState)() == secondRun)
@@ -323,7 +322,11 @@ void parseAssemblyCode(FILE *fp, char *filename)
     else if ((*globalState)() == firstRun)
         printf("\n\n\nFirst Run:\n");
     else
+    {
         printf("\n\n\nParsing Macros:\n");
+        printf("filePath:%s\n", (*path)());
+        printf("fileName:%s\n", (*file)());
+    }
 
     while (((c = fgetc(fp)) != EOF))
     {

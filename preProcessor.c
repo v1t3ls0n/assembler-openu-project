@@ -1,7 +1,7 @@
 
 
 #include "data.h"
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp);
 
 extern Bool isLabelDeclaration(char *s);
 extern Bool isOperation(char *s);
@@ -270,7 +270,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
     /*     parseAndReplaceMacros(source, target); */
     copyToNewFile(source, target);
     rewind(target);
-    parseAssemblyCode(target, fileName);
+    parseAssemblyCode(target);
     /*     rewind(target); */
 
     /*     printMacroTable(); */

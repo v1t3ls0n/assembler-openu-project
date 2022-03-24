@@ -1,6 +1,5 @@
 #include "data.h"
 extern char *cloneString(char *s);
-
 static State globalState = startProgram;
 void updateGlobalState(State new)
 {
@@ -17,16 +16,16 @@ static char *path;
 
 void setFileNamePath(char *s)
 {
-    size_t length;
+    /*    size_t length; */
+    printf("inside setFileNamePath, s:%s\n", s);
     if (!(*s))
     {
         /*      memset(path, 0, strlen(path)); */
         return;
     }
-    length = strlen(s) - strlen(currentFileName);
-    path = (char *)realloc(path, length * sizeof(char *));
-    strncpy(path, s, length);
-    printf("inside setFileNamePath, path:%s\n", path);
+    /*     length = strlen(s) - strlen(currentFileName); */
+    path = (char *)realloc(path, strlen(s) * sizeof(char));
+    strcpy(path, cloneString(s));
 }
 
 char *getFileNamePath(char *s)

@@ -31,7 +31,7 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp);
 
 extern ParseState handleState(char *token, char *line, FILE *fp);
 extern Bool parseSingleLine(char *line, FILE *fp);

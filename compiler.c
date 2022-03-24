@@ -11,7 +11,7 @@ extern void initMemory();
 extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *fp);
 extern void exportFilesMainHandler(char *baseFileName);
 extern void initExternalOperandsList();
 
@@ -70,6 +70,7 @@ void handleSingleSourceFile(char *arg)
     else
     {
         sscanf(arg, "%s", fileName);
+        (*setPath)(arg);
         (*setFileName)(fileName);
     }
     if ((fptr = fopen(strcat(arg, ".as"), "r")) == NULL)
@@ -94,7 +95,7 @@ void handleSingleSourceFile(char *arg)
         if ((*globalState)() == firstRun)
         {
             /*    initTablesArrays(); */
-            parseAssemblyCode(expandedSrc, fileName);
+            parseAssemblyCode(expandedSrc);
             if ((*globalState)() == secondRun)
             {
                 rewind(expandedSrc);
@@ -103,7 +104,7 @@ void handleSingleSourceFile(char *arg)
                 initMemory();
                 if (areExternalsExist())
                     initExternalOperandsList();
-                parseAssemblyCode(expandedSrc, fileName);
+                parseAssemblyCode(expandedSrc);
 
                 if ((*globalState)() == exportFiles)
                 {
