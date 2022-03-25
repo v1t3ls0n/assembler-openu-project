@@ -9,7 +9,7 @@ extern int countLengthOfNonDigitToken(char *s);
 /* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 extern FILE *getSourceFilePointer();
-static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
+static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 
 Bool handleSingleLine(char *line);
 
@@ -262,7 +262,7 @@ void parseAssemblyCode(FILE *src)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState;
-    (*setCurrentLineToStart)();
+    (*resetCurrentLineCounter)();
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
     else if ((*globalState)() == firstRun)
@@ -303,6 +303,6 @@ void parseAssemblyCode(FILE *src)
     else
         nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
-    (*setCurrentLineToStart)();
+    (*resetCurrentLineCounter)();
     (*setGlobalState)(nextState);
 }
