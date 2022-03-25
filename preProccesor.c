@@ -115,7 +115,7 @@ void parseSourceFile(FILE *src, FILE *target)
 
 char *getNthToken(char *s, int n)
 {
-    char *token = (char *)calloc(strlen(s), sizeof(char *));
+    char *token = (char *)calloc(strlen(s), sizeof(char));
     int i = 0;
     while (!*s)
     {
@@ -124,17 +124,17 @@ char *getNthToken(char *s, int n)
         if (i == n && !isspace(*s))
             *token = *s++;
     }
-    token = (char *)realloc(token, strlen(token) * sizeof(char *));
+    token = (char *)realloc(token, strlen(token) * sizeof(char));
     return token;
 }
 
 char *getFirstToken(char *s)
 {
-    char *firstToken = (char *)calloc(strlen(s), sizeof(char *));
+    char *firstToken = (char *)calloc(strlen(s), sizeof(char));
     while (!isspace(*s) && isprint(*s))
     {
         *firstToken = *s++;
     }
-    firstToken = (char *)realloc(firstToken, strlen(firstToken) * sizeof(char *));
+    firstToken = (char *)realloc(firstToken, strlen(firstToken) * sizeof(char));
     return firstToken;
 }

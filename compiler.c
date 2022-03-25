@@ -17,6 +17,7 @@ extern void closeOpenLogFiles(); */
 extern void resetMemory();
 extern void initTablesArrays();
 extern void exportFilesMainHandler();
+extern void closeOpenLogFiles();
 
 void copyToNewFile(FILE *source, FILE *target);
 
@@ -52,7 +53,7 @@ int handleSourceFiles(int argc, char *argv[])
 
 void handleSingleFile(char *arg)
 {
-    FILE *src, *target;
+    FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char));
@@ -92,11 +93,12 @@ void handleSingleFile(char *arg)
             printMacroTable();
             rewind(target);
             parseAssemblyCode(target);
+            printSymbolTable();
+
             if ((*globalState)() == secondRun)
             {
                 rewind(target);
                 updateFinalCountersValue();
-                printSymbolTable();
                 initMemory();
                 if (areExternalsExist())
                     initExternalOperandsList();
@@ -106,8 +108,7 @@ void handleSingleFile(char *arg)
                 {
                     fileName[strlen(fileName) - 3] = '\0';
                     (*setPath)(fileName);
-                    exportFilesMainHandler(fileName);
-                    resetMemory();
+                    exportFilesMainHandler();
                 }
                 else
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
@@ -116,6 +117,7 @@ void handleSingleFile(char *arg)
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
 
+        resetMemory();
         fclose(src);
         fclose(target);
         closeOpenLogFiles();

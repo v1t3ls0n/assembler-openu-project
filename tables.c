@@ -6,7 +6,6 @@ static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
 static ExtListItem *externalsOperandsList = NULL;
 /* Complex Struct Constant Variables: */
-extern Operation operations[OP_SIZE];
 extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
@@ -51,7 +50,7 @@ void updateExternalOperandList(char *name, unsigned base, unsigned offset)
     {
         while (i < externalCount && externalsOperandsList[i].name != NULL)
             i++;
-        externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char *));
+        externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char));
         strncpy(externalsOperandsList[i].name, name, strlen(name));
         externalsOperandsList[i].value->offset = offset;
         externalsOperandsList[i].value->base = base;

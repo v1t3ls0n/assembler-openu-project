@@ -4,14 +4,18 @@ int (*line)() = &getCurrentLineNumber;
 char *(*fileName)() = &getFileNamePath;
 
 static FILE *warningsFile = NULL, *errorsFile = NULL;
+static Bool isWarningFileExist = False;
+static Bool isErrorFileExist = False;
 
 void yieldWarningIntoFile(Warning err)
 {
-    static Bool isWarningFileExist = False;
+    extern FILE *warningsFile;
     if (!isWarningFileExist)
     {
-        warningsFile = fopen("warnings.log", "w+");
-        isWarningFileExist = True;
+        if ((warningsFile = fopen("warnings.log", "w+")) == NULL)
+            printf("Failed to open warning log file\n");
+        else
+            isWarningFileExist = True;
     }
 
     fprintf(warningsFile, "\n######################################################################\n");
@@ -52,11 +56,13 @@ void yieldWarningIntoFile(Warning err)
 
 void yieldErrorIntoFile(Error err)
 {
-    static Bool isErrorFileExist = False;
+    extern FILE *errorsFile;
     if (!isErrorFileExist)
     {
-        errorsFile = fopen("errors.log", "w+");
-        isErrorFileExist = True;
+        if ((errorsFile = fopen("errors.log", "w+")) == NULL)
+            printf("Failed to open erro log file\n");
+        else
+            isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");
     fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
@@ -550,8 +556,18 @@ Bool yieldError(Error err)
 
 void closeOpenLogFiles()
 {
-    if (warningsFile != NULL)
-        fclose(warningsFile);
-    if (errorsFile != NULL)
-        fclose(errorsFile);
+    extern FILE *warningsFile, *errorsFile;
+    printf("line 557\n");
+    if (isWarningFileExist && warningsFile != NULL)
+    {
+        printf("line 560\n");
+        /*   fclose(warningsFile); */
+    }
+    if (isErrorFileExist && errorsFile != NULL)
+    {
+        printf("line 565\n");
+        /*  fclose(errorsFile); */
+    }
+
+    return;
 }

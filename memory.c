@@ -4,8 +4,8 @@ extern void updateFinalSymbolTableValuesAndCountEntriesAndExternals();
 extern HexWord *convertBinaryWordToHex(BinaryWord *word);
 extern char *numToBin(int num);
 extern char *decToHex(int num);
-static BinaryWord *binaryImg;
-static HexWord *hexImg;
+static BinaryWord *binaryImg = NULL;
+static HexWord *hexImg = NULL;
 void covertBinaryMemoryImageToHexImageForObFile();
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
@@ -40,8 +40,11 @@ void initMemory()
 
 void resetMemory()
 {
-    free(binaryImg);
-    free(hexImg);
+    if (binaryImg)
+        free(binaryImg);
+    if (hexImg)
+        free(hexImg);
+
     IC = MEMORY_START;
     DC = 0;
     ICF = 0;
@@ -103,7 +106,7 @@ void updateFinalCountersValue()
     DCF = ICF + DC;
     DC = IC;
     IC = MEMORY_START;
-    /*     printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF); */
+    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
     updateFinalSymbolTableValuesAndCountEntriesAndExternals();
 }
 

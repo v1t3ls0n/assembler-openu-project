@@ -55,7 +55,7 @@ char *decToHex(int num)
 char *hexToBin(char *hex)
 {
     int i = 0;
-    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
+    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
 
     while (hex[i] != '\0')
     {

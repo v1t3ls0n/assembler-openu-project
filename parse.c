@@ -261,11 +261,13 @@ void parseAssemblyCode(FILE *src)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState;
+    char *(*fileName)() = &getFileNamePath;
+
     (*resetCurrentLineCounter)();
     if ((*globalState)() == secondRun)
-        printf("\n\n\nSecond Run:\n");
+        printf("\n\n\nSecond Run:(%s)\n", (*fileName)());
     else if ((*globalState)() == firstRun)
-        printf("\n\n\nFirst Run:\n");
+        printf("\n\n\nFirst Run:(%s)\n", (*fileName)());
 
     while (((c = fgetc(src)) != EOF))
     {
