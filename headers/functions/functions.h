@@ -52,19 +52,17 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-void parseAssemblyCode(FILE *src, ...);
-ParseState handleState(char *token, char *line, ...);
+void parseAssemblyCode(FILE *src);
+ParseState parseLine(char *token, char *line);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In preProcessor.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void parseAndReplaceMacros(FILE *source, FILE *target);
-void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
-void parseMacro(FILE *fp);
-FILE *createCopyFromSourceFile(FILE *source, char *fileName);
+void parseSourceFile(FILE *src, FILE *target);
+Bool parseMacros(char *line, char *token, FILE *src, FILE *target);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -159,7 +157,7 @@ char *cloneString(char *s);
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
-Bool parseSingleLine(char *line, ...);
+Bool handleSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
@@ -201,7 +199,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line, ...);
+ParseState parseLine(char *token, char *line);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);

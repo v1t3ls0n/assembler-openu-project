@@ -15,7 +15,7 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *token);
-extern void parseAssemblyCode(FILE *src, ...);
+extern void parseAssemblyCode(FILE *src);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);

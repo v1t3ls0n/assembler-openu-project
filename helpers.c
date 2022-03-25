@@ -4,7 +4,7 @@ char *cloneString(char *s)
     char *copy;
     if (!(*s))
         return "";
-    copy = calloc(strlen(s), sizeof(char));
+    copy = (char *)calloc(strlen(s), sizeof(char));
     strcpy(copy, s);
     return copy;
 }

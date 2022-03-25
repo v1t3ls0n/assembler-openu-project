@@ -134,6 +134,7 @@ Item *install(char *name, ItemType type)
         }
 
         hashval = hash(name);
+
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)
             symbols[hashval] = np;
@@ -337,6 +338,7 @@ Bool isNonEmptyExternal(char *name)
     Item *p = lookup(name, Symbol);
     if (p == NULL)
         return False;
+
     return (p->val.s.attrs.code || p->val.s.attrs.data) ? True : False;
 }
 

@@ -6,19 +6,12 @@ extern Bool yieldWarning(Warning err);
 extern char *trimFromLeft(char *s);
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
-static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
 /* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 extern FILE *getSourceFilePointer();
+static void (*setCurrentLineToStart)() = &resetCurrentLineNumber;
 
-extern Bool isPossiblyUseOfMacro(char *s);
-extern Bool isMacroOpening(char *s);
-extern Bool isMacroClosing(char *s);
-extern Bool isLegalMacroName(char *s);
-
-extern Item *addMacro(char *name, int start, int end);
-extern Item *updateMacro(char *name, int start, int end);
-extern Item *getMacro(char *s);
+Bool handleSingleLine(char *line);
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -175,146 +168,86 @@ Bool countAndVerifyStringArguments(char *token)
     return True;
 }
 
-ParseState handleState(char *token, char *line, ...)
+ParseState parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
 
-    if ((*globalState)() == parsingMacros)
+    if (isComment(token))
+        return lineParsedSuccessfully;
+
+    if (isLabelDeclaration(token))
     {
-        va_list args;
-        FILE *src = va_arg(args, FILE *);
-        FILE *target = va_arg(args, FILE *);
-        static char macroName[MAX_LABEL_LEN] = {0};
-        static Bool isReadingMacro = False;
-        va_start(args, line);
+        if (strlen(token) == 1)
+            yieldError(illegalLabelDeclaration);
+        else
+        {
+            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+            if (!next)
+                return yieldError(emptyLabelDecleration);
 
-        if (!isReadingMacro)
-            fprintf(target, "%s\n", line);
-        if (isMacroOpening(token))
-        {
-            long start = ftell(src) + strlen(token) - 1;
-            char *next = strtok(NULL, " \t \n");
-            if (!*next)
-                return Err;
-            strcpy(macroName, next);
-            addMacro(macroName, start, -1);
-            isReadingMacro = True;
-            fseek(target, -strlen(line) - 1, SEEK_END);
+            if ((*globalState)() == firstRun)
+                return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
+            else
+                return parseLine(next, line + strlen(token) + 1);
         }
-        else if (isMacroClosing(token))
-        {
-            long end = ftell(src) - strlen(token) - 1;
-            updateMacro(macroName, -1, end);
-            memset(macroName, 0, MAX_LABEL_LEN);
-            isReadingMacro = False;
-        }
-        else if (isPossiblyUseOfMacro(token))
-        {
-            Item *p = getMacro(token);
-            if (p != NULL)
-            {
-                int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
-                long lastPosition;
-                lastPosition = ftell(src);
-                fseek(src, p->val.m.start, SEEK_SET);
-                fseek(target, -toDelete - 1, SEEK_CUR);
-                while (toCopy > 0)
-                {
-                    c = fgetc(src);
-                    fputc(c, target);
-                    --toCopy;
-                }
+    }
 
-                fseek(src, lastPosition, SEEK_SET);
-            }
+    else if (isInstruction(token))
+    {
+
+        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+        int type = getInstructionType(token);
+        if (!next)
+        {
+            if (type == _TYPE_DATA || type == _TYPE_STRING)
+                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+            else
+                return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
         }
         else
-            return lineParsedSuccessfully;
+        {
+            if ((*globalState)() == firstRun)
+                return handleInstruction(type, token, next, line);
+            else
+            {
+                if (type == _TYPE_DATA)
+                    return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
+                else if (type == _TYPE_STRING)
+                    return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
+                else
+                    return lineParsedSuccessfully;
+            }
+        }
+    }
+
+    else if (isOperation(token))
+    {
+        char args[MAX_LINE_LEN] = {0};
+        strcpy(args, (line + strlen(token)));
+        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
+                                                                                                               : Err;
     }
 
     else
     {
-        if (isComment(token))
-            return lineParsedSuccessfully;
-
-        if (isLabelDeclaration(token))
-        {
-            if (strlen(token) == 1)
-                yieldError(illegalLabelDeclaration);
-            else
-            {
-                char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-                if (!next)
-                    return yieldError(emptyLabelDecleration);
-
-                if ((*globalState)() == firstRun)
-                    return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
-                else
-                    return handleState(next, line + strlen(token) + 1);
-            }
-        }
-
-        else if (isInstruction(token))
-        {
-
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-            int type = getInstructionType(token);
-            if (!next)
-            {
-                if (type == _TYPE_DATA || type == _TYPE_STRING)
-                    return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
-                else
-                    return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
-            }
-            else
-            {
-                if ((*globalState)() == firstRun)
-                    return handleInstruction(type, token, next, line);
-                else
-                {
-                    if (type == _TYPE_DATA)
-                        return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
-                    else if (type == _TYPE_STRING)
-                        return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
-                    else
-                        return lineParsedSuccessfully;
-                }
-            }
-        }
-
-        else if (isOperation(token))
-        {
-            char args[MAX_LINE_LEN] = {0};
-            strcpy(args, (line + strlen(token)));
-            return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
-                                                                                                                   : Err;
-        }
-
+        if (strlen(token) > 1)
+            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-        {
-            if (strlen(token) > 1)
-                yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
-            else
-                yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
-        }
+            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
     }
+
     return Err;
 }
 
-Bool parseSingleLine(char *line, ...)
+Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
-    va_list args;
-    FILE *src = va_arg(args, FILE *);
     ParseState state = newLine;
-    FILE *target = va_arg(args, FILE *);
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    va_start(args, line);
-
     memcpy(lineCopy, line, strlen(line));
-    token = ((*globalState)() == firstRun || (*globalState)() == parsingMacros) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
-    state = handleState(token, line, src, target);
+    token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    state = parseLine(token, line);
     (*currentLineNumberPlusPlus)();
 
     return state == lineParsedSuccessfully
@@ -322,7 +255,7 @@ Bool parseSingleLine(char *line, ...)
                : False;
 }
 
-void parseAssemblyCode(FILE *src, ...)
+void parseAssemblyCode(FILE *src)
 {
     State (*globalState)() = &getGlobalState;
     void (*setGlobalState)() = &updateGlobalState;
@@ -330,25 +263,16 @@ void parseAssemblyCode(FILE *src, ...)
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
     State nextState;
-    va_list args;
-    FILE *target;
-    va_start(args, src);
-    target = va_arg(args, FILE *);
-
     (*setCurrentLineToStart)();
     if ((*globalState)() == secondRun)
         printf("\n\n\nSecond Run:\n");
     else if ((*globalState)() == firstRun)
         printf("\n\n\nFirst Run:\n");
-    else
-        printf("\n\n\nParsing Macros:\n");
 
-    while (((c = ((*globalState)() == parsingMacros ? fgetc(target) : fgetc(src))) != EOF))
+    while (((c = fgetc(src)) != EOF))
     {
-
-        if ((*globalState)() == firstRun && (i >= MAX_LINE_LEN - 1 && c != '\n'))
+        if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
-
             isValidCode = False;
             yieldError(maxLineLengthExceeded);
             memset(line, 0, MAX_LINE_LEN);
@@ -357,11 +281,7 @@ void parseAssemblyCode(FILE *src, ...)
 
         if (c == '\n' && i > 0)
         {
-            if ((*globalState)() == parsingMacros)
-                isValidCode = parseSingleLine(line, src, target) && isValidCode;
-            else
-                isValidCode = parseSingleLine(line) && isValidCode;
-
+            isValidCode = handleSingleLine(line) && isValidCode;
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
@@ -374,22 +294,13 @@ void parseAssemblyCode(FILE *src, ...)
     }
 
     if (i > 0)
-    {
-        if ((*globalState)() == parsingMacros)
-            isValidCode = parseSingleLine(line, src, target) && isValidCode;
-        else
-            isValidCode = parseSingleLine(line) && isValidCode;
-    }
+        isValidCode = handleSingleLine(line) && isValidCode;
 
     if (!isValidCode)
         nextState = assemblyCodeFailedToCompile;
     else
-    {
-        if ((*globalState)() == parsingMacros)
-            nextState = firstRun;
-        else
-            nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
-    }
+        nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
+    (*setCurrentLineToStart)();
     (*setGlobalState)(nextState);
 }

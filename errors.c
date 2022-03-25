@@ -9,7 +9,6 @@ static FILE *warningsFile, *errorsFile;
 void yieldWarningIntoFile(Warning err)
 {
     static Bool isWarningFileExist = False;
-    printf("in errors.c line 12\n");
     if (!isWarningFileExist)
     {
         warningsFile = fopen("warnings.log", "w+");
@@ -51,6 +50,7 @@ void yieldWarningIntoFile(Warning err)
     fprintf(warningsFile, "\n");
     fprintf(warningsFile, "######################################################################\n\n");
 }
+
 void yieldErrorIntoFile(Error err)
 {
     static Bool isErrorFileExist = False;
@@ -60,7 +60,7 @@ void yieldErrorIntoFile(Error err)
         isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");
-    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*path)(), (*line)());
 
     switch (err)
     {
@@ -285,7 +285,7 @@ Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(stderr, "Warning!! in %s on line number %d\n", (*path)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -322,10 +322,11 @@ Bool yieldWarning(Warning err)
 }
 
 Bool yieldError(Error err)
+
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*path)(), (*line)());
 
     switch (err)
     {
@@ -546,4 +547,12 @@ Bool yieldError(Error err)
     fprintf(stderr, "######################################################################\n");
 
     return False;
+}
+
+void closeOpenLogFiles()
+{
+    if (warningsFile)
+        fclose(warningsFile);
+    if (errorsFile)
+        fclose(errorsFile);
 }

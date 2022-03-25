@@ -15,52 +15,31 @@ State getGlobalState()
 static char *currentFileName;
 static char *path;
 
-void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode)
-{
-    userCode->src = (FILE *)malloc(sizeof(FILE *));
-    userCode->expanded = (FILE *)malloc(sizeof(FILE *));
-
-    printf("fileName:%s\n", fileName);
-    if ((userCode->src = fopen(strcat(cloneString(fileName), ".as"), "r")) == NULL)
-    {
-        yieldError(fileCouldNotBeOpened);
-        return;
-    }
-
-    if ((userCode->expanded = fopen(strcat(cloneString(fileName), ".am"), "w+")) == NULL)
-    {
-        yieldError(fileCouldNotBeOpened);
-        return;
-    }
-}
-
 void setFileNamePath(char *s)
 {
-    /*    size_t length; */
-    printf("inside setFileNamePath, s:%s\n", s);
-
-    /*     length = strlen(s) - strlen(currentFileName); */
-
+    if (!*s)
+        return;
     path = (char *)realloc(path, strlen(s) * sizeof(char));
     strcpy(path, cloneString(s));
-    printf("inside setFileNamePath, path:%s\n", path);
 }
 
 char *getFileNamePath()
 {
-
     return cloneString(path);
 }
 
 void setCurrentFileName(char *s)
 {
-    printf("s:%s\n", s);
+    if (!*s)
+        return;
     currentFileName = (char *)realloc(currentFileName, strlen(s) * sizeof(char));
     strcpy(currentFileName, cloneString(s));
 }
 
 char *getCurrentFileName()
 {
+    if (!*currentFileName)
+        return "";
     return cloneString(currentFileName);
 }
 
