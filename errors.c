@@ -1,8 +1,7 @@
 
 #include "data.h"
 int (*line)() = &getCurrentLineNumber;
-char *(*file)() = &getCurrentFileName;
-char *(*path)() = &getFileNamePath;
+char *(*fileName)() = &getFileNamePath;
 
 static FILE *warningsFile, *errorsFile;
 
@@ -16,7 +15,7 @@ void yieldWarningIntoFile(Warning err)
     }
 
     fprintf(warningsFile, "\n######################################################################\n");
-    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -60,7 +59,7 @@ void yieldErrorIntoFile(Error err)
         isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");
-    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*path)(), (*line)());
+    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
 
     switch (err)
     {
@@ -285,7 +284,7 @@ Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Warning!! in %s on line number %d\n", (*path)(), (*line)());
+    fprintf(stderr, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -326,7 +325,7 @@ Bool yieldError(Error err)
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*path)(), (*line)());
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
 
     switch (err)
     {

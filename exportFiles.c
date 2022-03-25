@@ -8,6 +8,7 @@ extern void writeExternalsToFile(FILE *fp);
 
 void generateObFile(char *baseFileName);
 void createEntriesFile(char *baseFileName);
+extern char *getFileNamePath();
 
 void exportFilesMainHandler(char *baseFileName)
 {

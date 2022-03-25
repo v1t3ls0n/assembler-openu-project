@@ -6,7 +6,6 @@ extern Bool yieldWarning(Warning err);
 extern char *trimFromLeft(char *s);
 extern int countConsecutiveCommas(char *s);
 extern int countLengthOfNonDigitToken(char *s);
-/* static void (*setFileName)(char *) = &setCurrentFileName; */
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;

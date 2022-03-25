@@ -12,7 +12,6 @@ State getGlobalState()
     return current;
 }
 
-static char *currentFileName;
 static char *path;
 
 void setFileNamePath(char *s)
@@ -26,21 +25,6 @@ void setFileNamePath(char *s)
 char *getFileNamePath()
 {
     return cloneString(path);
-}
-
-void setCurrentFileName(char *s)
-{
-    if (!*s)
-        return;
-    currentFileName = (char *)realloc(currentFileName, strlen(s) * sizeof(char));
-    strcpy(currentFileName, cloneString(s));
-}
-
-char *getCurrentFileName()
-{
-    if (!*currentFileName)
-        return "";
-    return cloneString(currentFileName);
 }
 
 static unsigned currentLineNumber = 1;

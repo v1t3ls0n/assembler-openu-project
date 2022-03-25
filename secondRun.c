@@ -1,7 +1,6 @@
 
 #include "data.h"
 
-extern void setCurrentFileName(char *s);
 extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
 
 /* from firstRun.c */

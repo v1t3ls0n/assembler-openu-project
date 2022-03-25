@@ -61,7 +61,6 @@ void handleSingleFile(char *arg)
     char *fileName = (char *)calloc(strlen(arg), sizeof(char));
     strcpy(fileName, arg);
     strcat(fileName, ".as");
-
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");
