@@ -107,6 +107,7 @@ void handleSingleFile(char *arg)
                 if ((*globalState)() == exportFiles)
                 {
                     fileName[strlen(fileName) - 3] = '\0';
+                    (*setPath)(fileName);
                     exportFilesMainHandler(fileName);
                     resetMemory();
                 }

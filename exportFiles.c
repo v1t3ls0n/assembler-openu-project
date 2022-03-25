@@ -23,7 +23,7 @@ void exportFilesMainHandler(char *baseFileName)
 void generateObFile(char *baseFileName)
 {
     FILE *ob;
-    char *fileName = calloc(strlen(baseFileName) + 3, sizeof(char *));
+    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
     sscanf(baseFileName, "%s", fileName);
     strcat(fileName, ".ob");
     ob = fopen(fileName, "w+");
@@ -40,7 +40,7 @@ void generateObFile(char *baseFileName)
 void createEntriesFile(char *baseFileName)
 {
     FILE *ent;
-    char *fileName = calloc(strlen(baseFileName) + 3, sizeof(char *));
+    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
     sscanf(baseFileName, "%s", fileName);
     strcat(fileName, ".ent");
     ent = fopen(fileName, "w+");
@@ -57,7 +57,7 @@ void createEntriesFile(char *baseFileName)
 void createEnternalsFile(char *baseFileName)
 {
     FILE *ext;
-    char *fileName = calloc(strlen(baseFileName) + 3, sizeof(char *));
+    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
     sscanf(baseFileName, "%s", fileName);
     strcat(fileName, ".ext");
     ext = fopen(fileName, "w+");
