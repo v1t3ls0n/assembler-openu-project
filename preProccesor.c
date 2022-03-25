@@ -33,7 +33,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         if (!isLegalMacroName(next))
             return yieldError(illegalMacroNameUseOfSavedKeywords);
 
-        start = ftell(src) + strlen(token) + strlen(next) - 1;
+        start = ftell(src) - 1 + strlen(next);
         strcpy(macroName, next);
         isReadingMacro = True;
         fseek(target, -strlen(line) - 1, SEEK_END);
@@ -55,6 +55,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         {
             int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
             long lastPosition;
+            printf("macro exist!\ntoCopy:%d\ntoDelete:%d\nstart:%d\nend:%d\n", toCopy, toDelete, p->val.m.start, p->val.m.end);
             lastPosition = ftell(src);
             fseek(src, p->val.m.start, SEEK_SET);
             fseek(target, -toDelete - 1, SEEK_CUR);
@@ -87,20 +88,24 @@ void parseSourceFile(FILE *src, FILE *target)
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
-
-        if (c == '\n' && i > 0)
+        if (c == '\n')
         {
             (*currentLineNumberPlusPlus)();
-            memcpy(lineClone, line, MAX_LINE_LEN);
-            token = strtok(lineClone, " \t \n");
-            if (!parseMacros(line, token, src, target))
+
+            if (i > 0)
             {
-                (*setState)(assemblyCodeFailedToCompile);
-                return;
+                memcpy(lineClone, line, MAX_LINE_LEN);
+                token = strtok(lineClone, " \t \n");
+                if (!parseMacros(line, token, src, target))
+                {
+                    (*setState)(assemblyCodeFailedToCompile);
+                    return;
+                }
+                memset(line, 0, MAX_LINE_LEN);
+                i = 0;
             }
-            memset(line, 0, MAX_LINE_LEN);
-            i = 0;
         }
+
         if (isspace(c) && i > 0)
             line[i++] = ' ';
 
@@ -108,7 +113,15 @@ void parseSourceFile(FILE *src, FILE *target)
             line[i++] = c;
     }
     if (i > 0)
-        parseMacros(line, token, src, target);
+    {
+        memcpy(lineClone, line, MAX_LINE_LEN);
+        token = strtok(lineClone, " \t \n");
+        if (!parseMacros(line, token, src, target))
+        {
+            (*setState)(assemblyCodeFailedToCompile);
+            return;
+        }
+    }
 
     (*setState)(firstRun);
 }
