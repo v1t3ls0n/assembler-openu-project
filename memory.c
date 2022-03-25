@@ -1,16 +1,18 @@
 
 #include "data.h"
-extern void updateFinalSymbolTableValuesAndCountEntriesAndExternals();
+extern void updateFinalSymbolTableValues();
 extern HexWord *convertBinaryWordToHex(BinaryWord *word);
 extern char *numToBin(int num);
 extern char *decToHex(int num);
+void covertBinaryMemoryImageToHexImageForObFile();
+
 static BinaryWord *binaryImg = NULL;
 static HexWord *hexImg = NULL;
-void covertBinaryMemoryImageToHexImageForObFile();
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
+
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }
 unsigned getICF() { return ICF; }
@@ -23,14 +25,22 @@ void increaseInstructionCounter(int amount)
 {
     IC += amount;
 }
-void initMemory()
+void allocMemoryImg()
 {
     const int totalSize = DCF - MEMORY_START;
     int i, j;
-    binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
-
+    extern BinaryWord *binaryImg;
+    extern HexWord *hexImg;
+    binaryImg = (BinaryWord *)realloc(binaryImg, totalSize * sizeof(BinaryWord));
+    hexImg = (HexWord *)realloc(binaryImg, totalSize * sizeof(HexWord));
     for (i = 0; i < totalSize; i++)
     {
+        hexImg[i]._A = 0;
+        hexImg[i]._B = 0;
+        hexImg[i]._C = 0;
+        hexImg[i]._D = 0;
+        hexImg[i]._E = 0;
+
         for (j = 0; j < BINARY_WORD_SIZE; j++)
         {
             binaryImg[i].digit[j].on = 0;
@@ -38,13 +48,8 @@ void initMemory()
     }
 }
 
-void resetMemory()
+void resetMemoryCounters()
 {
-    if (binaryImg)
-        free(binaryImg);
-    if (hexImg)
-        free(hexImg);
-
     IC = MEMORY_START;
     DC = 0;
     ICF = 0;
@@ -99,7 +104,7 @@ void printWordBinary(unsigned index)
 
     printf("\n");
 }
-void updateFinalCountersValue()
+void calcFinalAddrsCountersValues()
 {
 
     ICF = IC;
@@ -107,24 +112,24 @@ void updateFinalCountersValue()
     DC = IC;
     IC = MEMORY_START;
     printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
-    updateFinalSymbolTableValuesAndCountEntriesAndExternals();
 }
 
 void covertBinaryMemoryImageToHexImageForObFile()
 {
+    extern BinaryWord *binaryImg;
+    extern HexWord *hexImg;
     int i;
     int totalSize = DCF - MEMORY_START;
-    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
     for (i = 0; i < totalSize; i++)
         hexImg[i] = *convertBinaryWordToHex(&binaryImg[i]);
 }
 
 void printMemoryImgInRequiredObjFileFormat()
 {
-
+    extern BinaryWord *binaryImg;
+    extern HexWord *hexImg;
     int i;
     int totalSize = DCF - MEMORY_START;
-    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
     printf("%d %d\n", ICF - MEMORY_START, DCF - ICF);
     for (i = 0; i < totalSize; i++)
     {
@@ -135,9 +140,10 @@ void printMemoryImgInRequiredObjFileFormat()
 
 void writeMemoryImageToObFile(FILE *fp)
 {
+    extern BinaryWord *binaryImg;
+    extern HexWord *hexImg;
     int i;
     int totalSize = DCF - MEMORY_START;
-    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
     fprintf(fp, "%d %d\n", ICF - MEMORY_START, DCF - ICF);
     for (i = 0; i < totalSize; i++)
     {

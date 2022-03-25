@@ -13,7 +13,7 @@ extern unsigned calcNumberCharactersLength(int num);
 extern Bool verifyLabelNaming(char *s);
 extern Bool isRegistery(char *s);
 
-void initTablesArrays()
+void initTables()
 {
     int i = 0;
 
@@ -50,7 +50,7 @@ void updateExternalOperandList(char *name, unsigned base, unsigned offset)
     {
         while (i < externalCount && externalsOperandsList[i].name != NULL)
             i++;
-        externalsOperandsList[i].name = calloc(strlen(name) + 1, sizeof(char));
+        externalsOperandsList[i].name = (char *)calloc(strlen(name) + 1, sizeof(char));
         strncpy(externalsOperandsList[i].name, name, strlen(name));
         externalsOperandsList[i].value->offset = offset;
         externalsOperandsList[i].value->base = base;
@@ -430,7 +430,7 @@ Item *updateMacro(char *name, int start, int end)
     return macro;
 }
 
-void updateFinalSymbolTableValuesAndCountEntriesAndExternals()
+void updateFinalSymbolTableValues()
 {
     int i = 0;
     while (i < HASHSIZE)

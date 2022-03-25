@@ -9,6 +9,7 @@ static Bool isErrorFileExist = False;
 
 void yieldWarningIntoFile(Warning err)
 {
+    extern Bool isWarningFileExist;
     extern FILE *warningsFile;
     if (!isWarningFileExist)
     {
@@ -57,6 +58,7 @@ void yieldWarningIntoFile(Warning err)
 void yieldErrorIntoFile(Error err)
 {
     extern FILE *errorsFile;
+    extern Bool isErrorFileExist;
     if (!isErrorFileExist)
     {
         if ((errorsFile = fopen("errors.log", "w+")) == NULL)
@@ -557,17 +559,15 @@ Bool yieldError(Error err)
 void closeOpenLogFiles()
 {
     extern FILE *warningsFile, *errorsFile;
-    printf("line 557\n");
+    extern Bool isWarningFileExist, isErrorFileExist;
     if (isWarningFileExist && warningsFile != NULL)
     {
-        printf("line 560\n");
-        /*   fclose(warningsFile); */
+        fclose(warningsFile);
+        isWarningFileExist = False;
     }
     if (isErrorFileExist && errorsFile != NULL)
     {
-        printf("line 565\n");
-        /*  fclose(errorsFile); */
+        fclose(errorsFile);
+        isErrorFileExist = False;
     }
-
-    return;
 }

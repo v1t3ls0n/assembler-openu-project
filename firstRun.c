@@ -185,7 +185,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
         {
             if (nextTokens)
             {
-                char *labelName = calloc(strlen(nextTokens), sizeof(char));
+                char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char));
                 strcpy(labelName, nextTokens);
                 nextTokens = strtok(NULL, " \t \n");
                 if (nextTokens)
@@ -200,6 +200,8 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
                     if (type == _TYPE_EXTERNAL)
                         return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
                 }
+
+                free(labelName);
             }
             else
             {

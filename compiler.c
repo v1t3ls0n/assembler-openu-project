@@ -4,9 +4,9 @@
 extern Bool handleSingleLine(char *line);
 void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
 extern void printBinaryImg();
-extern void initMemory();
+extern void allocMemoryImg();
 
-extern void updateFinalCountersValue();
+extern void calcFinalAddrsCountersValues();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *src);
 extern void exportFilesMainHandler();
@@ -14,12 +14,12 @@ extern void initExternalOperandsList();
 extern void setGlobalState(State new);
 extern void parseSourceFile(FILE *src, FILE *target);
 extern void closeOpenLogFiles(); */
-extern void resetMemory();
-extern void initTablesArrays();
+extern void resetMemoryCounters();
+extern void initTables();
 extern void exportFilesMainHandler();
 extern void closeOpenLogFiles();
-
-void copyToNewFile(FILE *source, FILE *target);
+extern void allocMemoryImg();
+extern void calcFinalAddrsCountersValues();
 
 void handleSingleFile(char *arg);
 
@@ -57,6 +57,10 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char));
+
+    if (!fileName)
+        return;
+
     memcpy(fileName, arg, strlen(arg));
     /*     strcpy(fileName, arg); */
     strcat(fileName, ".as");
@@ -66,7 +70,7 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", arg);
         fprintf(stderr, "######################################################################\n\n");
-
+        /*         free(fileName); */
         return;
     }
 
@@ -78,14 +82,16 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", arg);
         fprintf(stderr, "######################################################################\n\n");
-
+        /*         fclose(src);
+                free(fileName); */
         return;
     }
 
     else
     {
         (*globalState)(parsingMacros);
-        initTablesArrays();
+        resetMemoryCounters();
+        initTables();
         parseSourceFile(src, target);
 
         if ((*globalState)() == firstRun)
@@ -93,16 +99,16 @@ void handleSingleFile(char *arg)
             printMacroTable();
             rewind(target);
             parseAssemblyCode(target);
-            printSymbolTable();
 
             if ((*globalState)() == secondRun)
             {
+                calcFinalAddrsCountersValues();
+                updateFinalSymbolTableValues();
+                allocMemoryImg();
+                printSymbolTable();
                 rewind(target);
-                updateFinalCountersValue();
-                initMemory();
                 if (areExternalsExist())
                     initExternalOperandsList();
-
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {
@@ -117,10 +123,9 @@ void handleSingleFile(char *arg)
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
 
-        resetMemory();
+        free(fileName);
         fclose(src);
         fclose(target);
         closeOpenLogFiles();
-        free(fileName);
     }
 }
