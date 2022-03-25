@@ -1,30 +1,24 @@
 #include "data.h"
 
-extern void writeMemoryImageToObFile(FILE *fp);
-extern void writeEntriesToFile(FILE *fp);
-extern Bool areEntriesExist();
-extern Bool areExternalsExist();
-extern void writeExternalsToFile(FILE *fp);
+/* void generateObFile();
+void createEntriesFile();
+extern char *getFileNamePath(); */
+char *(*baseFileName)() = &getFileNamePath;
 
-void generateObFile(char *baseFileName);
-void createEntriesFile(char *baseFileName);
-extern char *getFileNamePath();
-
-void exportFilesMainHandler(char *baseFileName)
+void exportFilesMainHandler()
 {
     printf("Finished Successfully, about to export files!\n");
-    generateObFile(baseFileName);
+    generateObFile();
     if (areEntriesExist())
-        createEntriesFile(baseFileName);
+        createEntriesFile();
     if (areExternalsExist())
-        createEnternalsFile(baseFileName);
+        createExternalsFile();
 }
 
-void generateObFile(char *baseFileName)
+void generateObFile()
 {
     FILE *ob;
-    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
-    sscanf(baseFileName, "%s", fileName);
+    char *fileName = (*baseFileName)();
     strcat(fileName, ".ob");
     ob = fopen(fileName, "w+");
     if (ob == NULL)
@@ -37,11 +31,10 @@ void generateObFile(char *baseFileName)
     free(fileName);
 }
 
-void createEntriesFile(char *baseFileName)
+void createEntriesFile()
 {
     FILE *ent;
-    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
-    sscanf(baseFileName, "%s", fileName);
+    char *fileName = (*baseFileName)();
     strcat(fileName, ".ent");
     ent = fopen(fileName, "w+");
     if (ent == NULL)
@@ -54,11 +47,10 @@ void createEntriesFile(char *baseFileName)
     free(fileName);
 }
 
-void createEnternalsFile(char *baseFileName)
+void createExternalsFile()
 {
     FILE *ext;
-    char *fileName = (char *)calloc(strlen(baseFileName) + 3, sizeof(char));
-    sscanf(baseFileName, "%s", fileName);
+    char *fileName = (*baseFileName)();
     strcat(fileName, ".ext");
     ext = fopen(fileName, "w+");
     if (ext == NULL)

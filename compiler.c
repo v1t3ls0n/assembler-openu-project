@@ -12,7 +12,7 @@ extern void resetMemory();
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *src);
-extern void exportFilesMainHandler(char *baseFileName);
+extern void exportFilesMainHandler();
 extern void initExternalOperandsList();
 
 extern void updateGlobalState(State new);
