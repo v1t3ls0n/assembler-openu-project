@@ -16,7 +16,7 @@ char *getNthToken(char *s, int n);
 Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 {
 
-    char macroName[MAX_LABEL_LEN] = {0};
+    static char macroName[MAX_LABEL_LEN] = {0};
     static Bool isReadingMacro = False;
 
     if (!isReadingMacro)
@@ -31,12 +31,9 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         next = strtok(NULL, " \t \n");
 
         if (!*next)
-            return False;
+            return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
-        {
-            (*setGlobalState)(assemblyCodeFailedToCompile);
             return yieldError(illegalMacroNameUseOfSavedKeywords);
-        }
 
         strcpy(macroName, next);
         addMacro(macroName, start, -1);
@@ -46,7 +43,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     else if (isMacroClosing(token))
     {
         long end = ftell(src) - strlen(token) - 1;
-        printf("is macro closing!\n");
+        printf("is macro closing!\nend:%d\n", (int)end);
         updateMacro(macroName, -1, end);
         memset(macroName, 0, MAX_LABEL_LEN);
         isReadingMacro = False;
@@ -98,7 +95,10 @@ void parseSourceFile(FILE *src, FILE *target)
             memcpy(lineClone, line, MAX_LINE_LEN);
             token = strtok(lineClone, " \t \n");
             if (!parseMacros(line, token, src, target))
+            {
+                (*setGlobalState)(assemblyCodeFailedToCompile);
                 return;
+            }
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }

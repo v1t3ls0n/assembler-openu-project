@@ -62,7 +62,8 @@ typedef enum
     afterPlusOrMinusSignThereMustBeANumber,
     illegalApearenceOfCharacterInTheBegningOfTheLine,
     illegalLabelNameUseOfSavedKeywordUsingOperationName,
-    illegalLabelNameUseOfSavedKeywordUsingRegisteryName
+    illegalLabelNameUseOfSavedKeywordUsingRegisteryName,
+    macroDeclaretionWithoutDefiningMacroName
 
 } Error;
 
