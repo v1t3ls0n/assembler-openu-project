@@ -2,6 +2,9 @@
 
 extern char *cloneString(char *s);
 static State globalState = startProgram;
+static char *path;
+static unsigned currentLineNumber = 1;
+
 void setGlobalState(State new)
 {
     globalState = new;
@@ -11,8 +14,6 @@ State getGlobalState()
     State current = globalState;
     return current;
 }
-
-static char *path;
 
 void setFileNamePath(char *s)
 {
@@ -27,7 +28,6 @@ char *getFileNamePath()
     return cloneString(path);
 }
 
-static unsigned currentLineNumber = 1;
 void resetCurrentLineNumber()
 {
     currentLineNumber = 1;
