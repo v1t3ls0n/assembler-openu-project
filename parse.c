@@ -243,12 +243,11 @@ Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
     ParseState state = newLine;
-    char lineCopy[MAX_LINE_LEN] = {0};
+    char lineCopy[MAX_LINE_LEN + 1] = {0};
     char *token;
     memcpy(lineCopy, line, strlen(line));
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = parseLine(token, line);
-    (*currentLineNumberPlusPlus)();
 
     return state == lineParsedSuccessfully
                ? True
@@ -278,12 +277,15 @@ void parseAssemblyCode(FILE *src)
             memset(line, 0, MAX_LINE_LEN);
             i = 0;
         }
-
-        if (c == '\n' && i > 0)
+        if (c == '\n')
         {
-            isValidCode = handleSingleLine(line) && isValidCode;
-            memset(line, 0, MAX_LINE_LEN);
-            i = 0;
+            (*currentLineNumberPlusPlus)();
+            if (i > 0)
+            {
+                isValidCode = handleSingleLine(line) && isValidCode;
+                memset(line, 0, MAX_LINE_LEN);
+                i = 0;
+            }
         }
 
         if (isspace(c) && i > 0)

@@ -107,8 +107,8 @@ void handleSingleFile(char *arg)
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {
-                    arg[strlen(arg) - 3] = '\0';
-                    exportFilesMainHandler(arg);
+                    fileName[strlen(fileName) - 3] = '\0';
+                    exportFilesMainHandler(fileName);
                     resetMemory();
                 }
                 else
@@ -121,5 +121,6 @@ void handleSingleFile(char *arg)
         fclose(src);
         fclose(target);
         closeOpenLogFiles();
+        free(fileName);
     }
 }
