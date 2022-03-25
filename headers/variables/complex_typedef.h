@@ -2,12 +2,6 @@
 
 typedef struct
 {
-    FILE *src;
-    FILE *expanded;
-} assemblyCode;
-
-typedef struct
-{
     unsigned int on : 1;
 } Bit;
 

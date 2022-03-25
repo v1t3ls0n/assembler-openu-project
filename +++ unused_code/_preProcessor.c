@@ -24,7 +24,7 @@ void saveMacros(FILE *target);
 void popLastToken(FILE *target, char *token);
 void parseAndReplaceMacros(FILE *source, FILE *target);
 void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-extern void updateGlobalState(State new);
+extern void setGlobalState(State new);
 void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 int (*currentLine)() = &getCurrentLineNumber;
 
@@ -277,7 +277,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 
     /*     printMacroTable(); */
     /*     handleMacros(source, target); */
-    /*     updateGlobalState(firstRun); */
+    /*     setGlobalState(firstRun); */
 }
 
 /* ParseState getNextState(char *token, char *macroName, int c, ParseState currentState)

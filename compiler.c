@@ -1,25 +1,22 @@
 #include "data.h"
-/* Shared global State variables*/
 
-extern int firstRunParsing(FILE *fp, char *filename);
+/* extern int firstRunParsing(FILE *fp, char *filename);
 extern Bool handleSingleLine(char *line);
 void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
-
-extern void initTablesArrays();
 extern void printBinaryImg();
 extern void initMemory();
-extern void resetMemory();
+
 extern void updateFinalCountersValue();
 extern void printMemoryImgInRequiredObjFileFormat();
 extern void parseAssemblyCode(FILE *src);
 extern void exportFilesMainHandler();
 extern void initExternalOperandsList();
-
-extern void updateGlobalState(State new);
-
-extern void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode);
+extern void setGlobalState(State new);
 extern void parseSourceFile(FILE *src, FILE *target);
-extern void closeOpenLogFiles();
+extern void closeOpenLogFiles(); */
+extern void resetMemory();
+extern void initTablesArrays();
+extern void exportFilesMainHandler();
 
 void copyToNewFile(FILE *source, FILE *target);
 
@@ -59,8 +56,10 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char));
-    strcpy(fileName, arg);
+    memcpy(fileName, arg, strlen(arg));
+    /*     strcpy(fileName, arg); */
     strcat(fileName, ".as");
+    (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");
@@ -72,7 +71,6 @@ void handleSingleFile(char *arg)
 
     fileName[strlen(fileName) - 1] = 'm';
     (*setPath)(fileName);
-
     if ((target = fopen(fileName, "w+")) == NULL)
     {
 

@@ -2,7 +2,7 @@
 
 extern char *cloneString(char *s);
 static State globalState = startProgram;
-void updateGlobalState(State new)
+void setGlobalState(State new)
 {
     globalState = new;
 }

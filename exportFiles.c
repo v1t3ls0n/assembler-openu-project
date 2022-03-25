@@ -28,6 +28,7 @@ void generateObFile()
     }
     writeMemoryImageToObFile(ob);
     fclose(ob);
+
     free(fileName);
 }
 

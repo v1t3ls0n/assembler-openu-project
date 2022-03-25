@@ -1,5 +1,5 @@
 #include "data.h"
-void (*setGlobalState)() = &updateGlobalState;
+void (*setState)() = &setGlobalState;
 State (*globalState)() = &getGlobalState;
 
 extern Bool isPossiblyUseOfMacro(char *s);
@@ -16,37 +16,36 @@ char *getNthToken(char *s, int n);
 Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 {
 
-    static char macroName[MAX_LABEL_LEN] = {0};
+    static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
+    static long start = 0, end = 0;
 
     if (!isReadingMacro)
-    {
         fprintf(target, "%s\n", line);
-    }
+
     if (isMacroOpening(token))
     {
-        long start = ftell(src) + strlen(token) - 1;
-        char *next;
+
         printf("is macro opening!\n");
         next = strtok(NULL, " \t \n");
-
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
             return yieldError(illegalMacroNameUseOfSavedKeywords);
 
+        start = ftell(src) + strlen(token) + strlen(next) - 1;
         strcpy(macroName, next);
-        addMacro(macroName, start, -1);
         isReadingMacro = True;
         fseek(target, -strlen(line) - 1, SEEK_END);
     }
     else if (isMacroClosing(token))
     {
-        long end = ftell(src) - strlen(token) - 1;
+        end = ftell(src) - strlen(token) - 1;
         printf("is macro closing!\nend:%d\n", (int)end);
-        updateMacro(macroName, -1, end);
-        memset(macroName, 0, MAX_LABEL_LEN);
+        addMacro(macroName, start, end);
         isReadingMacro = False;
+        start = end = 0;
+        memset(macroName, 0, MAX_LABEL_LEN);
     }
     else if (isPossiblyUseOfMacro(token))
     {
@@ -96,7 +95,7 @@ void parseSourceFile(FILE *src, FILE *target)
             token = strtok(lineClone, " \t \n");
             if (!parseMacros(line, token, src, target))
             {
-                (*setGlobalState)(assemblyCodeFailedToCompile);
+                (*setState)(assemblyCodeFailedToCompile);
                 return;
             }
             memset(line, 0, MAX_LINE_LEN);
@@ -111,7 +110,7 @@ void parseSourceFile(FILE *src, FILE *target)
     if (i > 0)
         parseMacros(line, token, src, target);
 
-    (*setGlobalState)(firstRun);
+    (*setState)(firstRun);
 }
 
 char *getNthToken(char *s, int n)

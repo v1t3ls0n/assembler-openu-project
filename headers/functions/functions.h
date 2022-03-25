@@ -4,8 +4,7 @@
 /* --------------------------------------------In globalVariables.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void initAssemblyCodeFiles(char *fileName, assemblyCode *userCode);
-void updateGlobalState(State new);
+void setGlobalState(State new);
 State getGlobalState();
 
 void setCurrentFileName(char *s);

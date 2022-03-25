@@ -3,7 +3,7 @@
 int (*line)() = &getCurrentLineNumber;
 char *(*fileName)() = &getFileNamePath;
 
-static FILE *warningsFile, *errorsFile;
+static FILE *warningsFile = NULL, *errorsFile = NULL;
 
 void yieldWarningIntoFile(Warning err)
 {
@@ -550,8 +550,8 @@ Bool yieldError(Error err)
 
 void closeOpenLogFiles()
 {
-    if (warningsFile)
+    if (warningsFile != NULL)
         fclose(warningsFile);
-    if (errorsFile)
+    if (errorsFile != NULL)
         fclose(errorsFile);
 }

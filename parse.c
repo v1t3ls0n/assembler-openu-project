@@ -256,7 +256,7 @@ Bool handleSingleLine(char *line)
 void parseAssemblyCode(FILE *src)
 {
     State (*globalState)() = &getGlobalState;
-    void (*setGlobalState)() = &updateGlobalState;
+    void (*setState)() = &setGlobalState;
     int c = 0, i = 0;
     char line[MAX_LINE_LEN + 1] = {0};
     Bool isValidCode = True;
@@ -303,5 +303,5 @@ void parseAssemblyCode(FILE *src)
         nextState = (*globalState)() == firstRun ? secondRun : exportFiles;
 
     (*resetCurrentLineCounter)();
-    (*setGlobalState)(nextState);
+    (*setState)(nextState);
 }
