@@ -112,9 +112,10 @@ Bool writeDataInstruction(char *token)
 Bool writeStringInstruction(char *s)
 {
     char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
-    start++;
-
-    for (; start != end && *start != '\0'; start++)
+    int i, len = strlen(start);
+    printf("start:%s end:%s\n", start, end);
+    /*  start++; */
+    for (i = 1; i < len - 1; i++)
         addWord((A << 16) | *start, Data);
 
     addWord((A << 16) | '\0', Data);

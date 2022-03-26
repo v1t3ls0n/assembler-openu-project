@@ -19,7 +19,43 @@ Bool handleSingleLine(char *line);
    While the function parsing the arguments, ir also counts the number of .data elements that will take size in the data memory.
    In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .data instruction will take.
 */
+
 Bool countAndVerifyDataArguments(char *line)
+{
+    Bool isValid = True;
+    int size = 0, n = 0, num = 0, i = 0;
+    char c = 0;
+    char args[MAX_LINE_LEN + 1] = {0}, *p;
+    line = strstr(line, DATA) + strlen(DATA);
+    strcpy(args, line);
+    printf("countAndVerifyDataArguments\nline:%s\nargs:%s\n", line, args);
+
+    /*     memcpy(args, line, len); */
+    isValid = verifyCommaSyntax(args);
+    p = strtok(line, ", \t\n\f\r");
+    size = 1;
+    while (p != NULL)
+    {
+        sscanf(p, "%d%n%c", &num, &n, &c);
+        if (c == '.' && n > 0)
+            isValid = yieldError(wrongArgumentTypeNotAnInteger);
+        num = atoi(p);
+        if (!num && *p != '0')
+            isValid = yieldError(expectedNumber);
+
+        n = num = c = 0;
+        size++;
+        i += strlen(p);
+        p = strtok(NULL, ", \t\n\f\r");
+    }
+    printf("line 51\nsize:%d\n", size);
+
+    if (isValid)
+        increaseDataCounter(size);
+
+    return isValid;
+}
+Bool countAndVerifyDataArgumentsV2(char *line)
 {
 
     Bool isValid = True;
@@ -221,104 +257,11 @@ Bool verifyCommaSyntax(char *line)
     return isValid;
 }
 
-Bool countAndVerifyOperandSyntax(char *args)
-{
-    /*     char *s1 = args, *s2;
-        Bool parsedOperands = False;
-        int counter = 0;
-        int commasCounter = 0; */
-    Bool areOperandsLegal = True;
-    areOperandsLegal = verifyCommaSyntax(args);
-
-    /*     if (*s1 == ',')
-    {
-        while (*s1 && (*s1 == ',' || isspace(*s1)))
-            s1++;
-
-        if (*s1)
-            areOperandsLegal = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-        else
-            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-    }
-
-    s2 = s1;
-    while (*s1 && !parsedOperands)
-    {
-        counter++;
-        if (*s1 == ',' || isspace(*s1))
-        {
-            while (*s1 == ',' || isspace(*s1))
-            {
-                if (*s1 == ',')
-                    commasCounter++;
-                s1++;
-            }
-
-            if (commasCounter > 1)
-                areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
-
-strcpy(second, s1);
-strncpy(first, s2, counter - 1);
-parsedOperands = True;
-}
-
-s1++;
-}
-while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
-s1++;
-second[strlen(second) - strlen(s1)] = '\0';
-if (strlen(first) > 0 && strlen(second) < 1)
-{
-strcpy(second, first);
-memset(first, 0, strlen(first));
-if (commasCounter > 0)
-    areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-}
-
-commasCounter = 0;
-counter = 0;
-while (*s1 && *s1 != '\0')
-{
-if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
-    counter++;
-if (*s1 == ',')
-    commasCounter++;
-
-s1++;
-}
-
-if (commasCounter > 0)
-areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-
-if (counter > 0)
-areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-*/
-
-    /*
-            if (*s1 == ',')
-            {
-                yieldError(illegalApearenceOfCommaAfterLastParameter);
-                second[strlen(second) - strlen(s1) - 1] = '\0';
-            }
-            else if (!isspace(*s1) && isprint(*s1))
-                areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-
-
-            if (commasCounter > 1)
-                areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
-
-    else if (commasCounter < 1 && (strlen(first) && strlen(second)))
-        areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
-        */
-
-    return areOperandsLegal ? True : False;
-}
-
 Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
     args = strchr(line, '\"');
-    if (!args)
+    if (!*args)
         return yieldWarning(emptyStringDeclatretion);
 
     if (args[0] != '\"')
@@ -366,7 +309,6 @@ ParseState parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
-        printf("line:%s\n", line);
 
         if (!isInstructionStrict(token))
         {
@@ -375,9 +317,11 @@ ParseState parseLine(char *token, char *line)
         }
         type = getInstructionType(token);
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+        printf("line:%s\ntoken:%s\nnext:%s\n", line, token, next);
 
-        if (!next)
+        if (next == NULL)
         {
+            printf("line 328\n");
             if (type == _TYPE_DATA || type == _TYPE_STRING)
                 return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
             else
