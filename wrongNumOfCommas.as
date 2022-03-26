@@ -20,6 +20,10 @@ sub N[r14]     , O,
 jmp M    ,  
 ;illegal appearence of comma after the last parameter at not
 not        r4      ,   
+;missing comma at add
+add #2    r7
+;missing comma at cmp
+cmp        #3       N
 ;illegal appearence of comma after the last parameter + illegal comma before first operand at prn
 prn     ,#-88,
 ;illegal appearence of comma after the last parameter + illegal comma before first operand at cmp
