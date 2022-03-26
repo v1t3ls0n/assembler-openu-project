@@ -44,56 +44,86 @@ ParseState handleOperation(char *operationName, char *args)
 
         if (*s1 == ',')
         {
-            areOperandsLegal = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
             while (*s1 && (*s1 == ',' || isspace(*s1)))
                 s1++;
+
+            if (*s1)
+                areOperandsLegal = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+            else
+                areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
         }
+
         s2 = s1;
         while (*s1 && !parsedOperands)
         {
             counter++;
             if (*s1 == ',' || isspace(*s1))
             {
-                if (strlen(second) < 1)
+                while (*s1 == ',' || isspace(*s1))
                 {
-                    while (*s1 == ',' || isspace(*s1))
-                    {
-                        if (*s1 == ',')
-                            commasCounter++;
-                        s1++;
-                    }
-                    strcpy(second, s1);
-                    strncpy(first, s2, counter - 1);
+                    if (*s1 == ',')
+                        commasCounter++;
+                    s1++;
                 }
 
-                else
-                {
-                    second[strlen(second) - strlen(s1)] = '\0';
-                    parsedOperands = True;
-                }
+                if (commasCounter > 1)
+                    areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
+
+                /*                 printf("counter -1:%d strlens2 - strlens1:%d\n", counter - 1, (int)(strlen(s2) - strlen(s1)));
+                 */
+                strcpy(second, s1);
+                strncpy(first, s2, counter - 1);
+                parsedOperands = True;
             }
+
             s1++;
         }
+        while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
+            s1++;
 
-        s1 = strtok(s1, " \t \n");
+        if (*s1 == ',')
+            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
+
+        second[strlen(second) - strlen(s1)] = '\0';
 
         if (strlen(first) > 0 && strlen(second) < 1)
         {
             strcpy(second, first);
             memset(first, 0, strlen(first));
+            if (commasCounter > 0)
+                areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
         }
 
-        if (s1 != NULL)
+        counter = 0;
+        while (*s1 && *s1 != '\0')
+        {
+            if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
+                counter++;
+            s1++;
+        }
+        if (counter > 0)
             areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
 
-        if (commasCounter > 1)
-            areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
+        /*         printf("second:%s first:%s s1:%s\n", second, first, s1); */
+
+        /*
+                if (*s1 == ',')
+                {
+                    yieldError(illegalApearenceOfCommaAfterLastParameter);
+                    second[strlen(second) - strlen(s1) - 1] = '\0';
+                }
+                else if (!isspace(*s1) && isprint(*s1))
+                    areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
+         */
+        /*
+                if (commasCounter > 1)
+                    areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas); */
 
         else if (commasCounter < 1 && (strlen(first) && strlen(second)))
             areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
     }
 
-    areOperandsLegal = parseOperands(first, ',', second, p, active) && areOperandsLegal;
+    areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
     if (areOperandsLegal)
     {
         int size = 2;
@@ -111,36 +141,9 @@ ParseState handleOperation(char *operationName, char *args)
 
     return areOperandsLegal ? lineParsedSuccessfully : Err;
 }
-Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
+Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
-    printf("first:%s second:%s length first:%d length second:%d\n", src, des, (int)strlen(src), (int)strlen(des));
 
-    /*     int commasCount = 0;
-        int expectedCommasBasedOnNumberOfOperands = 0;
-        expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
-        if (src && strchr(src, ','))
-        {
-            char *p = strchr(src, ',');
-            *p = '\0';
-            commasCount++;
-        }
-
-        if (des && strchr(des, ','))
-        {
-            commasCount++;
-            des++;
-        }
-        if (comma == ',')
-            commasCount++;
-
-        if (commasCount > expectedCommasBasedOnNumberOfOperands)
-            return yieldError(wrongOperationSyntaxExtraCommas);
-
-        else if (commasCount < expectedCommasBasedOnNumberOfOperands)
-            return yieldError(wrongOperationSyntaxMissingCommas);
-
-        else if (commasCount == expectedCommasBasedOnNumberOfOperands)
-        { */
     if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !*src && !*des)
         return True;
     else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))

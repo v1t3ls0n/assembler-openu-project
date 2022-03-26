@@ -6,7 +6,6 @@ extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offs
 /* from firstRun.c */
 extern Bool handleSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
-extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 extern int getInstructionType(char *s);
 extern Bool isOperation(char *s);
 extern Bool isValidIndexParameter(char *s);

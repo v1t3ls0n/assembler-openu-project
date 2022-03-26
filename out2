@@ -1,0 +1,178 @@
+[H[2J[3Jgcc -ansi -Wall -pedantic -g data.h preProccesor.c globalVariables.c encode.c  exportFiles.c errors.c utils.c helpers.c parse.c operations.c tables.c  memory.c secondRun.c firstRun.c compiler.c -o compiler -lm
+
+	 ~ MACRO TABLE ~ 
+	name	start	end
+
+
+
+
+First Run:(wrongNumOfCommas.am)
+;this file will include errors- wrong number of commas 
+;consecutive commas at mov 
+mov O ,  ,, r3 
+s1:O ,  ,, r3  
+
+line59
+s1:O ,  ,, r3  
+
+second:r3 first:O s1:
+;consecutive commas at add 
+add #-5,,M[r14] 
+s1:#-5,,M[r14]  
+
+line59
+s1:#-5,,M[r14]  
+
+second:M[r14] first:#-5 s1:
+;consecutive commas at lea 
+lea L ,,  , , , O  
+s1:L ,,  , , , O   
+
+line59
+s1:L ,,  , , , O   
+
+second:O first:L s1:
+;illegal comma before first operand at cmp 
+cmp , #-5, #2 
+s1:, #-5, #2  
+
+line59
+s1:#-5, #2  
+
+second:#2 first:#-5 s1:
+;illegal comma before first operand at bne 
+bne ,L 
+s1:,L  
+
+line59
+s1:L  
+
+second:L first: s1:
+;illegal comma before first operand at red 
+red ,         r10 
+s1:,         r10  
+
+line59
+s1:r10  
+
+second:r10 first: s1:
+M: .data 9,6, -33    ,55 
+;illegal appearence of comma at stop 
+stop ,  
+s1:,   
+
+line59
+s1:
+second: first: s1:
+;illegal appearence of comma after the last parameter at sub 
+sub N[r14]     , O, 
+s1:N[r14]     , O,  
+
+line59
+s1:N[r14]     , O,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:O first:N[r14] s1:
+;illegal appearence of comma after the last parameter at jmp 
+jmp M    ,   
+s1:M    ,    
+
+line59
+s1:M    ,    
+
+second:M first: s1:
+;illegal appearence of comma after the last parameter at not 
+not        r4      ,    
+s1:r4      ,     
+
+line59
+s1:r4      ,     
+
+second:r4 first: s1:
+;missing comma at add 
+add #2    r7 
+s1:#2    r7  
+
+line59
+s1:#2    r7  
+
+second:r7 first:#2 s1:
+;missing comma at cmp 
+cmp        #3       N 
+s1:#3       N  
+
+line59
+s1:#3       N  
+
+second:N first:#3 s1:
+t operand at prn 
+prn     ,#-88, 
+s1:,#-88,  
+
+line59
+s1:#-88,  
+
+second:#-88 first: s1:
+t operand at cmp 
+cmp , r2,  O[r13] , 
+s1:, r2,  O[r13] ,  
+
+line59
+s1:r2,  O[r13] ,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:O[r13] first:r2 s1:
+t operand at red 
+red , N, 
+s1:, N,  
+
+line59
+s1:N,  
+
+second:N first: s1:
+mov #3,,,,,,r7, 
+s1:#3,,,,,,r7,  
+
+line59
+s1:#3,,,,,,r7,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:r7 first:#3 s1:
+add r2 ,     ,    r8  , 
+s1:r2 ,     ,    r8  ,  
+
+line59
+s1:r2 ,     ,    r8  ,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:r8 first:r2 s1:
+.extern L 
+;illegal comma before first operand + consecutive commas at sub 
+sub ,N,O[r12], 
+s1:,N,O[r12],  
+
+line59
+s1:N,O[r12],  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:O[r12] first:N s1:
+O: .extern N 
+;illegal comma before first operand + consecutive commas at lea 
+lea , M   ,r1    , 
+s1:, M   ,r1    ,  
+
+line59
+s1:M   ,r1    ,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:r1 first:M s1:
+O: .string "fnuu "  67*(+S4r)  ;/, e H B" 
+t operand + consecutive commas at cmp 
+cmp  ,#4   ,  , ,,L    , 
+s1:,#4   ,  , ,,L    ,  
+
+line59
+s1:#4   ,  , ,,L    ,  
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+second:L first:#4 s1:

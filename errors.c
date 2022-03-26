@@ -384,7 +384,7 @@ Bool yieldError(Error err)
     }
     case illegalApearenceOfCommaBeforeFirstParameter:
     {
-        fprintf(stderr, "Illegal appearence of a comma between before the first parameter");
+        fprintf(stderr, "Illegal appearence of a comma before the first parameter");
         break;
     }
     case illegalApearenceOfCommaAfterLastParameter:
