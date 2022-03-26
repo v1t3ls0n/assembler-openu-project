@@ -193,9 +193,18 @@ ParseState parseLine(char *token, char *line)
 
     else if (isInstruction(token))
     {
+        char *next;
+        int type;
+        Bool isValid = True;
 
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
-        int type = getInstructionType(token);
+        if (!isInstructionStrict(token))
+        {
+            isValid = yieldError(missinSpaceAfterInstruction);
+            token = getInstructionName(token);
+        }
+
+        next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+        type = getInstructionType(token);
         if (!next)
         {
             if (type == _TYPE_DATA || type == _TYPE_STRING)
@@ -206,7 +215,7 @@ ParseState parseLine(char *token, char *line)
         else
         {
             if ((*globalState)() == firstRun)
-                return handleInstruction(type, token, next, line);
+                return isValid && handleInstruction(type, token, next, line);
             else
             {
                 if (type == _TYPE_DATA)
