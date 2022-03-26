@@ -1,11 +1,10 @@
 
 #include "data.h"
 
-extern void setCurrentFileName(char *s);
 extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
 
 /* from firstRun.c */
-extern Bool parseSingleLine(char *line);
+extern Bool handleSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
 extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 extern int getInstructionType(char *s);
@@ -19,11 +18,11 @@ extern Bool isComment(char *s);
 extern int getSymbolBaseAddress(char *name);
 extern int getSymbolOffset(char *name);
 extern Bool isExternal(char *name);
-extern Item *getSymbol(char *name);
+
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
 extern Bool areExternalsExist();
-extern void updateExternalOperandList(char *name, unsigned base, unsigned offset);
+extern void updateExtPositionData(char *name, unsigned base, unsigned offset);
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
 
@@ -31,10 +30,10 @@ extern Operation *getOperationByName(char *s);
 extern unsigned getDC();
 extern unsigned getIC();
 extern void addWord(int value, DataType type);
-extern void parseAssemblyCode(FILE *fp, char *filename);
+extern void parseAssemblyCode(FILE *src);
 
-extern ParseState handleState(char *token, char *line);
-extern Bool parseSingleLine(char *line);
+extern ParseState parseLine(char *token, char *line);
+extern Bool handleSingleLine(char *line);
 
 Bool writeOperationBinary(char *operationName, char *args)
 {
@@ -43,14 +42,12 @@ Bool writeOperationBinary(char *operationName, char *args)
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
-
     writeFirstWord(op);
+
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
     {
-        /*         printf("operation:%s args:%s first:%s second:%s\n", operationName, args, first, second);
-         */
-        writeSecondWord(first, second, active, op);
 
+        writeSecondWord(first, second, active, op);
         if (active[0].index)
         {
             parseLabelNameFromIndexAddrOperand(first);
@@ -134,6 +131,7 @@ void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Op
         secondWord = secondWord | (active[1].reg ? (getRegisteryNumber(second) << 2) : (parseRegNumberFromIndexAddrOperand(second) << 2)) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
     else if (second && (active[1].direct || active[1].immediate))
         secondWord = secondWord | (0 << 2) | (active[1].direct ? (DIRECT_ADDR) : (IMMEDIATE_ADDR));
+
     addWord(secondWord, Code);
 }
 
@@ -153,9 +151,7 @@ void writeDirectOperandWord(char *labelName)
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        updateExternalOperandList(labelName, base, offset);
-
-        /*         writeToCurrentExternalsFile(labelName, base, offset); */
+        updateExtPositionData(labelName, base, offset);
     }
 
     else
@@ -175,6 +171,7 @@ void writeImmediateOperandWord(char *n)
 
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
 {
+
     if (isRegistery(operand))
         active[type].reg = 1;
     else if (isValidImmediateParamter(operand))
@@ -183,8 +180,10 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
         active[type].index = 1;
     else
     {
-        if (getSymbol(operand) != NULL)
+
+        if (isSymbolExist(operand))
         {
+
             if (isEntry(operand) && !isNonEmptyEntry(operand))
                 return yieldError(entryDeclaredButNotDefined);
 
@@ -199,35 +198,20 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
 char *parseLabelNameFromIndexAddrOperand(char *s)
 {
     char *p = strchr(s, '[');
+
     *p = 0;
+
     return s;
 }
 
 int parseRegNumberFromIndexAddrOperand(char *s)
 {
     char *p = strchr(s, ']');
+
     s = strchr(s, '[');
     s++;
     if (p)
         *p = 0;
+
     return getRegisteryNumber(s);
-}
-
-void writeSingleExternalsFile(char *name, unsigned base, unsigned offset)
-{
-
-    FILE *extSingle;
-    char *fileName = calloc(strlen(name) + 3, sizeof(char));
-    sscanf(name, "%s", fileName);
-    strcat(fileName, ".ext");
-    extSingle = fopen(fileName, "w+");
-    if (extSingle == NULL)
-    {
-        printf("failed to create %s compiled file\n", fileName);
-        return;
-    }
-    fprintf(extSingle, "%s BASE %d\n", name, base);
-    fprintf(extSingle, "%s OFFSET %d\n", name, offset);
-    fclose(extSingle);
-    free(fileName);
 }

@@ -35,7 +35,7 @@ int parseAllStrict(FILE *target)
 
             if (!isspace(c) && j < MAX_LABEL_LEN && i < MAX_LABEL_LEN)
             {
-                if (state == parsingMacroName)
+                if (state == getMacroName)
                     macroName[i++] = c;
 
                 else
@@ -54,7 +54,7 @@ int parseAllStrict(FILE *target)
                 {
                     if (!isMacro && isMacroOpening(token))
                     {
-                        state = parsingMacroName;
+                        state = getMacroName;
                         isMacro = True;
                     }
                     if (!isMacro && isMacroClosing(token))
@@ -95,7 +95,7 @@ int parseAllStrict(FILE *target)
           j = 0;
       }
 
-      else if (state == parsingMacroName)
+      else if (state == getMacroName)
       {
 
           if (isLegalMacroName(macroName))

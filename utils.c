@@ -44,7 +44,6 @@ Bool isRegistery(char *s)
 {
     int len = strlen(s);
     int i = 0;
-
     if (s[0] == 'r' && len >= 2)
     {
         while (i < REGS_SIZE)
@@ -53,9 +52,6 @@ Bool isRegistery(char *s)
                 return True;
             i++;
         }
-        /*         s++;
-                if (atoi(s) >= REGS_SIZE)
-                    yieldError(wrongRegisteryReferenceUndefinedReg); */
     }
     return False;
 }
@@ -74,6 +70,7 @@ Bool isValidIndexParameter(char *s)
     int len = strlen(s);
     if (len < 6)
         return False;
+
     else if (!(s[len - 1] == ']' && s[len - 4] == 'r' && s[len - 5] == '['))
         return False;
     else
@@ -83,7 +80,7 @@ Bool isValidIndexParameter(char *s)
 
         s[strlen(s) - 1] = 0;
 
-        if (getRegisteryNumber(s) < 10)
+        if (isRegistery(s) && getRegisteryNumber(s) < 10)
             return False;
     }
     return True;
@@ -119,19 +116,8 @@ int getInstructionType(char *s)
 
 int getRegisteryNumber(char *s)
 {
-    int len = strlen(s);
-    int i = 0;
-
-    if (s[0] == 'r' && len >= 2)
-    {
-        while (i < REGS_SIZE)
-        {
-            if ((strcmp(s, regs[i]) == 0))
-                return i;
-            i++;
-        }
-    }
-    return -1;
+    s++;
+    return atoi(s);
 }
 
 char *getInstructionNameByType(int type)

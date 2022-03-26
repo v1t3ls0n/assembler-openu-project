@@ -1,8 +1,11 @@
 #include "data.h"
-extern char *cloneString(char *s);
 
+extern char *cloneString(char *s);
 static State globalState = startProgram;
-void updateGlobalState(State new)
+static char *path;
+static unsigned currentLineNumber = 1;
+
+void setGlobalState(State new)
 {
     globalState = new;
 }
@@ -12,42 +15,19 @@ State getGlobalState()
     return current;
 }
 
-static char *currentFileName;
-static char *path;
-
 void setFileNamePath(char *s)
 {
-    size_t length;
-    if (!(*s))
-    {
-        /*      memset(path, 0, strlen(path)); */
+    if (!*s)
         return;
-    }
-    length = strlen(s) - strlen(currentFileName);
-    path = (char *)realloc(path, length * sizeof(char *));
-    strncpy(path, s, length);
-    printf("inside setFileNamePath, path:%s\n", path);
+    path = (char *)realloc(path, strlen(s) * sizeof(char *));
+    strcpy(path, cloneString(s));
 }
 
-char *getFileNamePath(char *s)
+char *getFileNamePath()
 {
-    if (!(*s))
-        return "";
     return cloneString(path);
 }
 
-void setCurrentFileName(char *s)
-{
-    currentFileName = (char *)realloc(currentFileName, strlen(s) * sizeof(char));
-    strcpy(currentFileName, cloneString(s));
-}
-
-char *getCurrentFileName()
-{
-    return cloneString(currentFileName);
-}
-
-static unsigned currentLineNumber = 1;
 void resetCurrentLineNumber()
 {
     currentLineNumber = 1;

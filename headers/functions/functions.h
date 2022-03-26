@@ -4,7 +4,7 @@
 /* --------------------------------------------In globalVariables.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void updateGlobalState(State new);
+void setGlobalState(State new);
 State getGlobalState();
 
 void setCurrentFileName(char *s);
@@ -15,13 +15,16 @@ void increaseCurrentLineNumber();
 void resetCurrentLineNumber();
 
 void setFileNamePath(char *s);
-char *getFileNamePath(char *s);
+char *getFileNamePath();
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In exportFiles.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-void exportFilesMainHandler(char *baseFileName);
-void createEnternalsFile(char *baseFileName);
+void generateObFile();
+void createEntriesFile();
+void createExternalsFile();
+extern char *getFileNamePath();
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In memory.c -------------------------------------------------------*/
@@ -31,12 +34,12 @@ void writeEntriesToFile(FILE *fp);
 void writeMemoryImageToObFile(FILE *fp);
 void increaseDataCounter(int amount);
 void increaseInstructionCounter(int amount);
-void updateFinalCountersValue();
+void calcFinalAddrsCountersValues();
 unsigned getDC();
 unsigned getIC();
 unsigned getICF();
 unsigned getDCF();
-void initMemory();
+void allocMemoryImg();
 void printBinaryImg();
 void printWordBinary(unsigned index);
 void wordStringToWordObj(char *s, DataType type);
@@ -51,19 +54,17 @@ void addWord(int value, DataType type);
 /*---------------------------------------------------------------------------------------------------------------*/
 
 int handleSourceFiles(int argc, char *argv[]);
-void parseAssemblyCode(FILE *fp, char *filename);
-ParseState handleState(char *token, char *line);
+void parseAssemblyCode(FILE *src);
+ParseState parseLine(char *token, char *line);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In preProcessor.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
-void parseAndReplaceMacros(FILE *source, FILE *target);
-void replaceWithMacro(FILE *target, FILE *source, int start, int end);
-void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
-void parseMacro(FILE *fp);
-FILE *createCopyFromSourceFile(FILE *source, char *fileName);
+void parseSourceFile(FILE *src, FILE *target);
+Bool parseMacros(char *line, char *token, FILE *src, FILE *target);
+
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -74,7 +75,7 @@ Bool yieldError(Error err);
 Bool yieldWarning(Warning err);
 void yieldWarningIntoFile(Warning err);
 void yieldErrorIntoFile(Error err);
-
+void closeOpenLogFiles();
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/
@@ -98,6 +99,7 @@ Item *install(char *name, ItemType type);
 void printSymbolTable();
 int printSymbolItem(Item *item);
 Item *getSymbol(char *name);
+Bool isSymbolExist(char *name);
 Item *addMacro(char *name, int start, int end);
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
@@ -109,7 +111,7 @@ Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 void initTables();
-void updateFinalSymbolTableValuesAndCountEntriesAndExternals();
+void updateFinalSymbolTableValues();
 int updateFinalValueOfSingleItem(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
@@ -124,9 +126,9 @@ void writeExternalsToFile(FILE *fp);
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
 
 void initExternalOperandsList();
-ExtListItem *findExternalOperandListItem(char *name);
-int findExternalOperandListItemIndex(char *name);
-void updateExternalOperandList(char *name, unsigned base, unsigned offset);
+ExtListItem *findExtOpListItem(char *name);
+int findExtOpListItemIndex(char *name);
+void updateExtPositionData(char *name, unsigned base, unsigned offset);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/
@@ -158,7 +160,7 @@ char *cloneString(char *s);
 int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
-Bool parseSingleLine(char *line);
+Bool handleSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
@@ -200,7 +202,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState handleState(char *token, char *line);
+ParseState parseLine(char *token, char *line);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);
