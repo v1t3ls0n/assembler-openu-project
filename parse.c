@@ -169,7 +169,8 @@ ParseState parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
 
-    printf("parse line, line:%s\n token:%s\n", line, token);
+    /*     printf("parse line, line:%s\n token:%s\n", line, token);
+     */
     if (isComment(token))
         return lineParsedSuccessfully;
 
@@ -270,8 +271,8 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
-        putchar(c);
-
+        /*         putchar(c);
+         */
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
             isValidCode = yieldError(maxLineLengthExceeded);

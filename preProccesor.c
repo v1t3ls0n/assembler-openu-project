@@ -25,8 +25,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
     if (isMacroOpening(token))
     {
-
-            next = strtok(NULL, " \t \n");
+        next = strtok(NULL, " \t \n");
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))

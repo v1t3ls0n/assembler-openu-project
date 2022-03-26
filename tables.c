@@ -24,8 +24,6 @@ void initTables()
     if (externalCount)
         resetExtList();
 
-    externalCount = 0;
-    entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
@@ -48,23 +46,23 @@ ExtListItem *findExtOpListItem(char *name)
 
 void resetExtList()
 {
-    ExtListItem *np = extListHead, *next;
+    ExtListItem *np = extListHead, *next = NULL;
     ExtPositionData *pos, *nextPos;
-    while (np != NULL)
+    externalCount = 0;
+    entriesCount = 0;
+    while (next != NULL)
     {
+        next = np->next;
         free(np->name);
-        pos = np->value;
-        while (pos != NULL)
+        nextPos = np->value;
+        while (nextPos != NULL)
         {
-            nextPos = np->next;
-            free(np->value);
             pos = nextPos;
+            nextPos = nextPos->next;
+            free(pos);
         }
-
-        np = next;
+        free(np);
     }
-
-    free(extListHead);
 }
 
 void updateExtPositionData(char *name, unsigned base, unsigned offset)
@@ -72,12 +70,11 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
 
     ExtListItem *np = findExtOpListItem(name);
     ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
-    printf("line 66, tables.c\n");
-
     new->base = base;
     new->offset = offset;
+    new->next = NULL;
     new->next = np->value;
-    np = new;
+    np->value = new;
 }
 
 void addExtListItem(Item *item)
@@ -93,7 +90,10 @@ void addExtListItem(Item *item)
         extListHead->next = next;
     }
     else
+    {
+        next->next = NULL;
         extListHead = next;
+    }
 }
 unsigned hash(char *s)
 {
@@ -496,7 +496,6 @@ void writeExternalsToFile(FILE *fp)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
-        printf("line 488\n");
         writeSingleExternal(fp, p->name, p->value);
         p = p->next;
     }
@@ -504,10 +503,10 @@ void writeExternalsToFile(FILE *fp)
 
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
 {
-    /*     printf("line 496\nvalue->base:%u\n", value->base); */
+    ExtPositionData *nextValue = value->next;
     fprintf(fp, "%s BASE %u\n", name, value->base);
     fprintf(fp, "%s OFFSET %u\n", name, value->offset);
-    if (value->next != NULL)
+    if (nextValue != NULL && nextValue->base)
         writeSingleExternal(fp, name, value->next);
 }
 

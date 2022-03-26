@@ -11,8 +11,8 @@ void exportFilesMainHandler()
     generateObFile();
     if (areEntriesExist())
         createEntriesFile();
-    /*     if (areExternalsExist())
-            createExternalsFile(); */
+    if (areExternalsExist())
+        createExternalsFile();
 }
 
 void generateObFile()
