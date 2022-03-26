@@ -24,65 +24,63 @@ ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
     char comma = 0;
-    char *first = 0, *second = 0, *inBetweenOperands = 0, *extra = 0;
+    char first[MAX_LABEL_LEN] = {0}, second[MAX_LABEL_LEN] = {0}, *inBetweenOperands = 0, *extra = 0;
     int commasCounter = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     Bool areOperandsLegal = True;
+
     /*
     val1,val2
     val1, val2
     val1 ,val2
     val1 , val2
      */
-    printf("args:%s\n", args);
     if (*args)
     {
-        char *s = args;
-        first = args;
-        if (*first == ',')
+        char *s1 = args, *s2;
+        Bool parsedOperands = False;
+        int counter = 0;
+        s1 = trimFromLeft(s1);
+
+        if (*s1 == ',')
         {
             areOperandsLegal = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-            while (*first && *first == ',')
-            {
-                first++;
-                s++;
-            }
-            s = s + strlen(first);
+            while (*s1 && (*s1 == ',' || isspace(*s1)))
+                s1++;
         }
-        s = trimFromLeft(s);
-        while (*s)
+        s2 = s1;
+        while (*s1 && !parsedOperands)
         {
-            if (isspace(*s))
-                s = trimFromLeft(s);
-
-            if (*s == ',')
+            counter++;
+            if (*s1 == ',' || isspace(*s1))
             {
-
-                if (second)
-                    areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
+                if (strlen(second) < 1)
+                {
+                    while (*s1 == ',' || isspace(*s1))
+                    {
+                        if (*s1 == ',')
+                            commasCounter++;
+                        s1++;
+                    }
+                    strcpy(second, s1);
+                    strncpy(first, s2, counter - 1);
+                }
 
                 else
                 {
-                    first = (char *)calloc((strlen(args) - strlen(s)) + 1, sizeof(char *));
-
-                    while (*s == ',')
-                    {
-                        commasCounter++;
-                        s++;
-                    }
-
-                    second = s;
-                    strncpy(first, args, (strlen(args) - strlen(s)) - 1);
+                    second[strlen(second) - 1] = '\0';
+                    parsedOperands = True;
                 }
             }
-
-            s++;
+            s1++;
         }
+
+        s1 = strtok(s1, " \t \n");
+        if (s1 != NULL)
+            areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
 
         if (commasCounter > 1)
             areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
-
-        printf("first:%s\nsecond:%s\n", first, second);
     }
 
     areOperandsLegal = parseOperands(first, ',', second, p, active) && areOperandsLegal;

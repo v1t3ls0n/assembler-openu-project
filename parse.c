@@ -279,8 +279,8 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
-        /*         putchar(c);
-         */
+        putchar(c);
+
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
             isValidCode = yieldError(maxLineLengthExceeded);
