@@ -77,13 +77,19 @@ ParseState handleOperation(char *operationName, char *args)
 
         s1 = strtok(s1, " \t \n");
 
+        if (strlen(first) > 0 && strlen(second) < 1)
+        {
+            strcpy(second, first);
+            memset(first, 0, strlen(first));
+        }
+
         if (s1 != NULL)
             areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
 
         if (commasCounter > 1)
             areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
 
-        else if (commasCounter < 1)
+        else if (commasCounter < 1 && (strlen(first) && strlen(second)))
             areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
     }
 
@@ -135,7 +141,7 @@ Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsO
 
         else if (commasCount == expectedCommasBasedOnNumberOfOperands)
         { */
-    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
+    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !*src && !*des)
         return True;
     else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
     {
