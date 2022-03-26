@@ -72,6 +72,8 @@ typedef struct
 {
     char *name;
     ExtPositionData *value;
+    void *next;
+
 } ExtListItem;
 
 typedef struct

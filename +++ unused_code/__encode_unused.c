@@ -19,7 +19,7 @@ char *generateFirstWordEncodedToBinary(Operation *operation)
 
 HexWord *generateFirstWordEncodedHex(Operation *operation)
 {
-    char *buf = (char *)calloc(6, sizeof(char));
+    char *buf = (char *)(6, sizeof(char*));
     HexWord *newWord = (HexWord *)malloc(1 * sizeof(HexWord *));
     sprintf(buf, "%x", (A | operation->op));
     newWord->_A = buf[0];

@@ -1,20 +1,26 @@
 
 #include "data.h"
 int (*line)() = &getCurrentLineNumber;
-char *(*file)() = &getCurrentFileName;
-static FILE *warningsFile, *errorsFile;
+char *(*fileName)() = &getFileNamePath;
+
+static FILE *warningsFile = NULL, *errorsFile = NULL;
+static Bool isWarningFileExist = False;
+static Bool isErrorFileExist = False;
 
 void yieldWarningIntoFile(Warning err)
 {
-    static Bool isWarningFileExist = False;
+    extern Bool isWarningFileExist;
+    extern FILE *warningsFile;
     if (!isWarningFileExist)
     {
-        warningsFile = fopen("warnings.log", "w+");
-        isWarningFileExist = True;
+        if ((warningsFile = fopen("warnings.log", "w+")) == NULL)
+            printf("Failed to open warning log file\n");
+        else
+            isWarningFileExist = True;
     }
 
     fprintf(warningsFile, "\n######################################################################\n");
-    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -48,16 +54,20 @@ void yieldWarningIntoFile(Warning err)
     fprintf(warningsFile, "\n");
     fprintf(warningsFile, "######################################################################\n\n");
 }
+
 void yieldErrorIntoFile(Error err)
 {
-    static Bool isErrorFileExist = False;
+    extern FILE *errorsFile;
+    extern Bool isErrorFileExist;
     if (!isErrorFileExist)
     {
-        errorsFile = fopen("errors.log", "w+");
-        isErrorFileExist = True;
+        if ((errorsFile = fopen("errors.log", "w+")) == NULL)
+            printf("Failed to open erro log file\n");
+        else
+            isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");
-    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
 
     switch (err)
     {
@@ -282,7 +292,7 @@ Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Warning!! in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(stderr, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
     case emptyLabelDecleration:
@@ -319,10 +329,11 @@ Bool yieldWarning(Warning err)
 }
 
 Bool yieldError(Error err)
+
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*file)(), (*line)());
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
 
     switch (err)
     {
@@ -543,4 +554,20 @@ Bool yieldError(Error err)
     fprintf(stderr, "######################################################################\n");
 
     return False;
+}
+
+void closeOpenLogFiles()
+{
+    extern FILE *warningsFile, *errorsFile;
+    extern Bool isWarningFileExist, isErrorFileExist;
+    if (isWarningFileExist && warningsFile != NULL)
+    {
+        fclose(warningsFile);
+        isWarningFileExist = False;
+    }
+    if (isErrorFileExist && errorsFile != NULL)
+    {
+        fclose(errorsFile);
+        isErrorFileExist = False;
+    }
 }

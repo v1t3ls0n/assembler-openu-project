@@ -20,9 +20,6 @@ bne END
 cmp val1, #-6
 bne END[r15]
 dec K
-      macro m3
-        inc r2
-        sub r2,r6
        
 .entry MAIN
 sub LOOP[r10] ,r14

@@ -4,9 +4,8 @@ char *numToBin(int num)
 {
     int i = 0;
     unsigned int result;
-    char *word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
-    char hex[6];
-
+    char *word, hex[6];
+    word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
     if (num < 0)
     {
         result = abs(num);

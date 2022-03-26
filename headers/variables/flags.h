@@ -62,7 +62,8 @@ typedef enum
     afterPlusOrMinusSignThereMustBeANumber,
     illegalApearenceOfCharacterInTheBegningOfTheLine,
     illegalLabelNameUseOfSavedKeywordUsingOperationName,
-    illegalLabelNameUseOfSavedKeywordUsingRegisteryName
+    illegalLabelNameUseOfSavedKeywordUsingRegisteryName,
+    macroDeclaretionWithoutDefiningMacroName
 
 } Error;
 
@@ -96,19 +97,12 @@ typedef enum
 {
     Err = 0,
     lineParsedSuccessfully = 1,
-    skipLine = 2,
     newLine = 3,
     skipToNextToken = 4,
     parseLabel = 5,
     parseInstruction = 6,
     parseOperation = 7,
     parsingLine = 8,
-
-    parsingMacro,
-    parsingMacroName = 9,
-    parsingMacroContent = 10,
-    endParsingOfMacroThatHaveNoEndingTag = 11,
-    evalToken = 12,
     parseDataVariables = 13,
     parseStringVariables = 14,
     parseEntryVariable = 15,
@@ -116,7 +110,23 @@ typedef enum
     parseSourceOperand = 17,
     parseDestinationOperand = 18,
     writingOperationIntoMemoryImg = 19,
-    writingDataIntoMemoryImg = 20
+    writingDataIntoMemoryImg = 20,
+
+    skipLine,
+    writeToTargetFile,
+    evalToken,
+    readToken,
+    saveCharToToken,
+    deleteMacroFromTarget,
+    deleteLastLine,
+    parsingMacroName,
+    searchingMacroStart,
+    searchingMacroEnd,
+    addMacroToTable,
+    replaceMacro,
+    parsingMacroContent,
+    parsingToken,
+    replacingMacro
 
 } ParseState;
 
