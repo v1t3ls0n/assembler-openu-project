@@ -254,6 +254,7 @@ Bool handleSingleLine(char *line)
     strcpy(lineCopy, line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = parseLine(token, line);
+    (*currentLineNumberPlusPlus)();
     return state == lineParsedSuccessfully
                ? True
                : False;
@@ -300,7 +301,6 @@ void parseAssemblyCode(FILE *src)
         if (c == '\n')
         {
             line[i++] = '\n';
-            (*currentLineNumberPlusPlus)();
             if (i > 0)
             {
                 isValidCode = handleSingleLine(line) && isValidCode;

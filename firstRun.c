@@ -25,24 +25,42 @@ ParseState handleOperation(char *operationName, char *args)
     Operation *p = getOperationByName(operationName);
     char comma = 0;
     char *first = 0, *second = 0, *inBetweenOperands = 0, *extra = 0;
+    int commasCounter = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     Bool areOperandsLegal = True;
+    printf("args:%s\n", args);
     first = strtok(args, " \t \n");
-    if (first)
-        inBetweenOperands = strtok(NULL, " \t \n");
-
     if (!first)
         areOperandsLegal = parseOperands(first, comma, second, p, active);
-    else
-    {
-        if ((first && inBetweenOperands) && strlen(inBetweenOperands) == 1 && inBetweenOperands[0] == ',')
-        {
-            comma = ',';
-            second = strtok(NULL, " \t \n");
-        }
-        else if (first && inBetweenOperands)
-            second = inBetweenOperands;
 
+    if (first)
+    {
+        inBetweenOperands = strtok(NULL, " \t \n");
+        if (inBetweenOperands != NULL && *inBetweenOperands == ',')
+        {
+            commasCounter = 1;
+            comma = ',';
+            extra = inBetweenOperands;
+            inBetweenOperands = 0;
+            while (extra != NULL)
+            {
+                if (*extra == ',')
+                {
+                    while (*extra && *extra == ',')
+                    {
+                        commasCounter++;
+                        extra++;
+                    }
+                }
+                else
+                    second = extra;
+
+                extra = strtok(NULL, " \t \n");
+            }
+
+            if (commasCounter > 1)
+                areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas) && areOperandsLegal;
+        }
         else
         {
             if (strchr(first, ','))
@@ -60,11 +78,7 @@ ParseState handleOperation(char *operationName, char *args)
             }
         }
 
-        areOperandsLegal = parseOperands(first, comma, second, p, active);
-
-        extra = strtok(NULL, " \t \n");
-        if (extra)
-            areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
+        areOperandsLegal = parseOperands(first, comma, second, p, active) && areOperandsLegal;
     }
 
     if (areOperandsLegal)

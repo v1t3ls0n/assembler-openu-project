@@ -244,7 +244,7 @@ void yieldErrorIntoFile(Error err)
         fprintf(errorsFile, "Missing Comma between operands");
         break;
     case wrongOperationSyntaxExtraCommas:
-        fprintf(errorsFile, "Missing Comma between operands");
+        fprintf(errorsFile, "Extra Comma between operands");
         break;
 
     case wrongInstructionSyntaxExtraCommas:
@@ -509,12 +509,12 @@ Bool yieldError(Error err)
         fprintf(stderr, "Missing Comma between operands");
         break;
     case wrongOperationSyntaxExtraCommas:
-        fprintf(stderr, "Missing Comma between operands");
+        fprintf(stderr, "Extra Comma between operands");
         break;
 
     case wrongInstructionSyntaxExtraCommas:
     {
-        fprintf(stderr, "extra comma between arguments");
+        fprintf(stderr, "Extra comma between arguments");
         break;
     }
 
