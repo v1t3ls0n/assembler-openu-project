@@ -24,3 +24,5 @@ cmp ,#2       X
 sub ,#2 ,  ,,r4
 .extern X
 Y: .string "getgeb gt"
+;wrong register for index addressing method
+cmp Y[r12]  ,X[r2]
