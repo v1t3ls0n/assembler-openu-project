@@ -15,6 +15,7 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *line);
+Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char second[MAX_LINE_LEN]);
 extern void parseAssemblyCode(FILE *src);
 
 extern Bool writeStringInstruction(char *s);
@@ -23,107 +24,12 @@ extern Bool writeDataInstruction(char *s);
 ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
-    char first[MAX_LABEL_LEN] = {0}, second[MAX_LABEL_LEN] = {0};
-    int commasCounter = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    Bool areOperandsLegal = True;
-
-    /*
-    val1,val2
-    val1, val2
-    val1 ,val2
-    val1 , val2
-     */
+    char first[MAX_LINE_LEN] = {0};
+    char second[MAX_LINE_LEN] = {0};
+    Bool areOperandsLegal;
     if (*args)
-    {
-        char *s1 = args, *s2;
-        Bool parsedOperands = False;
-        int counter = 0;
-        s1 = trimFromLeft(args);
-
-        if (*s1 == ',')
-        {
-            while (*s1 && (*s1 == ',' || isspace(*s1)))
-                s1++;
-
-            if (*s1)
-                areOperandsLegal = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-            else
-                areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-        }
-
-        s2 = s1;
-        while (*s1 && !parsedOperands)
-        {
-            counter++;
-            if (*s1 == ',' || isspace(*s1))
-            {
-                while (*s1 == ',' || isspace(*s1))
-                {
-                    if (*s1 == ',')
-                        commasCounter++;
-                    s1++;
-                }
-
-                if (commasCounter > 1)
-                    areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
-
-                /*                 printf("counter -1:%d strlens2 - strlens1:%d\n", counter - 1, (int)(strlen(s2) - strlen(s1)));
-                 */
-                strcpy(second, s1);
-                strncpy(first, s2, counter - 1);
-                parsedOperands = True;
-            }
-
-            s1++;
-        }
-        while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
-            s1++;
-        second[strlen(second) - strlen(s1)] = '\0';
-        if (strlen(first) > 0 && strlen(second) < 1)
-        {
-            strcpy(second, first);
-            memset(first, 0, strlen(first));
-            if (commasCounter > 0)
-                areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-        }
-
-        commasCounter = 0;
-        counter = 0;
-        while (*s1 && *s1 != '\0')
-        {
-            if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
-                counter++;
-            if (*s1 == ',')
-                commasCounter++;
-
-            s1++;
-        }
-
-        if (commasCounter > 0)
-            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-
-        if (counter > 0)
-            areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-
-        /*         printf("second:%s first:%s s1:%s\n", second, first, s1); */
-
-        /*
-                if (*s1 == ',')
-                {
-                    yieldError(illegalApearenceOfCommaAfterLastParameter);
-                    second[strlen(second) - strlen(s1) - 1] = '\0';
-                }
-                else if (!isspace(*s1) && isprint(*s1))
-                    areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-         */
-        /*
-                if (commasCounter > 1)
-                    areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas); */
-
-        else if (commasCounter < 1 && (strlen(first) && strlen(second)))
-            areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
-    }
+        areOperandsLegal = countAndVerifyOperandSyntax(args, first, second);
 
     areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
     if (areOperandsLegal)

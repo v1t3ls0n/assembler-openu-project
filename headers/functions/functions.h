@@ -188,7 +188,7 @@ Bool isComment(char *s);
 Bool countAndVerifyDataArguments(char *line);
 Bool countAndVerifyStringArguments(char *line);
 char *trimFromLeft(char *s);
-
+Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char second[MAX_LINE_LEN]);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
