@@ -116,29 +116,8 @@ int getInstructionType(char *s)
 
 int getRegisteryNumber(char *s)
 {
-    /*  int len = strlen(s);
-     int i = 0; */
-    int res = 0;
-    /*     printf("line 120 utils.c\ns:%s\n", s);
-     */
     s++;
-    res = atoi(s);
-    /*     printf("124 res from resgitery number:%d\n", res);
-     */
-    return res;
-
-    /*     if (s[0] == 'r' && len >= 2)
-        {
-            while (i < REGS_SIZE)
-            {
-                printf("line 125 i:%d\nregs[i]:%s\n", i, regs[i], s);
-                if ((strcmp(regs[i], s) == 0))
-                    return i;
-                i++;
-            }
-        }
-     */
-    /*     return -1; */
+    return atoi(s);
 }
 
 char *getInstructionNameByType(int type)

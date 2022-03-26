@@ -1,11 +1,12 @@
 #include "data.h"
-/* Shared global State variables*/
+
 static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
+
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
 static ExtListItem *extListHead = NULL;
-/* Complex Struct Constant Variables: */
+
 extern unsigned getDC();
 extern unsigned getIC();
 extern unsigned getICF();
@@ -19,9 +20,8 @@ void initTables()
     int i = 0;
 
     if (extListHead != NULL)
-    {
         free(extListHead);
-    }
+
     externalCount = 0;
     entriesCount = 0;
     while (i < HASHSIZE)
@@ -36,13 +36,9 @@ ExtListItem *findExtOpListItem(char *name)
 {
 
     ExtListItem *p = extListHead;
-    printf("line 40 tables.c name:%s\nhead%s\n", name, extListHead->name);
 
-    while (p->next != NULL)
+    while (p != NULL)
     {
-
-        printf("line 48 tables.c\np->name:%s\n", p->name);
-
         if (strcmp(name, p->name) == 0)
             return p;
 
@@ -73,19 +69,6 @@ void updateExtList(char *name, unsigned base, unsigned offset)
         last->next = new;
     }
 }
-
-/* void initExternalOperandsList()
-{
-    int i = 0;
-
-    while (i < HASHSIZE)
-    {
-        if (symbols[i] != NULL)
-            addExtListItem(symbols[i]);
-        i++;
-    }
-    printf("head:%s\n", extListHead->name);
-} */
 
 void addExtListItem(Item *item)
 {
@@ -335,7 +318,10 @@ int getSymbolOffset(char *name)
 
     return p->val.s.offset;
 }
-
+Bool isSymbolExist(char *name)
+{
+    return lookup(name, Symbol) != NULL ? True : False;
+}
 Bool isExternal(char *name)
 {
     Item *p = lookup(name, Symbol);
@@ -497,11 +483,11 @@ Bool areExternalsExist()
 
 void writeExternalsToFile(FILE *fp)
 {
-    int i = 0;
-    while (i < externalCount && extListHead[i].name)
+    ExtListItem *p = extListHead;
+    while (p != NULL)
     {
-        writeSingleExternal(fp, extListHead[i].name, extListHead[i].value);
-        i++;
+        writeSingleExternal(fp, p->name, p->value);
+        p = p->next;
     }
 }
 

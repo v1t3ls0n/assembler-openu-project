@@ -18,7 +18,7 @@ extern Bool isComment(char *s);
 extern int getSymbolBaseAddress(char *name);
 extern int getSymbolOffset(char *name);
 extern Bool isExternal(char *name);
-extern Item *getSymbol(char *name);
+
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
 extern Bool areExternalsExist();
@@ -40,7 +40,6 @@ Bool writeOperationBinary(char *operationName, char *args)
     Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    printf("line 43 secondRun,operationName:%s\nargs:%s\n", operationName, args);
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
     writeFirstWord(op);
@@ -182,7 +181,7 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
     else
     {
 
-        if (getSymbol(operand))
+        if (isSymbolExist(operand))
         {
 
             if (isEntry(operand) && !isNonEmptyEntry(operand))

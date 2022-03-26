@@ -99,6 +99,7 @@ Item *install(char *name, ItemType type);
 void printSymbolTable();
 int printSymbolItem(Item *item);
 Item *getSymbol(char *name);
+Bool isSymbolExist(char *name);
 Item *addMacro(char *name, int start, int end);
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 Bool updateSymbol(Item *p, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);

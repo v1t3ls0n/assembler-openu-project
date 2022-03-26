@@ -26,8 +26,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     if (isMacroOpening(token))
     {
 
-        printf("is macro opening!\n");
-        next = strtok(NULL, " \t \n");
+            next = strtok(NULL, " \t \n");
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
@@ -41,7 +40,6 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     else if (isMacroClosing(token))
     {
         end = ftell(src) - 1 - strlen(token) - 1;
-        printf("is macro closing!\nend:%d\n", (int)end);
         addMacro(macroName, start, end);
         isReadingMacro = False;
         start = end = 0;
@@ -50,12 +48,10 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     else if (isPossiblyUseOfMacro(token))
     {
         Item *p = getMacro(token);
-        printf("is possibly use of macro!\n");
         if (p != NULL)
         {
             int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
             long lastPosition;
-            printf("macro exist!\ntoCopy:%d\ntoDelete:%d\nstart:%d\nend:%d\n", toCopy, toDelete, p->val.m.start, p->val.m.end);
             lastPosition = ftell(src);
             fseek(src, p->val.m.start, SEEK_SET);
             fseek(target, -toDelete - 1, SEEK_CUR);

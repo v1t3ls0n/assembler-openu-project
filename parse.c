@@ -135,11 +135,9 @@ Bool countAndVerifyDataArguments(char *line)
         i += skip;
     }
 
-    /*     printf("line 189 commaCounter:%d size:%d\n", commasCounter, size); */
     if (commasCounter > (size - 1))
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    /*     printf("isValid:%d\n", isValid); */
     if (isValid)
         increaseDataCounter(size);
 
@@ -271,7 +269,7 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
-        putchar(c);
+
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
             isValidCode = yieldError(maxLineLengthExceeded);
