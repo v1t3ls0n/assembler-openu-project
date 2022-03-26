@@ -169,8 +169,6 @@ ParseState parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
 
-    /*     printf("parse line, line:%s\n token:%s\n", line, token);
-     */
     if (isComment(token))
         return lineParsedSuccessfully;
 
