@@ -56,6 +56,32 @@ Operation *getOperationByName(char *s)
     return NULL;
 }
 
+/* Bool isOperation(char *s)
+{
+    int i = 0;
+    while (i < OP_SIZE)
+    {
+
+        if (strstr(operations[i].keyword, s) == 0)
+            return True;
+        i++;
+    }
+    return False;
+}
+
+Bool isOperationStrict(char *s)
+{
+    int i = 0;
+    while (i < OP_SIZE)
+    {
+
+        if (strcmp(operations[i].keyword, s) == 0)
+            return True;
+        i++;
+    }
+    return False;
+} */
+
 Operation *getOperationByIndex(unsigned int i)
 {
     return i < OP_SIZE ? &operations[i] : NULL;
