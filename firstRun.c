@@ -40,7 +40,7 @@ ParseState handleOperation(char *operationName, char *args)
         char *s1 = args, *s2;
         Bool parsedOperands = False;
         int counter = 0;
-        s1 = trimFromLeft(s1);
+        s1 = trimFromLeft(args);
 
         if (*s1 == ',')
         {
@@ -83,7 +83,7 @@ ParseState handleOperation(char *operationName, char *args)
         if (commasCounter > 1)
             areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
 
-        else
+        else if (commasCounter < 1)
             areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
     }
 
