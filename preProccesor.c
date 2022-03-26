@@ -33,14 +33,14 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         if (!isLegalMacroName(next))
             return yieldError(illegalMacroNameUseOfSavedKeywords);
 
-        start = ftell(src) - 1 + strlen(next);
+        start = ftell(src) - 1 + strlen(next) - 1;
         strcpy(macroName, next);
         isReadingMacro = True;
         fseek(target, -strlen(line) - 1, SEEK_END);
     }
     else if (isMacroClosing(token))
     {
-        end = ftell(src) - strlen(token) - 1;
+        end = ftell(src) - 1 - strlen(token) - 1;
         printf("is macro closing!\nend:%d\n", (int)end);
         addMacro(macroName, start, end);
         isReadingMacro = False;
@@ -59,9 +59,9 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
             lastPosition = ftell(src);
             fseek(src, p->val.m.start, SEEK_SET);
             fseek(target, -toDelete - 1, SEEK_CUR);
-            while (toCopy > 0)
+            while (toCopy > 0 && (c = fgetc(src)) != EOF)
             {
-                c = fgetc(src);
+                putchar(c);
                 fputc(c, target);
                 --toCopy;
             }
@@ -75,8 +75,8 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
 void parseSourceFile(FILE *src, FILE *target)
 {
-    char line[MAX_LINE_LEN + 2] = {0};
-    char lineClone[MAX_LINE_LEN + 2] = {0};
+    char line[MAX_LINE_LEN] = {0};
+    char lineClone[MAX_LINE_LEN] = {0};
     char *token, c;
     int i = 0;
     void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
@@ -85,32 +85,38 @@ void parseSourceFile(FILE *src, FILE *target)
     {
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
-            memset(line, 0, MAX_LINE_LEN);
+            memset(lineClone, 0, i);
+            memset(line, 0, i);
             i = 0;
         }
+
+        else if (isspace(c) && i > 0)
+            line[i++] = ' ';
+
+        else if (isprint(c) && !isspace(c))
+            line[i++] = c;
+
         if (c == '\n')
         {
+
             (*currentLineNumberPlusPlus)();
 
             if (i > 0)
             {
-                memcpy(lineClone, line, MAX_LINE_LEN);
+
+                memcpy(lineClone, line, i);
                 token = strtok(lineClone, " \t \n");
                 if (!parseMacros(line, token, src, target))
                 {
                     (*setState)(assemblyCodeFailedToCompile);
                     return;
                 }
-                memset(line, 0, MAX_LINE_LEN);
-                i = 0;
             }
+
+            memset(lineClone, 0, i);
+            memset(line, 0, i);
+            i = 0;
         }
-
-        if (isspace(c) && i > 0)
-            line[i++] = ' ';
-
-        else if (isprint(c) && !isspace(c))
-            line[i++] = c;
     }
     if (i > 0)
     {
@@ -128,7 +134,7 @@ void parseSourceFile(FILE *src, FILE *target)
 
 char *getNthToken(char *s, int n)
 {
-    char *token = (char *)calloc(strlen(s), sizeof(char));
+    char *token = (char *)calloc(strlen(s), sizeof(char *));
     int i = 0;
     while (!*s)
     {
@@ -137,17 +143,17 @@ char *getNthToken(char *s, int n)
         if (i == n && !isspace(*s))
             *token = *s++;
     }
-    token = (char *)realloc(token, strlen(token) * sizeof(char));
+    token = (char *)realloc(token, strlen(token) * sizeof(char *));
     return token;
 }
 
 char *getFirstToken(char *s)
 {
-    char *firstToken = (char *)calloc(strlen(s), sizeof(char));
+    char *firstToken = (char *)calloc(strlen(s), sizeof(char *));
     while (!isspace(*s) && isprint(*s))
     {
         *firstToken = *s++;
     }
-    firstToken = (char *)realloc(firstToken, strlen(firstToken) * sizeof(char));
+    firstToken = (char *)realloc(firstToken, strlen(firstToken) * sizeof(char *));
     return firstToken;
 }

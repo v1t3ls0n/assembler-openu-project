@@ -22,7 +22,7 @@ extern Item *getSymbol(char *name);
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
 extern Bool areExternalsExist();
-extern void updateExternalOperandList(char *name, unsigned base, unsigned offset);
+extern void updateExtList(char *name, unsigned base, unsigned offset);
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
 
@@ -40,6 +40,7 @@ Bool writeOperationBinary(char *operationName, char *args)
     Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+    printf("line 43 secondRun,operationName:%s\nargs:%s\n", operationName, args);
     first = strtok(args, ", \t \n");
     second = strtok(NULL, ", \t \n");
     writeFirstWord(op);
@@ -48,7 +49,6 @@ Bool writeOperationBinary(char *operationName, char *args)
     {
 
         writeSecondWord(first, second, active, op);
-
         if (active[0].index)
         {
             parseLabelNameFromIndexAddrOperand(first);
@@ -132,6 +132,7 @@ void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Op
         secondWord = secondWord | (active[1].reg ? (getRegisteryNumber(second) << 2) : (parseRegNumberFromIndexAddrOperand(second) << 2)) | (active[1].reg ? (REGISTER_DIRECT_ADDR) : (INDEX_ADDR));
     else if (second && (active[1].direct || active[1].immediate))
         secondWord = secondWord | (0 << 2) | (active[1].direct ? (DIRECT_ADDR) : (IMMEDIATE_ADDR));
+
     addWord(secondWord, Code);
 }
 
@@ -151,7 +152,7 @@ void writeDirectOperandWord(char *labelName)
         addWord((E << 16) | 0, Code);
         offset = getIC();
         addWord((E << 16) | 0, Code);
-        updateExternalOperandList(labelName, base, offset);
+        updateExtList(labelName, base, offset);
     }
 
     else
@@ -180,8 +181,10 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
         active[type].index = 1;
     else
     {
+
         if (getSymbol(operand))
         {
+
             if (isEntry(operand) && !isNonEmptyEntry(operand))
                 return yieldError(entryDeclaredButNotDefined);
 
@@ -196,16 +199,20 @@ Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type)
 char *parseLabelNameFromIndexAddrOperand(char *s)
 {
     char *p = strchr(s, '[');
+
     *p = 0;
+
     return s;
 }
 
 int parseRegNumberFromIndexAddrOperand(char *s)
 {
     char *p = strchr(s, ']');
+
     s = strchr(s, '[');
     s++;
     if (p)
         *p = 0;
+
     return getRegisteryNumber(s);
 }

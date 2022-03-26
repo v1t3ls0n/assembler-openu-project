@@ -185,7 +185,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
         {
             if (nextTokens)
             {
-                char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char));
+                char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char *));
                 strcpy(labelName, nextTokens);
                 nextTokens = strtok(NULL, " \t \n");
                 if (nextTokens)

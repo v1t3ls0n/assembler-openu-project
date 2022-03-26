@@ -56,7 +56,7 @@ void handleSingleFile(char *arg)
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
-    char *fileName = (char *)calloc(strlen(arg), sizeof(char));
+    char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
 
     if (!fileName)
         return;
@@ -107,8 +107,6 @@ void handleSingleFile(char *arg)
                 allocMemoryImg();
                 printSymbolTable();
                 rewind(target);
-                if (areExternalsExist())
-                    initExternalOperandsList();
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {

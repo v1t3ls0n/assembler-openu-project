@@ -29,8 +29,8 @@ void allocMemoryImg()
 {
     const int totalSize = DCF - MEMORY_START;
     int i, j;
-    extern BinaryWord *binaryImg;
-    extern HexWord *hexImg;
+    /*     extern BinaryWord *binaryImg;
+        extern HexWord *hexImg; */
     binaryImg = (BinaryWord *)realloc(binaryImg, totalSize * sizeof(BinaryWord));
     hexImg = (HexWord *)realloc(binaryImg, totalSize * sizeof(HexWord));
     for (i = 0; i < totalSize; i++)
@@ -67,6 +67,7 @@ void printBinaryImg()
 }
 void addWord(int value, DataType type)
 {
+
     if (type == Code)
         addWordToCodeImage(numToBin(value));
     else if (type == Data)
@@ -79,8 +80,7 @@ void addWordToDataImage(char *s)
 }
 void addWordToCodeImage(char *s)
 {
-    /*     printf("inside addWordToCodeImage, s:%s\n", s);
-     */
+
     wordStringToWordObj(s, Code);
     IC++;
 }

@@ -4,8 +4,8 @@
 MAIN: add r3, LIST
 LOOP: prn #48
 macro m1
- inc r6
- mov r3, W
+; m1 content
+; m1 content line 2
 endm
 lea STR, r6
 inc r6

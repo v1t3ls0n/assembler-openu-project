@@ -242,12 +242,11 @@ Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
     ParseState state = newLine;
-    char lineCopy[MAX_LINE_LEN + 1] = {0};
+    char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
-    memcpy(lineCopy, line, strlen(line));
+    strcpy(lineCopy, line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = parseLine(token, line);
-
     return state == lineParsedSuccessfully
                ? True
                : False;
@@ -258,7 +257,8 @@ void parseAssemblyCode(FILE *src)
     State (*globalState)() = &getGlobalState;
     void (*setState)() = &setGlobalState;
     int c = 0, i = 0;
-    char line[MAX_LINE_LEN + 1] = {0};
+    char line[MAX_LINE_LEN] = {0};
+
     Bool isValidCode = True;
     State nextState;
     char *(*fileName)() = &getFileNamePath;
@@ -271,33 +271,41 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
+        putchar(c);
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
-            isValidCode = False;
-            yieldError(maxLineLengthExceeded);
-            memset(line, 0, MAX_LINE_LEN);
+            isValidCode = yieldError(maxLineLengthExceeded);
+            memset(line, 0, i);
             i = 0;
         }
+
+        if (isspace(c) && i > 0)
+        {
+            line[i++] = ' ';
+        }
+
+        else if (isprint(c) && !isspace(c))
+        {
+            line[i++] = c;
+        }
+
         if (c == '\n')
         {
+            line[i++] = '\n';
             (*currentLineNumberPlusPlus)();
             if (i > 0)
             {
                 isValidCode = handleSingleLine(line) && isValidCode;
-                memset(line, 0, MAX_LINE_LEN);
+                memset(line, 0, i);
                 i = 0;
             }
         }
-
-        if (isspace(c) && i > 0)
-            line[i++] = ' ';
-
-        else if (isprint(c) && !isspace(c))
-            line[i++] = c;
     }
 
     if (i > 0)
+    {
         isValidCode = handleSingleLine(line) && isValidCode;
+    }
 
     if (!isValidCode)
         nextState = assemblyCodeFailedToCompile;

@@ -19,7 +19,7 @@ void setFileNamePath(char *s)
 {
     if (!*s)
         return;
-    path = (char *)realloc(path, strlen(s) * sizeof(char));
+    path = (char *)realloc(path, strlen(s) * sizeof(char *));
     strcpy(path, cloneString(s));
 }
 

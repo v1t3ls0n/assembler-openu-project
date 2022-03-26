@@ -4,7 +4,7 @@ char *cloneString(char *s)
     char *copy;
     if (!(*s))
         return "";
-    copy = (char *)calloc(strlen(s), sizeof(char));
+    copy = (char *)calloc(strlen(s), sizeof(char *));
     strcpy(copy, s);
     return copy;
 }
@@ -47,7 +47,7 @@ char *decToHex(int num)
     char *hex;
     for (size = 0; i > 0; i = i / 16)
         size++;
-    hex = (char *)calloc(size, sizeof(char));
+    hex = (char *)calloc(size, sizeof(char *));
     sprintf(hex, "%05x", num);
     return hex;
 }
@@ -55,9 +55,9 @@ char *decToHex(int num)
 char *hexToBin(char *hex)
 {
     int i = 0;
-    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char));
+    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
 
-    while (hex[i] != '\0')
+    while (hex[i] != '\0' && i < 5)
     {
         switch (hex[i])
         {

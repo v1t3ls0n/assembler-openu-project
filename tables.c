@@ -4,7 +4,7 @@ static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
-static ExtListItem *externalsOperandsList = NULL;
+static ExtListItem *extListHead = NULL;
 /* Complex Struct Constant Variables: */
 extern unsigned getDC();
 extern unsigned getIC();
@@ -12,18 +12,18 @@ extern unsigned getICF();
 extern unsigned calcNumberCharactersLength(int num);
 extern Bool verifyLabelNaming(char *s);
 extern Bool isRegistery(char *s);
-
+void findAllExternals();
+void addExtListItem(Item *item);
 void initTables()
 {
     int i = 0;
 
-    if (externalsOperandsList != NULL)
+    if (extListHead != NULL)
     {
-        free(externalsOperandsList);
-        externalCount = 0;
-        entriesCount = 0;
+        free(extListHead);
     }
-
+    externalCount = 0;
+    entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
@@ -32,33 +32,39 @@ void initTables()
     }
 }
 
-ExtListItem *findExternalOperandListItem(char *name)
+ExtListItem *findExtOpListItem(char *name)
 {
-    int i;
-    for (i = 0; i < externalCount && externalsOperandsList[i].name != NULL; i++)
-        if (strcmp(externalsOperandsList[i].name, name) == 0)
-            return &externalsOperandsList[i];
+
+    ExtListItem *p = extListHead;
+    printf("line 40 tables.c name:%s\nhead%s\n", name, extListHead->name);
+
+    while (p->next != NULL)
+    {
+
+        printf("line 48 tables.c\np->name:%s\n", p->name);
+
+        if (strcmp(name, p->name) == 0)
+            return p;
+
+        p = p->next;
+    }
 
     return NULL;
 }
 
-void updateExternalOperandList(char *name, unsigned base, unsigned offset)
+void updateExtList(char *name, unsigned base, unsigned offset)
 {
-    int i = 0;
-    ExtListItem *np = findExternalOperandListItem(name);
-    if (np == NULL)
+
+    ExtListItem *np = findExtOpListItem(name);
+    if (np->value == NULL)
     {
-        while (i < externalCount && externalsOperandsList[i].name != NULL)
-            i++;
-        externalsOperandsList[i].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-        strncpy(externalsOperandsList[i].name, name, strlen(name));
-        externalsOperandsList[i].value->offset = offset;
-        externalsOperandsList[i].value->base = base;
-        externalsOperandsList[i].value->next = NULL;
+        np->value = (ExtPositionData *)malloc(sizeof(ExtPositionData));
+        np->value->offset = offset;
+        np->value->base = base;
     }
     else
     {
-        ExtPositionData *last = np->value, *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+        ExtPositionData *last = np->value, *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
         new->base = base;
         new->offset = offset;
         new->next = NULL;
@@ -68,21 +74,34 @@ void updateExternalOperandList(char *name, unsigned base, unsigned offset)
     }
 }
 
-void initExternalOperandsList()
+/* void initExternalOperandsList()
 {
-    int size = externalCount, i = 0;
-    externalsOperandsList = (ExtListItem *)malloc(size * sizeof(ExtListItem));
-    while (i < size)
+    int i = 0;
+
+    while (i < HASHSIZE)
     {
-        externalsOperandsList[i].name = NULL;
-        externalsOperandsList[i].value = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-        externalsOperandsList[i].value->base = 0;
-        externalsOperandsList[i].value->offset = 0;
-        externalsOperandsList[i].value->next = NULL;
+        if (symbols[i] != NULL)
+            addExtListItem(symbols[i]);
         i++;
     }
-}
+    printf("head:%s\n", extListHead->name);
+} */
 
+void addExtListItem(Item *item)
+{
+
+    ExtListItem *next;
+    next = (ExtListItem *)malloc(sizeof(ExtListItem *));
+    next->name = (char *)calloc(strlen(item->name), sizeof(char *));
+    strcpy(next->name, item->name);
+    if (extListHead != NULL)
+    {
+        next->next = extListHead->next;
+        extListHead->next = next;
+    }
+    else
+        extListHead = next;
+}
 unsigned hash(char *s)
 {
     unsigned hashval = 1;
@@ -107,7 +126,7 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     np = (Item *)malloc(sizeof(Item));
-    np->name = (char *)calloc(strlen(name) + 1, sizeof(char));
+    np->name = (char *)calloc(strlen(name) + 1, sizeof(char *));
     if (np == NULL || np->name == NULL)
     {
         yieldError(memoryAllocationFailure);
@@ -329,7 +348,8 @@ Bool isEntry(char *name)
     Item *p = lookup(name, Symbol);
     if (p == NULL)
         return False;
-    return p->val.s.attrs.entry;
+
+    return p->val.s.attrs.entry == 1 ? True : False;
 }
 
 Bool isNonEmptyExternal(char *name)
@@ -446,7 +466,10 @@ int updateFinalValueOfSingleItem(Item *item)
     if (item->val.s.attrs.entry)
         entriesCount++;
     if (item->val.s.attrs.external)
+    {
         externalCount++;
+        addExtListItem(item);
+    }
 
     if (item->val.s.attrs.data)
     {
@@ -475,9 +498,9 @@ Bool areExternalsExist()
 void writeExternalsToFile(FILE *fp)
 {
     int i = 0;
-    while (i < externalCount && externalsOperandsList[i].name)
+    while (i < externalCount && extListHead[i].name)
     {
-        writeSingleExternal(fp, externalsOperandsList[i].name, externalsOperandsList[i].value);
+        writeSingleExternal(fp, extListHead[i].name, extListHead[i].value);
         i++;
     }
 }
