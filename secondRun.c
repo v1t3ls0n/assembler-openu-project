@@ -39,8 +39,8 @@ Bool writeOperationBinary(char *operationName, char *args)
     Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    first = strtok(args, ", \t \n");
-    second = strtok(NULL, ", \t \n");
+    first = strtok(args, ", \t\n\f\r");
+    second = strtok(NULL, ", \t\n\f\r");
     writeFirstWord(op);
 
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
@@ -104,16 +104,18 @@ Bool writeDataInstruction(char *token)
     {
         num = atoi(token);
         addWord((A << 16) | num, Data);
-        token = strtok(NULL, ", \t \n");
+        token = strtok(NULL, ", \t\n\f\r");
     }
     return lineParsedSuccessfully;
 }
 
 Bool writeStringInstruction(char *s)
 {
-    int i = 1;
-    for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
-        addWord((A << 16) | s[i], Data);
+    char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
+    start++;
+
+    for (; start != end && *start != '\0'; start++)
+        addWord((A << 16) | *start, Data);
 
     addWord((A << 16) | '\0', Data);
     return lineParsedSuccessfully;

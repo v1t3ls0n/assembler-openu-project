@@ -9,7 +9,7 @@ extern int countLengthOfNonDigitToken(char *s);
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
-
+Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
 
 /* @ Function: countAndVerifyDataArguments
@@ -144,15 +144,93 @@ Bool countAndVerifyDataArguments(char *line)
     return isValid;
 }
 
-Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char second[MAX_LINE_LEN])
+Bool verifyCommaSyntax(char *line)
 {
-    char *s1 = args, *s2;
-    Bool parsedOperands = False;
-    int counter = 0;
     int commasCounter = 0;
+    Bool insideToken = False;
+    Bool isFirstToken = True;
+    Bool isValid = True;
+    char *s = line;
+    s = trimFromLeft(s);
+    printf("line in verifyCommaSyntax:%s\n", line);
+
+    while (*s == ',' || isspace(*s))
+    {
+        if (*s == ',')
+            commasCounter++;
+        s++;
+    }
+
+    if (commasCounter > 0)
+        isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+
+    commasCounter = 0;
+    isFirstToken = True;
+    while (s && *s != '\0')
+    {
+        if (insideToken)
+        {
+            if (isFirstToken == True && commasCounter == 0)
+            {
+                commasCounter = 1;
+                isFirstToken = False;
+            }
+
+            if (commasCounter > 1)
+            {
+                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+                commasCounter = 1;
+            }
+            else if (commasCounter < 1)
+            {
+                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                commasCounter = 1;
+            }
+            if (s && isspace(*s))
+            {
+                insideToken = False;
+                commasCounter = 0;
+            }
+            else if (*s == ',')
+            {
+                insideToken = False;
+                commasCounter = 0;
+                s--;
+            }
+        }
+        else
+        {
+            while (*s == ',' || isspace(*s))
+            {
+                if (*s == ',')
+                    commasCounter++;
+                s++;
+            }
+
+            if (s && (isprint(*s) && !isspace(*s)))
+                insideToken = True;
+        }
+
+        s++;
+    }
+
+    if (commasCounter > 0)
+        isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
+
+    printf("are commas valid? %d\n", isValid);
+    return isValid;
+}
+
+Bool countAndVerifyOperandSyntax(char *args)
+{
+    /*     char *s1 = args, *s2;
+        Bool parsedOperands = False;
+        int counter = 0;
+        int commasCounter = 0; */
     Bool areOperandsLegal = True;
-    s1 = trimFromLeft(args);
-    if (*s1 == ',')
+    areOperandsLegal = verifyCommaSyntax(args);
+
+    /*     if (*s1 == ',')
     {
         while (*s1 && (*s1 == ',' || isspace(*s1)))
             s1++;
@@ -179,45 +257,42 @@ Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char seco
             if (commasCounter > 1)
                 areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
 
-            /*                 printf("counter -1:%d strlens2 - strlens1:%d\n", counter - 1, (int)(strlen(s2) - strlen(s1)));
-             */
-            strcpy(second, s1);
-            strncpy(first, s2, counter - 1);
-            parsedOperands = True;
-        }
+strcpy(second, s1);
+strncpy(first, s2, counter - 1);
+parsedOperands = True;
+}
 
-        s1++;
-    }
-    while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
-        s1++;
-    second[strlen(second) - strlen(s1)] = '\0';
-    if (strlen(first) > 0 && strlen(second) < 1)
-    {
-        strcpy(second, first);
-        memset(first, 0, strlen(first));
-        if (commasCounter > 0)
-            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-    }
+s1++;
+}
+while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
+s1++;
+second[strlen(second) - strlen(s1)] = '\0';
+if (strlen(first) > 0 && strlen(second) < 1)
+{
+strcpy(second, first);
+memset(first, 0, strlen(first));
+if (commasCounter > 0)
+    areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
+}
 
-    commasCounter = 0;
-    counter = 0;
-    while (*s1 && *s1 != '\0')
-    {
-        if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
-            counter++;
-        if (*s1 == ',')
-            commasCounter++;
+commasCounter = 0;
+counter = 0;
+while (*s1 && *s1 != '\0')
+{
+if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
+    counter++;
+if (*s1 == ',')
+    commasCounter++;
 
-        s1++;
-    }
+s1++;
+}
 
-    if (commasCounter > 0)
-        areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
+if (commasCounter > 0)
+areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    if (counter > 0)
-        areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-
-    /*         printf("second:%s first:%s s1:%s\n", second, first, s1); */
+if (counter > 0)
+areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
+*/
 
     /*
             if (*s1 == ',')
@@ -227,13 +302,14 @@ Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char seco
             }
             else if (!isspace(*s1) && isprint(*s1))
                 areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-     */
-    /*
+
+
             if (commasCounter > 1)
-                areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas); */
+                areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
 
     else if (commasCounter < 1 && (strlen(first) && strlen(second)))
         areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
+        */
 
     return areOperandsLegal ? True : False;
 }
@@ -274,7 +350,7 @@ ParseState parseLine(char *token, char *line)
             yieldError(illegalLabelDeclaration);
         else
         {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
             if (!next)
                 return yieldError(emptyLabelDecleration);
 
@@ -298,7 +374,7 @@ ParseState parseLine(char *token, char *line)
             token = getInstructionName(token);
         }
         type = getInstructionType(token);
-        next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+        next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
 
         if (!next)
         {
@@ -350,7 +426,7 @@ Bool handleSingleLine(char *line)
     char *token;
     strcpy(lineCopy, line);
     printf("line:%s\n", line);
-    token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t\n\f\r") : strtok(lineCopy, ", \t\n\f\r");
     state = parseLine(token, line);
     (*currentLineNumberPlusPlus)();
     return state == lineParsedSuccessfully

@@ -15,23 +15,35 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *line);
-Bool countAndVerifyOperandSyntax(char *args, char first[MAX_LINE_LEN], char second[MAX_LINE_LEN]);
+
 extern void parseAssemblyCode(FILE *src);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
+extern Bool verifyCommaSyntax(char *line);
 
 ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    char first[MAX_LINE_LEN] = {0};
-    char second[MAX_LINE_LEN] = {0};
+    char *first = 0;
+    char *second = 0;
     Bool areOperandsLegal;
     if (*args)
-        areOperandsLegal = countAndVerifyOperandSyntax(args, first, second);
+        areOperandsLegal = verifyCommaSyntax(args);
+    first = strtok(args, ", \t\n\f\r");
+    if (first)
+    {
+        second = strtok(NULL, ", \t\n\f\r");
+        if (!second)
+        {
+            second = first;
+            first = 0;
+        }
+    }
 
     areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
+
     if (areOperandsLegal)
     {
         int size = 2;
@@ -52,7 +64,7 @@ ParseState handleOperation(char *operationName, char *args)
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
 
-    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !*src && !*des)
+    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
         return True;
     else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
     {
@@ -125,7 +137,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             {
                 char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char *));
                 strcpy(labelName, nextTokens);
-                nextTokens = strtok(NULL, " \t \n");
+                nextTokens = strtok(NULL, " \t\n\f\r");
                 if (nextTokens)
                 {
                     yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
@@ -179,7 +191,7 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
         int instruction = getInstructionType(nextToken);
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            char *next = strtok(NULL, " \t \n");
+            char *next = strtok(NULL, " \t\n\f\r");
             if (next)
                 return handleInstruction(instruction, nextToken, next, line);
             else

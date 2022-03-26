@@ -25,7 +25,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
     if (isMacroOpening(token))
     {
-        next = strtok(NULL, " \t \n");
+        next = strtok(NULL, " \t\n\f\r");
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
@@ -100,7 +100,7 @@ void parseSourceFile(FILE *src, FILE *target)
             {
 
                 memcpy(lineClone, line, i);
-                token = strtok(lineClone, " \t \n");
+                token = strtok(lineClone, " \t\n\f\r");
                 if (!parseMacros(line, token, src, target))
                 {
                     (*setState)(assemblyCodeFailedToCompile);
@@ -116,7 +116,7 @@ void parseSourceFile(FILE *src, FILE *target)
     if (i > 0)
     {
         memcpy(lineClone, line, MAX_LINE_LEN);
-        token = strtok(lineClone, " \t \n");
+        token = strtok(lineClone, " \t\n\f\r");
         if (!parseMacros(line, token, src, target))
         {
             (*setState)(assemblyCodeFailedToCompile);
