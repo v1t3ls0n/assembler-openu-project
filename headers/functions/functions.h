@@ -128,7 +128,7 @@ void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
 void initExternalOperandsList();
 ExtListItem *findExtOpListItem(char *name);
 int findExtOpListItemIndex(char *name);
-void updateExtList(char *name, unsigned base, unsigned offset);
+void updateExtPositionData(char *name, unsigned base, unsigned offset);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In encode.c -------------------------------------------------------*/

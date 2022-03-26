@@ -15,12 +15,14 @@ extern Bool verifyLabelNaming(char *s);
 extern Bool isRegistery(char *s);
 void findAllExternals();
 void addExtListItem(Item *item);
+void resetExtList();
+
 void initTables()
 {
     int i = 0;
 
-    if (extListHead != NULL)
-        free(extListHead);
+    if (externalCount)
+        resetExtList();
 
     externalCount = 0;
     entriesCount = 0;
@@ -34,40 +36,48 @@ void initTables()
 
 ExtListItem *findExtOpListItem(char *name)
 {
-
     ExtListItem *p = extListHead;
-
     while (p != NULL)
     {
         if (strcmp(name, p->name) == 0)
             return p;
-
         p = p->next;
     }
-
     return NULL;
 }
 
-void updateExtList(char *name, unsigned base, unsigned offset)
+void resetExtList()
+{
+    ExtListItem *np = extListHead, *next;
+    ExtPositionData *pos, *nextPos;
+    while (np != NULL)
+    {
+        free(np->name);
+        pos = np->value;
+        while (pos != NULL)
+        {
+            nextPos = np->next;
+            free(np->value);
+            pos = nextPos;
+        }
+
+        np = next;
+    }
+
+    free(extListHead);
+}
+
+void updateExtPositionData(char *name, unsigned base, unsigned offset)
 {
 
     ExtListItem *np = findExtOpListItem(name);
-    if (np->value == NULL)
-    {
-        np->value = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-        np->value->offset = offset;
-        np->value->base = base;
-    }
-    else
-    {
-        ExtPositionData *last = np->value, *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-        new->base = base;
-        new->offset = offset;
-        new->next = NULL;
-        while (last->next != NULL)
-            last = last->next;
-        last->next = new;
-    }
+    ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+    printf("line 66, tables.c\n");
+
+    new->base = base;
+    new->offset = offset;
+    new->next = np->value;
+    np = new;
 }
 
 void addExtListItem(Item *item)
@@ -486,6 +496,7 @@ void writeExternalsToFile(FILE *fp)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
+        printf("line 488\n");
         writeSingleExternal(fp, p->name, p->value);
         p = p->next;
     }
@@ -493,8 +504,9 @@ void writeExternalsToFile(FILE *fp)
 
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
 {
-    fprintf(fp, "%s BASE %d\n", name, value->base);
-    fprintf(fp, "%s OFFSET %d\n", name, value->offset);
+    /*     printf("line 496\nvalue->base:%u\n", value->base); */
+    fprintf(fp, "%s BASE %u\n", name, value->base);
+    fprintf(fp, "%s OFFSET %u\n", name, value->offset);
     if (value->next != NULL)
         writeSingleExternal(fp, name, value->next);
 }
