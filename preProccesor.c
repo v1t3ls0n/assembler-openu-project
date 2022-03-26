@@ -88,7 +88,7 @@ void parseSourceFile(FILE *src, FILE *target)
         else if (isspace(c) && i > 0)
             line[i++] = ' ';
 
-        else if (isprint(c) && !isspace(c))
+        else if (!isspace(c))
             line[i++] = c;
 
         if (c == '\n')

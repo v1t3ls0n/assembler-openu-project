@@ -14,7 +14,7 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
-extern Bool countAndVerifyStringArguments(char *token);
+extern Bool countAndVerifyStringArguments(char *line);
 extern void parseAssemblyCode(FILE *src);
 
 extern Bool writeStringInstruction(char *s);
@@ -23,8 +23,7 @@ extern Bool writeDataInstruction(char *s);
 ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
-    char comma = 0;
-    char first[MAX_LABEL_LEN] = {0}, second[MAX_LABEL_LEN] = {0}, *inBetweenOperands = 0, *extra = 0;
+    char first[MAX_LABEL_LEN] = {0}, second[MAX_LABEL_LEN] = {0};
     int commasCounter = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     Bool areOperandsLegal = True;
@@ -80,12 +79,7 @@ ParseState handleOperation(char *operationName, char *args)
         }
         while (*s1 && *s1 != '\0' && (!isspace(*s1) && *s1 != ','))
             s1++;
-
-        if (*s1 == ',')
-            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
-
         second[strlen(second) - strlen(s1)] = '\0';
-
         if (strlen(first) > 0 && strlen(second) < 1)
         {
             strcpy(second, first);
@@ -94,13 +88,21 @@ ParseState handleOperation(char *operationName, char *args)
                 areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
         }
 
+        commasCounter = 0;
         counter = 0;
         while (*s1 && *s1 != '\0')
         {
             if (isprint(*s1) && !isspace(*s1) && *s1 != ',')
                 counter++;
+            if (*s1 == ',')
+                commasCounter++;
+
             s1++;
         }
+
+        if (commasCounter > 0)
+            areOperandsLegal = yieldError(illegalApearenceOfCommaAfterLastParameter);
+
         if (counter > 0)
             areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
 
@@ -209,7 +211,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
         }
         else if (type == _TYPE_STRING)
-            return countAndVerifyStringArguments(nextTokens) ? lineParsedSuccessfully : Err;
+            return countAndVerifyStringArguments(line) ? lineParsedSuccessfully : Err;
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
@@ -249,7 +251,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
 
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;

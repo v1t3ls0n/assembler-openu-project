@@ -144,23 +144,25 @@ Bool countAndVerifyDataArguments(char *line)
     return isValid;
 }
 
-Bool countAndVerifyStringArguments(char *token)
+Bool countAndVerifyStringArguments(char *line)
 {
-
-    if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-
-    if (token)
-    {
-        if (token[0] == '\"' && (token[strlen(token) - 1] != '\"' || strlen(token) < 2))
-            return yieldError(closingQuotesForStringIsMissing);
-        else if (token[0] != '\"')
-            return yieldError(expectedQuotes);
-
-        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
-    }
-    else
+    char *s = 0, *args;
+    args = strchr(line, '\"');
+    if (!args)
         return yieldWarning(emptyStringDeclatretion);
+
+    if (args[0] != '\"')
+        return yieldError(expectedQuotes);
+
+    s = strrchr(args, '\"');
+    while (*s && *s != '\0')
+    {
+        if (!isspace(*s) && isprint(*s) && *s != '\"')
+            return yieldError(closingQuotesForStringIsMissing);
+        s++;
+    }
+
+    increaseDataCounter((int)(strlen(args) - 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
 }
@@ -194,15 +196,16 @@ ParseState parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
+        printf("line:%s\n", line);
 
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
             token = getInstructionName(token);
         }
-
-        next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
         type = getInstructionType(token);
+        next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+
         if (!next)
         {
             if (type == _TYPE_DATA || type == _TYPE_STRING)
@@ -252,6 +255,7 @@ Bool handleSingleLine(char *line)
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
     strcpy(lineCopy, line);
+    printf("line:%s\n", line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
     state = parseLine(token, line);
     (*currentLineNumberPlusPlus)();

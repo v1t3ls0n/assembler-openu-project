@@ -186,7 +186,7 @@ Bool isComment(char *s);
 /* --------------------------------------------In parse.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 Bool countAndVerifyDataArguments(char *line);
-Bool countAndVerifyStringArguments(char *token);
+Bool countAndVerifyStringArguments(char *line);
 char *trimFromLeft(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
