@@ -68,7 +68,7 @@ ParseState handleOperation(char *operationName, char *args)
 
                 else
                 {
-                    second[strlen(second) - 1] = '\0';
+                    second[strlen(second) - strlen(s1)] = '\0';
                     parsedOperands = True;
                 }
             }
@@ -76,11 +76,15 @@ ParseState handleOperation(char *operationName, char *args)
         }
 
         s1 = strtok(s1, " \t \n");
+
         if (s1 != NULL)
             areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
 
         if (commasCounter > 1)
             areOperandsLegal = yieldError(wrongOperationSyntaxExtraCommas);
+
+        else
+            areOperandsLegal = yieldError(wrongOperationSyntaxMissingCommas);
     }
 
     areOperandsLegal = parseOperands(first, ',', second, p, active) && areOperandsLegal;
@@ -103,58 +107,59 @@ ParseState handleOperation(char *operationName, char *args)
 }
 Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
 {
+    printf("first:%s second:%s length first:%d length second:%d\n", src, des, (int)strlen(src), (int)strlen(des));
 
-    int commasCount = 0;
-    int expectedCommasBasedOnNumberOfOperands = 0;
-    expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
-    if (src && strchr(src, ','))
+    /*     int commasCount = 0;
+        int expectedCommasBasedOnNumberOfOperands = 0;
+        expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
+        if (src && strchr(src, ','))
+        {
+            char *p = strchr(src, ',');
+            *p = '\0';
+            commasCount++;
+        }
+
+        if (des && strchr(des, ','))
+        {
+            commasCount++;
+            des++;
+        }
+        if (comma == ',')
+            commasCount++;
+
+        if (commasCount > expectedCommasBasedOnNumberOfOperands)
+            return yieldError(wrongOperationSyntaxExtraCommas);
+
+        else if (commasCount < expectedCommasBasedOnNumberOfOperands)
+            return yieldError(wrongOperationSyntaxMissingCommas);
+
+        else if (commasCount == expectedCommasBasedOnNumberOfOperands)
+        { */
+    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
+        return True;
+    else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
     {
-        char *p = strchr(src, ',');
-        *p = '\0';
-        commasCount++;
+
+        if (!src)
+            return yieldError(requiredSourceOperandIsMissin);
+        if (!des)
+            return yieldError(requiredDestinationOperandIsMissin);
+
+        return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
+    }
+    else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
+    {
+        if (!src)
+            return yieldError(requiredSourceOperandIsMissin);
+        return validateOperandMatch(op->src, active, src, 0);
+    }
+    else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
+    {
+        if (!des)
+            return yieldError(requiredDestinationOperandIsMissin);
+        return validateOperandMatch(op->des, active, des, 1);
     }
 
-    if (des && strchr(des, ','))
-    {
-        commasCount++;
-        des++;
-    }
-    if (comma == ',')
-        commasCount++;
-
-    if (commasCount > expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongOperationSyntaxExtraCommas);
-
-    else if (commasCount < expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongOperationSyntaxMissingCommas);
-
-    else if (commasCount == expectedCommasBasedOnNumberOfOperands)
-    {
-        if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
-            return True;
-        else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
-        {
-
-            if (!src)
-                return yieldError(requiredSourceOperandIsMissin);
-            if (!des)
-                return yieldError(requiredDestinationOperandIsMissin);
-
-            return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
-        }
-        else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
-        {
-            if (!src)
-                return yieldError(requiredSourceOperandIsMissin);
-            return validateOperandMatch(op->src, active, src, 0);
-        }
-        else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
-        {
-            if (!des)
-                return yieldError(requiredDestinationOperandIsMissin);
-            return validateOperandMatch(op->des, active, des, 1);
-        }
-    }
     return True;
 }
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
