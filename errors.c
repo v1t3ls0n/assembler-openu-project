@@ -108,7 +108,7 @@ void yieldErrorIntoFile(Error err)
     }
     case illegalApearenceOfCommaBeforeFirstParameter:
     {
-        fprintf(errorsFile, "Illegal appearence of a comma between before the first parameter");
+        fprintf(errorsFile, "Illegal appearence of a comma before the first parameter");
         break;
     }
     case illegalApearenceOfCommaAfterLastParameter:
