@@ -11,7 +11,7 @@ char *cloneString(char *s)
 
 char *trimFromLeft(char *s)
 {
-    while (isspace(*s))
+    while (isspace(*s) && *s != '\0')
         s++;
     return s;
 }
@@ -19,10 +19,11 @@ char *trimFromLeft(char *s)
 char *trimFromRight(char *s)
 {
     long offset = strlen(s) - 1;
+    char *start = s;
     s += offset;
     while (isspace(*s))
         s--;
-    return s;
+    return start;
 }
 int countSpaceCharacters(char *s)
 {
