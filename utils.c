@@ -37,6 +37,7 @@ Bool isInstruction(char *s)
 
 Bool isInstructionStrict(char *s)
 {
+
     return ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL))) ? True : False;
 }
 
@@ -88,28 +89,33 @@ Bool isValidIndexParameter(char *s)
 
 Bool isComment(char *s)
 {
+    s = trimFromLeft(s);
     return s[0] == ';' ? True : False;
 }
 Bool isOperation(char *s)
 {
-
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
-Bool isLabelDeclaration(char *s)
+Bool isLabelDeclarationStrict(char *s)
 {
     return s[strlen(s) - 1] == ':' ? True : False;
 }
 
+Bool isLabelDeclaration(char *s)
+{
+    return strchr(s, ':') != NULL ? True : False;
+}
+
 int getInstructionType(char *s)
 {
-    if (!strcmp(s, DATA))
+    if (strstr(s, DATA) != NULL)
         return _TYPE_DATA;
-    if (!strcmp(s, STRING))
+    if (strstr(s, STRING) != NULL)
         return _TYPE_STRING;
-    if (!strcmp(s, ENTRY))
+    if (strstr(s, ENTRY) != NULL)
         return _TYPE_ENTRY;
-    if (!strcmp(s, EXTERNAL))
+    if (strstr(s, EXTERNAL) != NULL)
         return _TYPE_EXTERNAL;
     return False;
 }
@@ -125,16 +131,16 @@ char *getInstructionNameByType(int type)
     switch (type)
     {
     case _TYPE_DATA:
-        return "DATA INSTRUCTION";
+        return strcat(DATA, "\0");
 
     case _TYPE_STRING:
-        return "STRING INSTRUCTION";
+        return strcat(STRING, "\0");
 
     case _TYPE_ENTRY:
-        return "ENTRY INSTRUCTION";
+        return strcat(ENTRY, "\0");
 
     case _TYPE_EXTERNAL:
-        return "EXTERNAL INSTRUCTION";
+        return strcat(EXTERNAL, "\0");
 
     default:
         break;
@@ -142,6 +148,7 @@ char *getInstructionNameByType(int type)
 
     return NULL;
 }
+
 char *getInstructionName(char *s)
 {
     if (strstr(s, DATA) != NULL)
