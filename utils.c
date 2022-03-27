@@ -96,9 +96,14 @@ Bool isOperation(char *s)
     return (getOperationByName(s) != NULL) ? True : False;
 }
 
-Bool isLabelDeclaration(char *s)
+Bool isLabelDeclarationStrict(char *s)
 {
     return s[strlen(s) - 1] == ':' ? True : False;
+}
+
+Bool isLabelDeclaration(char *s)
+{
+    return strchr(s, ':') != NULL ? True : False;
 }
 
 int getInstructionType(char *s)

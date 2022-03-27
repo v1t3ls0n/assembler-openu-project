@@ -122,6 +122,9 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case missingSpaceBetweenLabelDeclaretionAndInstruction:
+        fprintf(errorsFile, "Missing space between label declaretion and instruction name");
+        break;
     case extraOperandsPassed:
         fprintf(errorsFile, "Extra operands passed as paramters");
         break;
@@ -177,7 +180,7 @@ void yieldErrorIntoFile(Error err)
         break;
     case missinSpaceAfterInstruction:
     {
-        fprintf(errorsFile, "missin Space After Instruction");
+        fprintf(errorsFile, "missin Space between instruction and arguments");
         break;
     }
     case illegalApearenceOfCommaBeforeFirstParameter:
@@ -398,6 +401,10 @@ Bool yieldError(Error err)
 
     switch (err)
     {
+
+    case missingSpaceBetweenLabelDeclaretionAndInstruction:
+        fprintf(stderr, "Missing space between label declaretion and instruction name");
+        break;
     case illegalLabelNameLength:
         fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
@@ -455,7 +462,7 @@ Bool yieldError(Error err)
         break;
     case missinSpaceAfterInstruction:
     {
-        fprintf(stderr, "missin Space After Instruction");
+        fprintf(stderr, "missin Space between instruction and arguments");
         break;
     }
     case illegalApearenceOfCommaBeforeFirstParameter:

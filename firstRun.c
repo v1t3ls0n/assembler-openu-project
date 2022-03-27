@@ -224,15 +224,17 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
     /*     if (!labelName || !nextToken || !line)
             return False; */
     Bool isValid = True;
+    printf("\n\n\nlabelName:%s nextToken:%s line:%s\n\n\n", labelName, nextToken, line);
     if (isInstruction(nextToken))
     {
-        int instruction = getInstructionType(nextToken);
+        int instruction = 0;
+
         if (!isInstructionStrict(nextToken))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
             nextToken = getInstructionName(nextToken);
         }
-
+        instruction = getInstructionType(nextToken);
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
             char *next = strtok(NULL, " \t\n\f\r");

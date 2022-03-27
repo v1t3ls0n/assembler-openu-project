@@ -37,6 +37,7 @@ typedef enum
     illegalApearenceOfCommaBeforeFirstParameter,
     illegalApearenceOfCommaAfterLastParameter,
     missinSpaceAfterInstruction,
+    missingSpaceBetweenLabelDeclaretionAndInstruction,
     maxLineLengthExceeded,
     illegalOperand,
     none,

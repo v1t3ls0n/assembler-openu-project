@@ -11,6 +11,7 @@ extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
+Bool isLabelDeclarationStrict(char *s);
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -147,8 +148,8 @@ Bool countAndVerifyStringArguments(char *line)
     int size = 0;
     line = strstr(line, STRING) + strlen(STRING);
     line = trimFromLeft(line);
-    if (line == NULL)
-        return yieldWarning(emptyStringDeclatretion);
+    if (line == NULL || *line == '\0')
+        return yieldError(emptyStringDeclatretion);
 
     args = strchr(line, '\"');
     if (args)
@@ -184,25 +185,38 @@ Bool countAndVerifyStringArguments(char *line)
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-
+    Bool isValid = True;
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
-        if (strlen(token) == 1)
-            yieldError(illegalLabelDeclaration);
+        char *labelName = 0, *next = 0;
+
+        if (!isLabelDeclarationStrict(token))
+        {
+            next = strchr(token, ':');
+            isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
+            next++;
+            labelName = (char *)calloc((strlen(token) - strlen(next) + 1), sizeof(char *));
+            strncpy(labelName, token, strlen(token) - strlen(next));
+        }
         else
         {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-            if (!next)
-                return yieldError(emptyLabelDecleration);
-
-            if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line);
-            else
-                return parseLine(next, line + strlen(token) + 1);
+            labelName = token;
+            next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
         }
+
+        if (strlen(token) == 1)
+            isValid = yieldError(illegalLabelDeclaration);
+
+        if (!next)
+            return yieldError(emptyLabelDecleration);
+
+        if ((*globalState)() == firstRun)
+            return handleLabel(labelName, next, line) && isValid;
+        else
+            return parseLine(next, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))
