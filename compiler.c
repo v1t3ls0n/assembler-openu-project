@@ -48,7 +48,7 @@ int handleSourceFiles(int argc, char *argv[])
         i++;
     }
 
-    /*     closeOpenLogFiles(); */
+    closeOpenLogFiles();
 
     return True;
 }
