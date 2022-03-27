@@ -59,20 +59,17 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
-
     if (!fileName)
+    {
+        yieldError(memoryAllocationFailure);
         return;
-
+    }
     memcpy(fileName, arg, strlen(arg));
-    /*     strcpy(fileName, arg); */
     strcat(fileName, ".as");
     (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
-        fprintf(stderr, "\n######################################################################\n");
-        fprintf(stderr, " FAILURE! source code file %s could not be opened\n", arg);
-        fprintf(stderr, "######################################################################\n\n");
-        /*         free(fileName); */
+        fileCreationFailure(fileName);
         return;
     }
 
@@ -81,11 +78,7 @@ void handleSingleFile(char *arg)
     if ((target = fopen(fileName, "w+")) == NULL)
     {
 
-        fprintf(stderr, "\n######################################################################\n");
-        fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", arg);
-        fprintf(stderr, "######################################################################\n\n");
-        /*         fclose(src);
-                free(fileName); */
+        fileCreationFailure(fileName);
         return;
     }
 
