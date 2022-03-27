@@ -181,42 +181,39 @@ Bool parseLine(char *token, char *line)
     State (*globalState)() = &getGlobalState;
 
     Bool isValid = True;
-    printf("parse line, token:%s line:%s\n", token, line);
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
         char *next = 0;
-        /*         printf("inside is label declaration\n"); */
         if (!isLabelDeclarationStrict(token))
         {
-            char lineClone[MAX_LINE_LEN] = {0};
+            char lineClone[MAX_LINE_LEN] = {0}, *rest = 0;
             strcpy(lineClone, line);
             isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
-            next = strchr(token, ':');
-            *next = ' ';
-            token = splitToken(token);
+            token = line;
+            next = strchr(line, ':');
             next++;
-            strcat(token, ": ");
-            next = line + strlen(token);
-            sprintf(line, "%s%s", token, next);
-            strcpy(lineClone, line);
-            free(token);
+            *next = '\0';
+            rest = strchr(lineClone, ':');
+            rest++;
+            sprintf(line, "%s%c%s", token, ' ', rest);
+            strncpy(lineClone, line, strlen(line));
             next = (*globalState)() == firstRun ? strtok(lineClone, " \t\n\f\r") : strtok(lineClone, ", \t\n\f\r");
-            return parseLine(next, line) && isValid;
+            return parseLine(next, line) && False;
         }
         else
         {
             next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
             if (!next)
-                isValid = yieldError(emptyLabelDecleration);
-        }
+                return yieldError(emptyLabelDecleration);
 
-        if ((*globalState)() == firstRun)
-            return handleLabel(token, next, line) && isValid;
-        else
-            return parseLine(next, line + strlen(token) + 1) && isValid;
+            if ((*globalState)() == firstRun)
+                return handleLabel(token, next, line) && isValid;
+            else
+                return isValid && parseLine(next, line + strlen(token) + 1);
+        }
     }
 
     else if (isInstruction(token))

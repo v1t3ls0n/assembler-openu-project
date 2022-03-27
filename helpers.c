@@ -11,9 +11,6 @@ char *splitToken(char *s)
     while (*end != '\0' && !isspace(*end))
         end++;
 
-    if (*end)
-        *end = '\0';
-
     return start;
 }
 
