@@ -66,7 +66,6 @@ Bool verifyCommaSyntax(char *line)
     Bool isValid = True;
     char *s = line;
     s = trimFromLeft(s);
-    printf("line in verifyCommaSyntax:%s\n", line);
 
     while (*s == ',' || isspace(*s))
     {
@@ -75,8 +74,10 @@ Bool verifyCommaSyntax(char *line)
         s++;
     }
 
-    if (commasCounter > 0)
+    if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+    else if (!*s && strchr(s, ','))
+        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
@@ -92,12 +93,13 @@ Bool verifyCommaSyntax(char *line)
 
             if (commasCounter > 1)
             {
-                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+
+                isValid = yieldError(wrongCommasSyntaxExtra);
                 commasCounter = 1;
             }
             else if (commasCounter < 1)
             {
-                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                isValid = yieldError(wrongCommasSyntaxMissing);
                 commasCounter = 1;
             }
             if (s && isspace(*s))
@@ -131,7 +133,6 @@ Bool verifyCommaSyntax(char *line)
     if (commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    printf("are commas valid? %d\n", isValid);
     return isValid;
 }
 
