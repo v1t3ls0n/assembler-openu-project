@@ -244,12 +244,13 @@ Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
     char lineCopy[MAX_LINE_LEN] = {0};
+    Bool result = True;
     char *token;
     strcpy(lineCopy, line);
-    printf("line:%s\n", line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t\n\f\r") : strtok(lineCopy, ", \t\n\f\r");
+    result = parseLine(token, line);
     (*currentLineNumberPlusPlus)();
-    return parseLine(token, line);
+    return result;
 }
 
 void parseAssemblyCode(FILE *src)
