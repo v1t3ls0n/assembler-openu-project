@@ -93,12 +93,12 @@ Bool verifyCommaSyntax(char *line)
             if (commasCounter > 1)
             {
 
-                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+                isValid = yieldError(wrongCommasSyntaxExtra);
                 commasCounter = 1;
             }
             else if (commasCounter < 1)
             {
-                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                isValid = yieldError(wrongCommasSyntaxMissing);
                 commasCounter = 1;
             }
             if (s && isspace(*s))

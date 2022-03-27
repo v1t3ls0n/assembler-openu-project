@@ -230,9 +230,7 @@ void yieldErrorIntoFile(Error err)
     case fileCouldNotBeOpened:
         fprintf(errorsFile, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(errorsFile, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(errorsFile, "Overriding of external symbol exisiting in table is not allowed!");
         break;
@@ -387,7 +385,6 @@ Bool yieldWarning(Warning err)
 }
 
 Bool yieldError(Error err)
-
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
@@ -505,9 +502,7 @@ Bool yieldError(Error err)
     case fileCouldNotBeOpened:
         fprintf(stderr, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(stderr, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(stderr, "Overriding of external symbol exisiting in table is not allowed!");
         break;
