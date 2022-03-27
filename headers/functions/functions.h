@@ -76,6 +76,7 @@ Bool yieldWarning(Warning err);
 void yieldWarningIntoFile(Warning err);
 void yieldErrorIntoFile(Error err);
 void closeOpenLogFiles();
+void fileCreationFailure(char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/

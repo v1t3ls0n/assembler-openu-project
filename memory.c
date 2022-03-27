@@ -1,11 +1,9 @@
 
 #include "data.h"
-extern void updateFinalSymbolTableValues();
 extern HexWord *convertBinaryWordToHex(BinaryWord *word);
 extern char *numToBin(int num);
-extern char *decToHex(int num);
-void covertBinaryMemoryImageToHexImageForObFile();
 
+void covertBinaryMemoryImageToHexImageForObFile();
 static BinaryWord *binaryImg = NULL;
 static HexWord *hexImg = NULL;
 unsigned static IC = MEMORY_START;
@@ -110,16 +108,6 @@ void calcFinalAddrsCountersValues()
     DC = IC;
     IC = MEMORY_START;
     printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
-}
-
-void covertBinaryMemoryImageToHexImageForObFile()
-{
-    extern BinaryWord *binaryImg;
-    extern HexWord *hexImg;
-    int i;
-    int totalSize = DCF - MEMORY_START;
-    for (i = 0; i < totalSize; i++)
-        hexImg[i] = *convertBinaryWordToHex(&binaryImg[i]);
 }
 
 void printMemoryImgInRequiredObjFileFormat()
