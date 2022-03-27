@@ -176,58 +176,54 @@ Bool countAndVerifyStringArguments(char *line)
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
+    Bool isValid = True;
 
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
-        if (strlen(token) == 1)
-            yieldError(illegalLabelDeclaration);
-        else
-        {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-            if (!next)
-                return yieldError(emptyLabelDecleration);
 
-            if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) ? True : False;
-            else
-                return parseLine(next, line + strlen(token) + 1);
-        }
+        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+        if (!next)
+            isValid = yieldError(emptyLabelDecleration);
+
+        if ((*globalState)() == firstRun)
+            return handleLabel(token, next, line) && isValid;
+        else
+            return parseLine(next, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))
     {
         char *next;
         int type;
-        Bool isValid = True;
-
+        type = getInstructionType(token);
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
             token = getInstructionName(token);
         }
-        type = getInstructionType(token);
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
 
-        if (next == NULL)
+        if (isValid && next == NULL)
         {
             if (type == _TYPE_DATA || type == _TYPE_STRING)
                 return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldError(emptyStringDeclatretion);
             else
                 return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
         }
-        else
+        else if (next != NULL)
         {
+
             if ((*globalState)() == firstRun)
-                return isValid && handleInstruction(type, token, next, line);
+                return handleInstruction(type, token, next, line) && isValid;
             else
             {
                 if (type == _TYPE_DATA)
-                    return writeDataInstruction(next);
+                    return writeDataInstruction(next) && isValid;
                 else if (type == _TYPE_STRING)
-                    return writeStringInstruction(next);
+                    return writeStringInstruction(next) && isValid;
                 else
                     return True;
             }
@@ -244,12 +240,12 @@ Bool parseLine(char *token, char *line)
     else
     {
         if (strlen(token) > 1)
-            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            return yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+            return yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
     }
 
-    return False;
+    return isValid;
 }
 
 Bool handleSingleLine(char *line)
