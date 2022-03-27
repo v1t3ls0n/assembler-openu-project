@@ -19,10 +19,11 @@ char *trimFromLeft(char *s)
 char *trimFromRight(char *s)
 {
     long offset = strlen(s) - 1;
+    char *start = s;
     s += offset;
     while (isspace(*s))
         s--;
-    return s;
+    return start;
 }
 int countSpaceCharacters(char *s)
 {

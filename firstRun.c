@@ -21,7 +21,12 @@ extern void parseAssemblyCode(FILE *src);
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
-
+char *getNextToken(char *s);
+char *splitToken(char *s);
+char *trimFromRight(char *s);
+Bool isLabelDeclarationStrict(char *s);
+Bool isOperationNotStrict(char *s);
+char *getOperationName(char *s);
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -201,58 +206,97 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
     {
         int dataCounter = getDC();
         Bool isLabelNameAvailable;
-        firstToken[strlen(firstToken) - 1] = '\0';
         isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
-
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
-        else
-            return False;
     }
-    else
-        yieldError(undefinedOperation);
 
     return False;
 }
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
-    if (!labelName || !nextToken || !line)
-        return False;
+    Bool isValid = True;
+    char *firstToken = 0;
+    nextToken = trimFromLeft(nextToken);
+    firstToken = nextToken;
+
+    if (nextToken[0] == ':')
+        nextToken++;
+    nextToken = splitToken(nextToken);
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
+        int len = strlen(getInstructionNameByType(instruction)) + 1;
+        char cleanInstruction[MAX_INSTRUCTION_NAME_LEN + 1] = {0}, *end = 0;
+        strncpy(cleanInstruction, nextToken, len);
+        end = cleanInstruction;
+        while (!isspace(*end) && *end != '\0')
+            end++;
+        if (isspace(*end))
+            *end = '\0';
+
+        if (strlen(getInstructionNameByType(instruction)) != strlen(cleanInstruction))
+        {
+            isValid = yieldError(missinSpaceAfterInstruction);
+            nextToken = nextToken + strlen(getInstructionNameByType(instruction));
+        }
+
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            char *next = strtok(NULL, " \t\n\f\r");
-            if (next)
-                return handleInstruction(instruction, nextToken, next, line);
+            if (nextToken)
+                return handleInstruction(instruction, firstToken, nextToken, line) && isValid;
             else
                 return yieldWarning(emptyLabelDecleration);
         }
         else
-
-            return handleInstruction(instruction, labelName, nextToken, line);
+            return handleInstruction(instruction, labelName, nextToken, line) && isValid;
     }
 
     else if (isOperation(nextToken))
     {
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
-        int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
-        strcpy(args, &line[offset]);
+        strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
+        printf("args:%s\n", args);
+
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
             return False;
     }
-
     else
-        yieldError(illegalLabelUseExpectedOperationOrInstruction);
+        return yieldError(undefinedLabelDeclaretion);
 
     return False;
+}
+
+char *getNextToken(char *s)
+{
+    char *start = s;
+    while (*start != '\0' && !isspace(*start) && *start != ',')
+        start++;
+    return start;
+}
+
+char *splitToken(char *s)
+{
+    char *start = 0, *end;
+    char *nextToken;
+    s = trimFromLeft(s);
+    nextToken = (char *)calloc(strlen(s) + 1, sizeof(char *));
+    strcpy(nextToken, s);
+    start = nextToken;
+    end = start;
+    while (*end != '\0' && !isspace(*end))
+        end++;
+
+    if (*end)
+        *end = '\0';
+
+    return start;
 }

@@ -148,6 +148,13 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
+
+    if (strlen(name) < 1)
+    {
+        printf("name:%s\nname length:%d\n", name, (int)strlen(name));
+        /*         return yieldError(illegalLabelDeclaration); */
+    }
+
     if (!verifyLabelNamingAndPrintErrors(name))
         return False;
     p = lookup(name, Symbol);
@@ -273,6 +280,10 @@ Bool isNonEmptyEntry(char *name)
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)
 {
     Item *p = lookup(name, type);
+
+    if (name[strlen(name) - 1] == ':')
+        name[strlen(name) - 1] = '\0';
+
     if (p != NULL)
     {
         if (type == Symbol)
