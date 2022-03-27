@@ -150,19 +150,17 @@ Bool countAndVerifyStringArguments(char *line)
     line = trimFromLeft(line);
     if (!line || !*line)
         return yieldError(emptyStringDeclatretion);
-
     args = strchr(line, '\"');
     opening = strchr(line, '\"');
-    closing = strrchr(line, '\"');
 
-    if (opening)
+    if (opening && (!opening[1]))
+        isValid = yieldError(expectedQuotes);
+    if (args)
     {
-        if (args[0] != '\"')
-            isValid = yieldError(expectedQuotes);
-
-        else if (closing == opening)
+        closing = strrchr(line, '\"');
+        if (closing == args)
             return yieldError(closingQuotesForStringIsMissing);
-        s = strrchr(args, '\"');
+        s = opening;
         while (*s && *s != '\0')
         {
             s++;

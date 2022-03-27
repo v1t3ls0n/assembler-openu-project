@@ -34,10 +34,10 @@
 #define R14 0xE
 #define R15 0xF
 
-#define DATA ".data\0"
-#define STRING ".string\0"
-#define ENTRY ".entry\0"
-#define EXTERNAL ".extern\0"
+#define DATA ".data"
+#define STRING ".string"
+#define ENTRY ".entry"
+#define EXTERNAL ".extern"
 
 #define _TYPE_DATA -11
 #define _TYPE_STRING -22

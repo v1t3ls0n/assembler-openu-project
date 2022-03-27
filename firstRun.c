@@ -233,6 +233,8 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
         if (isspace(*end))
             *end = '\0';
 
+        printf("clean instruction%s\n", cleanInstruction);
+
         if (!isInstructionStrict(cleanInstruction))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
