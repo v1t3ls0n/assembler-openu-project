@@ -220,22 +220,26 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
     Bool isValid = True;
-    char *firstToken = nextToken;
+    char *firstToken = 0;
     nextToken = trimFromLeft(nextToken);
+    firstToken = nextToken;
+
+    if (nextToken[0] == ':')
+        nextToken++;
+
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
-        char cleanInstruction[8] = {0}, *end;
-        strncpy(cleanInstruction, nextToken, 8);
+        int len = strlen(getInstructionNameByType(instruction)) + 1;
+        char cleanInstruction[MAX_INSTRUCTION_NAME_LEN + 1] = {0}, *end = 0;
+        strncpy(cleanInstruction, nextToken, len);
         end = cleanInstruction;
         while (!isspace(*end) && *end != '\0')
             end++;
         if (isspace(*end))
             *end = '\0';
 
-        printf("clean instruction%s\n", cleanInstruction);
-
-        if (!isInstructionStrict(cleanInstruction))
+        if (strlen(getInstructionNameByType(instruction)) != strlen(cleanInstruction))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
             nextToken = nextToken + strlen(getInstructionNameByType(instruction));

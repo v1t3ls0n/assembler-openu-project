@@ -132,16 +132,16 @@ char *getInstructionNameByType(int type)
     switch (type)
     {
     case _TYPE_DATA:
-        return "DATA INSTRUCTION";
+        return strcat(DATA, "\0");
 
     case _TYPE_STRING:
-        return "STRING INSTRUCTION";
+        return strcat(STRING, "\0");
 
     case _TYPE_ENTRY:
-        return "ENTRY INSTRUCTION";
+        return strcat(ENTRY, "\0");
 
     case _TYPE_EXTERNAL:
-        return "EXTERNAL INSTRUCTION";
+        return strcat(EXTERNAL, "\0");
 
     default:
         break;
@@ -149,6 +149,7 @@ char *getInstructionNameByType(int type)
 
     return NULL;
 }
+
 char *getInstructionName(char *s)
 {
     if (strstr(s, DATA) != NULL)
