@@ -66,7 +66,8 @@ typedef enum
     macroDeclaretionWithoutDefiningMacroName,
     wrongCommasSyntaxExtra,
     wrongCommasSyntaxMissing,
-    wrongCommasSyntaxIllegalApearenceOfCommasInLine
+    wrongCommasSyntaxIllegalApearenceOfCommasInLine,
+    extraOperandsPassed
 
 } Error;
 

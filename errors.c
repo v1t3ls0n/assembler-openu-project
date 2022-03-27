@@ -122,6 +122,9 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case extraOperandsPassed:
+        fprintf(errorsFile, "Extra operands passed as paramters");
+        break;
     case wrongCommasSyntaxIllegalApearenceOfCommasInLine:
         fprintf(errorsFile, "Illegal apearence of commas in line");
         break;
@@ -397,6 +400,9 @@ Bool yieldError(Error err)
     {
     case illegalLabelNameLength:
         fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
+        break;
+    case extraOperandsPassed:
+        fprintf(stderr, "Extra operands passed as paramters");
         break;
 
     case wrongCommasSyntaxIllegalApearenceOfCommasInLine:

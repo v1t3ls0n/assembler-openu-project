@@ -28,14 +28,23 @@ Bool handleOperation(char *operationName, char *args)
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     char *first = 0;
     char *second = 0;
+    char *extra = 0;
     Bool areOperandsLegal;
+
     if (*args)
         areOperandsLegal = verifyCommaSyntax(args);
+
     first = strtok(args, ", \t\n\f\r");
     if (first)
     {
         second = strtok(NULL, ", \t\n\f\r");
-        if (!second)
+        if (second)
+        {
+            extra = strtok(NULL, ", \t\n\f\r");
+            if (extra)
+                yieldError(extraOperandsPassed);
+        }
+        else
         {
             second = first;
             first = 0;
