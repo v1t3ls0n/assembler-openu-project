@@ -81,42 +81,39 @@ void handleSingleFile(char *arg)
         return;
     }
 
-    else
-    {
-        (*globalState)(parsingMacros);
-        resetMemoryCounters();
-        initTables();
-        parseSourceFile(src, target);
+    (*globalState)(parsingMacros);
+    resetMemoryCounters();
+    initTables();
+    parseSourceFile(src, target);
 
-        if ((*globalState)() == firstRun)
+    if ((*globalState)() == firstRun)
+    {
+        printMacroTable();
+        rewind(target);
+        parseAssemblyCode(target);
+
+        if ((*globalState)() == secondRun)
         {
-            printMacroTable();
+            calcFinalAddrsCountersValues();
+            updateFinalSymbolTableValues();
+            allocMemoryImg();
+            printSymbolTable();
             rewind(target);
             parseAssemblyCode(target);
-
-            if ((*globalState)() == secondRun)
+            if ((*globalState)() == exportFiles)
             {
-                calcFinalAddrsCountersValues();
-                updateFinalSymbolTableValues();
-                allocMemoryImg();
-                printSymbolTable();
-                rewind(target);
-                parseAssemblyCode(target);
-                if ((*globalState)() == exportFiles)
-                {
-                    fileName[strlen(fileName) - 3] = '\0';
-                    (*setPath)(fileName);
-                    exportFilesMainHandler();
-                }
-                else
-                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+                fileName[strlen(fileName) - 3] = '\0';
+                (*setPath)(fileName);
+                exportFilesMainHandler();
             }
+            else
+                printf("\nSecond Run Finished With Errors, files will not be exported!\n");
         }
-        else
-            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
-
-        fclose(src);
-        free(fileName);
-        fclose(target);
     }
+    else
+        printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
+
+    fclose(src);
+    free(fileName);
+    fclose(target);
 }
