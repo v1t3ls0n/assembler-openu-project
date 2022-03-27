@@ -87,6 +87,8 @@ Operation *getOperationByName(char *s);
 Operation *getOperationByIndex(unsigned int i);
 int getOpIndex(char *s);
 Bool isOperationName(char *s);
+Bool isOperationNotStrict(char *s);
+char *getOperationName(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -208,3 +210,7 @@ int parseRegNumberFromIndexAddrOperand(char *s);
 Bool writeStringInstruction(char *s);
 Bool writeDataInstruction(char *s);
 void writeSingleExternalsFile(char *name, unsigned base, unsigned offset);
+
+/*  IN UTILS.C */
+
+Bool isLabelDeclaration(char *s);
