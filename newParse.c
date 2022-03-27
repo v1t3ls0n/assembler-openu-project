@@ -11,6 +11,7 @@ extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
+Bool isLabelDeclarationStrict(char *s);
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -19,18 +20,15 @@ Bool handleSingleLine(char *line);
    While the function parsing the arguments, ir also counts the number of .data elements that will take size in the data memory.
    In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .data instruction will take.
 */
-
 Bool countAndVerifyDataArguments(char *line)
 {
     Bool isValid = True;
     int size = 0, n = 0, num = 0;
     char c = 0;
     char args[MAX_LINE_LEN + 1] = {0}, *p;
-    line = strstr(line, DATA) + strlen(DATA);
-
     /* we make the pointer p to point on the position of the first character coming sfter the .data
-     instruction within the full line, so that p will point on the begining of the arguments string*/
-
+    instruction within the full line, so that p    will point on the begining of the arguments string*/
+    line = strstr(line, DATA) + strlen(DATA);
     /*copies the string of arguments pointer by p into the args local string we will use for parsing*/
     strcpy(args, line);
 
@@ -51,7 +49,6 @@ Bool countAndVerifyDataArguments(char *line)
         p = strtok(NULL, ", \t\n\f\r");
     }
 
-    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
@@ -66,7 +63,6 @@ Bool verifyCommaSyntax(char *line)
     Bool isValid = True;
     char *s = line;
     s = trimFromLeft(s);
-    printf("line in verifyCommaSyntax:%s\n", line);
 
     while (*s == ',' || isspace(*s))
     {
@@ -75,8 +71,10 @@ Bool verifyCommaSyntax(char *line)
         s++;
     }
 
-    if (commasCounter > 0)
+    if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+    else if (!*s && strchr(s, ','))
+        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
@@ -92,12 +90,13 @@ Bool verifyCommaSyntax(char *line)
 
             if (commasCounter > 1)
             {
-                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+
+                isValid = yieldError(wrongCommasSyntaxExtra);
                 commasCounter = 1;
             }
             else if (commasCounter < 1)
             {
-                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                isValid = yieldError(wrongCommasSyntaxMissing);
                 commasCounter = 1;
             }
             if (s && isspace(*s))
@@ -131,57 +130,90 @@ Bool verifyCommaSyntax(char *line)
     if (commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    printf("are commas valid? %d\n", isValid);
     return isValid;
 }
 
+/* @ Function: countAndVerifyStringArguments
+   @ Arguments: the function gets char * token which is the current token that we are about to parse the string argument from.
+   @ Description: The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
+   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
+   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
+   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
+*/
 Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
+    Bool isValid = True;
     int size = 0;
+    char *closing = 0, *opening = 0;
+    line = strstr(line, STRING) + strlen(STRING);
+    line = trimFromLeft(line);
+    if (!line || !*line)
+        return yieldError(emptyStringDeclatretion);
     args = strchr(line, '\"');
-    if (!*args)
-        return yieldWarning(emptyStringDeclatretion);
-
-    if (args[0] != '\"')
-        return yieldError(expectedQuotes);
-
-    s = strrchr(args, '\"');
-    while (*s && *s != '\0')
+    if (args)
     {
-        if (!isspace(*s) && isprint(*s) && *s != '\"')
-            return yieldError(closingQuotesForStringIsMissing);
-        s++;
-        size++;
+        opening = strchr(line, '\"');
+        closing = strrchr(line, '\"');
+        if (opening == closing && (opening[0] != line[0]))
+            isValid = yieldError(expectedQuotes);
+        else if (opening == closing && (opening[0] == line[0]))
+            yieldError(closingQuotesForStringIsMissing);
+        s = opening;
+        while (*s && *s != '\0')
+        {
+            s++;
+            size++;
+        }
     }
+    else
+    {
+        yieldError(expectedQuotes);
+        yieldError(closingQuotesForStringIsMissing);
+        isValid = False;
+    }
+    if (isValid)
+        increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
-    increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
-
-    return True;
+    return isValid;
 }
 
+/* @ Function: parseLine
+   @ Arguments: The function gets char * token which is the current token that we are about to parse and char *line which is the current line being parsed
+   @ Description: The function checks what is the current globalState, than checks what is the current token (an instruction, an operation, a label declaration...)
+   The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
+   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
+   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
+   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
+*/
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-
+    Bool isValid = True;
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
-        if (strlen(token) == 1)
-            yieldError(illegalLabelDeclaration);
-        else
+        char labelName[MAX_LABEL_LEN] = {0};
+        strcpy(labelName, token);
+        printf("line 195 parse.c\n");
+        if (!isLabelDeclarationStrict(token))
         {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-            if (!next)
-                return yieldError(emptyLabelDecleration);
-
-            if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) ? True : False;
-            else
-                return parseLine(next, line + strlen(token) + 1);
+            char *s;
+            isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
+            token = strchr(token, ':');
+            s = strchr(labelName, ':');
+            *s = '\0';
+            token++;
         }
+
+        token = strstr(line, labelName) + strlen(labelName);
+
+        if ((*globalState)() == firstRun)
+            return handleLabel(labelName, token, line) && isValid;
+        else
+            return parseLine(token, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))
@@ -189,12 +221,6 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
-
-        if (!isInstructionStrict(token))
-        {
-            isValid = yieldError(missinSpaceAfterInstruction);
-            token = getInstructionName(token);
-        }
         type = getInstructionType(token);
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
 
@@ -208,7 +234,7 @@ Bool parseLine(char *token, char *line)
         else
         {
             if ((*globalState)() == firstRun)
-                return isValid && handleInstruction(type, token, next, line);
+                return handleInstruction(type, token, next, line) && isValid;
             else
             {
                 if (type == _TYPE_DATA)
@@ -251,6 +277,7 @@ Bool handleSingleLine(char *line)
     (*currentLineNumberPlusPlus)();
     return result;
 }
+
 void parseAssemblyCode(FILE *src)
 {
     State (*globalState)() = &getGlobalState;
