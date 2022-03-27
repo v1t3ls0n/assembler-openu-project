@@ -33,7 +33,7 @@ extern void parseAssemblyCode(FILE *src);
 
 extern ParseState parseLine(char *token, char *line);
 extern Bool handleSingleLine(char *line);
-
+Bool writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);
@@ -47,54 +47,36 @@ Bool writeOperationBinary(char *operationName, char *args)
     {
 
         writeSecondWord(first, second, active, op);
-        if (active[0].index)
-        {
-            parseLabelNameFromIndexAddrOperand(first);
-            writeDirectOperandWord(first);
-        }
-        else if (active[0].direct)
-            writeDirectOperandWord(first);
-        else if (active[0].immediate)
-            writeImmediateOperandWord(first);
-
-        if (active[1].direct)
-            writeDirectOperandWord(second);
-
-        else if (active[1].immediate)
-            writeImmediateOperandWord(second);
-
-        else if (active[1].index)
-        {
-            parseLabelNameFromIndexAddrOperand(second);
-            writeDirectOperandWord(second);
-        }
+        writeAdditionalOperandsWords(op, active[0], first);
+        writeAdditionalOperandsWords(op, active[1], second);
     }
     else if (!second && first && detectOperandType(first, active, 1))
     {
-
         second = first;
-        /*
-                printf("operation:%s args:%s first:%s second:%s\n", operationName, args, first, second);
-         */
         writeSecondWord(first, second, active, op);
-
-        if (active[1].index)
-        {
-            parseLabelNameFromIndexAddrOperand(second);
-            writeDirectOperandWord(second);
-        }
-        else if (active[1].direct)
-            writeDirectOperandWord(second);
-        else if (active[1].immediate)
-            writeImmediateOperandWord(second);
+        writeAdditionalOperandsWords(op, active[1], second);
     }
     else if (!first && !second && !op->funct)
-        return lineParsedSuccessfully;
+        return True;
 
     else
-        return Err;
+        return False;
 
-    return lineParsedSuccessfully;
+    return True;
+}
+
+Bool writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
+{
+
+    if (active.index)
+    {
+        parseLabelNameFromIndexAddrOperand(value);
+        writeDirectOperandWord(value);
+    }
+    else if (active.direct)
+        writeDirectOperandWord(value);
+    else if (active.immediate)
+        writeImmediateOperandWord(value);
 }
 
 Bool writeDataInstruction(char *token)
