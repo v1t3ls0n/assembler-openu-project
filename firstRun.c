@@ -22,7 +22,7 @@ extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
 char *getNextToken(char *s);
-void splitToken(char *s);
+char *splitToken(char *s);
 char *trimFromRight(char *s);
 Bool isLabelDeclarationStrict(char *s);
 
@@ -161,7 +161,6 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
 
 Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
-    printf("first token:%s\n", firstToken);
 
     if (isInstruction(firstToken))
     {
@@ -212,35 +211,38 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
-            printf("line 211!!!!!!!!!!!!!!!!!!11\n");
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
-        printf("line 215!!!!!!!!!!!!\n");
     }
 
-    printf("line 220\n");
     return False;
 }
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
     Bool isValid = True;
-    char *secondToken = nextToken, *thirdToken;
-    splitToken(secondToken);
-    secondToken = trimFromRight(secondToken);
-
-    if (isInstruction(secondToken))
+    char *firstToken = nextToken;
+    nextToken = trimFromLeft(nextToken);
+    if (isInstruction(nextToken))
     {
-        int instruction = 0;
-        if (!isInstructionStrict(secondToken))
+        int instruction = getInstructionType(nextToken);
+        char cleanInstruction[8] = {0}, *end;
+        strncpy(cleanInstruction, nextToken, 8);
+        end = cleanInstruction;
+        while (!isspace(*end) && *end != '\0')
+            end++;
+        if (isspace(*end))
+            *end = '\0';
+
+        if (!isInstructionStrict(cleanInstruction))
+        {
             isValid = yieldError(missinSpaceAfterInstruction);
+            nextToken = nextToken + strlen(getInstructionNameByType(instruction));
+        }
 
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            thirdToken = nextToken + strlen(secondToken);
-            splitToken(nextToken);
-            printf("line 243\n");
-            if (thirdToken)
-                return handleInstruction(instruction, nextToken, thirdToken, line) && isValid;
+            if (nextToken)
+                return handleInstruction(instruction, firstToken, nextToken, line) && isValid;
             else
                 return yieldWarning(emptyLabelDecleration);
         }
@@ -252,35 +254,37 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
     {
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
-        int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
-        strcpy(args, &line[offset]);
+        strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
             return False;
     }
     else
-    {
-        if (!nextToken)
-            return yieldError(emptyLabelDecleration);
-    }
+        return yieldError(undefinedLabelDeclaretion);
 
     return False;
 }
 
 char *getNextToken(char *s)
 {
-    s = trimFromLeft(s);
-    while (*s != '\0' && !isspace(*s))
-        s++;
-    return s;
+    char *start = s;
+    while (*start != '\0' && !isspace(*start) && *start != ',')
+        start++;
+    return start;
 }
 
-void splitToken(char *s)
+char *splitToken(char *s)
 {
+    char *start = 0, *end;
     s = trimFromLeft(s);
-    while (*s != '\0' && !isspace(*s))
-        s++;
-    if (*s)
-        *s = '\0';
+    start = s;
+    end = start;
+    while (*end != '\0' && !isspace(*end))
+        end++;
+
+    if (*end)
+        *end = '\0';
+
+    return start;
 }

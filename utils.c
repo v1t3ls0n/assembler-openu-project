@@ -37,6 +37,7 @@ Bool isInstruction(char *s)
 
 Bool isInstructionStrict(char *s)
 {
+
     return ((!strcmp(s, DATA) || !strcmp(s, STRING) || !strcmp(s, ENTRY) || !strcmp(s, EXTERNAL))) ? True : False;
 }
 

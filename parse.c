@@ -143,33 +143,42 @@ Bool verifyCommaSyntax(char *line)
 Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
+    Bool isValid = True;
     int size = 0;
+    char *closing = 0, *opening = 0;
     line = strstr(line, STRING) + strlen(STRING);
     line = trimFromLeft(line);
     if (!line || !*line)
         return yieldError(emptyStringDeclatretion);
 
     args = strchr(line, '\"');
-    if (args)
+    opening = strchr(line, '\"');
+    closing = strrchr(line, '\"');
+
+    if (opening)
     {
         if (args[0] != '\"')
-            return yieldError(expectedQuotes);
+            isValid = yieldError(expectedQuotes);
 
+        else if (closing == opening)
+            return yieldError(closingQuotesForStringIsMissing);
         s = strrchr(args, '\"');
         while (*s && *s != '\0')
         {
-            if (!isspace(*s) && isprint(*s) && *s != '\"')
-                return yieldError(closingQuotesForStringIsMissing);
             s++;
             size++;
         }
     }
     else
-        return yieldError(expectedQuotes);
+    {
+        yieldError(expectedQuotes);
+        yieldError(closingQuotesForStringIsMissing);
+        isValid = False;
+    }
+    if (isValid)
+        increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
-    increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
-
-    return True;
+    return isValid;
 }
 
 /* @ Function: parseLine

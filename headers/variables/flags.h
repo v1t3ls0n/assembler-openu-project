@@ -70,7 +70,8 @@ typedef enum
     wrongCommasSyntaxIllegalApearenceOfCommasInLine,
     extraOperandsPassed,
     emptyStringDeclatretion,
-    emptyLabelDecleration
+    emptyLabelDecleration,
+    undefinedLabelDeclaretion
 
 } Error;
 

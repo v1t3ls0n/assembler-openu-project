@@ -117,8 +117,11 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case undefinedLabelDeclaretion:
+        fprintf(errorsFile, "undefined Label Declaretion");
+        break;
     case emptyLabelDecleration:
-        fprintf(warningsFile, "empty Label Declaretion");
+        fprintf(errorsFile, "empty Label Declaretion");
         break;
     case emptyStringDeclatretion:
         fprintf(errorsFile, "empty String Declatretion");
@@ -397,6 +400,10 @@ Bool yieldError(Error err)
 
     switch (err)
     {
+
+    case undefinedLabelDeclaretion:
+        fprintf(stderr, "undefined Label Declaretion");
+        break;
     case emptyLabelDecleration:
         fprintf(stderr, "empty Label Declaretion");
         break;
