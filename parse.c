@@ -144,10 +144,17 @@ Bool countAndVerifyDataArguments(char *line)
     return isValid;
 }
 
+/* @ Function: countAndVerifyStringArguments
+   @ Arguments: the function gets char * token which is the current token that we are about to parse the string argument from.
+   @ Description: The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
+   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
+   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
+   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
+*/
 Bool countAndVerifyStringArguments(char *token)
 {
 
-    if (isInstruction(token))
+    if (isInstruction(token)) /*if the current token is an instruction, it moves on to the next token- the argument*/
         token = strtok(NULL, " \t \n");
 
     if (token)
