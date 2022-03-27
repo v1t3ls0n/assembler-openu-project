@@ -1,19 +1,5 @@
 #include "data.h"
 
-/* extern int firstRunParsing(FILE *fp, char *filename);
-extern Bool handleSingleLine(char *line);
-void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
-extern void printBinaryImg();
-extern void allocMemoryImg();
-
-extern void calcFinalAddrsCountersValues();
-extern void printMemoryImgInRequiredObjFileFormat();
-extern void parseAssemblyCode(FILE *src);
-extern void exportFilesMainHandler();
-extern void initExternalOperandsList();
-extern void setGlobalState(State new);
-extern void parseSourceFile(FILE *src, FILE *target);
-extern void closeOpenLogFiles(); */
 extern void resetMemoryCounters();
 extern void initTables();
 extern void exportFilesMainHandler();
@@ -99,8 +85,8 @@ void handleSingleFile(char *arg)
         {
             printMacroTable();
             rewind(target);
+            /* First run: */
             parseAssemblyCode(target);
-
             if ((*globalState)() == secondRun)
             {
                 calcFinalAddrsCountersValues();
@@ -108,6 +94,7 @@ void handleSingleFile(char *arg)
                 allocMemoryImg();
                 printSymbolTable();
                 rewind(target);
+                /* Second Run: */
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {
@@ -118,9 +105,11 @@ void handleSingleFile(char *arg)
                 else
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
+            else
+                printf("\nFirst Run Finished With Errors, will not enter second run!\n");
         }
         else
-            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
+            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
 
         free(fileName);
         fclose(src);
