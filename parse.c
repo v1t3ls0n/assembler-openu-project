@@ -141,7 +141,6 @@ Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
     int size = 0;
-    printf("line:%s\n", line);
     line = strstr(line, STRING) + strlen(STRING);
     line = trimFromLeft(line);
     if (line == NULL)
