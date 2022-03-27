@@ -122,6 +122,19 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case extraOperandsPassed:
+        fprintf(errorsFile, "Extra operands passed as paramters");
+        break;
+    case wrongCommasSyntaxIllegalApearenceOfCommasInLine:
+        fprintf(errorsFile, "Illegal apearence of commas in line");
+        break;
+    case wrongCommasSyntaxExtra:
+        fprintf(errorsFile, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(errorsFile, "Missing Commas between arguments");
+        break;
     case illegalLabelNameLength:
         fprintf(errorsFile, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
@@ -204,13 +217,13 @@ void yieldErrorIntoFile(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(errorsFile, "required operand Is Missing");
+        fprintf(errorsFile, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(errorsFile, "requiredDestinationOperandIsMissin");
+        fprintf(errorsFile, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
@@ -223,9 +236,7 @@ void yieldErrorIntoFile(Error err)
     case fileCouldNotBeOpened:
         fprintf(errorsFile, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(errorsFile, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(errorsFile, "Overriding of external symbol exisiting in table is not allowed!");
         break;
@@ -380,7 +391,6 @@ Bool yieldWarning(Warning err)
 }
 
 Bool yieldError(Error err)
-
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
@@ -391,6 +401,21 @@ Bool yieldError(Error err)
     case illegalLabelNameLength:
         fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
+    case extraOperandsPassed:
+        fprintf(stderr, "Extra operands passed as paramters");
+        break;
+
+    case wrongCommasSyntaxIllegalApearenceOfCommasInLine:
+        fprintf(stderr, "Illegal apearence of commas in line");
+        break;
+    case wrongCommasSyntaxExtra:
+        fprintf(stderr, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(stderr, "Missing Commas between arguments");
+        break;
+
     case illegalLabelNameUseOfSavedKeywordUsingOperationName:
         fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
         break;
@@ -470,13 +495,13 @@ Bool yieldError(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(stderr, "required operand Is Missing");
+        fprintf(stderr, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(stderr, "requiredDestinationOperandIsMissin");
+        fprintf(stderr, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
@@ -489,9 +514,7 @@ Bool yieldError(Error err)
     case fileCouldNotBeOpened:
         fprintf(stderr, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(stderr, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(stderr, "Overriding of external symbol exisiting in table is not allowed!");
         break;

@@ -51,7 +51,6 @@ Bool countAndVerifyDataArguments(char *line)
         p = strtok(NULL, ", \t\n\f\r");
     }
 
-    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
@@ -75,8 +74,10 @@ Bool verifyCommaSyntax(char *line)
         s++;
     }
 
-    if (commasCounter > 0)
+    if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+    else if (!*s && strchr(s, ','))
+        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
@@ -92,12 +93,13 @@ Bool verifyCommaSyntax(char *line)
 
             if (commasCounter > 1)
             {
-                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+
+                isValid = yieldError(wrongCommasSyntaxExtra);
                 commasCounter = 1;
             }
             else if (commasCounter < 1)
             {
-                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                isValid = yieldError(wrongCommasSyntaxMissing);
                 commasCounter = 1;
             }
             if (s && isspace(*s))
@@ -139,21 +141,29 @@ Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
     int size = 0;
-    args = strchr(line, '\"');
-    if (!*args)
+    printf("line:%s\n", line);
+    line = strstr(line, STRING) + strlen(STRING);
+    line = trimFromLeft(line);
+    if (line == NULL)
         return yieldWarning(emptyStringDeclatretion);
 
-    if (args[0] != '\"')
-        return yieldError(expectedQuotes);
-
-    s = strrchr(args, '\"');
-    while (*s && *s != '\0')
+    args = strchr(line, '\"');
+    if (args)
     {
-        if (!isspace(*s) && isprint(*s) && *s != '\"')
-            return yieldError(closingQuotesForStringIsMissing);
-        s++;
-        size++;
+        if (args[0] != '\"')
+            return yieldError(expectedQuotes);
+
+        s = strrchr(args, '\"');
+        while (*s && *s != '\0')
+        {
+            if (!isspace(*s) && isprint(*s) && *s != '\"')
+                return yieldError(closingQuotesForStringIsMissing);
+            s++;
+            size++;
+        }
     }
+    else
+        return yieldError(expectedQuotes);
 
     increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
@@ -243,12 +253,13 @@ Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
     char lineCopy[MAX_LINE_LEN] = {0};
+    Bool result = True;
     char *token;
     strcpy(lineCopy, line);
-    printf("line:%s\n", line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t\n\f\r") : strtok(lineCopy, ", \t\n\f\r");
+    result = parseLine(token, line);
     (*currentLineNumberPlusPlus)();
-    return parseLine(token, line);
+    return result;
 }
 
 void parseAssemblyCode(FILE *src)

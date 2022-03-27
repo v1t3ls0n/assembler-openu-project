@@ -20,7 +20,6 @@ extern void exportFilesMainHandler();
 extern void closeOpenLogFiles();
 extern void allocMemoryImg();
 extern void calcFinalAddrsCountersValues();
-extern void fileOpeningFailure(char *fileName);
 
 void handleSingleFile(char *arg);
 
@@ -28,6 +27,7 @@ int main(int argc, char *argv[])
 {
 
     handleSourceFiles(argc, argv);
+
     return 0;
 }
 
@@ -38,15 +38,18 @@ int handleSourceFiles(int argc, char *argv[])
     int i = 1;
     if (filesCount < 1)
     {
-        yieldError(AssemblerDidNotGetSourceFiles);
+        fprintf(stderr, "\n\nYou did not passed any source files to the assembler!\n\n");
         exit(1);
     }
+
     while (--argc)
     {
         handleSingleFile(argv[i]);
         i++;
     }
-    closeOpenLogFiles();
+
+    /*     closeOpenLogFiles(); */
+
     return True;
 }
 
@@ -56,17 +59,18 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
+
     if (!fileName)
-    {
-        yieldError(memoryAllocationFailure);
         return;
-    }
-    memcpy(fileName, arg, strlen(arg));
+
+    strcpy(fileName, arg);
     strcat(fileName, ".as");
     (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
-        fileOpeningFailure(fileName);
+        fprintf(stderr, "\n######################################################################\n");
+        fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
+        fprintf(stderr, "######################################################################\n\n");
         free(fileName);
         return;
     }
@@ -75,7 +79,10 @@ void handleSingleFile(char *arg)
     (*setPath)(fileName);
     if ((target = fopen(fileName, "w+")) == NULL)
     {
-        fileCreationFailure(fileName);
+
+        fprintf(stderr, "\n######################################################################\n");
+        fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
+        fprintf(stderr, "######################################################################\n\n");
         fclose(src);
         free(fileName);
         return;
@@ -115,8 +122,8 @@ void handleSingleFile(char *arg)
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
 
-        fclose(src);
         free(fileName);
+        fclose(src);
         fclose(target);
     }
 }
