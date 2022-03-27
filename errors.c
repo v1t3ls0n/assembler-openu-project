@@ -122,6 +122,13 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case wrongCommasSyntaxExtra:
+        fprintf(errorsFile, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(errorsFile, "Missing Commas between arguments");
+        break;
     case illegalLabelNameLength:
         fprintf(errorsFile, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
@@ -391,6 +398,15 @@ Bool yieldError(Error err)
     case illegalLabelNameLength:
         fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
+
+    case wrongCommasSyntaxExtra:
+        fprintf(stderr, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(stderr, "Missing Commas between arguments");
+        break;
+
     case illegalLabelNameUseOfSavedKeywordUsingOperationName:
         fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
         break;

@@ -92,6 +92,7 @@ Bool verifyCommaSyntax(char *line)
 
             if (commasCounter > 1)
             {
+
                 isValid = yieldError(wrongOperationSyntaxExtraCommas);
                 commasCounter = 1;
             }
