@@ -160,12 +160,12 @@ Bool countAndVerifyStringArguments(char *line)
     return True;
 }
 
-ParseState parseLine(char *token, char *line)
+Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
 
     if (isComment(token))
-        return lineParsedSuccessfully;
+        return True;
 
     if (isLabelDeclaration(token))
     {
@@ -178,7 +178,7 @@ ParseState parseLine(char *token, char *line)
                 return yieldError(emptyLabelDecleration);
 
             if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) ? lineParsedSuccessfully : Err;
+                return handleLabel(token, next, line) ? True : False;
             else
                 return parseLine(next, line + strlen(token) + 1);
         }
@@ -197,11 +197,9 @@ ParseState parseLine(char *token, char *line)
         }
         type = getInstructionType(token);
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-        printf("line:%s\ntoken:%s\nnext:%s\n", line, token, next);
 
         if (next == NULL)
         {
-            printf("line 328\n");
             if (type == _TYPE_DATA || type == _TYPE_STRING)
                 return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
             else
@@ -214,11 +212,11 @@ ParseState parseLine(char *token, char *line)
             else
             {
                 if (type == _TYPE_DATA)
-                    return writeDataInstruction(next) ? lineParsedSuccessfully : Err;
+                    return writeDataInstruction(next);
                 else if (type == _TYPE_STRING)
-                    return writeStringInstruction(next) ? lineParsedSuccessfully : Err;
+                    return writeStringInstruction(next);
                 else
-                    return lineParsedSuccessfully;
+                    return True;
             }
         }
     }
@@ -227,8 +225,7 @@ ParseState parseLine(char *token, char *line)
     {
         char args[MAX_LINE_LEN] = {0};
         strcpy(args, (line + strlen(token)));
-        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args) ? lineParsedSuccessfully
-                                                                                                               : Err;
+        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
     }
 
     else
@@ -239,23 +236,19 @@ ParseState parseLine(char *token, char *line)
             yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
     }
 
-    return Err;
+    return False;
 }
 
 Bool handleSingleLine(char *line)
 {
     State (*globalState)() = &getGlobalState;
-    ParseState state = newLine;
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
     strcpy(lineCopy, line);
     printf("line:%s\n", line);
     token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t\n\f\r") : strtok(lineCopy, ", \t\n\f\r");
-    state = parseLine(token, line);
     (*currentLineNumberPlusPlus)();
-    return state == lineParsedSuccessfully
-               ? True
-               : False;
+    return parseLine(token, line);
 }
 
 void parseAssemblyCode(FILE *src)
@@ -264,7 +257,6 @@ void parseAssemblyCode(FILE *src)
     void (*setState)() = &setGlobalState;
     int c = 0, i = 0;
     char line[MAX_LINE_LEN] = {0};
-
     Bool isValidCode = True;
     State nextState;
     char *(*fileName)() = &getFileNamePath;

@@ -22,7 +22,7 @@ extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
 
-ParseState handleOperation(char *operationName, char *args)
+Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
@@ -59,7 +59,7 @@ ParseState handleOperation(char *operationName, char *args)
         increaseInstructionCounter(size);
     }
 
-    return areOperandsLegal ? lineParsedSuccessfully : Err;
+    return areOperandsLegal ? True : False;
 }
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
@@ -118,7 +118,7 @@ Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions ac
     return True;
 }
 
-ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
+Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 {
 
     if (isInstruction(firstToken))
@@ -126,10 +126,10 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
 
         if (type == _TYPE_DATA)
         {
-            return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
+            return countAndVerifyDataArguments(line) ? True : False;
         }
         else if (type == _TYPE_STRING)
-            return countAndVerifyStringArguments(line) ? lineParsedSuccessfully : Err;
+            return countAndVerifyStringArguments(line) ? True : False;
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
@@ -141,14 +141,14 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
                 if (nextTokens)
                 {
                     yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
-                    return Err;
+                    return False;
                 }
                 else
                 {
                     if (type == _TYPE_ENTRY)
-                        return addSymbol(labelName, 0, 0, 0, 1, 0) ? lineParsedSuccessfully : Err;
+                        return addSymbol(labelName, 0, 0, 0, 1, 0) ? True : False;
                     if (type == _TYPE_EXTERNAL)
-                        return addSymbol(labelName, 0, 0, 0, 0, 1) ? lineParsedSuccessfully : Err;
+                        return addSymbol(labelName, 0, 0, 0, 0, 1) ? True : False;
                 }
 
                 free(labelName);
@@ -156,7 +156,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             else
             {
                 yieldError(emptyDeclaretionOfEntryOrExternalVariables);
-                return Err;
+                return False;
             }
         }
     }
@@ -172,20 +172,20 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
 
-            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;
+            return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
         else
-            return Err;
+            return False;
     }
     else
         yieldError(undefinedOperation);
 
-    return Err;
+    return False;
 }
-ParseState handleLabel(char *labelName, char *nextToken, char *line)
+Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
     if (!labelName || !nextToken || !line)
-        return Err;
+        return False;
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
@@ -209,13 +209,13 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
         int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
         strcpy(args, &line[offset]);
         if (handleOperation(nextToken, args))
-            return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? lineParsedSuccessfully : Err;
+            return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
-            return Err;
+            return False;
     }
 
     else
         yieldError(illegalLabelUseExpectedOperationOrInstruction);
 
-    return Err;
+    return False;
 }
