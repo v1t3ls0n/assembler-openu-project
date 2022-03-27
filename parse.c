@@ -155,7 +155,7 @@ Bool countAndVerifyStringArguments(char *line)
         size++;
     }
 
-    increaseDataCounter((int)(size)); /*counts the \0 at the end of the string as well*/
+    increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
     return True;
 }
