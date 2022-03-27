@@ -39,6 +39,19 @@ Operation *getOperationByIndex(unsigned int i)
     return i < OP_SIZE ? &operations[i] : NULL;
 }
 
+char *getOperationName(char *s)
+{
+    int i = 0;
+    while (i < OP_SIZE)
+    {
+
+        if (strstr(operations[i].keyword, s) != NULL)
+            return operations[i].keyword;
+        i++;
+    }
+    return 0;
+}
+
 int getOpIndex(char *s)
 {
     int i = 0;
@@ -51,29 +64,15 @@ int getOpIndex(char *s)
     }
     return -1;
 }
-
-/* Bool isOperation(char *s)
+Bool isOperationNotStrict(char *s)
 {
     int i = 0;
     while (i < OP_SIZE)
     {
 
-        if (strstr(operations[i].keyword, s) == 0)
+        if (strstr(operations[i].keyword, s) != NULL)
             return True;
         i++;
     }
     return False;
 }
-
-Bool isOperationStrict(char *s)
-{
-    int i = 0;
-    while (i < OP_SIZE)
-    {
-
-        if (strcmp(operations[i].keyword, s) == 0)
-            return True;
-        i++;
-    }
-    return False;
-} */
