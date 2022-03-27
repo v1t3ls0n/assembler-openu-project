@@ -84,7 +84,7 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
     if (op->des.direct || op->des.immediate || op->des.index || op->des.reg)
         expectedOperandsCount++;
 
-    if (expectedOperandsCount == operandsPassedCount == 0)
+    if ((expectedOperandsCount == operandsPassedCount) && expectedOperandsCount == 0)
         return True;
 
     if (operandsPassedCount > expectedOperandsCount)
@@ -95,22 +95,28 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
 
         if (!src)
             isValid = yieldError(requiredSourceOperandIsMissin);
+
+        else
+            isValid = validateOperandMatch(op->src, active, src, 0) && isValid;
+
         if (!des)
             isValid = yieldError(requiredDestinationOperandIsMissin);
-
-        isValid = (validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1)) && isValid;
+        else
+            isValid = validateOperandMatch(op->des, active, des, 1) && isValid;
     }
     else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
     {
         if (!src)
-            isValid = yieldError(requiredSourceOperandIsMissin);
-        return validateOperandMatch(op->src, active, src, 0) && isValid;
+            return yieldError(requiredSourceOperandIsMissin);
+        else
+            return validateOperandMatch(op->src, active, src, 0) && isValid;
     }
     else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
     {
         if (!des)
-            isValid = yieldError(requiredDestinationOperandIsMissin);
-        return validateOperandMatch(op->des, active, des, 1) && isValid;
+            return yieldError(requiredDestinationOperandIsMissin);
+        else
+            return validateOperandMatch(op->des, active, des, 1) && isValid;
     }
 
     return isValid;
