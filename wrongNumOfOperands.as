@@ -1,5 +1,4 @@
 ;this file will include errors- wrong number of operands
-
 ;to many operands for mov
 mov #3, r8, r15, A
 sub X[r12], r5
