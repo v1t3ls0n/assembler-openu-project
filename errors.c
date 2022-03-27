@@ -217,13 +217,13 @@ void yieldErrorIntoFile(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(errorsFile, "required operand Is Missing");
+        fprintf(errorsFile, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(errorsFile, "requiredDestinationOperandIsMissin");
+        fprintf(errorsFile, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
