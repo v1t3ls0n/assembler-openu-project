@@ -191,16 +191,14 @@ Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
     Bool isValid = True;
+    printf("token:%s\n", token);
 
     if (isComment(token))
         return True;
-
     if (isLabelDeclaration(token))
     {
-
         char labelName[MAX_LABEL_LEN] = {0}, *newToken = 0;
         strcpy(labelName, token);
-
         if (!isLabelDeclarationStrict(token))
         {
             char *s;
@@ -209,16 +207,14 @@ Bool parseLine(char *token, char *line)
             s = strchr(labelName, ':');
             *s = '\0';
             newToken++;
-            newToken = strstr(line, labelName) + strlen(labelName);
-            newToken = splitToken(newToken);
-            token = newToken;
         }
+        newToken = strstr(line, labelName) + strlen(labelName);
+        newToken = splitToken(newToken);
 
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
         if ((*globalState)() == firstRun)
             isValid = handleLabel(labelName, newToken, line) && isValid;
         else
-            isValid = parseLine(next, line + strlen(token) + 1);
+            isValid = parseLine(newToken, line + strlen(newToken)) && isValid;
     }
 
     else if (isInstruction(token))
@@ -237,8 +233,9 @@ Bool parseLine(char *token, char *line)
                 yieldWarning(emptyEntryDeclaretion);
             else if (type == _TYPE_EXTERNAL)
                 yieldWarning(emptyExternalDeclaretion);
+            /*             if (type == _TYPE_STRING)
+            yieldWarning(emptyStringDeclatretion); */
         }
-
         else
         {
             if ((*globalState)() == firstRun)
@@ -259,18 +256,17 @@ Bool parseLine(char *token, char *line)
     {
         char args[MAX_LINE_LEN] = {0};
         strcpy(args, (line + strlen(token)));
-        return (*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args);
+        isValid = ((*globalState)() == firstRun ? handleOperation(token, args) : writeOperationBinary(token, args)) && isValid;
     }
-
     else
     {
         if (strlen(token) > 1)
-            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            isValid = yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+            isValid = yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
     }
 
-    return False;
+    return isValid;
 }
 
 Bool handleSingleLine(char *line)

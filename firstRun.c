@@ -21,9 +21,9 @@ extern void parseAssemblyCode(FILE *src);
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
-char *getNextToken(char *s);
-char *splitToken(char *s);
-char *trimFromRight(char *s);
+
+extern char *splitToken(char *s);
+
 Bool isLabelDeclarationStrict(char *s);
 Bool isOperationNotStrict(char *s);
 char *getOperationName(char *s);
@@ -76,6 +76,7 @@ Bool handleOperation(char *operationName, char *args)
 
     return areOperandsLegal ? True : False;
 }
+
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
     int expectedOperandsCount = 0;
@@ -133,6 +134,7 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
 
     return isValid;
 }
+
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
     Bool isImmediate = isValidImmediateParamter(operand);
@@ -224,10 +226,11 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
     char *firstToken = 0;
     nextToken = trimFromLeft(nextToken);
     firstToken = nextToken;
-
     if (nextToken[0] == ':')
         nextToken++;
+
     nextToken = splitToken(nextToken);
+
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
@@ -249,12 +252,12 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
             if (nextToken)
-                return handleInstruction(instruction, firstToken, nextToken, line) && isValid;
+                isValid = handleInstruction(instruction, firstToken, nextToken, line) && isValid;
             else
-                return yieldWarning(emptyLabelDecleration);
+                isValid = yieldWarning(emptyLabelDecleration);
         }
         else
-            return handleInstruction(instruction, labelName, nextToken, line) && isValid;
+            isValid = handleInstruction(instruction, labelName, nextToken, line) && isValid;
     }
 
     else if (isOperation(nextToken))
@@ -262,41 +265,15 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
         strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
-        printf("args:%s\n", args);
 
         if (handleOperation(nextToken, args))
-            return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
+            isValid = addSymbol(labelName, icAddr, 1, 0, 0, 0) && isValid;
         else
-            return False;
+            isValid = False;
     }
     else
-        return yieldError(undefinedLabelDeclaretion);
+        isValid = yieldError(undefinedLabelDeclaretion);
 
-    return False;
-}
-
-char *getNextToken(char *s)
-{
-    char *start = s;
-    while (*start != '\0' && !isspace(*start) && *start != ',')
-        start++;
-    return start;
-}
-
-char *splitToken(char *s)
-{
-    char *start = 0, *end;
-    char *nextToken;
-    s = trimFromLeft(s);
-    nextToken = (char *)calloc(strlen(s) + 1, sizeof(char *));
-    strcpy(nextToken, s);
-    start = nextToken;
-    end = start;
-    while (*end != '\0' && !isspace(*end))
-        end++;
-
-    if (*end)
-        *end = '\0';
-
-    return start;
+    free(nextToken);
+    return isValid;
 }

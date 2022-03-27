@@ -34,8 +34,6 @@ int handleSourceFiles(int argc, char *argv[])
         i++;
     }
 
-    closeOpenLogFiles();
-
     return True;
 }
 
@@ -83,9 +81,9 @@ void handleSingleFile(char *arg)
 
         if ((*globalState)() == firstRun)
         {
+
             printMacroTable();
             rewind(target);
-            /* First run: */
             parseAssemblyCode(target);
             if ((*globalState)() == secondRun)
             {
@@ -94,7 +92,6 @@ void handleSingleFile(char *arg)
                 allocMemoryImg();
                 printSymbolTable();
                 rewind(target);
-                /* Second Run: */
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {
@@ -114,5 +111,7 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
+
+        closeOpenLogFiles();
     }
 }

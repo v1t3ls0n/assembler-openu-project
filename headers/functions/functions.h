@@ -152,6 +152,8 @@ char *numToBin(int num);
 int countConsecutiveCommas(char *s);
 int countLengthOfNonDigitToken(char *s);
 char *cloneString(char *s);
+char *splitToken(char *s);
+char *getNextToken(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
