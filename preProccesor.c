@@ -25,7 +25,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
     if (isMacroOpening(token))
     {
-        next = strtok(NULL, " \t \n");
+        next = strtok(NULL, " \t\n\f\r");
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
@@ -88,7 +88,7 @@ void parseSourceFile(FILE *src, FILE *target)
         else if (isspace(c) && i > 0)
             line[i++] = ' ';
 
-        else if (isprint(c) && !isspace(c))
+        else if (!isspace(c))
             line[i++] = c;
 
         if (c == '\n')
@@ -100,7 +100,7 @@ void parseSourceFile(FILE *src, FILE *target)
             {
 
                 memcpy(lineClone, line, i);
-                token = strtok(lineClone, " \t \n");
+                token = strtok(lineClone, " \t\n\f\r");
                 if (!parseMacros(line, token, src, target))
                 {
                     (*setState)(assemblyCodeFailedToCompile);
@@ -116,7 +116,7 @@ void parseSourceFile(FILE *src, FILE *target)
     if (i > 0)
     {
         memcpy(lineClone, line, MAX_LINE_LEN);
-        token = strtok(lineClone, " \t \n");
+        token = strtok(lineClone, " \t\n\f\r");
         if (!parseMacros(line, token, src, target))
         {
             (*setState)(assemblyCodeFailedToCompile);
@@ -125,30 +125,4 @@ void parseSourceFile(FILE *src, FILE *target)
     }
 
     (*setState)(firstRun);
-}
-
-char *getNthToken(char *s, int n)
-{
-    char *token = (char *)calloc(strlen(s), sizeof(char *));
-    int i = 0;
-    while (!*s)
-    {
-        if (isspace(*s))
-            i++;
-        if (i == n && !isspace(*s))
-            *token = *s++;
-    }
-    token = (char *)realloc(token, strlen(token) * sizeof(char *));
-    return token;
-}
-
-char *getFirstToken(char *s)
-{
-    char *firstToken = (char *)calloc(strlen(s), sizeof(char *));
-    while (!isspace(*s) && isprint(*s))
-    {
-        *firstToken = *s++;
-    }
-    firstToken = (char *)realloc(firstToken, strlen(firstToken) * sizeof(char *));
-    return firstToken;
 }

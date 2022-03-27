@@ -1,9 +1,6 @@
 #include "data.h"
-
-/* void generateObFile();
-void createEntriesFile();
-extern char *getFileNamePath(); */
-char *(*baseFileName)() = &getFileNamePath;
+extern void fileCreationFailure(char *fileName);
+static char *(*baseFileName)() = &getFileNamePath;
 
 void exportFilesMainHandler()
 {
@@ -21,15 +18,15 @@ void generateObFile()
     char *fileName = (*baseFileName)();
     strcat(fileName, ".ob");
     ob = fopen(fileName, "w+");
-    if (ob == NULL)
-    {
-        printf("failed to create .ob compiled image file for the source expanded source code\n");
-        return;
-    }
-    writeMemoryImageToObFile(ob);
-    fclose(ob);
 
-    free(fileName);
+    if (ob != NULL)
+    {
+        writeMemoryImageToObFile(ob);
+        fclose(ob);
+        free(fileName);
+    }
+    else
+        fileCreationFailure(fileName);
 }
 
 void createEntriesFile()
@@ -38,14 +35,15 @@ void createEntriesFile()
     char *fileName = (*baseFileName)();
     strcat(fileName, ".ent");
     ent = fopen(fileName, "w+");
-    if (ent == NULL)
+
+    if (ent != NULL)
     {
-        printf("failed to create .ent file\n");
-        return;
+        writeEntriesToFile(ent);
+        fclose(ent);
+        free(fileName);
     }
-    writeEntriesToFile(ent);
-    fclose(ent);
-    free(fileName);
+    else
+        fileCreationFailure(fileName);
 }
 
 void createExternalsFile()
@@ -54,12 +52,12 @@ void createExternalsFile()
     char *fileName = (*baseFileName)();
     strcat(fileName, ".ext");
     ext = fopen(fileName, "w+");
-    if (ext == NULL)
+    if (ext != NULL)
     {
-        printf("failed to create .ext file\n");
-        return;
+        writeExternalsToFile(ext);
+        fclose(ext);
+        free(fileName);
     }
-    writeExternalsToFile(ext);
-    fclose(ext);
-    free(fileName);
+    else
+        fileCreationFailure(fileName);
 }

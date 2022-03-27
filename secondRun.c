@@ -5,8 +5,7 @@ extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offs
 
 /* from firstRun.c */
 extern Bool handleSingleLine(char *line);
-extern ParseState handleFirstToken(char *token, char *line, ParseState state);
-extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
+extern Bool handleFirstToken(char *token, char *line, Bool state);
 extern int getInstructionType(char *s);
 extern Bool isOperation(char *s);
 extern Bool isValidIndexParameter(char *s);
@@ -32,70 +31,52 @@ extern unsigned getIC();
 extern void addWord(int value, DataType type);
 extern void parseAssemblyCode(FILE *src);
 
-extern ParseState parseLine(char *token, char *line);
+extern Bool parseLine(char *token, char *line);
 extern Bool handleSingleLine(char *line);
-
+void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    first = strtok(args, ", \t \n");
-    second = strtok(NULL, ", \t \n");
+    first = strtok(args, ", \t\n\f\r");
+    second = strtok(NULL, ", \t\n\f\r");
     writeFirstWord(op);
 
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
     {
 
         writeSecondWord(first, second, active, op);
-        if (active[0].index)
-        {
-            parseLabelNameFromIndexAddrOperand(first);
-            writeDirectOperandWord(first);
-        }
-        else if (active[0].direct)
-            writeDirectOperandWord(first);
-        else if (active[0].immediate)
-            writeImmediateOperandWord(first);
-
-        if (active[1].direct)
-            writeDirectOperandWord(second);
-
-        else if (active[1].immediate)
-            writeImmediateOperandWord(second);
-
-        else if (active[1].index)
-        {
-            parseLabelNameFromIndexAddrOperand(second);
-            writeDirectOperandWord(second);
-        }
+        writeAdditionalOperandsWords(op, active[0], first);
+        writeAdditionalOperandsWords(op, active[1], second);
     }
     else if (!second && first && detectOperandType(first, active, 1))
     {
-
         second = first;
-        /*
-                printf("operation:%s args:%s first:%s second:%s\n", operationName, args, first, second);
-         */
         writeSecondWord(first, second, active, op);
-
-        if (active[1].index)
-        {
-            parseLabelNameFromIndexAddrOperand(second);
-            writeDirectOperandWord(second);
-        }
-        else if (active[1].direct)
-            writeDirectOperandWord(second);
-        else if (active[1].immediate)
-            writeImmediateOperandWord(second);
+        writeAdditionalOperandsWords(op, active[1], second);
     }
     else if (!first && !second && !op->funct)
-        return lineParsedSuccessfully;
+        return True;
 
     else
-        return Err;
+        return False;
 
-    return lineParsedSuccessfully;
+    return True;
+}
+
+void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
+{
+
+    if (active.index)
+    {
+        parseLabelNameFromIndexAddrOperand(value);
+        writeDirectOperandWord(value);
+    }
+    else if (active.direct)
+        writeDirectOperandWord(value);
+    else if (active.immediate)
+        writeImmediateOperandWord(value);
 }
 
 Bool writeDataInstruction(char *token)
@@ -105,19 +86,23 @@ Bool writeDataInstruction(char *token)
     {
         num = atoi(token);
         addWord((A << 16) | num, Data);
-        token = strtok(NULL, ", \t \n");
+        token = strtok(NULL, ", \t\n\f\r");
     }
-    return lineParsedSuccessfully;
+    return True;
 }
 
 Bool writeStringInstruction(char *s)
 {
-    int i = 1;
-    for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
-        addWord((A << 16) | s[i], Data);
+    char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
+    int i, len;
+    printf("start:%s end:%s\n", start, end);
+    start++;
+    len = strlen(start);
+    for (i = 0; i < len - 2; i++)
+        addWord((A << 16) | start[i], Data);
 
     addWord((A << 16) | '\0', Data);
-    return lineParsedSuccessfully;
+    return True;
 }
 
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op)

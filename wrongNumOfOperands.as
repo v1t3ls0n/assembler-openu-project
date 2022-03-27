@@ -19,7 +19,7 @@ A: prn #4, #-68
 stop r9
 ;to many operands for rts
 rts #7, #-2
-.extern A
+.entry A
 ;to little operands for add
 add A[r15]
 ;to little operands for cmp

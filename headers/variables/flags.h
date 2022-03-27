@@ -63,7 +63,11 @@ typedef enum
     illegalApearenceOfCharacterInTheBegningOfTheLine,
     illegalLabelNameUseOfSavedKeywordUsingOperationName,
     illegalLabelNameUseOfSavedKeywordUsingRegisteryName,
-    macroDeclaretionWithoutDefiningMacroName
+    macroDeclaretionWithoutDefiningMacroName,
+    wrongCommasSyntaxExtra,
+    wrongCommasSyntaxMissing,
+    wrongCommasSyntaxIllegalApearenceOfCommasInLine,
+    extraOperandsPassed
 
 } Error;
 
@@ -92,43 +96,6 @@ typedef enum
     endProgram,
     startProgram
 } State;
-
-typedef enum
-{
-    Err = 0,
-    lineParsedSuccessfully = 1,
-    newLine = 3,
-    skipToNextToken = 4,
-    parseLabel = 5,
-    parseInstruction = 6,
-    parseOperation = 7,
-    parsingLine = 8,
-    parseDataVariables = 13,
-    parseStringVariables = 14,
-    parseEntryVariable = 15,
-    parseExternalVariable = 16,
-    parseSourceOperand = 17,
-    parseDestinationOperand = 18,
-    writingOperationIntoMemoryImg = 19,
-    writingDataIntoMemoryImg = 20,
-
-    skipLine,
-    writeToTargetFile,
-    evalToken,
-    readToken,
-    saveCharToToken,
-    deleteMacroFromTarget,
-    deleteLastLine,
-    parsingMacroName,
-    searchingMacroStart,
-    searchingMacroEnd,
-    addMacroToTable,
-    replaceMacro,
-    parsingMacroContent,
-    parsingToken,
-    replacingMacro
-
-} ParseState;
 
 typedef enum
 {

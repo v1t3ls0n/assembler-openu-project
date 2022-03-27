@@ -1,28 +1,6 @@
 #include "data.h"
-/*
 
-STRUCTURE:
-typedef struct
-{
-    unsigned int immediate : 1;
-    unsigned int direct : 1;
-    unsigned int index : 1;
-    unsigned int reg : 1;
-} AddrMethodsOptions;
-
-
-STRUCTURE:
-typedef struct
-{
-    unsigned int op;
-    unsigned int funct : 4;
-    char keyword[4];
-    AddrMethodsOptions src;
-    AddrMethodsOptions des;
-} Operation;
-
-*/
-Operation operations[OP_SIZE] = {
+static Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
     {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
@@ -73,3 +51,29 @@ int getOpIndex(char *s)
     }
     return -1;
 }
+
+/* Bool isOperation(char *s)
+{
+    int i = 0;
+    while (i < OP_SIZE)
+    {
+
+        if (strstr(operations[i].keyword, s) == 0)
+            return True;
+        i++;
+    }
+    return False;
+}
+
+Bool isOperationStrict(char *s)
+{
+    int i = 0;
+    while (i < OP_SIZE)
+    {
+
+        if (strcmp(operations[i].keyword, s) == 0)
+            return True;
+        i++;
+    }
+    return False;
+} */

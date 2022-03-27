@@ -11,7 +11,7 @@ char *cloneString(char *s)
 
 char *trimFromLeft(char *s)
 {
-    while (isspace(*s))
+    while (isspace(*s) && *s != '\0')
         s++;
     return s;
 }

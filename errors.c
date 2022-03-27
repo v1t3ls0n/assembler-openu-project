@@ -6,6 +6,57 @@ char *(*fileName)() = &getFileNamePath;
 static FILE *warningsFile = NULL, *errorsFile = NULL;
 static Bool isWarningFileExist = False;
 static Bool isErrorFileExist = False;
+void fileCreationFailure(char *fileName)
+{
+    extern FILE *errorsFile;
+    extern Bool isErrorFileExist;
+
+    if (!isErrorFileExist)
+    {
+        if ((errorsFile = fopen("errors.log", "w+")) == NULL)
+        {
+            fprintf(stderr, "\n######################################################################\n");
+            fprintf(stderr, " FAILURE! failed to create %s error log file\n", fileName);
+            fprintf(stderr, "######################################################################\n\n");
+        }
+        else
+            isErrorFileExist = True;
+    }
+
+    fprintf(stderr, "\n######################################################################\n");
+    fprintf(stderr, " FAILURE! failed to create %s file\n", fileName);
+    fprintf(stderr, "######################################################################\n\n");
+
+    fprintf(errorsFile, "\n######################################################################\n");
+    fprintf(errorsFile, " FAILURE! failed to create %s file\n", fileName);
+    fprintf(errorsFile, "######################################################################\n\n");
+}
+
+void fileOpeningFailure(char *fileName)
+{
+    extern FILE *errorsFile;
+    extern Bool isErrorFileExist;
+
+    if (!isErrorFileExist)
+    {
+        if ((errorsFile = fopen("errors.log", "w+")) == NULL)
+        {
+            fprintf(stderr, "\n######################################################################\n");
+            fprintf(stderr, " FAILURE! failed to create %s error log file\n", fileName);
+            fprintf(stderr, "######################################################################\n\n");
+        }
+        else
+            isErrorFileExist = True;
+    }
+
+    fprintf(stderr, "\n######################################################################\n");
+    fprintf(stderr, " FAILURE! failed to open %s file\n", fileName);
+    fprintf(stderr, "######################################################################\n\n");
+
+    fprintf(errorsFile, "\n######################################################################\n");
+    fprintf(errorsFile, " FAILURE! failed to open %s file\n", fileName);
+    fprintf(errorsFile, "######################################################################\n\n");
+}
 
 void yieldWarningIntoFile(Warning err)
 {
@@ -71,6 +122,19 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case extraOperandsPassed:
+        fprintf(errorsFile, "Extra operands passed as paramters");
+        break;
+    case wrongCommasSyntaxIllegalApearenceOfCommasInLine:
+        fprintf(errorsFile, "Illegal apearence of commas in line");
+        break;
+    case wrongCommasSyntaxExtra:
+        fprintf(errorsFile, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(errorsFile, "Missing Commas between arguments");
+        break;
     case illegalLabelNameLength:
         fprintf(errorsFile, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
@@ -153,13 +217,13 @@ void yieldErrorIntoFile(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(errorsFile, "required operand Is Missing");
+        fprintf(errorsFile, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(errorsFile, "requiredDestinationOperandIsMissin");
+        fprintf(errorsFile, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
@@ -172,9 +236,7 @@ void yieldErrorIntoFile(Error err)
     case fileCouldNotBeOpened:
         fprintf(errorsFile, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(errorsFile, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(errorsFile, "Overriding of external symbol exisiting in table is not allowed!");
         break;
@@ -244,7 +306,7 @@ void yieldErrorIntoFile(Error err)
         fprintf(errorsFile, "Missing Comma between operands");
         break;
     case wrongOperationSyntaxExtraCommas:
-        fprintf(errorsFile, "Missing Comma between operands");
+        fprintf(errorsFile, "Extra Comma between operands");
         break;
 
     case wrongInstructionSyntaxExtraCommas:
@@ -329,7 +391,6 @@ Bool yieldWarning(Warning err)
 }
 
 Bool yieldError(Error err)
-
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
@@ -340,6 +401,21 @@ Bool yieldError(Error err)
     case illegalLabelNameLength:
         fprintf(stderr, "illegal Label Name length is greater than the maximum allowed which is %d characters", MAX_LABEL_LEN);
         break;
+    case extraOperandsPassed:
+        fprintf(stderr, "Extra operands passed as paramters");
+        break;
+
+    case wrongCommasSyntaxIllegalApearenceOfCommasInLine:
+        fprintf(stderr, "Illegal apearence of commas in line");
+        break;
+    case wrongCommasSyntaxExtra:
+        fprintf(stderr, "Extra commas between arguments");
+        break;
+
+    case wrongCommasSyntaxMissing:
+        fprintf(stderr, "Missing Commas between arguments");
+        break;
+
     case illegalLabelNameUseOfSavedKeywordUsingOperationName:
         fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\nUsing Operation Name is not allowed");
         break;
@@ -384,7 +460,7 @@ Bool yieldError(Error err)
     }
     case illegalApearenceOfCommaBeforeFirstParameter:
     {
-        fprintf(stderr, "Illegal appearence of a comma between before the first parameter");
+        fprintf(stderr, "Illegal appearence of a comma before the first parameter");
         break;
     }
     case illegalApearenceOfCommaAfterLastParameter:
@@ -419,13 +495,13 @@ Bool yieldError(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(stderr, "required operand Is Missing");
+        fprintf(stderr, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(stderr, "requiredDestinationOperandIsMissin");
+        fprintf(stderr, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
@@ -438,9 +514,7 @@ Bool yieldError(Error err)
     case fileCouldNotBeOpened:
         fprintf(stderr, "file could not be  opened");
         break;
-    case AssemblerDidNotGetSourceFiles:
-        fprintf(stderr, "You did not passed any source files to the assembler!");
-        break;
+
     case illegalOverrideOfExternalSymbol:
         fprintf(stderr, "Overriding of external symbol exisiting in table is not allowed!");
         break;
@@ -509,12 +583,12 @@ Bool yieldError(Error err)
         fprintf(stderr, "Missing Comma between operands");
         break;
     case wrongOperationSyntaxExtraCommas:
-        fprintf(stderr, "Missing Comma between operands");
+        fprintf(stderr, "Extra Comma between operands");
         break;
 
     case wrongInstructionSyntaxExtraCommas:
     {
-        fprintf(stderr, "extra comma between arguments");
+        fprintf(stderr, "Extra comma between arguments");
         break;
     }
 

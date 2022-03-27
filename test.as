@@ -3,6 +3,10 @@
 .extern W
 MAIN: add r3, LIST
 LOOP: prn #48
+macro m1
+ inc r6
+ mov r3, W
+endm
 lea STR, r6
 inc r6
 mov r3, W
@@ -17,8 +21,6 @@ END: stop
 STR: .string "abcd"
 LIST: .data 6, -9
 .data -100
-.entry cmp
-r1: .data 34
-mov: .data 3,4
+.entry K
 K: .data 31
 .extern val1

@@ -95,3 +95,10 @@ typedef struct
     } val;
     void *next;
 } Item;
+
+typedef struct
+{
+    char first[MAX_LINE_LEN];
+    char second[MAX_LINE_LEN];
+
+} OperandsArgs;

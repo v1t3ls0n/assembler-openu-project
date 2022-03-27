@@ -38,7 +38,7 @@ int handleSourceFiles(int argc, char *argv[])
     int i = 1;
     if (filesCount < 1)
     {
-        yieldError(AssemblerDidNotGetSourceFiles);
+        fprintf(stderr, "\n\nYou did not passed any source files to the assembler!\n\n");
         exit(1);
     }
 
@@ -47,6 +47,8 @@ int handleSourceFiles(int argc, char *argv[])
         handleSingleFile(argv[i]);
         i++;
     }
+
+    /*     closeOpenLogFiles(); */
 
     return True;
 }
@@ -61,16 +63,15 @@ void handleSingleFile(char *arg)
     if (!fileName)
         return;
 
-    memcpy(fileName, arg, strlen(arg));
-    /*     strcpy(fileName, arg); */
+    strcpy(fileName, arg);
     strcat(fileName, ".as");
     (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");
-        fprintf(stderr, " FAILURE! source code file %s could not be opened\n", arg);
+        fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         free(fileName); */
+        free(fileName);
         return;
     }
 
@@ -80,10 +81,10 @@ void handleSingleFile(char *arg)
     {
 
         fprintf(stderr, "\n######################################################################\n");
-        fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", arg);
+        fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         fclose(src);
-                free(fileName); */
+        fclose(src);
+        free(fileName);
         return;
     }
 
@@ -124,6 +125,5 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
-        closeOpenLogFiles();
     }
 }
