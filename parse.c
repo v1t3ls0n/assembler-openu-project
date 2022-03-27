@@ -141,21 +141,29 @@ Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
     int size = 0;
-    args = strchr(line, '\"');
-    if (!*args)
+    printf("line:%s\n", line);
+    line = strstr(line, STRING) + strlen(STRING);
+    line = trimFromLeft(line);
+    if (line == NULL)
         return yieldWarning(emptyStringDeclatretion);
 
-    if (args[0] != '\"')
-        return yieldError(expectedQuotes);
-
-    s = strrchr(args, '\"');
-    while (*s && *s != '\0')
+    args = strchr(line, '\"');
+    if (args)
     {
-        if (!isspace(*s) && isprint(*s) && *s != '\"')
-            return yieldError(closingQuotesForStringIsMissing);
-        s++;
-        size++;
+        if (args[0] != '\"')
+            return yieldError(expectedQuotes);
+
+        s = strrchr(args, '\"');
+        while (*s && *s != '\0')
+        {
+            if (!isspace(*s) && isprint(*s) && *s != '\"')
+                return yieldError(closingQuotesForStringIsMissing);
+            s++;
+            size++;
+        }
     }
+    else
+        return yieldError(expectedQuotes);
 
     increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
