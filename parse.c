@@ -36,8 +36,8 @@ Bool countAndVerifyDataArguments(char *line)
     if (!strlen(args))
         return yieldWarning(emptyDataDeclaretion);
     p = args;
-    p = trimFromLeft(p);
-    i = len - strlen(p);
+    p = trimFromLeft(p); /*skips all the white-space chars from the left*/
+    i = len - strlen(p); /*sets i to point on the current char it parses*/
 
     if (*p == ',')
     {
@@ -51,7 +51,7 @@ Bool countAndVerifyDataArguments(char *line)
 
         if (!isspace(p[0]))
         {
-            i = len - strlen(p);
+            i = len - strlen(p); /*sets i to point on the current char it parses*/
             if (!isdigit(p[0]))
             {
 
@@ -62,21 +62,21 @@ Bool countAndVerifyDataArguments(char *line)
                         if (isspace(p[1]))
                         {
                             isValid = yieldError(afterPlusOrMinusSignThereMustBeANumber);
-                            minusOrPlusFlag = False;
+                            minusOrPlusFlag = False; /*sets minusOrPlusFlag to be false so it can be used for the first argument of .data*/
                         }
                         else
                             minusOrPlusFlag = True;
                     }
-                    else
+                    else /*if there is a sequence of minus or plus chars it reports the error- expected a number*/
                     {
                         isValid = yieldError(expectedNumber);
-                        minusOrPlusFlag = False;
+                        minusOrPlusFlag = False; /*sets minusOrPlusFlag to be false so it can be used for the first argument of .data*/
                     }
                     skip = 1;
                 }
                 else if (*p == ',')
                 {
-                    skip = countConsecutiveCommas(p);
+                    skip = countConsecutiveCommas(p); /*counts the number of extra commas so it would know to skip them*/
                     commasCounter += skip;
                 }
                 else
@@ -105,7 +105,7 @@ Bool countAndVerifyDataArguments(char *line)
                     commasCounter = size;
                 }
 
-                i = len - strlen(p);
+                i = len - strlen(p); /*sets i to point on the current char it parses*/
                 sscanf(&args[i], "%d%n%c", &num, &n, &c);
                 if (c && c != ',' && !isspace(c) && c != '.')
                 {
@@ -171,20 +171,28 @@ Bool countAndVerifyStringArguments(char *token)
 
     return True;
 }
-
+/* @ Function: parseLine
+   @ Arguments: The function gets char * token which is the current token that we are about to parse and char *line which is the current line being parsed
+   @ Description: The function checks what is the current globalState, than checks what is the current token (an instruction, an operation, a label declaration...)
+   The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
+   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
+   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
+   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
+*/
 ParseState parseLine(char *token, char *line)
 {
-    State (*globalState)() = &getGlobalState;
+    State (*globalState)() = &getGlobalState; /*gets the current state of the line*/
 
-    if (isComment(token))
+    if (isComment(token)) /*ignores the line and moves on if the current line is a comment*/
         return lineParsedSuccessfully;
 
     if (isLabelDeclaration(token))
     {
-        if (strlen(token) == 1)
+        if (strlen(token) == 1) /*the length of the label declaration and the : that comes afterwards should be at least 2, so if it is shorter there is an error- the label declaration is illegal*/
             yieldError(illegalLabelDeclaration);
         else
         {
+            /*if the current global state is firstRun it would moves on to the next token and the delimeter is a white-space char, else the delimeter is a white-space char or a comma*/
             char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
             if (!next)
                 return yieldError(emptyLabelDecleration);
