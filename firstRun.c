@@ -221,22 +221,29 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 }
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
-    if (!labelName || !nextToken || !line)
-        return False;
+    /*     if (!labelName || !nextToken || !line)
+            return False; */
+    Bool isValid = True;
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
+        if (!isInstructionStrict(nextToken))
+        {
+            isValid = yieldError(missinSpaceAfterInstruction);
+            nextToken = getInstructionName(nextToken);
+        }
+
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
             char *next = strtok(NULL, " \t\n\f\r");
             if (next)
-                return handleInstruction(instruction, nextToken, next, line);
+                return handleInstruction(instruction, nextToken, next, line) && isValid;
             else
                 return yieldWarning(emptyLabelDecleration);
         }
         else
 
-            return handleInstruction(instruction, labelName, nextToken, line);
+            return handleInstruction(instruction, labelName, nextToken, line) && isValid;
     }
 
     else if (isOperation(nextToken))

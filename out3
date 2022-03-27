@@ -1,274 +1,81 @@
 [H[2J[3Jgcc -ansi -Wall -pedantic -g data.h preProccesor.c globalVariables.c encode.c  exportFiles.c errors.c utils.c helpers.c parse.c operations.c tables.c  memory.c secondRun.c firstRun.c compiler.c -o compiler -lm
-inside addMacro
-name:m1
-start:77
-end:95
 
 	 ~ MACRO TABLE ~ 
 	name	start	end
-	m1	    77	    95
 
 
 
 
-First Run:(test.am)
-; file ps.am 
-line:; file ps.am  
-
-.entry LIST 
-line:.entry LIST  
-
-line:.entry LIST  
-
+First Run:(wrongUseOfInstructions.am)
+;this file will include errors  
+.entry B   
 token:.entry
-next:LIST
-.extern W 
-line:.extern W  
+;empty data instruction  
+A: .data  
+line in verifyCommaSyntax:   
 
-line:.extern W  
+are commas valid? 1
+;missing space after data instruction  
+B: .data5 , 6 ,3  
+;consecutive commas  
+C: 6, 7, ,, 8  
+;missing comma  
+D: .data 4  8    
+line in verifyCommaSyntax: 4  8     
 
+are commas valid? 0
+;missing commas (twice)  
+E: .data 4,5 6 , 7, 8   3  
+line in verifyCommaSyntax: 4,5 6 , 7, 8   3   
+
+are commas valid? 0
+;illegal appearence of comma before the first parameter  
+F:   .data ,5 , 7 ,1  
+line in verifyCommaSyntax: ,5 , 7 ,1   
+
+are commas valid? 0
+;missing space between label and instruction  
+G:.data 5,6,2,3,-1  
+token:G:.data
+!!!!!!!!!!!!!!!!!!!!!!! is not instruction strict !!!!!!!!!!!!!!!!!!
+;illegal appearence of comma after the last parameter  
+H: .data 8,   
+line in verifyCommaSyntax: 8,    
+
+are commas valid? 0
+;undefined character (not an int) for data  
+I: .data   43 , 6.5 , 8, 1  
+line in verifyCommaSyntax:   43 , 6.5 , 8, 1   
+
+are commas valid? 1
+;undefined character (not an int) for data (twice)  
+J: .data 5 , 7 ,a ,8 ,b  
+line in verifyCommaSyntax: 5 , 7 ,a ,8 ,b   
+
+are commas valid? 1
+;illegal appearence of comma before the first parameter + illegal appearence of comma after the last parameter  
+K: .data   , 6 , 7 ,8,  
+line in verifyCommaSyntax:   , 6 , 7 ,8,   
+
+are commas valid? 0
+;missing comma + consecutive comma  
+L: .data 4   6    , 8,9,, , 2  
+line in verifyCommaSyntax: 4   6    , 8,9,, , 2   
+
+are commas valid? 0
+;illegal appearence of comma before the first parameter + missing commas  
+M: .data ,4  5  
+line in verifyCommaSyntax: ,4  5   
+
+are commas valid? 0
+;empty string instruction  
+N: .string  
+;label defined as both entry and extern  
+.extern B  
 token:.extern
-next:W
-MAIN: add r3, LIST 
-line:MAIN: add r3, LIST  
-
-line in verifyCommaSyntax: r3, LIST  
-
-are commas valid? 1
-LOOP: prn #48 
-line:LOOP: prn #48  
-
-line in verifyCommaSyntax: #48  
-
-are commas valid? 1
-lea STR, r6 
-line:lea STR, r6  
-
-line in verifyCommaSyntax: STR, r6  
-
-are commas valid? 1
-inc r6 
-line:inc r6  
-
-line in verifyCommaSyntax: r6  
-
-are commas valid? 1
-mov r3, W 
-line:mov r3, W  
-
-line in verifyCommaSyntax: r3, W  
-
-are commas valid? 1
-sub r1, r4 
-line:sub r1, r4  
-
-line in verifyCommaSyntax: r1, r4  
-
-are commas valid? 1
-bne END 
-line:bne END  
-
-line in verifyCommaSyntax: END  
-
-are commas valid? 1
-cmp val1, #-6 
-line:cmp val1, #-6  
-
-line in verifyCommaSyntax: val1, #-6  
-
-are commas valid? 1
-bne END[r15] 
-line:bne END[r15]  
-
-line in verifyCommaSyntax: END[r15]  
-
-are commas valid? 1
-dec K 
-line:dec K  
-
-line in verifyCommaSyntax: K  
-
-are commas valid? 1
-.entry MAIN 
-line:.entry MAIN  
-
-line:.entry MAIN  
-
-token:.entry
-next:MAIN
-sub LOOP[r10] ,r14 
-line:sub LOOP[r10] ,r14  
-
-line in verifyCommaSyntax: LOOP[r10] ,r14  
-
-are commas valid? 1
-END: stop 
-line:END: stop  
-
-line in verifyCommaSyntax:  
-
-are commas valid? 1
-STR: .string "abcd" 
-line:STR: .string "abcd"  
-
-LIST: .data 6, -9 
-line:LIST: .data 6, -9  
-
-line in verifyCommaSyntax: 6, -9  
-
-are commas valid? 1
-line: 6 size:2
-.data -100 
-line:.data -100  
-
-line:.data -100  
-
-token:.data
-next:-100
-line in verifyCommaSyntax: -100  
-
-are commas valid? 1
-line: -100 size:1
-.entry K 
-line:.entry K  
-
-line:.entry K  
-
-token:.entry
-next:K
-K: .data 31 
-line:K: .data 31  
-
-line in verifyCommaSyntax: 31  
-
-are commas valid? 1
-line: 31 size:1
-.extern val1
-line:.extern val1 
-
-line:.extern val1 
-
-token:.extern
-next:val1
-DC:141 IC:100
-ICF:141 DCF:152
-
-		 ~ SYMBOL TABLE ~ 
-name	value	base	offset	attributes
-K	151	144	7	data,entry
-STR	141	128	13	data
-W	0	0	0	external
-LIST	148	144	4	data,entry
-LOOP	104	96	8	code
-val1	0	0	0	external
-MAIN	100	96	4	code,entry
-END	140	128	12	code
-
-
-
-
-Second Run:(test.am)
-; file ps.am 
-line:; file ps.am  
-
-.entry LIST 
-line:.entry LIST  
-
-line:.entry LIST  
-
-token:.entry
-next:LIST
-.extern W 
-line:.extern W  
-
-line:.extern W  
-
-token:.extern
-next:W
-MAIN: add r3, LIST 
-line:MAIN: add r3, LIST  
-
-LOOP: prn #48 
-line:LOOP: prn #48  
-
-lea STR, r6 
-line:lea STR, r6  
-
-inc r6 
-line:inc r6  
-
-mov r3, W 
-line:mov r3, W  
-
-sub r1, r4 
-line:sub r1, r4  
-
-bne END 
-line:bne END  
-
-cmp val1, #-6 
-line:cmp val1, #-6  
-
-bne END[r15] 
-line:bne END[r15]  
-
-dec K 
-line:dec K  
-
-.entry MAIN 
-line:.entry MAIN  
-
-line:.entry MAIN  
-
-token:.entry
-next:MAIN
-sub LOOP[r10] ,r14 
-line:sub LOOP[r10] ,r14  
-
-END: stop 
-line:END: stop  
-
-STR: .string "abcd" 
-line:STR: .string "abcd"  
-
-line:.string "abcd"  
-
-token:.string
-next:"abcd"
-start:"abcd" end:"
-LIST: .data 6, -9 
-line:LIST: .data 6, -9  
-
-line:.data 6, -9  
-
-token:.data
-next:6
-.data -100 
-line:.data -100  
-
-line:.data -100  
-
-token:.data
-next:-100
-.entry K 
-line:.entry K  
-
-line:.entry K  
-
-token:.entry
-next:K
-K: .data 31 
-line:K: .data 31  
-
-line:.data 31  
-
-token:.data
-next:31
-.extern val1
-line:.extern val1 
-
-line:.extern val1 
-
-token:.extern
-next:val1
-Finished Successfully, about to export files!
+;string instruction without closing "  
+O: .string "juth45    
+;string instruction without opening "  
+P: .string     gfbgrbr"  
+;string instruction without " (opening and closing)  
+Q: .string uhuf    

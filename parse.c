@@ -199,7 +199,7 @@ Bool parseLine(char *token, char *line)
                 return yieldError(emptyLabelDecleration);
 
             if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) ? True : False;
+                return handleLabel(token, next, line);
             else
                 return parseLine(next, line + strlen(token) + 1);
         }
@@ -210,7 +210,7 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
-
+        printf("token:%s\n", token);
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
