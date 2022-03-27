@@ -94,7 +94,6 @@ Bool isComment(char *s)
 }
 Bool isOperation(char *s)
 {
-
     return (getOperationByName(s) != NULL) ? True : False;
 }
 

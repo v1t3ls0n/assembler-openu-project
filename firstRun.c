@@ -25,7 +25,8 @@ char *getNextToken(char *s);
 char *splitToken(char *s);
 char *trimFromRight(char *s);
 Bool isLabelDeclarationStrict(char *s);
-
+Bool isOperationNotStrict(char *s);
+char *getOperationName(char *s);
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -226,7 +227,7 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
 
     if (nextToken[0] == ':')
         nextToken++;
-
+    nextToken = splitToken(nextToken);
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
@@ -261,6 +262,8 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
         strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
+        printf("args:%s\n", args);
+
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
@@ -283,8 +286,11 @@ char *getNextToken(char *s)
 char *splitToken(char *s)
 {
     char *start = 0, *end;
+    char *nextToken;
     s = trimFromLeft(s);
-    start = s;
+    nextToken = (char *)calloc(strlen(s) + 1, sizeof(char *));
+    strcpy(nextToken, s);
+    start = nextToken;
     end = start;
     while (*end != '\0' && !isspace(*end))
         end++;
