@@ -191,16 +191,20 @@ Bool parseLine(char *token, char *line)
         /*         printf("inside is label declaration\n"); */
         if (!isLabelDeclarationStrict(token))
         {
-            /*             printf("not label strict!\n"); */
-
+            char lineClone[MAX_LINE_LEN] = {0};
+            strcpy(lineClone, line);
             isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
             next = strchr(token, ':');
             *next = ' ';
-            next++;
             token = splitToken(token);
-            strcat(token, ":");
-            /*             printf("next:%s\ntoken:%s\nline:%s\n", next, token, line);
-             */ return parseLine(token, line + strlen(token)) && isValid;
+            next++;
+            strcat(token, ": ");
+            next = line + strlen(token);
+            sprintf(line, "%s%s", token, next);
+            strcpy(lineClone, line);
+            free(token);
+            next = (*globalState)() == firstRun ? strtok(lineClone, " \t\n\f\r") : strtok(lineClone, ", \t\n\f\r");
+            return parseLine(next, line) && isValid;
         }
         else
         {
