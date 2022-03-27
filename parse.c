@@ -51,7 +51,6 @@ Bool countAndVerifyDataArguments(char *line)
         p = strtok(NULL, ", \t\n\f\r");
     }
 
-    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
