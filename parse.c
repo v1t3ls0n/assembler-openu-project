@@ -140,23 +140,36 @@ Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
     int size = 0;
-    args = strchr(line, '\"');
+    char *closing = 0, *opening = 0;
+    args = strstr(line, STRING) + strlen(STRING);
+
     if (!*args)
         return yieldWarning(emptyStringDeclatretion);
 
-    if (args[0] != '\"')
-        return yieldError(expectedQuotes);
+    opening = strchr(args, '\"');
 
-    s = strrchr(args, '\"');
-    while (*s && *s != '\0')
+    if (!opening || !*opening)
     {
-        if (!isspace(*s) && isprint(*s) && *s != '\"')
-            return yieldError(closingQuotesForStringIsMissing);
-        s++;
-        size++;
+        yieldError(expectedQuotes);
+        yieldError(closingQuotesForStringIsMissing);
+        return False;
     }
+    else
+    {
+        closing = strrchr(args, '\"');
+        if (opening == closing && (opening[0] != args[0]))
+            return yieldError(expectedQuotes);
 
-    increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
+        if (opening == closing && (opening[0] == args[0]))
+            return yieldError(closingQuotesForStringIsMissing);
+        else
+        {
+            size = strlen(opening) - strlen(closing);
+            printf(" size:%d\n\n\n\n", size);
+            increaseDataCounter(size);
+        }
+        printf("\n\n\n\nline:%s args:%s opening:%s closing:%s\n\n\n", line, args, opening, closing);
+    }
 
     return True;
 }
