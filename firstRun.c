@@ -46,8 +46,9 @@ Bool handleOperation(char *operationName, char *args)
         }
         else
         {
-            second = first;
-            first = 0;
+            second = 0;
+            /*             second = first;
+                        first = 0; */
         }
     }
 
@@ -83,6 +84,12 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
         expectedOperandsCount++;
     if (op->des.direct || op->des.immediate || op->des.index || op->des.reg)
         expectedOperandsCount++;
+
+    if (expectedOperandsCount == 1 && operandsPassedCount == 1)
+    {
+        des = src;
+        src = 0;
+    }
 
     if ((expectedOperandsCount == operandsPassedCount) && expectedOperandsCount == 0)
         return True;
