@@ -142,9 +142,9 @@ Bool countAndVerifyStringArguments(char *line)
     int size = 0;
     char *closing = 0, *opening = 0;
     args = strstr(line, STRING) + strlen(STRING);
-
+    args = trimFromLeft(args);
     if (!*args)
-        return yieldWarning(emptyStringDeclatretion);
+        return yieldError(emptyStringDeclatretion);
 
     opening = strchr(args, '\"');
 
@@ -157,11 +157,11 @@ Bool countAndVerifyStringArguments(char *line)
     else
     {
         closing = strrchr(args, '\"');
-        if (opening == closing && (opening[0] != args[0]))
-            return yieldError(expectedQuotes);
-
         if (opening == closing && (opening[0] == args[0]))
             return yieldError(closingQuotesForStringIsMissing);
+
+        if (opening == closing && (opening[0] != args[0]))
+            return yieldError(expectedQuotes);
         else
         {
             size = strlen(opening) - strlen(closing);
