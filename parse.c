@@ -63,7 +63,6 @@ Bool verifyCommaSyntax(char *line)
     Bool isValid = True;
     char *s = line;
     s = trimFromLeft(s);
-    printf("line in verifyCommaSyntax:%s\n", line);
 
     while (*s == ',' || isspace(*s))
     {
@@ -186,6 +185,7 @@ Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
     Bool isValid = True;
+    printf("line:%s token:%s\n", line, token);
     if (isComment(token))
         return True;
 
@@ -207,9 +207,6 @@ Bool parseLine(char *token, char *line)
             next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
         }
 
-        if (strlen(token) == 1)
-            isValid = yieldError(illegalLabelDeclaration);
-
         if (!next)
             return yieldError(emptyLabelDecleration);
 
@@ -224,7 +221,7 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
-        printf("token:%s\n", token);
+
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);

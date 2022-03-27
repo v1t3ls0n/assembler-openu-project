@@ -21,7 +21,7 @@ extern void parseAssemblyCode(FILE *src);
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
-
+Bool isLabelDeclarationStrict(char *s);
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -201,14 +201,13 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
     {
         int dataCounter = getDC();
         Bool isLabelNameAvailable;
-        firstToken[strlen(firstToken) - 1] = '\0';
         isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
+
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
-
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
         else

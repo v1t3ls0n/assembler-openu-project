@@ -88,6 +88,7 @@ Bool isValidIndexParameter(char *s)
 
 Bool isComment(char *s)
 {
+    s = trimFromLeft(s);
     return s[0] == ';' ? True : False;
 }
 Bool isOperation(char *s)
