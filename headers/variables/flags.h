@@ -65,7 +65,8 @@ typedef enum
     illegalLabelNameUseOfSavedKeywordUsingRegisteryName,
     macroDeclaretionWithoutDefiningMacroName,
     wrongCommasSyntaxExtra,
-    wrongCommasSyntaxMissing
+    wrongCommasSyntaxMissing,
+    wrongCommasSyntaxIllegalApearenceOfCommasInLine
 
 } Error;
 

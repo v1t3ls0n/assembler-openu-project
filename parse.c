@@ -75,8 +75,10 @@ Bool verifyCommaSyntax(char *line)
         s++;
     }
 
-    if (commasCounter > 0)
+    if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+    else if (!*s)
+        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
