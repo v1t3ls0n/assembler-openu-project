@@ -112,11 +112,12 @@ Bool writeDataInstruction(char *token)
 Bool writeStringInstruction(char *s)
 {
     char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
-    int i, len = strlen(start);
+    int i, len;
     printf("start:%s end:%s\n", start, end);
-    /*  start++; */
-    for (i = 1; i < len - 1; i++)
-        addWord((A << 16) | *start, Data);
+    start++;
+    len = strlen(start);
+    for (i = 0; i < len - 2; i++)
+        addWord((A << 16) | start[i], Data);
 
     addWord((A << 16) | '\0', Data);
     return lineParsedSuccessfully;

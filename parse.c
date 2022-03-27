@@ -23,17 +23,20 @@ Bool handleSingleLine(char *line);
 Bool countAndVerifyDataArguments(char *line)
 {
     Bool isValid = True;
-    int size = 0, n = 0, num = 0, i = 0;
+    int size = 0, n = 0, num = 0;
     char c = 0;
     char args[MAX_LINE_LEN + 1] = {0}, *p;
     line = strstr(line, DATA) + strlen(DATA);
-    strcpy(args, line);
-    printf("countAndVerifyDataArguments\nline:%s\nargs:%s\n", line, args);
 
-    /*     memcpy(args, line, len); */
+    /* we make the pointer p to point on the position of the first character coming sfter the .data
+     instruction within the full line, so that p will point on the begining of the arguments string*/
+
+    /*copies the string of arguments pointer by p into the args local string we will use for parsing*/
+    strcpy(args, line);
+
     isValid = verifyCommaSyntax(args);
     p = strtok(line, ", \t\n\f\r");
-    size = 1;
+
     while (p != NULL)
     {
         sscanf(p, "%d%n%c", &num, &n, &c);
@@ -45,135 +48,10 @@ Bool countAndVerifyDataArguments(char *line)
 
         n = num = c = 0;
         size++;
-        i += strlen(p);
         p = strtok(NULL, ", \t\n\f\r");
     }
-    printf("line 51\nsize:%d\n", size);
 
-    if (isValid)
-        increaseDataCounter(size);
-
-    return isValid;
-}
-Bool countAndVerifyDataArgumentsV2(char *line)
-{
-
-    Bool isValid = True;
-    Bool minusOrPlusFlag = False;
-    char args[MAX_LINE_LEN + 1] = {0};
-    int size = 0, num = 0, n = 0, commasCounter = 0, i = 0, len = 0, skip = 0;
-    char c = 0, *p;
-    /* we make the pointer p to point on the position of the first character coming sfter the .data
-     instruction within the full line, so that p will point on the begining of the arguments string*/
-    p = (strstr(line, DATA) + strlen(DATA));
-    len = strlen(p);
-    /*copies the string of arguments pointer by p into the args local string we will use for parsing*/
-    memcpy(args, p, len);
-    if (!strlen(args))
-        return yieldWarning(emptyDataDeclaretion);
-    p = args;
-    p = trimFromLeft(p);
-    i = len - strlen(p);
-
-    if (*p == ',')
-    {
-        isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-        p++;
-        i++;
-    }
-
-    while (p && i < len)
-    {
-
-        if (!isspace(p[0]))
-        {
-            i = len - strlen(p);
-            if (!isdigit(p[0]))
-            {
-
-                if (*p == '-' || *p == '+')
-                {
-                    if (!minusOrPlusFlag)
-                    {
-                        if (isspace(p[1]))
-                        {
-                            isValid = yieldError(afterPlusOrMinusSignThereMustBeANumber);
-                            minusOrPlusFlag = False;
-                        }
-                        else
-                            minusOrPlusFlag = True;
-                    }
-                    else
-                    {
-                        isValid = yieldError(expectedNumber);
-                        minusOrPlusFlag = False;
-                    }
-                    skip = 1;
-                }
-                else if (*p == ',')
-                {
-                    skip = countConsecutiveCommas(p);
-                    commasCounter += skip;
-                }
-                else
-                {
-                    isValid = yieldError(expectedNumber);
-                    skip = countLengthOfNonDigitToken(p);
-                    size++;
-                }
-            }
-            else
-            {
-                if (commasCounter < 1 && size > 0)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-                    commasCounter = size;
-                }
-
-                else if (commasCounter > size)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxExtraCommas);
-                    commasCounter = size;
-                }
-                else if (size > commasCounter)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-                    commasCounter = size;
-                }
-
-                i = len - strlen(p);
-                sscanf(&args[i], "%d%n%c", &num, &n, &c);
-                if (c && c != ',' && !isspace(c) && c != '.')
-                {
-                    isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                    n++;
-                    p++;
-                    i++;
-                }
-
-                else if (c == '.')
-                {
-                    isValid = yieldError(wrongArgumentTypeNotAnInteger);
-                    p += n + 1;
-                    i += n + 1;
-                    sscanf(&args[i], "%d%n", &num, &n);
-                }
-                size++;
-                minusOrPlusFlag = False;
-                skip = n > 0 ? n : 1;
-                c = n = num = 0;
-            }
-        }
-        else
-            skip = 1;
-
-        p += skip;
-        i += skip;
-    }
-
-    if (commasCounter > (size - 1))
-        isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
-
+    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
@@ -260,6 +138,7 @@ Bool verifyCommaSyntax(char *line)
 Bool countAndVerifyStringArguments(char *line)
 {
     char *s = 0, *args;
+    int size = 0;
     args = strchr(line, '\"');
     if (!*args)
         return yieldWarning(emptyStringDeclatretion);
@@ -273,9 +152,10 @@ Bool countAndVerifyStringArguments(char *line)
         if (!isspace(*s) && isprint(*s) && *s != '\"')
             return yieldError(closingQuotesForStringIsMissing);
         s++;
+        size++;
     }
 
-    increaseDataCounter((int)(strlen(args) - 1)); /*counts the \0 at the end of the string as well*/
+    increaseDataCounter((int)(size)); /*counts the \0 at the end of the string as well*/
 
     return True;
 }
