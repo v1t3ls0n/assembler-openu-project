@@ -107,24 +107,20 @@ Item *updateSymbolAddressValue(char *name, int newValue);
 Item *getMacro(char *s);
 Item *updateMacro(char *name, int start, int end);
 Bool verifyLabelNaming(char *s);
-Item *removeFromTable(char *name, ItemType type);
 Bool verifyLabelNamingAndPrintErrors(char *s);
 Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 void initTables();
 void updateFinalSymbolTableValues();
-int updateFinalValueOfSingleItem(Item *item);
+void updateFinalValueOfSingleItem(Item *item);
 int getSymbolBaseAddress(char *name);
 int getSymbolOffset(char *name);
 Bool isExternal(char *name);
 Bool isEntry(char *name);
 Bool isNonEmptyEntry(char *name);
-
 Bool areEntriesExist();
 Bool areExternalsExist();
-
 void writeExternalsToFile(FILE *fp);
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
-
 void initExternalOperandsList();
 ExtListItem *findExtOpListItem(char *name);
 int findExtOpListItemIndex(char *name);
@@ -157,11 +153,9 @@ char *cloneString(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In firstRun.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-int firstRunParsing(FILE *fp, char *filename);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
 Bool handleSingleLine(char *line);
-ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);

@@ -1,9 +1,6 @@
 #include "data.h"
 
-/* void generateObFile();
-void createEntriesFile();
-extern char *getFileNamePath(); */
-char *(*baseFileName)() = &getFileNamePath;
+static char *(*baseFileName)() = &getFileNamePath;
 
 void exportFilesMainHandler()
 {

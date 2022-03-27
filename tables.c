@@ -6,31 +6,14 @@ static Item *macros[HASHSIZE] = {0};
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
 static ExtListItem *extListHead = NULL;
-
-extern unsigned getDC();
-extern unsigned getIC();
 extern unsigned getICF();
-extern unsigned calcNumberCharactersLength(int num);
 extern Bool verifyLabelNaming(char *s);
-extern Bool isRegistery(char *s);
+
 void findAllExternals();
 void addExtListItem(Item *item);
 void resetExtList();
-
-void initTables()
-{
-    int i = 0;
-
-    if (externalCount)
-        resetExtList();
-
-    while (i < HASHSIZE)
-    {
-        symbols[i] = NULL;
-        macros[i] = NULL;
-        i++;
-    }
-}
+ExtListItem *findExtOpListItem(char *name);
+void updateExtPositionData(char *name, unsigned base, unsigned offset);
 
 ExtListItem *findExtOpListItem(char *name)
 {
@@ -95,6 +78,7 @@ void addExtListItem(Item *item)
         extListHead = next;
     }
 }
+
 unsigned hash(char *s)
 {
     unsigned hashval = 1;
@@ -154,86 +138,6 @@ Item *install(char *name, ItemType type)
     }
 
     return np;
-}
-
-void printMacroTable()
-{
-    int i = 0;
-    printf("\n\t ~ MACRO TABLE ~ \n");
-    printf("\tname\tstart\tend");
-    while (i < HASHSIZE)
-    {
-        if (macros[i] != NULL)
-            printMacroItem(macros[i]);
-        i++;
-    }
-    printf("\n\n");
-}
-
-int printMacroItem(Item *item)
-{
-
-    printf("\n\t%s\t %5d\t%6d", item->name, item->val.m.start, item->val.m.end);
-    if (item->next != NULL)
-        printMacroItem(item->next);
-    return 0;
-}
-
-void printSymbolTable()
-{
-    int i = 0;
-
-    printf("\n\t\t ~ SYMBOL TABLE ~ \n");
-    printf("name\tvalue\tbase\toffset\tattributes");
-
-    while (i < HASHSIZE)
-    {
-        if (symbols[i] != NULL)
-            printSymbolItem(symbols[i]);
-        i++;
-    }
-    printf("\n\n");
-}
-
-int printSymbolItem(Item *item)
-{
-    /*  printf("line 94, inside printSymbolItem \n");
-     */
-
-    printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
-    if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
-        printf("   ");
-
-    else
-    {
-        if ((item->val.s.attrs.code || item->val.s.attrs.data) && (item->val.s.attrs.entry || item->val.s.attrs.external))
-        {
-            if (item->val.s.attrs.code)
-                printf("code,");
-            else
-                printf("data,");
-
-            if (item->val.s.attrs.entry)
-                printf("entry");
-            else
-                printf("external");
-        }
-        else
-        {
-            if (item->val.s.attrs.code)
-                printf("code");
-            else if (item->val.s.attrs.data)
-                printf("data");
-            else if (item->val.s.attrs.entry)
-                printf("entry");
-            else
-                printf("external");
-        }
-    }
-
-    if (item->next != NULL)
-        printSymbolItem(item->next);
-    return 0;
 }
 
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
@@ -328,6 +232,7 @@ int getSymbolOffset(char *name)
 
     return p->val.s.offset;
 }
+
 Bool isSymbolExist(char *name)
 {
     return lookup(name, Symbol) != NULL ? True : False;
@@ -457,7 +362,7 @@ void updateFinalSymbolTableValues()
     }
 }
 
-int updateFinalValueOfSingleItem(Item *item)
+void updateFinalValueOfSingleItem(Item *item)
 {
     if (item->val.s.attrs.entry)
         entriesCount++;
@@ -479,7 +384,6 @@ int updateFinalValueOfSingleItem(Item *item)
 
     if (item->next != NULL)
         updateFinalValueOfSingleItem(item->next);
-    return 0;
 }
 
 Bool areEntriesExist()
@@ -533,4 +437,99 @@ int writeSingleEntry(Item *item, FILE *fp, int count)
         writeSingleEntry(item->next, fp, count);
 
     return count;
+}
+
+void initTables()
+{
+    int i = 0;
+
+    if (externalCount)
+        resetExtList();
+
+    while (i < HASHSIZE)
+    {
+        symbols[i] = NULL;
+        macros[i] = NULL;
+        i++;
+    }
+}
+
+void printMacroTable()
+{
+    int i = 0;
+    printf("\n\t ~ MACRO TABLE ~ \n");
+    printf("\tname\tstart\tend");
+    while (i < HASHSIZE)
+    {
+        if (macros[i] != NULL)
+            printMacroItem(macros[i]);
+        i++;
+    }
+    printf("\n\n");
+}
+
+int printMacroItem(Item *item)
+{
+
+    printf("\n\t%s\t %5d\t%6d", item->name, item->val.m.start, item->val.m.end);
+    if (item->next != NULL)
+        printMacroItem(item->next);
+    return 0;
+}
+
+void printSymbolTable()
+{
+    int i = 0;
+
+    printf("\n\t\t ~ SYMBOL TABLE ~ \n");
+    printf("name\tvalue\tbase\toffset\tattributes");
+
+    while (i < HASHSIZE)
+    {
+        if (symbols[i] != NULL)
+            printSymbolItem(symbols[i]);
+        i++;
+    }
+    printf("\n\n");
+}
+
+int printSymbolItem(Item *item)
+{
+    /*  printf("line 94, inside printSymbolItem \n");
+     */
+
+    printf("\n%s\t%u\t%u\t%u\t", item->name, item->val.s.value, item->val.s.base, item->val.s.offset);
+    if (!item->val.s.attrs.code && !item->val.s.attrs.data && !item->val.s.attrs.entry && !item->val.s.attrs.external)
+        printf("   ");
+
+    else
+    {
+        if ((item->val.s.attrs.code || item->val.s.attrs.data) && (item->val.s.attrs.entry || item->val.s.attrs.external))
+        {
+            if (item->val.s.attrs.code)
+                printf("code,");
+            else
+                printf("data,");
+
+            if (item->val.s.attrs.entry)
+                printf("entry");
+            else
+                printf("external");
+        }
+        else
+        {
+            if (item->val.s.attrs.code)
+                printf("code");
+            else if (item->val.s.attrs.data)
+                printf("data");
+            else if (item->val.s.attrs.entry)
+                printf("entry");
+            else
+                printf("external");
+        }
+    }
+
+    if (item->next != NULL)
+        printSymbolItem(item->next);
+    return 0;
 }
