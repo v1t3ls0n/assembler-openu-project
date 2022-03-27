@@ -76,7 +76,7 @@ Bool verifyCommaSyntax(char *line)
 
     if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-    else if (!*s)
+    else if (!*s && strchr(s, ','))
         isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;

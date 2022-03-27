@@ -495,13 +495,13 @@ Bool yieldError(Error err)
         break;
     case requiredSourceOperandIsMissin:
     {
-        fprintf(stderr, "required operand Is Missing");
+        fprintf(stderr, "required source operand is missing");
         break;
     }
 
     case requiredDestinationOperandIsMissin:
     {
-        fprintf(stderr, "requiredDestinationOperandIsMissin");
+        fprintf(stderr, "required destination operand is missing");
         break;
     }
     case illegalMacroNameUseOfSavedKeywords:
