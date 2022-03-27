@@ -130,7 +130,6 @@ Bool verifyCommaSyntax(char *line)
     if (commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
-    printf("are commas valid? %d\n", isValid);
     return isValid;
 }
 
@@ -147,7 +146,7 @@ Bool countAndVerifyStringArguments(char *line)
     int size = 0;
     line = strstr(line, STRING) + strlen(STRING);
     line = trimFromLeft(line);
-    if (line == NULL || *line == '\0')
+    if (!line || !*line)
         return yieldError(emptyStringDeclatretion);
 
     args = strchr(line, '\"');
@@ -185,35 +184,30 @@ Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
     Bool isValid = True;
-    printf("line:%s token:%s\n", line, token);
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
-        char *labelName = 0, *next = 0;
-
+        char labelName[MAX_LABEL_LEN] = {0};
+        strcpy(labelName, token);
+        printf("line 195 parse.c\n");
         if (!isLabelDeclarationStrict(token))
         {
-            next = strchr(token, ':');
+            char *s;
             isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
-            next++;
-            labelName = (char *)calloc((strlen(token) - strlen(next) + 1), sizeof(char *));
-            strncpy(labelName, token, strlen(token) - strlen(next));
-        }
-        else
-        {
-            labelName = token;
-            next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+            token = strchr(token, ':');
+            s = strchr(labelName, ':');
+            *s = '\0';
+            token++;
         }
 
-        if (!next)
-            return yieldError(emptyLabelDecleration);
+        token = strstr(line, labelName) + strlen(labelName);
 
         if ((*globalState)() == firstRun)
-            return handleLabel(labelName, next, line) && isValid;
+            return handleLabel(labelName, token, line) && isValid;
         else
-            return parseLine(next, line + strlen(token) + 1);
+            return parseLine(token, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))
@@ -221,12 +215,6 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         Bool isValid = True;
-
-        if (!isInstructionStrict(token))
-        {
-            isValid = yieldError(missinSpaceAfterInstruction);
-            token = getInstructionName(token);
-        }
         type = getInstructionType(token);
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
 
@@ -240,7 +228,7 @@ Bool parseLine(char *token, char *line)
         else
         {
             if ((*globalState)() == firstRun)
-                return isValid && handleInstruction(type, token, next, line);
+                return handleInstruction(type, token, next, line) && isValid;
             else
             {
                 if (type == _TYPE_DATA)

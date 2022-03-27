@@ -109,13 +109,13 @@ Bool isLabelDeclaration(char *s)
 
 int getInstructionType(char *s)
 {
-    if (!strcmp(s, DATA))
+    if (strstr(s, DATA) != NULL)
         return _TYPE_DATA;
-    if (!strcmp(s, STRING))
+    if (strstr(s, STRING) != NULL)
         return _TYPE_STRING;
-    if (!strcmp(s, ENTRY))
+    if (strstr(s, ENTRY) != NULL)
         return _TYPE_ENTRY;
-    if (!strcmp(s, EXTERNAL))
+    if (strstr(s, EXTERNAL) != NULL)
         return _TYPE_EXTERNAL;
     return False;
 }

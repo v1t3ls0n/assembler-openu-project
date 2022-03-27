@@ -74,16 +74,11 @@ void yieldWarningIntoFile(Warning err)
     fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
-    case emptyLabelDecleration:
-        fprintf(warningsFile, "empty Label Declaretion");
-        break;
 
     case emptyDataDeclaretion:
         fprintf(warningsFile, "empty Data Declaretion");
         break;
-    case emptyStringDeclatretion:
-        fprintf(warningsFile, "empty String Declatretion");
-        break;
+
     case emptyExternalDeclaretion:
         fprintf(warningsFile, "empty external Declatretion");
         break;
@@ -122,6 +117,12 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case emptyLabelDecleration:
+        fprintf(warningsFile, "empty Label Declaretion");
+        break;
+    case emptyStringDeclatretion:
+        fprintf(errorsFile, "empty String Declatretion");
+        break;
     case missingSpaceBetweenLabelDeclaretionAndInstruction:
         fprintf(errorsFile, "Missing space between label declaretion and instruction name");
         break;
@@ -360,16 +361,11 @@ Bool yieldWarning(Warning err)
     fprintf(stderr, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
     switch (err)
     {
-    case emptyLabelDecleration:
-        fprintf(stderr, "empty Label Declaretion");
-        break;
 
     case emptyDataDeclaretion:
         fprintf(stderr, "empty Data Declaretion");
         break;
-    case emptyStringDeclatretion:
-        fprintf(stderr, "empty String Declatretion");
-        break;
+
     case emptyExternalDeclaretion:
         fprintf(stderr, "empty external Declatretion");
         break;
@@ -401,7 +397,12 @@ Bool yieldError(Error err)
 
     switch (err)
     {
-
+    case emptyLabelDecleration:
+        fprintf(stderr, "empty Label Declaretion");
+        break;
+    case emptyStringDeclatretion:
+        fprintf(stderr, "empty String Declatretion");
+        break;
     case missingSpaceBetweenLabelDeclaretionAndInstruction:
         fprintf(stderr, "Missing space between label declaretion and instruction name");
         break;

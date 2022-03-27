@@ -12,7 +12,6 @@ inc r6
 mov r3, W
 sub r1, r4
 bne END
-cmp val1, #-6
 bne END[r15]
 dec K
 .entry MAIN

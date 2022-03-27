@@ -68,19 +68,20 @@ typedef enum
     wrongCommasSyntaxExtra,
     wrongCommasSyntaxMissing,
     wrongCommasSyntaxIllegalApearenceOfCommasInLine,
-    extraOperandsPassed
+    extraOperandsPassed,
+    emptyStringDeclatretion,
+    emptyLabelDecleration
 
 } Error;
 
 typedef enum
 {
     emptyDeclaretionOfEntryOrExternalVariables,
-    emptyStringDeclatretion,
+
     emptyEntryDeclaretion,
     emptyExternalDeclaretion,
     instructionHasNoArguments,
-    emptyDataDeclaretion,
-    emptyLabelDecleration
+    emptyDataDeclaretion
 
 } Warning;
 
