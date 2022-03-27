@@ -77,6 +77,7 @@ void yieldWarningIntoFile(Warning err);
 void yieldErrorIntoFile(Error err);
 void closeOpenLogFiles();
 void fileCreationFailure(char *fileName);
+void fileOpeningFailure(char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/

@@ -20,6 +20,7 @@ extern void exportFilesMainHandler();
 extern void closeOpenLogFiles();
 extern void allocMemoryImg();
 extern void calcFinalAddrsCountersValues();
+extern void fileOpeningFailure(char *fileName);
 
 void handleSingleFile(char *arg);
 
@@ -27,7 +28,6 @@ int main(int argc, char *argv[])
 {
 
     handleSourceFiles(argc, argv);
-
     return 0;
 }
 
@@ -41,15 +41,12 @@ int handleSourceFiles(int argc, char *argv[])
         yieldError(AssemblerDidNotGetSourceFiles);
         exit(1);
     }
-
     while (--argc)
     {
         handleSingleFile(argv[i]);
         i++;
     }
-
     closeOpenLogFiles();
-
     return True;
 }
 
@@ -69,7 +66,8 @@ void handleSingleFile(char *arg)
     (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
-        fileCreationFailure(fileName);
+        fileOpeningFailure(fileName);
+        free(fileName);
         return;
     }
 
@@ -77,47 +75,45 @@ void handleSingleFile(char *arg)
     (*setPath)(fileName);
     if ((target = fopen(fileName, "w+")) == NULL)
     {
-
         fileCreationFailure(fileName);
+        fclose(src);
+        free(fileName);
         return;
     }
 
-    else
-    {
-        (*globalState)(parsingMacros);
-        resetMemoryCounters();
-        initTables();
-        parseSourceFile(src, target);
+    (*globalState)(parsingMacros);
+    resetMemoryCounters();
+    initTables();
+    parseSourceFile(src, target);
 
-        if ((*globalState)() == firstRun)
+    if ((*globalState)() == firstRun)
+    {
+        printMacroTable();
+        rewind(target);
+        parseAssemblyCode(target);
+
+        if ((*globalState)() == secondRun)
         {
-            printMacroTable();
+            calcFinalAddrsCountersValues();
+            updateFinalSymbolTableValues();
+            allocMemoryImg();
+            printSymbolTable();
             rewind(target);
             parseAssemblyCode(target);
-
-            if ((*globalState)() == secondRun)
+            if ((*globalState)() == exportFiles)
             {
-                calcFinalAddrsCountersValues();
-                updateFinalSymbolTableValues();
-                allocMemoryImg();
-                printSymbolTable();
-                rewind(target);
-                parseAssemblyCode(target);
-                if ((*globalState)() == exportFiles)
-                {
-                    fileName[strlen(fileName) - 3] = '\0';
-                    (*setPath)(fileName);
-                    exportFilesMainHandler();
-                }
-                else
-                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+                fileName[strlen(fileName) - 3] = '\0';
+                (*setPath)(fileName);
+                exportFilesMainHandler();
             }
+            else
+                printf("\nSecond Run Finished With Errors, files will not be exported!\n");
         }
-        else
-            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
-
-        free(fileName);
-        fclose(src);
-        fclose(target);
     }
+    else
+        printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
+
+    fclose(src);
+    free(fileName);
+    fclose(target);
 }

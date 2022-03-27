@@ -6,7 +6,6 @@ char *(*fileName)() = &getFileNamePath;
 static FILE *warningsFile = NULL, *errorsFile = NULL;
 static Bool isWarningFileExist = False;
 static Bool isErrorFileExist = False;
-
 void fileCreationFailure(char *fileName)
 {
     extern FILE *errorsFile;
@@ -30,6 +29,32 @@ void fileCreationFailure(char *fileName)
 
     fprintf(errorsFile, "\n######################################################################\n");
     fprintf(errorsFile, " FAILURE! failed to create %s file\n", fileName);
+    fprintf(errorsFile, "######################################################################\n\n");
+}
+
+void fileOpeningFailure(char *fileName)
+{
+    extern FILE *errorsFile;
+    extern Bool isErrorFileExist;
+
+    if (!isErrorFileExist)
+    {
+        if ((errorsFile = fopen("errors.log", "w+")) == NULL)
+        {
+            fprintf(stderr, "\n######################################################################\n");
+            fprintf(stderr, " FAILURE! failed to create %s error log file\n", fileName);
+            fprintf(stderr, "######################################################################\n\n");
+        }
+        else
+            isErrorFileExist = True;
+    }
+
+    fprintf(stderr, "\n######################################################################\n");
+    fprintf(stderr, " FAILURE! failed to open %s file\n", fileName);
+    fprintf(stderr, "######################################################################\n\n");
+
+    fprintf(errorsFile, "\n######################################################################\n");
+    fprintf(errorsFile, " FAILURE! failed to open %s file\n", fileName);
     fprintf(errorsFile, "######################################################################\n\n");
 }
 
