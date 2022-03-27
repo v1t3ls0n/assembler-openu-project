@@ -72,33 +72,48 @@ Bool handleOperation(char *operationName, char *args)
 }
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
+    int expectedOperandsCount = 0;
+    int operandsPassedCount = 0;
+    Bool isValid = True;
+    if (src)
+        operandsPassedCount++;
+    if (des)
+        operandsPassedCount++;
+    if (op->src.direct || op->src.immediate || op->src.index || op->src.reg)
+        expectedOperandsCount++;
+    if (op->des.direct || op->des.immediate || op->des.index || op->des.reg)
+        expectedOperandsCount++;
 
-    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
+    if (expectedOperandsCount == operandsPassedCount == 0)
         return True;
-    else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
+
+    if (operandsPassedCount > expectedOperandsCount)
+        isValid = yieldError(extraOperandsPassed);
+
+    if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
     {
 
         if (!src)
-            return yieldError(requiredSourceOperandIsMissin);
+            isValid = yieldError(requiredSourceOperandIsMissin);
         if (!des)
-            return yieldError(requiredDestinationOperandIsMissin);
+            isValid = yieldError(requiredDestinationOperandIsMissin);
 
-        return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
+        isValid = (validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1)) && isValid;
     }
     else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
     {
         if (!src)
-            return yieldError(requiredSourceOperandIsMissin);
-        return validateOperandMatch(op->src, active, src, 0);
+            isValid = yieldError(requiredSourceOperandIsMissin);
+        return validateOperandMatch(op->src, active, src, 0) && isValid;
     }
     else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
     {
         if (!des)
-            return yieldError(requiredDestinationOperandIsMissin);
-        return validateOperandMatch(op->des, active, des, 1);
+            isValid = yieldError(requiredDestinationOperandIsMissin);
+        return validateOperandMatch(op->des, active, des, 1) && isValid;
     }
 
-    return True;
+    return isValid;
 }
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
