@@ -37,6 +37,7 @@ typedef enum
     illegalApearenceOfCommaBeforeFirstParameter,
     illegalApearenceOfCommaAfterLastParameter,
     missinSpaceAfterInstruction,
+    missingSpaceBetweenLabelDeclaretionAndInstruction,
     maxLineLengthExceeded,
     illegalOperand,
     none,
@@ -63,19 +64,25 @@ typedef enum
     illegalApearenceOfCharacterInTheBegningOfTheLine,
     illegalLabelNameUseOfSavedKeywordUsingOperationName,
     illegalLabelNameUseOfSavedKeywordUsingRegisteryName,
-    macroDeclaretionWithoutDefiningMacroName
+    macroDeclaretionWithoutDefiningMacroName,
+    wrongCommasSyntaxExtra,
+    wrongCommasSyntaxMissing,
+    wrongCommasSyntaxIllegalApearenceOfCommasInLine,
+    extraOperandsPassed,
+    emptyStringDeclatretion,
+    emptyLabelDecleration,
+    undefinedLabelDeclaretion
 
 } Error;
 
 typedef enum
 {
     emptyDeclaretionOfEntryOrExternalVariables,
-    emptyStringDeclatretion,
+
     emptyEntryDeclaretion,
     emptyExternalDeclaretion,
     instructionHasNoArguments,
-    emptyDataDeclaretion,
-    emptyLabelDecleration
+    emptyDataDeclaretion
 
 } Warning;
 
