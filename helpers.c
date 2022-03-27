@@ -1,4 +1,22 @@
 #include "data.h"
+char *splitToken(char *s)
+{
+    char *start = 0, *end;
+    char *nextToken;
+    s = trimFromLeft(s);
+    nextToken = (char *)calloc(strlen(s) + 2, sizeof(char *));
+    strcpy(nextToken, s);
+    start = nextToken;
+    end = start;
+    while (*end != '\0' && !isspace(*end))
+        end++;
+
+    if (*end)
+        *end = '\0';
+
+    return start;
+}
+
 char *cloneString(char *s)
 {
     char *copy;

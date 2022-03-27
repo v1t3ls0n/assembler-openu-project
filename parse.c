@@ -11,6 +11,9 @@ extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
+Bool isLabelDeclarationStrict(char *s);
+
+extern char *splitToken(char *s);
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -176,22 +179,40 @@ Bool countAndVerifyStringArguments(char *line)
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-    Bool isValid = True;
 
+    Bool isValid = True;
+    printf("parse line, token:%s line:%s\n", token, line);
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
+        char *next = 0;
+        /*         printf("inside is label declaration\n"); */
+        if (!isLabelDeclarationStrict(token))
+        {
+            /*             printf("not label strict!\n"); */
 
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-        if (!next)
-            isValid = yieldError(emptyLabelDecleration);
+            isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
+            next = strchr(token, ':');
+            *next = ' ';
+            next++;
+            token = splitToken(token);
+            strcat(token, ":");
+            /*             printf("next:%s\ntoken:%s\nline:%s\n", next, token, line);
+             */ return parseLine(token, line + strlen(token)) && isValid;
+        }
+        else
+        {
+            next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+            if (!next)
+                isValid = yieldError(emptyLabelDecleration);
+        }
 
         if ((*globalState)() == firstRun)
             return handleLabel(token, next, line) && isValid;
         else
-            return parseLine(next, line + strlen(token) + 1);
+            return parseLine(next, line + strlen(token) + 1) && isValid;
     }
 
     else if (isInstruction(token))
@@ -199,6 +220,7 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         type = getInstructionType(token);
+        printf("inside is instruction\n");
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
