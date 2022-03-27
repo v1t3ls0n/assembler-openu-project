@@ -55,7 +55,7 @@ void addWord(int value, DataType type);
 
 int handleSourceFiles(int argc, char *argv[]);
 void parseAssemblyCode(FILE *src);
-ParseState parseLine(char *token, char *line);
+Bool parseLine(char *token, char *line);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -157,11 +157,11 @@ char *cloneString(char *s);
 Bool isInstruction(char *s);
 Bool isInstructionStrict(char *s);
 Bool handleSingleLine(char *line);
-ParseState handleOperation(char *operationName, char *args);
+Bool handleOperation(char *operationName, char *args);
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
-ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line);
-ParseState handleLabel(char *labelName, char *nextToken, char *line);
+Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line);
+Bool handleLabel(char *labelName, char *nextToken, char *line);
 Bool isLabelDeclaration(char *s);
 Bool isOperation(char *s);
 int getInstructionType(char *s);
@@ -197,7 +197,7 @@ void writeSecondWord();
 Bool writeOperationBinary(char *operationName, char *line);
 Bool writeInstructionBinary(char *instructionName, char *line);
 void parseSingleLinesecondRunParsing(char *line);
-ParseState parseLine(char *token, char *line);
+Bool parseLine(char *token, char *line);
 Bool detectOperandType(char *operand, AddrMethodsOptions active[2], int type);
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
 void writeFirstWord(Operation *op);

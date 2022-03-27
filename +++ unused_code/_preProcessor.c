@@ -31,8 +31,8 @@ int (*currentLine)() = &getCurrentLineNumber;
 long popLastLine(FILE *target, int start);
 void moveToLineStart(FILE *fp, unsigned direction);
 long getLineStart(FILE *fp, unsigned direction);
-ParseState getNextState(char *token, char *macroName, int c, ParseState currentState);
-ParseState evaluateToken(char *token, ParseState state);
+Bool getNextState(char *token, char *macroName, int c, Bool currentState);
+Bool evaluateToken(char *token, Bool state);
 void removeCharactersWithinRange(FILE *fp, long start, long end);
 void popCharacterFromEnd(FILE *fp, long amount);
 void handleMacros(FILE *source, FILE *target);
@@ -52,7 +52,7 @@ void copyToNewFile(FILE *source, FILE *target)
 }
 void handleMacros(FILE *source, FILE *target)
 {
-    /*    ParseState state = parsingToken;
+    /*    Bool state = parsingToken;
        char line[MAX_LINE_LEN + 1] = {0};
        char macroName[MAX_LABEL_LEN + 1] = {0};
        char *s = 0, *e = 0, *first, *token;
@@ -118,7 +118,7 @@ else
 */
 }
 
-ParseState evaluateToken(char *token, ParseState state)
+Bool evaluateToken(char *token, Bool state)
 {
 
     printf("token:%s\n", token);
@@ -161,7 +161,7 @@ ParseState evaluateToken(char *token, ParseState state)
         else
         {
             yieldError(illegalMacroNameUseOfSavedKeywords);
-            return Err;
+            return False;
         }
     }
 
@@ -280,7 +280,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
     /*     setGlobalState(firstRun); */
 }
 
-/* ParseState getNextState(char *token, char *macroName, int c, ParseState currentState)
+/* Bool getNextState(char *token, char *macroName, int c, Bool currentState)
 {
     printf("token:%s\n", token);
 
@@ -330,7 +330,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
             else
             {
                 yieldError(illegalMacroNameUseOfSavedKeywords);
-                return Err;
+                return False;
             }
         }
     }
@@ -346,7 +346,7 @@ void createExpandedSourceFile(FILE *source, FILE *target, char *fileName)
 void parseAndReplaceMacros(FILE *source, FILE *target)
 {
     /*
- ParseState state = parsingToken;
+ Bool state = parsingToken;
  int toDeleteStart = 0, toDeleteEnd = 0;
  long start = 0, end = 0;
  int c = 0, i = 0, j = 0;

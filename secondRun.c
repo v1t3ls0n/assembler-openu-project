@@ -5,7 +5,7 @@ extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offs
 
 /* from firstRun.c */
 extern Bool handleSingleLine(char *line);
-extern ParseState handleFirstToken(char *token, char *line, ParseState state);
+extern Bool handleFirstToken(char *token, char *line, Bool state);
 extern int getInstructionType(char *s);
 extern Bool isOperation(char *s);
 extern Bool isValidIndexParameter(char *s);
@@ -31,9 +31,9 @@ extern unsigned getIC();
 extern void addWord(int value, DataType type);
 extern void parseAssemblyCode(FILE *src);
 
-extern ParseState parseLine(char *token, char *line);
+extern Bool parseLine(char *token, char *line);
 extern Bool handleSingleLine(char *line);
-Bool writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
+void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);
@@ -65,7 +65,7 @@ Bool writeOperationBinary(char *operationName, char *args)
     return True;
 }
 
-Bool writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
+void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
 {
 
     if (active.index)
@@ -88,7 +88,7 @@ Bool writeDataInstruction(char *token)
         addWord((A << 16) | num, Data);
         token = strtok(NULL, ", \t\n\f\r");
     }
-    return lineParsedSuccessfully;
+    return True;
 }
 
 Bool writeStringInstruction(char *s)
@@ -102,7 +102,7 @@ Bool writeStringInstruction(char *s)
         addWord((A << 16) | start[i], Data);
 
     addWord((A << 16) | '\0', Data);
-    return lineParsedSuccessfully;
+    return True;
 }
 
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op)

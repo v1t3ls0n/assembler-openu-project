@@ -128,7 +128,7 @@ if (operand[0] == 'r' && isdigit(operand[strlen(operand) - 1]))
 
 int parseAllStrict(FILE *target)
 {
-    ParseState state = evalToken;
+    Bool state = evalToken;
     Bool isMacro = False;
     int c = 0, i = 0, j = 0;
     int start = 1, end = 1, current = 1;
