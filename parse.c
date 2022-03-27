@@ -138,9 +138,8 @@ Bool verifyCommaSyntax(char *line)
 
 Bool countAndVerifyStringArguments(char *line)
 {
-    char *s = 0, *args;
+    char *args, *closing = 0, *opening = 0;
     int size = 0;
-    char *closing = 0, *opening = 0;
     args = strstr(line, STRING) + strlen(STRING);
     args = trimFromLeft(args);
     if (!*args)
@@ -215,7 +214,7 @@ Bool parseLine(char *token, char *line)
         if (next == NULL)
         {
             if (type == _TYPE_DATA || type == _TYPE_STRING)
-                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
+                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldError(emptyStringDeclatretion);
             else
                 return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
         }
