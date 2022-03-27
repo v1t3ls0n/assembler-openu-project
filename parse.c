@@ -63,29 +63,29 @@ Bool countAndVerifyDataArguments(char *line)
 
 Bool verifyCommaSyntax(char *line)
 {
-    int commasCounter = 0;
+    int commasCounter = 0, argsCounter = 0;
     Bool insideToken = False;
     Bool isFirstToken = True;
     Bool isValid = True;
     char *s = line;
     s = trimFromLeft(s);
 
-    while (*s == ',' || isspace(*s))
+    while ((*s == ',' || isspace(*s)) && *s != '\0')
     {
         if (*s == ',')
             commasCounter++;
         s++;
     }
-
-    if (*s && strlen(s) && commasCounter > 0)
+    if (!*s && commasCounter > 0)
+        return yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
+    else if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-    else if (!*s && strchr(s, ','))
-        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
     while (s && *s != '\0')
     {
+        printf("%c ", *s);
         if (insideToken)
         {
             if (isFirstToken == True && commasCounter == 0)
@@ -119,6 +119,9 @@ Bool verifyCommaSyntax(char *line)
         }
         else
         {
+
+            argsCounter++;
+
             while (*s == ',' || isspace(*s))
             {
                 if (*s == ',')
@@ -127,13 +130,29 @@ Bool verifyCommaSyntax(char *line)
             }
 
             if (s && (isprint(*s) && !isspace(*s)))
+            {
                 insideToken = True;
+            }
         }
 
         s++;
     }
 
-    if (commasCounter > 0)
+    /* commasCounter--; */
+    printf("\n\nline:%s\ncommas counter:%d\nargs counter:%d\n\n", line, commasCounter, argsCounter);
+    s = strrchr(s, ',');
+    if (s != NULL && *s == ',')
+    {
+        s++;
+        commasCounter = 1;
+        while (s && *s != '\0')
+        {
+            if ((isprint(*s) && !isspace(*s)))
+                commasCounter = 0;
+            s++;
+        }
+    }
+    if (commasCounter)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
     return isValid;
