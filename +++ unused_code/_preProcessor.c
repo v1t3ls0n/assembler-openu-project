@@ -61,7 +61,7 @@ void handleMacros(FILE *source, FILE *target)
 
        while ((fgets(line, MAX_LINE_LEN, source)) != NULL)
        {
-           token = strtok(line, " \t \n");
+           token = strtok(line, " \t\n\f\r");
 
                    i = strlen(token) - 1;
                    c = token[i];

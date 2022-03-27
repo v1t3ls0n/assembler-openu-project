@@ -14,58 +14,35 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
-extern Bool countAndVerifyStringArguments(char *token);
+extern Bool countAndVerifyStringArguments(char *line);
+
 extern void parseAssemblyCode(FILE *src);
 
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
+extern Bool verifyCommaSyntax(char *line);
 
 ParseState handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
-    char comma = 0;
-    char *first = 0, *second = 0, *inBetweenOperands = 0, *extra = 0;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    Bool areOperandsLegal = True;
-    first = strtok(args, " \t \n");
+    char *first = 0;
+    char *second = 0;
+    Bool areOperandsLegal;
+    if (*args)
+        areOperandsLegal = verifyCommaSyntax(args);
+    first = strtok(args, ", \t\n\f\r");
     if (first)
-        inBetweenOperands = strtok(NULL, " \t \n");
-
-    if (!first)
-        areOperandsLegal = parseOperands(first, comma, second, p, active);
-    else
     {
-        if ((first && inBetweenOperands) && strlen(inBetweenOperands) == 1 && inBetweenOperands[0] == ',')
+        second = strtok(NULL, ", \t\n\f\r");
+        if (!second)
         {
-            comma = ',';
-            second = strtok(NULL, " \t \n");
+            second = first;
+            first = 0;
         }
-        else if (first && inBetweenOperands)
-            second = inBetweenOperands;
-
-        else
-        {
-            if (strchr(first, ','))
-            {
-                char *p = strchr(first, ',');
-                second = p;
-                second++;
-                comma = ',';
-                *p = '\0';
-            }
-            else
-            {
-                second = first;
-                first = 0;
-            }
-        }
-
-        areOperandsLegal = parseOperands(first, comma, second, p, active);
-
-        extra = strtok(NULL, " \t \n");
-        if (extra)
-            areOperandsLegal = yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
     }
+
+    areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
 
     if (areOperandsLegal)
     {
@@ -84,61 +61,34 @@ ParseState handleOperation(char *operationName, char *args)
 
     return areOperandsLegal ? lineParsedSuccessfully : Err;
 }
-
-Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2])
+Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
 
-    int commasCount = 0;
-    int expectedCommasBasedOnNumberOfOperands = 0;
-    expectedCommasBasedOnNumberOfOperands = (src && des) ? 1 : 0;
-    if (src && strchr(src, ','))
+    if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
+        return True;
+    else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
     {
-        char *p = strchr(src, ',');
-        *p = '\0';
-        commasCount++;
+
+        if (!src)
+            return yieldError(requiredSourceOperandIsMissin);
+        if (!des)
+            return yieldError(requiredDestinationOperandIsMissin);
+
+        return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
+    }
+    else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
+    {
+        if (!src)
+            return yieldError(requiredSourceOperandIsMissin);
+        return validateOperandMatch(op->src, active, src, 0);
+    }
+    else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
+    {
+        if (!des)
+            return yieldError(requiredDestinationOperandIsMissin);
+        return validateOperandMatch(op->des, active, des, 1);
     }
 
-    if (des && strchr(des, ','))
-    {
-        commasCount++;
-        des++;
-    }
-    if (comma == ',')
-        commasCount++;
-
-    if (commasCount > expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongOperationSyntaxExtraCommas);
-
-    else if (commasCount < expectedCommasBasedOnNumberOfOperands)
-        return yieldError(wrongOperationSyntaxMissingCommas);
-
-    else if (commasCount == expectedCommasBasedOnNumberOfOperands)
-    {
-        if (!op->src.direct && !op->src.immediate && !op->src.index && !op->src.reg && !op->des.direct && !op->des.immediate && !op->des.index && !op->des.reg && !src && !des)
-            return True;
-        else if ((op->src.direct || op->src.immediate || op->src.reg || op->src.index) && (op->des.direct || op->des.immediate || op->des.reg || op->des.index))
-        {
-
-            if (!src)
-                return yieldError(requiredSourceOperandIsMissin);
-            if (!des)
-                return yieldError(requiredDestinationOperandIsMissin);
-
-            return validateOperandMatch(op->src, active, src, 0) && validateOperandMatch(op->des, active, des, 1);
-        }
-        else if (op->src.direct || op->src.immediate || op->src.reg || op->src.index)
-        {
-            if (!src)
-                return yieldError(requiredSourceOperandIsMissin);
-            return validateOperandMatch(op->src, active, src, 0);
-        }
-        else if (op->des.direct || op->des.immediate || op->des.reg || op->des.index)
-        {
-            if (!des)
-                return yieldError(requiredDestinationOperandIsMissin);
-            return validateOperandMatch(op->des, active, des, 1);
-        }
-    }
     return True;
 }
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
@@ -179,7 +129,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             return countAndVerifyDataArguments(line) ? lineParsedSuccessfully : Err;
         }
         else if (type == _TYPE_STRING)
-            return countAndVerifyStringArguments(nextTokens) ? lineParsedSuccessfully : Err;
+            return countAndVerifyStringArguments(line) ? lineParsedSuccessfully : Err;
 
         if (type == _TYPE_ENTRY || type == _TYPE_EXTERNAL)
         {
@@ -187,7 +137,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
             {
                 char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char *));
                 strcpy(labelName, nextTokens);
-                nextTokens = strtok(NULL, " \t \n");
+                nextTokens = strtok(NULL, " \t\n\f\r");
                 if (nextTokens)
                 {
                     yieldError(illegalApearenceOfCharactersInTheEndOfTheLine);
@@ -219,7 +169,7 @@ ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char 
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
-        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(nextTokens))) && isLabelNameAvailable)
+        if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
 
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? lineParsedSuccessfully : Err;
@@ -241,7 +191,7 @@ ParseState handleLabel(char *labelName, char *nextToken, char *line)
         int instruction = getInstructionType(nextToken);
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            char *next = strtok(NULL, " \t \n");
+            char *next = strtok(NULL, " \t\n\f\r");
             if (next)
                 return handleInstruction(instruction, nextToken, next, line);
             else

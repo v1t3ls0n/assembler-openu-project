@@ -6,7 +6,6 @@ extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offs
 /* from firstRun.c */
 extern Bool handleSingleLine(char *line);
 extern ParseState handleFirstToken(char *token, char *line, ParseState state);
-extern Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
 extern int getInstructionType(char *s);
 extern Bool isOperation(char *s);
 extern Bool isValidIndexParameter(char *s);
@@ -40,8 +39,8 @@ Bool writeOperationBinary(char *operationName, char *args)
     Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
-    first = strtok(args, ", \t \n");
-    second = strtok(NULL, ", \t \n");
+    first = strtok(args, ", \t\n\f\r");
+    second = strtok(NULL, ", \t\n\f\r");
     writeFirstWord(op);
 
     if (first && second && (detectOperandType(first, active, 0) && detectOperandType(second, active, 1)))
@@ -105,16 +104,20 @@ Bool writeDataInstruction(char *token)
     {
         num = atoi(token);
         addWord((A << 16) | num, Data);
-        token = strtok(NULL, ", \t \n");
+        token = strtok(NULL, ", \t\n\f\r");
     }
     return lineParsedSuccessfully;
 }
 
 Bool writeStringInstruction(char *s)
 {
-    int i = 1;
-    for (i = 1; s[i] != '\"' && s[i] != '\0'; i++)
-        addWord((A << 16) | s[i], Data);
+    char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
+    int i, len;
+    printf("start:%s end:%s\n", start, end);
+    start++;
+    len = strlen(start);
+    for (i = 0; i < len - 2; i++)
+        addWord((A << 16) | start[i], Data);
 
     addWord((A << 16) | '\0', Data);
     return lineParsedSuccessfully;

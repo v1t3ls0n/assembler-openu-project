@@ -1,0 +1,274 @@
+[H[2J[3Jgcc -ansi -Wall -pedantic -g data.h preProccesor.c globalVariables.c encode.c  exportFiles.c errors.c utils.c helpers.c parse.c operations.c tables.c  memory.c secondRun.c firstRun.c compiler.c -o compiler -lm
+inside addMacro
+name:m1
+start:77
+end:95
+
+	 ~ MACRO TABLE ~ 
+	name	start	end
+	m1	    77	    95
+
+
+
+
+First Run:(test.am)
+; file ps.am 
+line:; file ps.am  
+
+.entry LIST 
+line:.entry LIST  
+
+line:.entry LIST  
+
+token:.entry
+next:LIST
+.extern W 
+line:.extern W  
+
+line:.extern W  
+
+token:.extern
+next:W
+MAIN: add r3, LIST 
+line:MAIN: add r3, LIST  
+
+line in verifyCommaSyntax: r3, LIST  
+
+are commas valid? 1
+LOOP: prn #48 
+line:LOOP: prn #48  
+
+line in verifyCommaSyntax: #48  
+
+are commas valid? 1
+lea STR, r6 
+line:lea STR, r6  
+
+line in verifyCommaSyntax: STR, r6  
+
+are commas valid? 1
+inc r6 
+line:inc r6  
+
+line in verifyCommaSyntax: r6  
+
+are commas valid? 1
+mov r3, W 
+line:mov r3, W  
+
+line in verifyCommaSyntax: r3, W  
+
+are commas valid? 1
+sub r1, r4 
+line:sub r1, r4  
+
+line in verifyCommaSyntax: r1, r4  
+
+are commas valid? 1
+bne END 
+line:bne END  
+
+line in verifyCommaSyntax: END  
+
+are commas valid? 1
+cmp val1, #-6 
+line:cmp val1, #-6  
+
+line in verifyCommaSyntax: val1, #-6  
+
+are commas valid? 1
+bne END[r15] 
+line:bne END[r15]  
+
+line in verifyCommaSyntax: END[r15]  
+
+are commas valid? 1
+dec K 
+line:dec K  
+
+line in verifyCommaSyntax: K  
+
+are commas valid? 1
+.entry MAIN 
+line:.entry MAIN  
+
+line:.entry MAIN  
+
+token:.entry
+next:MAIN
+sub LOOP[r10] ,r14 
+line:sub LOOP[r10] ,r14  
+
+line in verifyCommaSyntax: LOOP[r10] ,r14  
+
+are commas valid? 1
+END: stop 
+line:END: stop  
+
+line in verifyCommaSyntax:  
+
+are commas valid? 1
+STR: .string "abcd" 
+line:STR: .string "abcd"  
+
+LIST: .data 6, -9 
+line:LIST: .data 6, -9  
+
+line in verifyCommaSyntax: 6, -9  
+
+are commas valid? 1
+line: 6 size:2
+.data -100 
+line:.data -100  
+
+line:.data -100  
+
+token:.data
+next:-100
+line in verifyCommaSyntax: -100  
+
+are commas valid? 1
+line: -100 size:1
+.entry K 
+line:.entry K  
+
+line:.entry K  
+
+token:.entry
+next:K
+K: .data 31 
+line:K: .data 31  
+
+line in verifyCommaSyntax: 31  
+
+are commas valid? 1
+line: 31 size:1
+.extern val1
+line:.extern val1 
+
+line:.extern val1 
+
+token:.extern
+next:val1
+DC:141 IC:100
+ICF:141 DCF:152
+
+		 ~ SYMBOL TABLE ~ 
+name	value	base	offset	attributes
+K	151	144	7	data,entry
+STR	141	128	13	data
+W	0	0	0	external
+LIST	148	144	4	data,entry
+LOOP	104	96	8	code
+val1	0	0	0	external
+MAIN	100	96	4	code,entry
+END	140	128	12	code
+
+
+
+
+Second Run:(test.am)
+; file ps.am 
+line:; file ps.am  
+
+.entry LIST 
+line:.entry LIST  
+
+line:.entry LIST  
+
+token:.entry
+next:LIST
+.extern W 
+line:.extern W  
+
+line:.extern W  
+
+token:.extern
+next:W
+MAIN: add r3, LIST 
+line:MAIN: add r3, LIST  
+
+LOOP: prn #48 
+line:LOOP: prn #48  
+
+lea STR, r6 
+line:lea STR, r6  
+
+inc r6 
+line:inc r6  
+
+mov r3, W 
+line:mov r3, W  
+
+sub r1, r4 
+line:sub r1, r4  
+
+bne END 
+line:bne END  
+
+cmp val1, #-6 
+line:cmp val1, #-6  
+
+bne END[r15] 
+line:bne END[r15]  
+
+dec K 
+line:dec K  
+
+.entry MAIN 
+line:.entry MAIN  
+
+line:.entry MAIN  
+
+token:.entry
+next:MAIN
+sub LOOP[r10] ,r14 
+line:sub LOOP[r10] ,r14  
+
+END: stop 
+line:END: stop  
+
+STR: .string "abcd" 
+line:STR: .string "abcd"  
+
+line:.string "abcd"  
+
+token:.string
+next:"abcd"
+start:"abcd" end:"
+LIST: .data 6, -9 
+line:LIST: .data 6, -9  
+
+line:.data 6, -9  
+
+token:.data
+next:6
+.data -100 
+line:.data -100  
+
+line:.data -100  
+
+token:.data
+next:-100
+.entry K 
+line:.entry K  
+
+line:.entry K  
+
+token:.entry
+next:K
+K: .data 31 
+line:K: .data 31  
+
+line:.data 31  
+
+token:.data
+next:31
+.extern val1
+line:.extern val1 
+
+line:.extern val1 
+
+token:.extern
+next:val1
+Finished Successfully, about to export files!

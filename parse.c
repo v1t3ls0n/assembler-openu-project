@@ -9,7 +9,7 @@ extern int countLengthOfNonDigitToken(char *s);
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
-
+Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
 
 /* @ Function: countAndVerifyDataArguments
@@ -19,148 +19,143 @@ Bool handleSingleLine(char *line);
    While the function parsing the arguments, ir also counts the number of .data elements that will take size in the data memory.
    In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .data instruction will take.
 */
+
 Bool countAndVerifyDataArguments(char *line)
 {
-
     Bool isValid = True;
-    Bool minusOrPlusFlag = False;
-    char args[MAX_LINE_LEN + 1] = {0};
-    int size = 0, num = 0, n = 0, commasCounter = 0, i = 0, len = 0, skip = 0;
-    char c = 0, *p;
+    int size = 0, n = 0, num = 0;
+    char c = 0;
+    char args[MAX_LINE_LEN + 1] = {0}, *p;
+    line = strstr(line, DATA) + strlen(DATA);
+
     /* we make the pointer p to point on the position of the first character coming sfter the .data
      instruction within the full line, so that p will point on the begining of the arguments string*/
-    p = (strstr(line, DATA) + strlen(DATA));
-    len = strlen(p);
+
     /*copies the string of arguments pointer by p into the args local string we will use for parsing*/
-    memcpy(args, p, len);
-    if (!strlen(args))
-        return yieldWarning(emptyDataDeclaretion);
-    p = args;
-    p = trimFromLeft(p);
-    i = len - strlen(p);
+    strcpy(args, line);
 
-    if (*p == ',')
+    isValid = verifyCommaSyntax(args);
+    p = strtok(line, ", \t\n\f\r");
+
+    while (p != NULL)
     {
-        isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-        p++;
-        i++;
+        sscanf(p, "%d%n%c", &num, &n, &c);
+        if (c == '.' && n > 0)
+            isValid = yieldError(wrongArgumentTypeNotAnInteger);
+        num = atoi(p);
+        if (!num && *p != '0')
+            isValid = yieldError(expectedNumber);
+
+        n = num = c = 0;
+        size++;
+        p = strtok(NULL, ", \t\n\f\r");
     }
 
-    while (p && i < len)
-    {
-
-        if (!isspace(p[0]))
-        {
-            i = len - strlen(p);
-            if (!isdigit(p[0]))
-            {
-
-                if (*p == '-' || *p == '+')
-                {
-                    if (!minusOrPlusFlag)
-                    {
-                        if (isspace(p[1]))
-                        {
-                            isValid = yieldError(afterPlusOrMinusSignThereMustBeANumber);
-                            minusOrPlusFlag = False;
-                        }
-                        else
-                            minusOrPlusFlag = True;
-                    }
-                    else
-                    {
-                        isValid = yieldError(expectedNumber);
-                        minusOrPlusFlag = False;
-                    }
-                    skip = 1;
-                }
-                else if (*p == ',')
-                {
-                    skip = countConsecutiveCommas(p);
-                    commasCounter += skip;
-                }
-                else
-                {
-                    isValid = yieldError(expectedNumber);
-                    skip = countLengthOfNonDigitToken(p);
-                    size++;
-                }
-            }
-            else
-            {
-                if (commasCounter < 1 && size > 0)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-                    commasCounter = size;
-                }
-
-                else if (commasCounter > size)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxExtraCommas);
-                    commasCounter = size;
-                }
-                else if (size > commasCounter)
-                {
-                    isValid = yieldError(wrongInstructionSyntaxMissinCommas);
-                    commasCounter = size;
-                }
-
-                i = len - strlen(p);
-                sscanf(&args[i], "%d%n%c", &num, &n, &c);
-                if (c && c != ',' && !isspace(c) && c != '.')
-                {
-                    isValid = yieldError(illegalApearenceOfCharactersOnLine);
-                    n++;
-                    p++;
-                    i++;
-                }
-
-                else if (c == '.')
-                {
-                    isValid = yieldError(wrongArgumentTypeNotAnInteger);
-                    p += n + 1;
-                    i += n + 1;
-                    sscanf(&args[i], "%d%n", &num, &n);
-                }
-                size++;
-                minusOrPlusFlag = False;
-                skip = n > 0 ? n : 1;
-                c = n = num = 0;
-            }
-        }
-        else
-            skip = 1;
-
-        p += skip;
-        i += skip;
-    }
-
-    if (commasCounter > (size - 1))
-        isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
-
+    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
     return isValid;
 }
 
-Bool countAndVerifyStringArguments(char *token)
+Bool verifyCommaSyntax(char *line)
 {
+    int commasCounter = 0;
+    Bool insideToken = False;
+    Bool isFirstToken = True;
+    Bool isValid = True;
+    char *s = line;
+    s = trimFromLeft(s);
+    printf("line in verifyCommaSyntax:%s\n", line);
 
-    if (isInstruction(token))
-        token = strtok(NULL, " \t \n");
-
-    if (token)
+    while (*s == ',' || isspace(*s))
     {
-        if (token[0] == '\"' && (token[strlen(token) - 1] != '\"' || strlen(token) < 2))
-            return yieldError(closingQuotesForStringIsMissing);
-        else if (token[0] != '\"')
-            return yieldError(expectedQuotes);
-
-        increaseDataCounter((int)(strlen(token) - 1)); /*counts the \0 at the end of the string as well*/
+        if (*s == ',')
+            commasCounter++;
+        s++;
     }
-    else
+
+    if (commasCounter > 0)
+        isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
+
+    commasCounter = 0;
+    isFirstToken = True;
+    while (s && *s != '\0')
+    {
+        if (insideToken)
+        {
+            if (isFirstToken == True && commasCounter == 0)
+            {
+                commasCounter = 1;
+                isFirstToken = False;
+            }
+
+            if (commasCounter > 1)
+            {
+                isValid = yieldError(wrongOperationSyntaxExtraCommas);
+                commasCounter = 1;
+            }
+            else if (commasCounter < 1)
+            {
+                isValid = yieldError(wrongOperationSyntaxMissingCommas);
+                commasCounter = 1;
+            }
+            if (s && isspace(*s))
+            {
+                insideToken = False;
+                commasCounter = 0;
+            }
+            else if (*s == ',')
+            {
+                insideToken = False;
+                commasCounter = 0;
+                s--;
+            }
+        }
+        else
+        {
+            while (*s == ',' || isspace(*s))
+            {
+                if (*s == ',')
+                    commasCounter++;
+                s++;
+            }
+
+            if (s && (isprint(*s) && !isspace(*s)))
+                insideToken = True;
+        }
+
+        s++;
+    }
+
+    if (commasCounter > 0)
+        isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
+
+    printf("are commas valid? %d\n", isValid);
+    return isValid;
+}
+
+Bool countAndVerifyStringArguments(char *line)
+{
+    char *s = 0, *args;
+    int size = 0;
+    args = strchr(line, '\"');
+    if (!*args)
         return yieldWarning(emptyStringDeclatretion);
+
+    if (args[0] != '\"')
+        return yieldError(expectedQuotes);
+
+    s = strrchr(args, '\"');
+    while (*s && *s != '\0')
+    {
+        if (!isspace(*s) && isprint(*s) && *s != '\"')
+            return yieldError(closingQuotesForStringIsMissing);
+        s++;
+        size++;
+    }
+
+    increaseDataCounter((int)(size)); /*counts the \0 at the end of the string as well*/
 
     return True;
 }
@@ -178,7 +173,7 @@ ParseState parseLine(char *token, char *line)
             yieldError(illegalLabelDeclaration);
         else
         {
-            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
+            char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
             if (!next)
                 return yieldError(emptyLabelDecleration);
 
@@ -200,11 +195,13 @@ ParseState parseLine(char *token, char *line)
             isValid = yieldError(missinSpaceAfterInstruction);
             token = getInstructionName(token);
         }
-
-        next = (*globalState)() == firstRun ? strtok(NULL, " \t \n") : strtok(NULL, ", \t \n");
         type = getInstructionType(token);
-        if (!next)
+        next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+        printf("line:%s\ntoken:%s\nnext:%s\n", line, token, next);
+
+        if (next == NULL)
         {
+            printf("line 328\n");
             if (type == _TYPE_DATA || type == _TYPE_STRING)
                 return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
             else
@@ -252,8 +249,10 @@ Bool handleSingleLine(char *line)
     char lineCopy[MAX_LINE_LEN] = {0};
     char *token;
     strcpy(lineCopy, line);
-    token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t \n") : strtok(lineCopy, ", \t \n");
+    printf("line:%s\n", line);
+    token = ((*globalState)() == firstRun) ? strtok(lineCopy, " \t\n\f\r") : strtok(lineCopy, ", \t\n\f\r");
     state = parseLine(token, line);
+    (*currentLineNumberPlusPlus)();
     return state == lineParsedSuccessfully
                ? True
                : False;
@@ -278,8 +277,8 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
-        /*         putchar(c);
-         */
+        putchar(c);
+
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
             isValidCode = yieldError(maxLineLengthExceeded);
@@ -300,7 +299,6 @@ void parseAssemblyCode(FILE *src)
         if (c == '\n')
         {
             line[i++] = '\n';
-            (*currentLineNumberPlusPlus)();
             if (i > 0)
             {
                 isValidCode = handleSingleLine(line) && isValidCode;

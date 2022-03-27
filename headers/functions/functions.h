@@ -163,7 +163,7 @@ Bool isInstructionStrict(char *s);
 Bool handleSingleLine(char *line);
 ParseState handleFirstToken(char *token, char *line, ParseState state);
 ParseState handleOperation(char *operationName, char *args);
-Bool parseOperands(char *src, char comma, char *des, Operation *op, AddrMethodsOptions active[2]);
+Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
 ParseState handleInstruction(int type, char *firstToken, char *nextTokens, char *line);
 ParseState handleLabel(char *labelName, char *nextToken, char *line);
@@ -186,7 +186,7 @@ Bool isComment(char *s);
 /* --------------------------------------------In parse.c: ----------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 Bool countAndVerifyDataArguments(char *line);
-Bool countAndVerifyStringArguments(char *token);
+Bool countAndVerifyStringArguments(char *line);
 char *trimFromLeft(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
