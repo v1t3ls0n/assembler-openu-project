@@ -58,12 +58,22 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
 {
 
     ExtListItem *np = findExtOpListItem(name);
-    ExtPositionData new;
-    new.base = base;
-    new.offset = offset;
-    new.next = np->value.next ? np->value.next : NULL;
+    /*     printf("line 62 in table inside update ext position data\nname:%s\nbase:%u\noffset:%u\nnp->name:%s\nnp->value.base:%d\n", name, base, offset, np->name, np->value.base);
+     */
+    if (np->value.base)
+    {
+        ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
+        new->base = base;
+        new->offset = offset;
+        new->next = np->value.next;
+        np->value.next = new;
+    }
+    else
+    {
+        np->value.base = base;
+        np->value.offset = offset;
+    }
 
-    np->value = new;
     externalCount++;
 }
 
