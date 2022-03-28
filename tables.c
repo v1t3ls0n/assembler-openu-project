@@ -17,13 +17,16 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset);
 
 ExtListItem *findExtOpListItem(char *name)
 {
+    extern ExtListItem *extListHead;
     ExtListItem *p = extListHead;
+    printf("line 21, table.c\nhead:%s\n", extListHead->name);
     while (p != NULL)
     {
-
-        if (strcmp(name, p->name) == 0)
-            return p;
-
+        if (p->name)
+        {
+            if (strcmp(name, p->name) == 0)
+                return p;
+        }
         p = p->next;
     }
     return NULL;
@@ -38,7 +41,7 @@ void resetExtList()
     while (next != NULL)
     {
         next = np->next;
-        nextPos = np->value;
+        nextPos = np->value.next;
         while (nextPos != NULL)
         {
             pos = nextPos;
@@ -47,26 +50,29 @@ void resetExtList()
         }
         free(np);
     }
+    free(extListHead);
 }
 
 void updateExtPositionData(char *name, unsigned base, unsigned offset)
 {
 
     ExtListItem *np = findExtOpListItem(name);
-    ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
-    new->base = base;
-    new->offset = offset;
-    new->next = NULL;
-    new->next = np->value;
+    ExtPositionData new;
+    new.base = base;
+    new.offset = offset;
+    new.next = np->value.next ? np->value.next : NULL;
+
+    printf("inside update xt position data\nname:%s\nbase:%u\noffset:%u\n", name, base, offset);
+    printf("np found in list, np->name:%s\n", np->name);
     np->value = new;
+    externalCount++;
 }
 
 void addExtListItem(char *name)
 {
 
     ExtListItem *next;
-    next = (ExtListItem *)malloc(sizeof(ExtListItem));
-
+    next = (ExtListItem *)calloc(1, sizeof(ExtListItem));
     strncpy(next->name, name, strlen(name));
 
     if (extListHead != NULL)
@@ -376,10 +382,7 @@ void updateFinalValueOfSingleItem(Item *item)
     if (item->val.s.attrs.entry)
         entriesCount++;
     if (item->val.s.attrs.external)
-    {
-        externalCount++;
         addExtListItem(item->name);
-    }
 
     if (item->val.s.attrs.data)
     {
@@ -409,17 +412,19 @@ void writeExternalsToFile(FILE *fp)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
-        writeSingleExternal(fp, p->name, p->value);
+        if (p->value.base)
+            writeSingleExternal(fp, p->name, p->value.base, p->value.offset, p->value.next);
         p = p->next;
     }
 }
 
-void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
+void writeSingleExternal(FILE *fp, char *name, unsigned base, unsigned offset, ExtPositionData *next)
 {
-    fprintf(fp, "%s BASE %u\n", name, value->base);
-    fprintf(fp, "%s OFFSET %u\n", name, value->offset);
-    if (value->next != NULL)
-        writeSingleExternal(fp, name, value->next);
+
+    fprintf(fp, "%s BASE %u\n", name, base);
+    fprintf(fp, "%s OFFSET %u\n", name, offset);
+    if (next != NULL)
+        writeSingleExternal(fp, name, next->base, next->offset, next->next);
 }
 
 void writeEntriesToFile(FILE *fp)

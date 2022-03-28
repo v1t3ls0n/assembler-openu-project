@@ -124,7 +124,7 @@ Bool isNonEmptyEntry(char *name);
 Bool areEntriesExist();
 Bool areExternalsExist();
 void writeExternalsToFile(FILE *fp);
-void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
+void writeSingleExternal(FILE *fp, char *name, unsigned base, unsigned offset, ExtPositionData *next);
 void initExternalOperandsList();
 ExtListItem *findExtOpListItem(char *name);
 int findExtOpListItemIndex(char *name);

@@ -71,7 +71,7 @@ typedef struct ExtPositionData
 typedef struct ExtListItem
 {
     char name[MAX_LABEL_LEN];
-    ExtPositionData *value;
+    ExtPositionData value;
     struct ExtListItem *next;
 
 } ExtListItem;
