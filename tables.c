@@ -148,6 +148,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
+
     if (!verifyLabelNamingAndPrintErrors(name))
         return False;
     p = lookup(name, Symbol);
@@ -273,6 +274,10 @@ Bool isNonEmptyEntry(char *name)
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)
 {
     Item *p = lookup(name, type);
+
+    if (name[strlen(name) - 1] == ':')
+        name[strlen(name) - 1] = '\0';
+
     if (p != NULL)
     {
         if (type == Symbol)
@@ -320,7 +325,7 @@ Item *getMacro(char *s)
 Item *addMacro(char *name, int start, int end)
 {
     Item *macro = lookup(name, Macro);
-    printf("inside addMacro\nname:%s\nstart:%d\nend:%d\n", name, start, end);
+
     if (macro != NULL)
     {
         yieldError(illegalMacroNameAlreadyInUse);

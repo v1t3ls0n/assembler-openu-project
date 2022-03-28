@@ -54,7 +54,6 @@ Bool countAndVerifyDataArguments(char *line)
         p = strtok(NULL, ", \t\n\f\r");
     }
 
-    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
@@ -85,7 +84,6 @@ Bool verifyCommaSyntax(char *line)
     isFirstToken = True;
     while (s && *s != '\0')
     {
-        printf("%c ", *s);
         if (insideToken)
         {
             if (isFirstToken == True && commasCounter == 0)
@@ -138,8 +136,6 @@ Bool verifyCommaSyntax(char *line)
         s++;
     }
 
-    /* commasCounter--; */
-    printf("\n\nline:%s\ncommas counter:%d\nargs counter:%d\n\n", line, commasCounter, argsCounter);
     s = strrchr(s, ',');
     if (s != NULL && *s == ',')
     {
@@ -186,10 +182,8 @@ Bool countAndVerifyStringArguments(char *line)
         else
         {
             size = strlen(opening) - strlen(closing);
-            printf(" size:%d\n\n\n\n", size);
             increaseDataCounter(size);
         }
-        printf("\n\n\n\nline:%s args:%s opening:%s closing:%s\n\n\n", line, args, opening, closing);
     }
 
     return True;
@@ -240,7 +234,6 @@ Bool parseLine(char *token, char *line)
         char *next;
         int type;
         type = getInstructionType(token);
-        printf("inside is instruction\n");
         if (!isInstructionStrict(token))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
@@ -320,7 +313,6 @@ void parseAssemblyCode(FILE *src)
 
     while (((c = fgetc(src)) != EOF))
     {
-        putchar(c);
 
         if (i >= MAX_LINE_LEN - 1 && !isspace(c))
         {
