@@ -63,7 +63,6 @@ void printBinaryImg()
 }
 void addWord(int value, DataType type)
 {
-
     if (type == Code)
         addWordToCodeImage(numToBin(value));
     else if (type == Data)
@@ -76,7 +75,6 @@ void addWordToDataImage(char *s)
 }
 void addWordToCodeImage(char *s)
 {
-
     wordStringToWordObj(s, Code);
     IC++;
 }
