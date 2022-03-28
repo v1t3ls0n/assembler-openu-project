@@ -18,27 +18,30 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
     static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
-    static long start = 0, end = 0;
-
+    static long start = 0, end = 0, current;
     if (!isReadingMacro)
-        fprintf(target, "%s\n", line);
+    {
+        fprintf(target, "%s", line);
+        current = ftell(target);
+    }
 
     if (isMacroOpening(token))
     {
+        fseek(target, current - strlen(line), SEEK_SET);
+        fprintf(target, "%s", "\0");
         next = strtok(NULL, " \t\n\f\r");
         if (!*next)
             return yieldError(macroDeclaretionWithoutDefiningMacroName);
         if (!isLegalMacroName(next))
             return yieldError(illegalMacroNameUseOfSavedKeywords);
 
-        start = ftell(src) - 1 + strlen(next) - 1;
+        start = ftell(src);
         strcpy(macroName, next);
         isReadingMacro = True;
-        fseek(target, -strlen(line) - 1, SEEK_END);
     }
     else if (isMacroClosing(token))
     {
-        end = ftell(src) - 1 - strlen(token) - 1;
+        end = ftell(src) - strlen(line) + 1;
         addMacro(macroName, start, end);
         isReadingMacro = False;
         start = end = 0;
@@ -49,17 +52,14 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         Item *p = getMacro(token);
         if (p != NULL)
         {
-            int c, toCopy = p->val.m.end - p->val.m.start, toDelete = strlen(token);
-            long lastPosition;
+            long c, toCopy = p->val.m.end - p->val.m.start;
+            long lastPosition = 0;
+            fseek(target, -strlen(line), SEEK_CUR);
+            fprintf(target, "%s", "\0");
             lastPosition = ftell(src);
             fseek(src, p->val.m.start, SEEK_SET);
-            fseek(target, -toDelete - 1, SEEK_CUR);
-            while (toCopy > 0 && (c = fgetc(src)) != EOF)
-            {
-                putchar(c);
+            while (--toCopy && (c = fgetc(src)) != EOF)
                 fputc(c, target);
-                --toCopy;
-            }
 
             fseek(src, lastPosition, SEEK_SET);
         }
@@ -84,11 +84,7 @@ void parseSourceFile(FILE *src, FILE *target)
             memset(line, 0, i);
             i = 0;
         }
-
-        else if (isspace(c) && i > 0)
-            line[i++] = ' ';
-
-        else if (!isspace(c))
+        else
             line[i++] = c;
 
         if (c == '\n')
