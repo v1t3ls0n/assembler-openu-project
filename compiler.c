@@ -1,19 +1,10 @@
 #include "data.h"
 
-extern void resetMemoryCounters();
-extern void initTables();
-extern void exportFilesMainHandler();
-extern void closeOpenLogFiles();
-extern void allocMemoryImg();
-extern void calcFinalAddrsCountersValues();
-extern void freeHashTable(ItemType type);
 void handleSingleFile(char *arg);
 
 int main(int argc, char *argv[])
 {
-
     handleSourceFiles(argc, argv);
-
     return 0;
 }
 
@@ -43,6 +34,13 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
+    extern void resetMemoryCounters();
+    extern void initTables();
+    extern void exportFilesMainHandler();
+    extern void closeOpenLogFiles();
+    extern void allocMemoryImg();
+    extern void calcFinalAddrsCountersValues();
+    extern void freeHashTable(ItemType type);
 
     strncpy(fileName, arg, strlen(arg));
     strcat(fileName, ".as");
@@ -53,8 +51,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         free(fileName);
-                return; */
+        free(fileName);
+        return;
     }
 
     fileName[strlen(fileName) - 1] = 'm';
@@ -65,9 +63,9 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         fclose(src);
-                free(fileName);
-                return; */
+        fclose(src);
+        free(fileName);
+        return;
     }
 
     else
