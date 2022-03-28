@@ -55,6 +55,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
             Item *p = getMacro(token);
             if (p != NULL)
             {
+
                 long c, toCopy = p->val.m.end - p->val.m.start;
                 long lastPosition = 0;
                 fseek(target, -strlen(line), SEEK_CUR);

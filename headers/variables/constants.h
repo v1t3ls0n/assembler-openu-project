@@ -8,7 +8,7 @@
 #define MAX_LINE_LEN 320
 #define MAX_INSTRUCTION_NAME_LEN 8
 
-#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
+#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 16)
 
 #define A 0x0004
 #define R 0x0002
