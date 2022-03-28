@@ -168,8 +168,8 @@ Bool countAndVerifyStringArguments(char *line)
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-
     Bool isValid = True;
+
     if (isComment(token))
         return True;
 
@@ -290,39 +290,28 @@ void parseAssemblyCode(FILE *src)
     while (((c = fgetc(src)) != EOF))
     {
 
-        if (i >= MAX_LINE_LEN - 1 && !isspace(c))
-        {
-            isValidCode = yieldError(maxLineLengthExceeded);
-            memset(line, 0, i);
-            i = 0;
-        }
-
         if (isspace(c) && i > 0)
-        {
             line[i++] = ' ';
-        }
 
-        else if (isprint(c) && !isspace(c))
-        {
+        else if (!isspace(c))
             line[i++] = c;
-        }
+
+        if (i >= MAX_LINE_LEN - 2)
+            c = '\n';
 
         if (c == '\n')
         {
-            line[i++] = '\n';
             if (i > 0)
             {
                 isValidCode = handleSingleLine(line) && isValidCode;
-                memset(line, 0, i);
+                memset(line, 0, MAX_LINE_LEN);
                 i = 0;
             }
         }
     }
 
     if (i > 0)
-    {
         isValidCode = handleSingleLine(line) && isValidCode;
-    }
 
     if (!isValidCode)
         nextState = assemblyCodeFailedToCompile;
