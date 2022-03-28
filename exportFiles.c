@@ -2,11 +2,11 @@
 extern void fileCreationFailure(char *fileName);
 static char *(*baseFileName)() = &getFileNamePath;
 
-/* void exportFilesMainHandler()
+/*  void exportFilesMainHandler()
 This function calls other functions that will create the .ob file,
- .ent file and .ext file if there are any entry labels, and .ext file
- if there are any external labels.
- */
+.ent file and .ext file if there are any entry labels, and .ext file
+if there are any external labels.*/
+
 void exportFilesMainHandler()
 {
     printf("Finished Successfully, about to export files!\n");
@@ -19,7 +19,7 @@ void exportFilesMainHandler()
 
 /* void generateObFile()
 This function generates the .ob files by writing the memory image,
-if the file can't be generate it yields error */
+if the file can't be generate it yields error  */
 void generateObFile()
 {
     FILE *ob;
@@ -56,9 +56,10 @@ void createEntriesFile()
     else
         fileCreationFailure(fileName);
 }
-/* void createExternalsFile()
-does the same but for external operands in use list (.ext file)
- */
+
+/* createExternalsFile()
+This function generates the .ext files (as long as there are external labels)
+by writing it into the file, if the file can't be generate it yields error */
 void createExternalsFile()
 {
     FILE *ext;
