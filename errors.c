@@ -1,7 +1,7 @@
 #include "data.h"
 
 static int (*line)() = &getCurrentLineNumber;
-static char *(*fileName)() = &getFileNamePath;
+static char *(*filePath)() = &getFileNamePath;
 static FILE *warningsFile = NULL, *errorsFile = NULL;
 static Bool isWarningFileExist = False;
 static Bool isErrorFileExist = False;
@@ -64,6 +64,7 @@ void yieldWarningIntoFile(Warning err)
     extern FILE *warningsFile;
     if (!isWarningFileExist)
     {
+
         if ((warningsFile = fopen("warnings.log", "w+")) == NULL)
             printf("Failed to open warning log file\n");
         else
@@ -71,7 +72,7 @@ void yieldWarningIntoFile(Warning err)
     }
 
     fprintf(warningsFile, "\n######################################################################\n");
-    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
+    fprintf(warningsFile, "Warning!! in %s on line number %d\n", (*filePath)(), (*line)());
     switch (err)
     {
 
@@ -113,7 +114,7 @@ void yieldErrorIntoFile(Error err)
             isErrorFileExist = True;
     }
     fprintf(errorsFile, "\n######################################################################\n");
-    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
+    fprintf(errorsFile, "Error!! occured in %s on line number %d\n", (*filePath)(), (*line)());
 
     switch (err)
     {
@@ -367,7 +368,7 @@ Bool yieldWarning(Warning err)
 {
     yieldWarningIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Warning!! in %s on line number %d\n", (*fileName)(), (*line)());
+    fprintf(stderr, "Warning!! in %s on line number %d\n", (*filePath)(), (*line)());
     switch (err)
     {
 
@@ -402,7 +403,7 @@ Bool yieldError(Error err)
 {
     yieldErrorIntoFile(err);
     fprintf(stderr, "\n######################################################################\n");
-    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*fileName)(), (*line)());
+    fprintf(stderr, "Error!! occured in %s on line number %d\n", (*filePath)(), (*line)());
 
     switch (err)
     {
