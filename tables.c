@@ -67,12 +67,7 @@ void addExtListItem(char *name)
 
     ExtListItem *next;
     next = (ExtListItem *)malloc(sizeof(ExtListItem *));
-    printf("name:%s\n", name);
     next->name = name;
-    next->value = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
-    next->value->base = 0;
-    next->value->offset = 0;
-    next->value->next = NULL;
     if (extListHead != NULL)
     {
         next->next = extListHead->next;
