@@ -2,9 +2,9 @@
 
 static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
-
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
+
 static ExtListItem *extListHead = NULL;
 extern unsigned getICF();
 extern Bool verifyLabelNaming(char *s);

@@ -38,7 +38,6 @@ void popCharacterFromEnd(FILE *fp, long amount);
 void handleMacros(FILE *source, FILE *target);
 
 extern char *trimFromLeft(char *s);
-extern char *trimFromRight(char *s);
 
 void copyToNewFile(FILE *source, FILE *target);
 

@@ -43,9 +43,7 @@ void parseMacros(char *line, char *token, FILE *src, FILE *target)
         }
         else if (isMacroClosing(token))
         {
-
             end = ftell(src) - strlen(line) + 1;
-
             addMacro(macroName, start, end);
             isReadingMacro = False;
             start = end = 0;
@@ -56,19 +54,15 @@ void parseMacros(char *line, char *token, FILE *src, FILE *target)
             Item *p = getMacro(token);
             if (p != NULL)
             {
-
                 long c, toCopy = p->val.m.end - p->val.m.start;
                 long lastPosition = 0;
                 fseek(target, -strlen(line), SEEK_CUR);
                 fprintf(target, "%s", "\0");
                 lastPosition = ftell(src);
                 fseek(src, p->val.m.start, SEEK_SET);
+
                 while (--toCopy && (c = fgetc(src)) != EOF)
-                {
-                    putchar(c);
                     fputc(c, target);
-                }
-                printf("\n");
 
                 fseek(src, lastPosition, SEEK_SET);
             }
