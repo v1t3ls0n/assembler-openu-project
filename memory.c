@@ -16,11 +16,6 @@ unsigned getIC() { return IC; }
 unsigned getICF() { return ICF; }
 unsigned getDCF() { return DCF; }
 
-/* @ Function: verifyCommaSyntax
-   @ Arguments:
-   @ Description:
-*/
-
 void increaseDataCounter(int amount)
 {
     DC += amount;
@@ -59,11 +54,7 @@ void resetMemoryCounters()
     ICF = 0;
     DCF = 0;
 }
-/* @ Function: printBinaryImg
-   @ Arguments: The function gets no arguments.
-   @ Description: The function prints the binary i
-   The function doesn't return any value.
-*/
+
 void printBinaryImg()
 {
     int i;
@@ -74,6 +65,7 @@ void printBinaryImg()
         printWordBinary(i);
     }
 }
+
 void addWord(int value, DataType type)
 {
 
@@ -93,6 +85,7 @@ void addWordToCodeImage(char *s)
     wordStringToWordObj(s, Code);
     IC++;
 }
+
 void wordStringToWordObj(char *s, DataType type)
 {
     int j;
@@ -136,11 +129,7 @@ void printMemoryImgInRequiredObjFileFormat()
         printf("%04d A%x-B%x-C%x-D%x-E%x\n", MEMORY_START + i, hexImg[i]._A, hexImg[i]._B, hexImg[i]._C, hexImg[i]._D, hexImg[i]._E);
     }
 }
-/* @ Function: writeMemoryImageToObFile
-   @ Arguments: The function gets FILE *fp the file it writes the ob memory into
-   @ Description: The function generates the .ob memory image of the code. For each line, it converts the binary memory into the hex memory
-   The function doesn't return any value.
-*/
+
 void writeMemoryImageToObFile(FILE *fp)
 {
     extern BinaryWord *binaryImg;

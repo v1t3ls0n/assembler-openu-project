@@ -9,6 +9,7 @@ void setGlobalState(State new)
 {
     globalState = new;
 }
+
 State getGlobalState()
 {
     State current = globalState;
@@ -32,10 +33,12 @@ void resetCurrentLineNumber()
 {
     currentLineNumber = 1;
 }
+
 void increaseCurrentLineNumber()
 {
     currentLineNumber++;
 }
+
 int getCurrentLineNumber()
 {
     return currentLineNumber;
