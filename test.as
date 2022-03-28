@@ -15,10 +15,12 @@ bne END
 cmp val1, #-6
 bne END[r15]
 dec K
+m1
 .entry MAIN
 sub LOOP[r10] ,r14
 END: stop
 STR: .string "abcd"
+m1
 LIST: .data 6, -9
 .data -100
 .entry K

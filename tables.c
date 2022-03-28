@@ -20,8 +20,10 @@ ExtListItem *findExtOpListItem(char *name)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
+
         if (strcmp(name, p->name) == 0)
             return p;
+
         p = p->next;
     }
     return NULL;
@@ -62,8 +64,10 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
 
 void addExtListItem(char *name)
 {
+
     ExtListItem *next;
     next = (ExtListItem *)malloc(sizeof(ExtListItem *));
+    printf("name:%s\n", name);
     next->name = name;
     next->value = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
     next->value->base = 0;
