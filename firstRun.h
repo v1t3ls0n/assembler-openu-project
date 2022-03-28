@@ -1,7 +1,9 @@
 #include "firstRun.c"
 /*
+   ##########################################################################################################
+   ###########################################  General Overview: ###########################################
+   ##########################################################################################################
 
-   General Overview:
    In FirstRun.c we are parsing and analysizing the assembly code we got after we extracted the macros from it
    we verify that the syntax is legal and that the use of the assembly language follows the rules of our
    operations and instructions (operands type match, instruction type match, comment type match, legal declaretion
@@ -16,6 +18,10 @@
    much space we need for the instruction image. Doing so allows us to allocate just the required amount of memory
    needed without wasting big random chuncks of memory upfront. If everything goes well, means that the  first Run end
    without errors, then we set the sharedState ((*globalState)()) to secondRun.
+   ##########################################################################################################
+   ##########################################################################################################
+   ##########################################################################################################
+   ##########################################################################################################
 
  */
 
