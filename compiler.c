@@ -1,5 +1,7 @@
 #include "data.h"
+
 void handleSingleFile(char *arg);
+
 int main(int argc, char *argv[])
 {
     handleSourceFiles(argc, argv);
