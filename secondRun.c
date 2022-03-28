@@ -34,12 +34,6 @@ extern void parseAssemblyCode(FILE *src);
 extern Bool parseLine(char *token, char *line);
 extern Bool handleSingleLine(char *line);
 void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
-/* @ Function: writeOperationBinary
-   @ Arguments: The function gets char *operationName- the name of the operation and char *args - the arguments of the operation
-   @ Description: The function splits char * args to tooken- each token is a different operand.
-   Than the function checks what is the kind of the operands and writes them in words at the memory.
-   If there is an operand which is an undifined labl at the table of symbols, it returns false. Else it returns true.
-*/
 Bool writeOperationBinary(char *operationName, char *args)
 {
     Operation *op = getOperationByName(operationName);
@@ -70,11 +64,7 @@ Bool writeOperationBinary(char *operationName, char *args)
 
     return True;
 }
-/* @ Function: writeAdditionalOperandsWords
-   @ Arguments: The function gets Operation *op- the operation, AddrMethodsOptions active- the allowed addresing methods for the operands,
-   and char * value- the operand which is about to be written in the memory.
-   @ Description: The functiom checks the addressing method of the operations, than acording to the addressing method it writes value (the operand) in the memory.
-*/
+
 void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
 {
 
@@ -88,11 +78,7 @@ void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char
     else if (active.immediate)
         writeImmediateOperandWord(value);
 }
-/* @ Function: writeDataInstruction
-   @ Arguments: The function gets char *token, which is the token of the .data instruction's arguments.
-   @ Description: The function spilts char *token into tokens- separate each one of the .data arguments, then it adds and writes them in the memory.
-   The function returns true.
-*/
+
 Bool writeDataInstruction(char *token)
 {
     int num;
@@ -105,12 +91,6 @@ Bool writeDataInstruction(char *token)
     return True;
 }
 
-/* @ Function: writeStringInstruction
-   @ Arguments: The function gets char *s, which is the string of the .string instruction.
-   @ Description: The function search the opening quotes in char *s, to find out where the string starts.
-   Then, it it adds and writes the characters of the string in the memory.
-   The function returns true.
-*/
 Bool writeStringInstruction(char *s)
 {
     char *start = strchr(s, '\"');
@@ -123,11 +103,7 @@ Bool writeStringInstruction(char *s)
     addWord((A << 16) | '\0', Data);
     return True;
 }
-/* @ Function: writeSecondWord
-   @ Arguments: The function gets char *first and char *second - the first and second operands of the operation- Operation *op.
-   It also gets AddrMethodsOptions active[2]- an array with the allowed addresing methods for the operands.
-   @ Description: The function builds the second word of each operation and its parameters, it checks what is the
-*/
+
 void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op)
 {
     unsigned secondWord = (A << 16) | (op->funct << 12);
