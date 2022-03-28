@@ -94,8 +94,10 @@ char *getOperationName(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In table.c --------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-
+void resetTables();
+void freeMacrosTable();
 void printMacroTable();
+void freeHashTable(ItemType type);
 int printMacroItem(Item *item);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);

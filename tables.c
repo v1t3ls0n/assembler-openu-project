@@ -14,7 +14,8 @@ void addExtListItem(char *name);
 void resetExtList();
 ExtListItem *findExtOpListItem(char *name);
 void updateExtPositionData(char *name, unsigned base, unsigned offset);
-
+void freeTableItem(Item *item);
+void freeTablesMemory();
 ExtListItem *findExtOpListItem(char *name)
 {
     extern ExtListItem *extListHead;
@@ -36,7 +37,7 @@ void resetExtList()
     ExtListItem *np = extListHead, *next = NULL;
     ExtPositionData *pos, *nextPos;
     externalCount = 0;
-    entriesCount = 0;
+
     while (next != NULL)
     {
         next = np->next;
@@ -49,7 +50,8 @@ void resetExtList()
         }
         free(np);
     }
-    free(extListHead);
+
+    extListHead = NULL;
 }
 
 void updateExtPositionData(char *name, unsigned base, unsigned offset)
@@ -116,7 +118,6 @@ Item *install(char *name, ItemType type)
     }
     else
     {
-        /*    memcpy(np->name, name, strlen(name)); */
         strcpy(np->name, name);
         if (type == Symbol)
         {
@@ -135,7 +136,6 @@ Item *install(char *name, ItemType type)
         }
 
         hashval = hash(name);
-        np->next = (Item *)malloc(sizeof(Item));
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)
             symbols[hashval] = np;
@@ -450,17 +450,54 @@ int writeSingleEntry(Item *item, FILE *fp, int count)
 
 void initTables()
 {
+    extern unsigned externalCount, entriesCount;
     int i = 0;
-
-    if (externalCount > 0 && extListHead != NULL)
+    if (extListHead != NULL)
         resetExtList();
 
+    externalCount = entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
         macros[i] = NULL;
         i++;
     }
+}
+
+void freeHashTable(ItemType type)
+{
+
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (type == Macro ? (macros[i] != NULL) : (symbols[i] != NULL))
+        {
+
+            free(type == Macro ? macros[i] : symbols[i]);
+            /* freeTableItem(type == Macro ? macros[i] : symbols[i]); */
+        }
+        i++;
+    }
+}
+
+void freeMacrosTable()
+{
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (macros[i] != NULL)
+            freeTableItem(macros[i]);
+        i++;
+    }
+}
+
+void freeTableItem(Item *item)
+{
+    if (item->next != NULL)
+        freeTableItem(item->next);
+    printf("item->name:%s\n", item->name);
+    free(item);
+    return;
 }
 
 void printMacroTable()

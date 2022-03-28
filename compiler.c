@@ -6,7 +6,7 @@ extern void exportFilesMainHandler();
 extern void closeOpenLogFiles();
 extern void allocMemoryImg();
 extern void calcFinalAddrsCountersValues();
-
+extern void freeHashTable(ItemType type);
 void handleSingleFile(char *arg);
 
 int main(int argc, char *argv[])
@@ -34,7 +34,6 @@ int handleSourceFiles(int argc, char *argv[])
         i++;
     }
 
-    closeOpenLogFiles();
     return 0;
 }
 
@@ -54,8 +53,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        free(fileName);
-        return;
+        /*         free(fileName);
+                return; */
     }
 
     fileName[strlen(fileName) - 1] = 'm';
@@ -66,22 +65,23 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        fclose(src);
-        free(fileName);
-        return;
+        /*     fclose(src);
+            free(fileName);
+            return; */
     }
 
     else
     {
         (*globalState)(parsingMacros);
-        resetMemoryCounters();
         initTables();
+        resetMemoryCounters();
         parseSourceFile(src, target);
+        printMacroTable();
+        freeHashTable(Macro);
 
         if ((*globalState)() == firstRun)
         {
 
-            printMacroTable();
             rewind(target);
             parseAssemblyCode(target);
             if ((*globalState)() == secondRun)
@@ -103,6 +103,8 @@ void handleSingleFile(char *arg)
             }
             else
                 printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
+
+            freeHashTable(Symbol);
         }
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
@@ -110,5 +112,6 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
+        closeOpenLogFiles();
     }
 }
