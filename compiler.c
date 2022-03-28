@@ -35,7 +35,7 @@ int handleSourceFiles(int argc, char *argv[])
     }
 
     closeOpenLogFiles();
-    return True;
+    return 0;
 }
 
 void handleSingleFile(char *arg)
@@ -43,14 +43,12 @@ void handleSingleFile(char *arg)
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
-    char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
+    char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
 
-    if (!fileName)
-        return;
-
-    strcpy(fileName, arg);
+    strncpy(fileName, arg, strlen(arg));
     strcat(fileName, ".as");
     (*setPath)(fileName);
+
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");

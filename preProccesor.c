@@ -101,16 +101,19 @@ void parseSourceFile(FILE *src, FILE *target)
 
                 memcpy(lineClone, line, i);
                 token = strtok(lineClone, " \t\n\f\r");
-                if (!parseMacros(line, token, src, target))
+                if (token != NULL)
                 {
-                    (*setState)(assemblyCodeFailedToCompile);
-                    return;
+                    if (!parseMacros(line, token, src, target))
+                    {
+                        (*setState)(assemblyCodeFailedToCompile);
+                        return;
+                    }
                 }
-            }
 
-            memset(lineClone, 0, i);
-            memset(line, 0, i);
-            i = 0;
+                memset(lineClone, 0, i);
+                memset(line, 0, i);
+                i = 0;
+            }
         }
     }
     if (i > 0)
