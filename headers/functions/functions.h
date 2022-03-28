@@ -77,6 +77,7 @@ void yieldWarningIntoFile(Warning err);
 void yieldErrorIntoFile(Error err);
 void closeOpenLogFiles();
 void fileCreationFailure(char *fileName);
+void fileOpeningFailure(char *fileName);
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In Operations.c: ----------------------------------------------------*/
@@ -86,6 +87,8 @@ Operation *getOperationByName(char *s);
 Operation *getOperationByIndex(unsigned int i);
 int getOpIndex(char *s);
 Bool isOperationName(char *s);
+Bool isOperationNotStrict(char *s);
+char *getOperationName(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/

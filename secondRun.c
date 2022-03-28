@@ -93,9 +93,8 @@ Bool writeDataInstruction(char *token)
 
 Bool writeStringInstruction(char *s)
 {
-    char *end = strrchr(s, '\"'), *start = strchr(s, '\"');
+    char *start = strchr(s, '\"');
     int i, len;
-    printf("start:%s end:%s\n", start, end);
     start++;
     len = strlen(start);
     for (i = 0; i < len - 2; i++)
