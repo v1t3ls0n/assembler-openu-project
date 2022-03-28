@@ -19,6 +19,7 @@ int handleSourceFiles(int argc, char *argv[])
         handleSingleFile(argv[i]);
         i++;
     }
+    closeOpenLogFiles();
     return 0;
 }
 void handleSingleFile(char *arg)
@@ -103,6 +104,5 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
-        closeOpenLogFiles();
     }
 }
