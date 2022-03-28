@@ -8,14 +8,15 @@ macro m1
  mov r3, W
 endm
 lea STR, r6
-inc val1
+inc r6
 mov r3, W
 sub r1, r4
 bne END
+cmp val1, #-6
 bne END[r15]
-dec val1
+dec K
 .entry MAIN
-sub LOOP[r10] ,W
+sub LOOP[r10] ,r14
 END: stop
 STR: .string "abcd"
 LIST: .data 6, -9

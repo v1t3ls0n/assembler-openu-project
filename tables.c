@@ -19,7 +19,6 @@ ExtListItem *findExtOpListItem(char *name)
 {
     extern ExtListItem *extListHead;
     ExtListItem *p = extListHead;
-    printf("line 21, table.c\nhead:%s\n", extListHead->name);
     while (p != NULL)
     {
         if (p->name)
@@ -62,8 +61,6 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
     new.offset = offset;
     new.next = np->value.next ? np->value.next : NULL;
 
-    printf("inside update xt position data\nname:%s\nbase:%u\noffset:%u\n", name, base, offset);
-    printf("np found in list, np->name:%s\n", np->name);
     np->value = new;
     externalCount++;
 }
@@ -111,8 +108,7 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     np = (Item *)malloc(sizeof(Item));
-    /*     np.name = (char *)calloc(strlen(name) + 1, sizeof(char *));
-     */
+
     if (np == NULL)
     {
         yieldError(memoryAllocationFailure);
@@ -121,7 +117,7 @@ Item *install(char *name, ItemType type)
     else
     {
         /*    memcpy(np->name, name, strlen(name)); */
-        strncpy(np->name, name, strlen(name));
+        strcpy(np->name, name);
         if (type == Symbol)
         {
             np->val.s.attrs.code = 0;
