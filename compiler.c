@@ -103,7 +103,7 @@ void handleSingleFile(char *arg)
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
             else
-                printf("\nFirst Run Finished With Errors, will not enter second run!\n");
+                printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
         }
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);

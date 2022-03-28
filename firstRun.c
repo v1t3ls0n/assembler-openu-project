@@ -22,11 +22,8 @@ extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
 
-extern char *splitToken(char *s);
+extern Bool isIndexParameter(char *s);
 
-Bool isLabelDeclarationStrict(char *s);
-Bool isOperationNotStrict(char *s);
-char *getOperationName(char *s);
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -47,16 +44,11 @@ Bool handleOperation(char *operationName, char *args)
         {
             extra = strtok(NULL, ", \t\n\f\r");
             if (extra)
-                yieldError(extraOperandsPassed);
+                areOperandsLegal = yieldError(extraOperandsPassed);
         }
         else
-        {
             second = 0;
-            /*             second = first;
-                        first = 0; */
-        }
     }
-
     areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
 
     if (areOperandsLegal)
@@ -74,7 +66,7 @@ Bool handleOperation(char *operationName, char *args)
         increaseInstructionCounter(size);
     }
 
-    return areOperandsLegal ? True : False;
+    return areOperandsLegal;
 }
 
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
@@ -96,6 +88,25 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
         des = src;
         src = 0;
     }
+
+    int expectedOperandsCount = 0;
+    int operandsPassedCount = 0;
+    Bool isValid = True;
+    if (src)
+        operandsPassedCount++;
+    if (des)
+        operandsPassedCount++;
+    if (op->src.direct || op->src.immediate || op->src.index || op->src.reg)
+        expectedOperandsCount++;
+    if (op->des.direct || op->des.immediate || op->des.index || op->des.reg)
+        expectedOperandsCount++;
+
+    if (expectedOperandsCount == 1 && operandsPassedCount == 1)
+    {
+        des = src;
+        src = 0;
+    }
+    printf("src:%s des:%s\n", src, des);
 
     if ((expectedOperandsCount == operandsPassedCount) && expectedOperandsCount == 0)
         return True;
@@ -137,22 +148,26 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
 
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
+    Bool isAny = isValidImmediateParamter(operand) || isValidIndexParameter(operand) || isRegistery(operand) || verifyLabelNaming(operand) || isIndexParameter(operand);
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = !isImmediate && isValidIndexParameter(operand);
     Bool isReg = !isDirectIndex && !isImmediate && isRegistery(operand);
     Bool isDirect = !isReg && !isDirectIndex && !isImmediate && verifyLabelNaming(operand);
 
-    if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
-        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
+    if (isIndexParameter(operand) && !isDirectIndex)
+        return yieldError(registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange);
+
+    if (!isAny)
+        return type == 1 ? yieldError(illegalInputPassedAsOperandDesOperand) : yieldError(illegalInputPassedAsOperandSrcOperand);
 
     else if (!allowedAddrs.reg && isReg)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.immediate && isImmediate)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.direct && isDirect)
-        return yieldError(illegalOperand);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.index && isDirectIndex)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
 
     active[type].direct = isDirect;
     active[type].reg = isReg;
@@ -223,41 +238,27 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
     Bool isValid = True;
-    char *firstToken = 0;
-    nextToken = trimFromLeft(nextToken);
-    firstToken = nextToken;
-    if (nextToken[0] == ':')
-        nextToken++;
-
-    nextToken = splitToken(nextToken);
-
+    if (!labelName || !nextToken || !line)
+        return False;
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
-        int len = strlen(getInstructionNameByType(instruction)) + 1;
-        char cleanInstruction[MAX_INSTRUCTION_NAME_LEN + 1] = {0}, *end = 0;
-        strncpy(cleanInstruction, nextToken, len);
-        end = cleanInstruction;
-        while (!isspace(*end) && *end != '\0')
-            end++;
-        if (isspace(*end))
-            *end = '\0';
-
-        if (strlen(getInstructionNameByType(instruction)) != strlen(cleanInstruction))
+        if (!isInstructionStrict(nextToken))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
-            nextToken = nextToken + strlen(getInstructionNameByType(instruction));
+            nextToken = getInstructionNameByType(instruction);
         }
 
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            if (nextToken)
-                isValid = handleInstruction(instruction, firstToken, nextToken, line) && isValid;
+            char *next = strtok(NULL, " \t\n\f\r");
+            if (next)
+                return handleInstruction(instruction, nextToken, next, line) && isValid;
             else
                 isValid = yieldWarning(emptyLabelDecleration);
         }
         else
-            isValid = handleInstruction(instruction, labelName, nextToken, line) && isValid;
+            return handleInstruction(instruction, labelName, nextToken, line) && isValid;
     }
 
     else if (isOperation(nextToken))

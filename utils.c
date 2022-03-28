@@ -66,9 +66,35 @@ Bool isValidImmediateParamter(char *s)
             return False;
     return True;
 }
+Bool isIndexParameter(char *s)
+{
+    int len = strlen(s);
+    char *opening = 0, *closing = 0;
+    Bool result = True;
+    if (len < 5)
+        return False;
+    else if ((opening = strchr(s, '[')) == NULL || (closing = strchr(s, ']')) == NULL)
+        return False;
+    else if (closing < opening || (s[len - 1] != ']'))
+        return False;
+    else
+    {
+        opening++;
+        *closing = '\0';
+        if (!isRegistery(opening))
+        {
+            printf("not registery!!!!!!!!!!!!!\n");
+            result = False;
+        }
+        *closing = ']';
+    }
+    return result;
+}
+
 Bool isValidIndexParameter(char *s)
 {
     int len = strlen(s);
+    Bool result = True;
     if (len < 6)
         return False;
 
@@ -76,15 +102,18 @@ Bool isValidIndexParameter(char *s)
         return False;
     else
     {
-        s = strchr(s, '[');
-        s++;
+        char *opening = 0;
+        opening = strchr(s, '[');
+        opening++;
+        s[len - 1] = '\0';
 
-        s[strlen(s) - 1] = 0;
-
-        if (isRegistery(s) && getRegisteryNumber(s) < 10)
-            return False;
+        if (isRegistery(opening) && getRegisteryNumber(opening) < 10)
+        {
+            result = False;
+        }
+        s[len - 1] = ']';
     }
-    return True;
+    return result;
 }
 
 Bool isComment(char *s)

@@ -12,7 +12,6 @@ static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
 Bool isLabelDeclarationStrict(char *s);
-extern char *splitToken(char *s);
 
 /* @ Function: countAndVerifyDataArguments
    @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
@@ -58,22 +57,21 @@ Bool countAndVerifyDataArguments(char *line)
 
 Bool verifyCommaSyntax(char *line)
 {
-    int commasCounter = 0, argsCounter = 0;
+    int commasCounter = 0;
     Bool insideToken = False;
     Bool isFirstToken = True;
     Bool isValid = True;
     char *s = line;
     s = trimFromLeft(s);
 
-    while ((*s == ',' || isspace(*s)) && *s != '\0')
+    while (*s == ',' || isspace(*s))
     {
         if (*s == ',')
             commasCounter++;
         s++;
     }
-    if (!*s && commasCounter > 0)
-        return yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
-    else if (*s && strlen(s) && commasCounter > 0)
+
+    if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
     else if (!*s && strchr(s, ','))
         isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
@@ -82,7 +80,6 @@ Bool verifyCommaSyntax(char *line)
     isFirstToken = True;
     while (s && *s != '\0')
     {
-        printf("%c ", *s);
         if (insideToken)
         {
             if (isFirstToken == True && commasCounter == 0)
@@ -116,9 +113,6 @@ Bool verifyCommaSyntax(char *line)
         }
         else
         {
-
-            argsCounter++;
-
             while (*s == ',' || isspace(*s))
             {
                 if (*s == ',')
@@ -127,29 +121,13 @@ Bool verifyCommaSyntax(char *line)
             }
 
             if (s && (isprint(*s) && !isspace(*s)))
-            {
                 insideToken = True;
-            }
         }
 
         s++;
     }
 
-    /* commasCounter--; */
-    printf("\n\nline:%s\ncommas counter:%d\nargs counter:%d\n\n", line, commasCounter, argsCounter);
-    s = strrchr(s, ',');
-    if (s != NULL && *s == ',')
-    {
-        s++;
-        commasCounter = 1;
-        while (s && *s != '\0')
-        {
-            if ((isprint(*s) && !isspace(*s)))
-                commasCounter = 0;
-            s++;
-        }
-    }
-    if (commasCounter)
+    if (commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
     return isValid;
@@ -164,39 +142,40 @@ Bool verifyCommaSyntax(char *line)
 */
 Bool countAndVerifyStringArguments(char *line)
 {
-    char *args, *closing = 0, *opening = 0;
+    char *s = 0, *args;
+    Bool isValid = True;
     int size = 0;
-    args = strstr(line, STRING) + strlen(STRING);
-    args = trimFromLeft(args);
-    if (!*args)
+    char *closing = 0, *opening = 0;
+    line = strstr(line, STRING) + strlen(STRING);
+    line = trimFromLeft(line);
+    if (!line || !*line)
         return yieldError(emptyStringDeclatretion);
-
-    opening = strchr(args, '\"');
-
-    if (!opening || !*opening)
+    args = strchr(line, '\"');
+    if (args)
     {
-        yieldError(expectedQuotes);
-        yieldError(closingQuotesForStringIsMissing);
-        return False;
+        opening = strchr(line, '\"');
+        closing = strrchr(line, '\"');
+        if (opening == closing && (opening[0] != line[0]))
+            isValid = yieldError(expectedQuotes);
+        else if (opening == closing && (opening[0] == line[0]))
+            yieldError(closingQuotesForStringIsMissing);
+        s = opening;
+        while (*s && *s != '\0')
+        {
+            s++;
+            size++;
+        }
     }
     else
     {
-        closing = strrchr(args, '\"');
-        if (opening == closing && (opening[0] == args[0]))
-            return yieldError(closingQuotesForStringIsMissing);
-
-        if (opening == closing && (opening[0] != args[0]))
-            return yieldError(expectedQuotes);
-        else
-        {
-            size = strlen(opening) - strlen(closing);
-            printf(" size:%d\n\n\n\n", size);
-            increaseDataCounter(size);
-        }
-        printf("\n\n\n\nline:%s args:%s opening:%s closing:%s\n\n\n", line, args, opening, closing);
+        yieldError(expectedQuotes);
+        yieldError(closingQuotesForStringIsMissing);
+        isValid = False;
     }
+    if (isValid)
+        increaseDataCounter((int)(size + 1)); /*counts the \0 at the end of the string as well*/
 
-    return True;
+    return isValid;
 }
 
 /* @ Function: parseLine
@@ -211,80 +190,57 @@ Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
     Bool isValid = True;
-
-    Bool isValid = True;
     if (isComment(token))
         return True;
 
     if (isLabelDeclaration(token))
     {
-        char *next = 0;
+        char labelName[MAX_LABEL_LEN] = {0};
+        strcpy(labelName, token);
+        printf("line 195 parse.c\n");
         if (!isLabelDeclarationStrict(token))
         {
-            char lineClone[MAX_LINE_LEN] = {0}, *rest = 0;
-            strcpy(lineClone, line);
+            char *s;
             isValid = yieldError(missingSpaceBetweenLabelDeclaretionAndInstruction);
-            token = line;
-            next = strchr(line, ':');
-            next++;
-            *next = '\0';
-            rest = strchr(lineClone, ':');
-            rest++;
-            sprintf(line, "%s%c%s", token, ' ', rest);
-            strncpy(lineClone, line, strlen(line));
-            next = (*globalState)() == firstRun ? strtok(lineClone, " \t\n\f\r") : strtok(lineClone, ", \t\n\f\r");
-            return parseLine(next, line) && False;
-        }
-        else
-        {
-            next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-            if (!next)
-                return yieldError(emptyLabelDecleration);
-
-            if ((*globalState)() == firstRun)
-                return handleLabel(token, next, line) && isValid;
-            else
-                return isValid && parseLine(next, line + strlen(token) + 1);
+            token = strchr(token, ':');
+            s = strchr(labelName, ':');
+            *s = '\0';
+            token++;
         }
 
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
+        token = strstr(line, labelName) + strlen(labelName);
+
         if ((*globalState)() == firstRun)
-            isValid = handleLabel(labelName, newToken, line) && isValid;
+            return handleLabel(labelName, token, line) && isValid;
         else
-            isValid = parseLine(next, line + strlen(token) + 1);
+            return parseLine(token, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))
     {
         char *next;
         int type;
+        Bool isValid = True;
         type = getInstructionType(token);
-        printf("inside is instruction\n");
-        if (!isInstructionStrict(token))
-        {
-            isValid = yieldError(missinSpaceAfterInstruction);
-            token = getInstructionName(token);
-        }
         next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
 
-        if (isValid && next == NULL)
+        if (next == NULL)
         {
             if (type == _TYPE_DATA || type == _TYPE_STRING)
-                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldError(emptyStringDeclatretion);
+                return type == _TYPE_DATA ? yieldWarning(emptyDataDeclaretion) : yieldWarning(emptyStringDeclatretion);
             else
                 return type == _TYPE_ENTRY ? yieldWarning(emptyEntryDeclaretion) : yieldWarning(emptyExternalDeclaretion);
         }
-        else if (next != NULL)
+        else
         {
-
             if ((*globalState)() == firstRun)
                 return handleInstruction(type, token, next, line) && isValid;
             else
             {
                 if (type == _TYPE_DATA)
-                    return writeDataInstruction(next) && isValid;
+                    return writeDataInstruction(next);
                 else if (type == _TYPE_STRING)
-                    return writeStringInstruction(next) && isValid;
+                    return writeStringInstruction(next);
                 else
                     return True;
             }
@@ -301,12 +257,12 @@ Bool parseLine(char *token, char *line)
     else
     {
         if (strlen(token) > 1)
-            return yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
+            yieldError(undefinedTokenNotOperationOrInstructionOrLabel);
         else
-            return yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
+            yieldError(illegalApearenceOfCharacterInTheBegningOfTheLine);
     }
 
-    return isValid;
+    return False;
 }
 
 Bool handleSingleLine(char *line)
@@ -321,6 +277,7 @@ Bool handleSingleLine(char *line)
     (*currentLineNumberPlusPlus)();
     return result;
 }
+
 void parseAssemblyCode(FILE *src)
 {
     State (*globalState)() = &getGlobalState;

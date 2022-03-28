@@ -1,25 +1,28 @@
-; file ps.am
-.entry LIST
-.extern W
-MAIN: add r3, LIST
-LOOP: prn #48
-macro m1
- inc r6
- mov r3, W
-endm
-lea STR, r6
-inc r6
-mov r3, W
-sub r1, r4
-bne END
-bne END[r15]
-dec K
-.entry MAIN
-sub LOOP[r10] ,r14
-END: stop
-STR: .string "abcd"
-LIST: .data 6, -9
-.data -100
-.entry K
-K: .data 31
-.extern val1
+;this file will include errors
+
+;undefined label
+MAIN: add #2, r4
+;undefined operation
+Sub r4 , r2
+;consecutive commas
+mov X[r12] ,        , , r4
+;missing commas
+lea X          r1
+;illegal appearence of comma before the first operand
+jsr , Y
+;illegal appearence of comma after the last parameter
+prn     #4         ,
+  ;wrong addressing method for dec 
+           dec #4
+;data instruction with illegal appearence of characters (not an int)
+Z: .data 4  ,  7  ,6.5,3,r,7
+;wrong addresing method for mov
+   mov r2,  #-99
+;illegal appearence of comma before the first operand + missing commas
+cmp ,#2       X
+;illegal appearence of comma before the first operand + consecutive commas
+sub ,#2 ,  ,,r4
+.extern X
+Y: .string "getgeb gt"
+;wrong register for index addressing method
+cmp Y[r12]  ,X[r2]
