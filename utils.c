@@ -82,7 +82,10 @@ Bool isIndexParameter(char *s)
         opening++;
         *closing = '\0';
         if (!isRegistery(opening))
+        {
+            printf("not registery!!!!!!!!!!!!!\n");
             result = False;
+        }
         *closing = ']';
     }
     return result;
@@ -99,14 +102,16 @@ Bool isValidIndexParameter(char *s)
         return False;
     else
     {
-        s = strchr(s, '[');
-        s++;
-        s[strlen(s) - 1] = 0;
+        char *opening = 0;
+        opening = strchr(s, '[');
+        opening++;
+        s[len - 1] = '\0';
 
-        if (isRegistery(s) && getRegisteryNumber(s) < 10)
+        if (isRegistery(opening) && getRegisteryNumber(opening) < 10)
+        {
             result = False;
-
-        s[strlen(s) - 1] = ']';
+        }
+        s[len - 1] = ']';
     }
     return result;
 }
