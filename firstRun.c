@@ -22,6 +22,8 @@ extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
 
+extern Bool isIndexParameter(char *s);
+
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -47,7 +49,6 @@ Bool handleOperation(char *operationName, char *args)
         else
             second = 0;
     }
-
     areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
 
     if (areOperandsLegal)
@@ -87,6 +88,7 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
         des = src;
         src = 0;
     }
+    printf("src:%s des:%s\n", src, des);
 
     if ((expectedOperandsCount == operandsPassedCount) && expectedOperandsCount == 0)
         return True;
@@ -127,22 +129,26 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
 }
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
+    Bool isAny = isValidImmediateParamter(operand) || isValidIndexParameter(operand) || isRegistery(operand) || verifyLabelNaming(operand) || isIndexParameter(operand);
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = !isImmediate && isValidIndexParameter(operand);
     Bool isReg = !isDirectIndex && !isImmediate && isRegistery(operand);
     Bool isDirect = !isReg && !isDirectIndex && !isImmediate && verifyLabelNaming(operand);
 
-    if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
-        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
+    if (isIndexParameter(operand) && !isDirectIndex)
+        return yieldError(registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange);
+
+    if (!isAny)
+        return type == 1 ? yieldError(illegalInputPassedAsOperandDesOperand) : yieldError(illegalInputPassedAsOperandSrcOperand);
 
     else if (!allowedAddrs.reg && isReg)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.immediate && isImmediate)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.direct && isDirect)
-        return yieldError(illegalOperand);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.index && isDirectIndex)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
 
     active[type].direct = isDirect;
     active[type].reg = isReg;

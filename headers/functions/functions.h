@@ -208,3 +208,5 @@ int parseRegNumberFromIndexAddrOperand(char *s);
 Bool writeStringInstruction(char *s);
 Bool writeDataInstruction(char *s);
 void writeSingleExternalsFile(char *name, unsigned base, unsigned offset);
+
+Bool isIndexParameter(char *s);
