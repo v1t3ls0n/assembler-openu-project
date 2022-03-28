@@ -7,10 +7,15 @@ macro m1
  inc r6
  mov r3, W
 endm
+macro m2
+;m2 macro first line comment
+    ;   m2 macro second line comment
+endm
 lea STR, r6
 inc r6
 mov r3, W
 sub r1, r4
+m2
 bne END
 cmp val1, #-6
 bne END[r15]

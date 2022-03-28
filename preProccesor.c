@@ -24,44 +24,48 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         fprintf(target, "%s", line);
         current = ftell(target);
     }
-
-    if (isMacroOpening(token))
+    if (!isPossiblyUseOfMacro(token) && !isMacroOpening(token) && !isMacroClosing(token))
+        return True;
+    else
     {
-        fseek(target, current - strlen(line), SEEK_SET);
-        fprintf(target, "%s", "\0");
-        next = strtok(NULL, " \t\n\f\r");
-        if (!*next)
-            return yieldError(macroDeclaretionWithoutDefiningMacroName);
-        if (!isLegalMacroName(next))
-            return yieldError(illegalMacroNameUseOfSavedKeywords);
-
-        start = ftell(src);
-        strcpy(macroName, next);
-        isReadingMacro = True;
-    }
-    else if (isMacroClosing(token))
-    {
-        end = ftell(src) - strlen(line) + 1;
-        addMacro(macroName, start, end);
-        isReadingMacro = False;
-        start = end = 0;
-        memset(macroName, 0, MAX_LABEL_LEN);
-    }
-    else if (isPossiblyUseOfMacro(token))
-    {
-        Item *p = getMacro(token);
-        if (p != NULL)
+        if (isMacroOpening(token))
         {
-            long c, toCopy = p->val.m.end - p->val.m.start;
-            long lastPosition = 0;
-            fseek(target, -strlen(line), SEEK_CUR);
+            fseek(target, current - strlen(line), SEEK_SET);
             fprintf(target, "%s", "\0");
-            lastPosition = ftell(src);
-            fseek(src, p->val.m.start, SEEK_SET);
-            while (--toCopy && (c = fgetc(src)) != EOF)
-                fputc(c, target);
+            next = strtok(NULL, " \t\n\f\r");
+            if (!*next)
+                return yieldError(macroDeclaretionWithoutDefiningMacroName);
+            if (!isLegalMacroName(next))
+                return yieldError(illegalMacroNameUseOfSavedKeywords);
 
-            fseek(src, lastPosition, SEEK_SET);
+            start = ftell(src);
+            strcpy(macroName, next);
+            isReadingMacro = True;
+        }
+        else if (isMacroClosing(token))
+        {
+            end = ftell(src) - strlen(line) + 1;
+            addMacro(macroName, start, end);
+            isReadingMacro = False;
+            start = end = 0;
+            memset(macroName, 0, MAX_LABEL_LEN);
+        }
+        else if (isPossiblyUseOfMacro(token))
+        {
+            Item *p = getMacro(token);
+            if (p != NULL)
+            {
+                long c, toCopy = p->val.m.end - p->val.m.start;
+                long lastPosition = 0;
+                fseek(target, -strlen(line), SEEK_CUR);
+                fprintf(target, "%s", "\0");
+                lastPosition = ftell(src);
+                fseek(src, p->val.m.start, SEEK_SET);
+                while (--toCopy && (c = fgetc(src)) != EOF)
+                    fputc(c, target);
+
+                fseek(src, lastPosition, SEEK_SET);
+            }
         }
     }
 
