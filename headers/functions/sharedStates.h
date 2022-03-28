@@ -1,5 +1,4 @@
 
-
 void setGlobalState(State newState);
 /* @ Function: setGlobalState
    @ Aruments: The function gets State new- the state the function will update

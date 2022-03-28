@@ -1,4 +1,4 @@
-#include "operation.h"
+#include "data.h"
 
 static Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},

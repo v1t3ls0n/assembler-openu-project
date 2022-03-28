@@ -1,5 +1,3 @@
-#include "sharedStates.h"
-
 Bool yieldError(Error err);
 void yieldErrorIntoFile(Error err);
 Bool yieldWarning(Warning err);

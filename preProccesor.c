@@ -1,4 +1,4 @@
-#include "preProccesor.h"
+#include "data.h"
 void (*setState)() = &setGlobalState;
 State (*globalState)() = &getGlobalState;
 

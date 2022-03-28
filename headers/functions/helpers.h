@@ -1,6 +1,3 @@
-
-#include "sharedStates.h"
-
 char *cloneString(char *s);
 char *trimFromLeft(char *s);
 char *decToHex(int num);

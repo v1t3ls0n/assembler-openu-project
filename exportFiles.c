@@ -1,4 +1,4 @@
-#include "sharedStates.h"
+#include "data.h"
 
 extern void fileCreationFailure(char *fileName);
 static char *(*baseFileName)() = &getFileNamePath;

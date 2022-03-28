@@ -1,4 +1,4 @@
-#include "firstRun.h"
+#include "data.h"
 
 /* extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);

@@ -1,4 +1,3 @@
-#include "sharedStates.h"
 
 Bool writeOperationBinary(char *operationName, char *args);
 /* @ Function: writeOperationBinary

@@ -1,4 +1,4 @@
-#include "sharedStates.h"
+#include "data.h"
 
 static int (*line)() = &getCurrentLineNumber;
 static char *(*fileName)() = &getFileNamePath;

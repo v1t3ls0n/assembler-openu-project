@@ -1,4 +1,3 @@
-#include "sharedStates.h"
 
 /* @ Function: void parseSourceFile(FILE *src, FILE *target)
    @ Arguments: FILE *src, FILE *target. the *src FILE pointer

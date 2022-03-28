@@ -1,4 +1,3 @@
-#include "sharedStates.h"
 
 Bool isOperationName(char *s);
 Operation *getOperationByName(char *s);

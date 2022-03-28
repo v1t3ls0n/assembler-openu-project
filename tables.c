@@ -1,5 +1,4 @@
-#include "tables.h"
-
+#include "data.h"
 static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
 static unsigned entriesCount = 0;

@@ -1,4 +1,4 @@
-#include "parse.h"
+#include "data.h"
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool countAndVerifyDataArguments(char *line)
