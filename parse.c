@@ -1,16 +1,6 @@
-#include "data.h"
-#include <stdarg.h>
-
-extern Bool yieldError(Error err);
-extern Bool yieldWarning(Warning err);
-extern char *trimFromLeft(char *s);
+#include "parse.h"
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
-extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
-Bool verifyCommaSyntax(char *line);
-Bool handleSingleLine(char *line);
-Bool isLabelDeclarationStrict(char *s);
-
 Bool countAndVerifyDataArguments(char *line)
 {
     Bool isValid = True;

@@ -1,4 +1,5 @@
-#include "firstRun.c"
+#include "sharedStates.h"
+
 /*
    ##########################################################################################################
    ###########################################  General Overview: ###########################################
@@ -49,3 +50,29 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
    @ Description: The function checks if the operand has the right addressing mrhod, returns true if it does, and false if it doesn't.
    */
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
+
+Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line);
+/* @ Function: Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
+   @ Arguments: the function gets int type- the type of the instruction,
+   char *firstToken and char *nextToken- the first and second tokens in the instruction line (char * line).
+   @ Description: The function checks the first token. If it is an instruction,
+   it checks what is the type of the instruction, and yeilds error if there are illegal appearence of characters in the declaration.
+   If it is a label declaration, it makes sure there is a valid instruction
+   and its arguments afterwards, if the declaration is not valid it yeilds error.
+   If the firstToken is not a label declaration or any type of legal instruction, it yeilds error.
+   The function keeps on validating the whole line and reports all of the errors.
+   If there aren't any mistake, the function returns true and if there is a vald label it adds it to the symbols table.
+   Else, it returns false.
+
+*/
+
+Bool handleLabel(char *labelName, char *nextToken, char *line);
+/*  @ Function: Bool handleLabel(char *labelName, char *nextToken, char *line)
+    @ Arguments: The function gets char *labelName- the name of the label it handles,
+    char *nextToken- one of the tokens in the line (char * line).
+    @ Description: The function gets a line in the code that starts with a label declaration.
+    The function checks if this is an instruction line or an operation line.
+    If it encountered an error it yields (prints) the error.
+     The function keeps on validating the whole line and reports all of the errors.
+    The function returns true if the line is valid, andfalse if it ian't.
+*/

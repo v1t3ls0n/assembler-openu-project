@@ -1,4 +1,4 @@
-#include "parse.c"
+#include "sharedStates.h"
 
 /* @ Function: verifyCommaSyntax
    @ Arguments:

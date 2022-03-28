@@ -1,5 +1,5 @@
-#include "./headers/lib/lib.h"
-#include "./headers/variables/variables.h"
+
+#include "sharedStates.h"
 
 char *cloneString(char *s);
 char *trimFromLeft(char *s);

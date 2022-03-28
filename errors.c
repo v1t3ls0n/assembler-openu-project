@@ -1,11 +1,11 @@
+#include "sharedStates.h"
 
-#include "data.h"
-int (*line)() = &getCurrentLineNumber;
-char *(*fileName)() = &getFileNamePath;
-
+static int (*line)() = &getCurrentLineNumber;
+static char *(*fileName)() = &getFileNamePath;
 static FILE *warningsFile = NULL, *errorsFile = NULL;
 static Bool isWarningFileExist = False;
 static Bool isErrorFileExist = False;
+
 void fileCreationFailure(char *fileName)
 {
     extern FILE *errorsFile;

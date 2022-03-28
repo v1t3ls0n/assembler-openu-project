@@ -1,6 +1,4 @@
-#include "data.h"
-
-void handleSingleFile(char *arg);
+#include "compiler.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +21,6 @@ int handleSourceFiles(int argc, char *argv[])
     }
     return 0;
 }
-
 void handleSingleFile(char *arg)
 {
     FILE *src = NULL, *target = NULL;

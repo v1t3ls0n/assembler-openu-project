@@ -1,5 +1,5 @@
+#include "sharedStates.h"
 
-#include "data.h"
 static BinaryWord *binaryImg = NULL;
 static HexWord *hexImg = NULL;
 unsigned static IC = MEMORY_START;

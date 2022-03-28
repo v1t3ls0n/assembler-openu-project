@@ -1,4 +1,4 @@
-#include "memory.c"
+#include "sharedStates.h"
 
 void increaseDataCounter(int amount);
 /* @ Function: increaseDataCounter

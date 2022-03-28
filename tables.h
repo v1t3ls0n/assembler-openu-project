@@ -1,4 +1,5 @@
-#include "tables.c"
+#include "sharedStates.h"
+
 /*The file tables.c is responsible of all the tables, lists and data structures in the code.
 It handles the macros table, the symbols table and the external operands nested singly linked list
 Both the symbols and the macros able are using the same hash table data structure and main function\interface.

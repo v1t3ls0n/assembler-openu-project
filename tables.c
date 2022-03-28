@@ -1,4 +1,4 @@
-#include "data.h"
+#include "tables.h"
 
 static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};

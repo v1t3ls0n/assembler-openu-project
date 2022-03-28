@@ -1,4 +1,4 @@
-#include "utils.c"
+#include "sharedStates.h"
 
 Bool isMacroOpening(char *s);
 /* @ Function: isMacroOpening
