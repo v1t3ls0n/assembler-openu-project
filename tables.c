@@ -38,7 +38,6 @@ void resetExtList()
     while (next != NULL)
     {
         next = np->next;
-        free(np->name);
         nextPos = np->value;
         while (nextPos != NULL)
         {
@@ -54,7 +53,7 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
 {
 
     ExtListItem *np = findExtOpListItem(name);
-    ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+    ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
     new->base = base;
     new->offset = offset;
     new->next = NULL;
@@ -66,8 +65,10 @@ void addExtListItem(char *name)
 {
 
     ExtListItem *next;
-    next = (ExtListItem *)malloc(sizeof(ExtListItem *));
-    next->name = name;
+    next = (ExtListItem *)malloc(sizeof(ExtListItem));
+
+    strncpy(next->name, name, strlen(name));
+
     if (extListHead != NULL)
     {
         next->next = extListHead->next;
@@ -104,15 +105,17 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     np = (Item *)malloc(sizeof(Item));
-    np->name = (char *)calloc(strlen(name) + 1, sizeof(char *));
-    if (np == NULL || np->name == NULL)
+    /*     np.name = (char *)calloc(strlen(name) + 1, sizeof(char *));
+     */
+    if (np == NULL)
     {
         yieldError(memoryAllocationFailure);
         return NULL;
     }
     else
     {
-        memcpy(np->name, name, strlen(name));
+        /*    memcpy(np->name, name, strlen(name)); */
+        strncpy(np->name, name, strlen(name));
         if (type == Symbol)
         {
             np->val.s.attrs.code = 0;
@@ -130,7 +133,7 @@ Item *install(char *name, ItemType type)
         }
 
         hashval = hash(name);
-
+        np->next = (Item *)malloc(sizeof(Item));
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)
             symbols[hashval] = np;
@@ -375,8 +378,7 @@ void updateFinalValueOfSingleItem(Item *item)
     if (item->val.s.attrs.external)
     {
         externalCount++;
-        printf("item->name:%s\n", item->name);
-        addExtListItem(cloneString(item->name));
+        addExtListItem(item->name);
     }
 
     if (item->val.s.attrs.data)

@@ -33,5 +33,7 @@ STR: .string "abcd"
 LIST: .data 6, -9
 .data -100
 .entry K
+m1
 K: .data 31
 .extern val1
+m1
