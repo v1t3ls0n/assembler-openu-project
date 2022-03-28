@@ -490,17 +490,6 @@ void freeHashTable(ItemType type)
     }
 }
 
-void freeMacrosTable()
-{
-    int i = 0;
-    while (i < HASHSIZE)
-    {
-        if (macros[i] != NULL)
-            freeTableItem(macros[i]);
-        i++;
-    }
-}
-
 void freeTableItem(Item *item)
 {
     if (item->next != NULL)
