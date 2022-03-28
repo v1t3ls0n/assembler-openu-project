@@ -1,19 +1,5 @@
 #include "data.h"
 
-/* extern int firstRunParsing(FILE *fp, char *filename);
-extern Bool handleSingleLine(char *line);
-void createExpandedSourceFile(FILE *source, FILE *target, char *fileName);
-extern void printBinaryImg();
-extern void allocMemoryImg();
-
-extern void calcFinalAddrsCountersValues();
-extern void printMemoryImgInRequiredObjFileFormat();
-extern void parseAssemblyCode(FILE *src);
-extern void exportFilesMainHandler();
-extern void initExternalOperandsList();
-extern void setGlobalState(State new);
-extern void parseSourceFile(FILE *src, FILE *target);
-extern void closeOpenLogFiles(); */
 extern void resetMemoryCounters();
 extern void initTables();
 extern void exportFilesMainHandler();
@@ -38,7 +24,7 @@ int handleSourceFiles(int argc, char *argv[])
     int i = 1;
     if (filesCount < 1)
     {
-        yieldError(AssemblerDidNotGetSourceFiles);
+        fprintf(stderr, "\n\nYou did not passed any source files to the assembler!\n\n");
         exit(1);
     }
 
@@ -49,7 +35,6 @@ int handleSourceFiles(int argc, char *argv[])
     }
 
     closeOpenLogFiles();
-
     return True;
 }
 
@@ -59,17 +44,19 @@ void handleSingleFile(char *arg)
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
+
     if (!fileName)
-    {
-        yieldError(memoryAllocationFailure);
         return;
-    }
-    memcpy(fileName, arg, strlen(arg));
+
+    strcpy(fileName, arg);
     strcat(fileName, ".as");
     (*setPath)(fileName);
     if ((src = fopen(fileName, "r")) == NULL)
     {
-        fileCreationFailure(fileName);
+        fprintf(stderr, "\n######################################################################\n");
+        fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
+        fprintf(stderr, "######################################################################\n\n");
+        free(fileName);
         return;
     }
 
@@ -78,7 +65,11 @@ void handleSingleFile(char *arg)
     if ((target = fopen(fileName, "w+")) == NULL)
     {
 
-        fileCreationFailure(fileName);
+        fprintf(stderr, "\n######################################################################\n");
+        fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
+        fprintf(stderr, "######################################################################\n\n");
+        fclose(src);
+        free(fileName);
         return;
     }
 
@@ -91,10 +82,10 @@ void handleSingleFile(char *arg)
 
         if ((*globalState)() == firstRun)
         {
+
             printMacroTable();
             rewind(target);
             parseAssemblyCode(target);
-
             if ((*globalState)() == secondRun)
             {
                 calcFinalAddrsCountersValues();
@@ -116,7 +107,7 @@ void handleSingleFile(char *arg)
                 printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
         }
         else
-            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", arg);
+            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
 
         free(fileName);
         fclose(src);

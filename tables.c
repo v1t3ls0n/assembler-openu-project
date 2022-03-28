@@ -10,7 +10,7 @@ extern unsigned getICF();
 extern Bool verifyLabelNaming(char *s);
 
 void findAllExternals();
-void addExtListItem(Item *item);
+void addExtListItem(char *name);
 void resetExtList();
 ExtListItem *findExtOpListItem(char *name);
 void updateExtPositionData(char *name, unsigned base, unsigned offset);
@@ -20,8 +20,10 @@ ExtListItem *findExtOpListItem(char *name)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
+
         if (strcmp(name, p->name) == 0)
             return p;
+
         p = p->next;
     }
     return NULL;
@@ -60,13 +62,17 @@ void updateExtPositionData(char *name, unsigned base, unsigned offset)
     np->value = new;
 }
 
-void addExtListItem(Item *item)
+void addExtListItem(char *name)
 {
 
     ExtListItem *next;
     next = (ExtListItem *)malloc(sizeof(ExtListItem *));
-    next->name = (char *)calloc(strlen(item->name), sizeof(char *));
-    strcpy(next->name, item->name);
+    printf("name:%s\n", name);
+    next->name = name;
+    next->value = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
+    next->value->base = 0;
+    next->value->offset = 0;
+    next->value->next = NULL;
     if (extListHead != NULL)
     {
         next->next = extListHead->next;
@@ -148,6 +154,7 @@ Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, uns
 
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
+
     if (!verifyLabelNamingAndPrintErrors(name))
         return False;
     p = lookup(name, Symbol);
@@ -273,6 +280,10 @@ Bool isNonEmptyEntry(char *name)
 Bool isLabelNameAlreadyTaken(char *name, ItemType type)
 {
     Item *p = lookup(name, type);
+
+    if (name[strlen(name) - 1] == ':')
+        name[strlen(name) - 1] = '\0';
+
     if (p != NULL)
     {
         if (type == Symbol)
@@ -320,7 +331,7 @@ Item *getMacro(char *s)
 Item *addMacro(char *name, int start, int end)
 {
     Item *macro = lookup(name, Macro);
-    printf("inside addMacro\nname:%s\nstart:%d\nend:%d\n", name, start, end);
+
     if (macro != NULL)
     {
         yieldError(illegalMacroNameAlreadyInUse);
@@ -369,7 +380,8 @@ void updateFinalValueOfSingleItem(Item *item)
     if (item->val.s.attrs.external)
     {
         externalCount++;
-        addExtListItem(item);
+        printf("item->name:%s\n", item->name);
+        addExtListItem(cloneString(item->name));
     }
 
     if (item->val.s.attrs.data)
@@ -407,10 +419,9 @@ void writeExternalsToFile(FILE *fp)
 
 void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
 {
-    ExtPositionData *nextValue = value->next;
     fprintf(fp, "%s BASE %u\n", name, value->base);
     fprintf(fp, "%s OFFSET %u\n", name, value->offset);
-    if (nextValue != NULL && nextValue->base)
+    if (value->next != NULL)
         writeSingleExternal(fp, name, value->next);
 }
 
@@ -443,7 +454,7 @@ void initTables()
 {
     int i = 0;
 
-    if (externalCount)
+    if (externalCount > 0 && extListHead != NULL)
         resetExtList();
 
     while (i < HASHSIZE)

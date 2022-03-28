@@ -88,7 +88,6 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
         des = src;
         src = 0;
     }
-    printf("src:%s des:%s\n", src, des);
 
     if ((expectedOperandsCount == operandsPassedCount) && expectedOperandsCount == 0)
         return True;
