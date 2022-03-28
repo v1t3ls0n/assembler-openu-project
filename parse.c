@@ -12,6 +12,7 @@ static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
 Bool verifyCommaSyntax(char *line);
 Bool handleSingleLine(char *line);
 Bool isLabelDeclarationStrict(char *s);
+
 extern char *splitToken(char *s);
 
 /* @ Function: countAndVerifyDataArguments
@@ -21,15 +22,18 @@ extern char *splitToken(char *s);
    While the function parsing the arguments, ir also counts the number of .data elements that will take size in the data memory.
    In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .data instruction will take.
 */
+
 Bool countAndVerifyDataArguments(char *line)
 {
     Bool isValid = True;
     int size = 0, n = 0, num = 0;
     char c = 0;
     char args[MAX_LINE_LEN + 1] = {0}, *p;
-    /* we make the pointer p to point on the position of the first character coming sfter the .data
-    instruction within the full line, so that p    will point on the begining of the arguments string*/
     line = strstr(line, DATA) + strlen(DATA);
+
+    /* we make the pointer p to point on the position of the first character coming sfter the .data
+     instruction within the full line, so that p will point on the begining of the arguments string*/
+
     /*copies the string of arguments pointer by p into the args local string we will use for parsing*/
     strcpy(args, line);
 
@@ -50,6 +54,7 @@ Bool countAndVerifyDataArguments(char *line)
         p = strtok(NULL, ", \t\n\f\r");
     }
 
+    printf("line:%s size:%d\n", line, size);
     if (isValid)
         increaseDataCounter(size);
 
@@ -75,8 +80,6 @@ Bool verifyCommaSyntax(char *line)
         return yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
     else if (*s && strlen(s) && commasCounter > 0)
         isValid = yieldError(illegalApearenceOfCommaBeforeFirstParameter);
-    else if (!*s && strchr(s, ','))
-        isValid = yieldError(wrongCommasSyntaxIllegalApearenceOfCommasInLine);
 
     commasCounter = 0;
     isFirstToken = True;
@@ -155,13 +158,6 @@ Bool verifyCommaSyntax(char *line)
     return isValid;
 }
 
-/* @ Function: countAndVerifyStringArguments
-   @ Arguments: the function gets char * token which is the current token that we are about to parse the string argument from.
-   @ Description: The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
-   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
-   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
-   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
-*/
 Bool countAndVerifyStringArguments(char *line)
 {
     char *args, *closing = 0, *opening = 0;
@@ -199,18 +195,9 @@ Bool countAndVerifyStringArguments(char *line)
     return True;
 }
 
-/* @ Function: parseLine
-   @ Arguments: The function gets char * token which is the current token that we are about to parse and char *line which is the current line being parsed
-   @ Description: The function checks what is the current globalState, than checks what is the current token (an instruction, an operation, a label declaration...)
-   The function extracts the argument string of the .string instruction, than the function analyses\ parses the string.
-   If the function encounter errors no opening or closing quotes, it yields (prints) the relevant error message.
-   While the function parsing the arguments, ir also counts the length of the .string string (including the \0 at the end) that will take size in the data memory.
-   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .string instruction will take.
-*/
 Bool parseLine(char *token, char *line)
 {
     State (*globalState)() = &getGlobalState;
-    Bool isValid = True;
 
     Bool isValid = True;
     if (isComment(token))
@@ -246,12 +233,6 @@ Bool parseLine(char *token, char *line)
             else
                 return isValid && parseLine(next, line + strlen(token) + 1);
         }
-
-        char *next = (*globalState)() == firstRun ? strtok(NULL, " \t\n\f\r") : strtok(NULL, ", \t\n\f\r");
-        if ((*globalState)() == firstRun)
-            isValid = handleLabel(labelName, newToken, line) && isValid;
-        else
-            isValid = parseLine(next, line + strlen(token) + 1);
     }
 
     else if (isInstruction(token))

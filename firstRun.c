@@ -68,26 +68,8 @@ Bool handleOperation(char *operationName, char *args)
 
     return areOperandsLegal;
 }
-
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
-    int expectedOperandsCount = 0;
-    int operandsPassedCount = 0;
-    Bool isValid = True;
-    if (src)
-        operandsPassedCount++;
-    if (des)
-        operandsPassedCount++;
-    if (op->src.direct || op->src.immediate || op->src.index || op->src.reg)
-        expectedOperandsCount++;
-    if (op->des.direct || op->des.immediate || op->des.index || op->des.reg)
-        expectedOperandsCount++;
-
-    if (expectedOperandsCount == 1 && operandsPassedCount == 1)
-    {
-        des = src;
-        src = 0;
-    }
 
     int expectedOperandsCount = 0;
     int operandsPassedCount = 0;
@@ -145,7 +127,6 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
 
     return isValid;
 }
-
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
     Bool isAny = isValidImmediateParamter(operand) || isValidIndexParameter(operand) || isRegistery(operand) || verifyLabelNaming(operand) || isIndexParameter(operand);
@@ -223,15 +204,21 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
     {
         int dataCounter = getDC();
         Bool isLabelNameAvailable;
+        firstToken[strlen(firstToken) - 1] = '\0';
         isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
+
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
+        else
+            return False;
     }
+    else
+        yieldError(undefinedOperation);
 
     return False;
 }
@@ -255,7 +242,7 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
             if (next)
                 return handleInstruction(instruction, nextToken, next, line) && isValid;
             else
-                isValid = yieldWarning(emptyLabelDecleration);
+                return yieldWarning(emptyLabelDecleration);
         }
         else
             return handleInstruction(instruction, labelName, nextToken, line) && isValid;
@@ -265,16 +252,16 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
     {
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
-        strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
-
+        int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
+        strcpy(args, &line[offset]);
         if (handleOperation(nextToken, args))
-            isValid = addSymbol(labelName, icAddr, 1, 0, 0, 0) && isValid;
+            return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
-            isValid = False;
+            return False;
     }
-    else
-        isValid = yieldError(undefinedLabelDeclaretion);
 
-    free(nextToken);
-    return isValid;
+    else
+        yieldError(illegalLabelUseExpectedOperationOrInstruction);
+
+    return False;
 }
