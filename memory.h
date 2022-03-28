@@ -41,3 +41,16 @@ void writeMemoryImageToObFile(FILE *fp);
    @ Description: The function generates the .ob memory image of the code. It writes into the .ob file word by word using helper functions to convert binary word into an hex word.
    The function doesn't return any value.
 */
+
+void printMemoryImgInRequiredObjFileFormat();
+void calcFinalAddrsCountersValues();
+void printWordBinary(unsigned index);
+void addWordToCodeImage(char *s);
+void addWordToDataImage(char *s);
+void addWord(int value, DataType type);
+void printBinaryImg();
+
+unsigned getDC();
+unsigned getIC();
+unsigned getICF();
+unsigned getDCF();
