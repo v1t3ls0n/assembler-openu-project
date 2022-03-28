@@ -21,6 +21,7 @@ extern void parseAssemblyCode(FILE *src);
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
+<<<<<<< HEAD
 char *getNextToken(char *s);
 char *splitToken(char *s);
 char *trimFromRight(char *s);
@@ -33,6 +34,11 @@ char *getOperationName(char *s);
    @ Description:This function is the main function of parsing operations. It splits the operands from the line, it calls to the functions to validate them.
    For instance, it calls to parseOperand to validate that all of the operation are legal.
    */
+=======
+
+extern Bool isIndexParameter(char *s);
+
+>>>>>>> 6bed85ffa8ad18bbd86395e1f0d312d190915fe3
 Bool handleOperation(char *operationName, char *args)
 {
     Operation *p = getOperationByName(operationName);
@@ -53,16 +59,11 @@ Bool handleOperation(char *operationName, char *args)
         {
             extra = strtok(NULL, ", \t\n\f\r");
             if (extra)
-                yieldError(extraOperandsPassed);
+                areOperandsLegal = yieldError(extraOperandsPassed);
         }
         else
-        {
             second = 0;
-            /*             second = first;
-                        first = 0; */
-        }
     }
-
     areOperandsLegal = parseOperands(first, second, p, active) && areOperandsLegal;
 
     if (areOperandsLegal)
@@ -80,7 +81,7 @@ Bool handleOperation(char *operationName, char *args)
         increaseInstructionCounter(size);
     }
 
-    return areOperandsLegal ? True : False;
+    return areOperandsLegal;
 }
 /* @ Function: handleOperation
    @ Arguments: This function gets the source and destination operands, the operation and the posible addresing method of each of the operands.
@@ -90,6 +91,7 @@ Bool handleOperation(char *operationName, char *args)
    */
 Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
 {
+
     int expectedOperandsCount = 0;
     int operandsPassedCount = 0;
     Bool isValid = True;
@@ -153,22 +155,26 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
    */
 Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type)
 {
+    Bool isAny = isValidImmediateParamter(operand) || isValidIndexParameter(operand) || isRegistery(operand) || verifyLabelNaming(operand) || isIndexParameter(operand);
     Bool isImmediate = isValidImmediateParamter(operand);
     Bool isDirectIndex = !isImmediate && isValidIndexParameter(operand);
     Bool isReg = !isDirectIndex && !isImmediate && isRegistery(operand);
     Bool isDirect = !isReg && !isDirectIndex && !isImmediate && verifyLabelNaming(operand);
 
-    if (!isReg && !isImmediate && !isDirect && !isDirectIndex)
-        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
+    if (isIndexParameter(operand) && !isDirectIndex)
+        return yieldError(registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange);
+
+    if (!isAny)
+        return type == 1 ? yieldError(illegalInputPassedAsOperandDesOperand) : yieldError(illegalInputPassedAsOperandSrcOperand);
 
     else if (!allowedAddrs.reg && isReg)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.immediate && isImmediate)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.direct && isDirect)
-        return yieldError(illegalOperand);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
     else if (!allowedAddrs.index && isDirectIndex)
-        return yieldError(operandTypeDoNotMatch);
+        return type == 1 ? yieldError(desOperandTypeIsNotAllowed) : yieldError(srcOperandTypeIsNotAllowed);
 
     active[type].direct = isDirect;
     active[type].reg = isReg;
@@ -224,50 +230,43 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
     {
         int dataCounter = getDC();
         Bool isLabelNameAvailable;
+        firstToken[strlen(firstToken) - 1] = '\0';
         isLabelNameAvailable = !isLabelNameAlreadyTaken(firstToken, Symbol);
         if (!isLabelNameAvailable)
             yieldError(illegalSymbolNameAlreadyInUse);
 
         if (((type == _TYPE_DATA && countAndVerifyDataArguments(line)) || (type == _TYPE_STRING && countAndVerifyStringArguments(line))) && isLabelNameAvailable)
         {
+
             return addSymbol(firstToken, dataCounter, 0, 1, 0, 0) ? True : False;
         }
+        else
+            return False;
     }
+    else
+        yieldError(undefinedOperation);
 
     return False;
 }
 Bool handleLabel(char *labelName, char *nextToken, char *line)
 {
     Bool isValid = True;
-    char *firstToken = 0;
-    nextToken = trimFromLeft(nextToken);
-    firstToken = nextToken;
-
-    if (nextToken[0] == ':')
-        nextToken++;
-    nextToken = splitToken(nextToken);
+    if (!labelName || !nextToken || !line)
+        return False;
     if (isInstruction(nextToken))
     {
         int instruction = getInstructionType(nextToken);
-        int len = strlen(getInstructionNameByType(instruction)) + 1;
-        char cleanInstruction[MAX_INSTRUCTION_NAME_LEN + 1] = {0}, *end = 0;
-        strncpy(cleanInstruction, nextToken, len);
-        end = cleanInstruction;
-        while (!isspace(*end) && *end != '\0')
-            end++;
-        if (isspace(*end))
-            *end = '\0';
-
-        if (strlen(getInstructionNameByType(instruction)) != strlen(cleanInstruction))
+        if (!isInstructionStrict(nextToken))
         {
             isValid = yieldError(missinSpaceAfterInstruction);
-            nextToken = nextToken + strlen(getInstructionNameByType(instruction));
+            nextToken = getInstructionNameByType(instruction);
         }
 
         if (instruction == _TYPE_ENTRY || instruction == _TYPE_EXTERNAL)
         {
-            if (nextToken)
-                return handleInstruction(instruction, firstToken, nextToken, line) && isValid;
+            char *next = strtok(NULL, " \t\n\f\r");
+            if (next)
+                return handleInstruction(instruction, nextToken, next, line) && isValid;
             else
                 return yieldWarning(emptyLabelDecleration);
         }
@@ -279,42 +278,16 @@ Bool handleLabel(char *labelName, char *nextToken, char *line)
     {
         int icAddr = getIC();
         char args[MAX_LINE_LEN] = {0};
-        strcpy(args, (strstr(line, nextToken) + strlen(nextToken)));
-        printf("args:%s\n", args);
-
+        int offset = (int)(strlen(labelName) + strlen(nextToken) + 1);
+        strcpy(args, &line[offset]);
         if (handleOperation(nextToken, args))
             return addSymbol(labelName, icAddr, 1, 0, 0, 0) ? True : False;
         else
             return False;
     }
+
     else
-        return yieldError(undefinedLabelDeclaretion);
+        yieldError(illegalLabelUseExpectedOperationOrInstruction);
 
     return False;
-}
-
-char *getNextToken(char *s)
-{
-    char *start = s;
-    while (*start != '\0' && !isspace(*start) && *start != ',')
-        start++;
-    return start;
-}
-
-char *splitToken(char *s)
-{
-    char *start = 0, *end;
-    char *nextToken;
-    s = trimFromLeft(s);
-    nextToken = (char *)calloc(strlen(s) + 1, sizeof(char *));
-    strcpy(nextToken, s);
-    start = nextToken;
-    end = start;
-    while (*end != '\0' && !isspace(*end))
-        end++;
-
-    if (*end)
-        *end = '\0';
-
-    return start;
 }

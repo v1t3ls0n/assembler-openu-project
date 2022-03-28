@@ -117,6 +117,17 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+
+    case registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange:
+        fprintf(errorsFile, "illegal use of registery index operand addressing method\nRegistery Index addr method is allows to use only registeries\n that are between the r10 - r15!");
+        break;
+    case illegalInputPassedAsOperandSrcOperand:
+        fprintf(errorsFile, "illegal operands input passed to source operand ");
+        break;
+
+    case illegalInputPassedAsOperandDesOperand:
+        fprintf(errorsFile, "illegal operands input passed to destination operand ");
+        break;
     case undefinedLabelDeclaretion:
         fprintf(errorsFile, "undefined Label Declaretion");
         break;
@@ -157,11 +168,11 @@ void yieldErrorIntoFile(Error err)
         fprintf(errorsFile, "illegal Label Name Use Of Saved Keyword.\n");
         break;
     case desOperandTypeIsNotAllowed:
-        fprintf(errorsFile, "illegal input passed as destination operand!");
+        fprintf(errorsFile, "type of destination operand passed to operation is not accepted!");
         break;
 
     case srcOperandTypeIsNotAllowed:
-        fprintf(errorsFile, "illegal input passed as source operand!");
+        fprintf(errorsFile, "type of source operand passed to operation is not accepted!");
         break;
     case illegalOverrideOfLocalSymbolWithExternalSymbol:
         fprintf(errorsFile, "symbol already declared and defined locally,\nso it could not be re-declared as external variable.");
@@ -209,11 +220,6 @@ void yieldErrorIntoFile(Error err)
         break;
     }
 
-    case illegalOperand:
-    {
-        fprintf(errorsFile, "illegal Operand!");
-        break;
-    }
     case operandTypeDoNotMatch:
     {
         fprintf(errorsFile, "Operand type does not fit to current operation");
@@ -401,6 +407,23 @@ Bool yieldError(Error err)
     switch (err)
     {
 
+    case registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange:
+        fprintf(stderr, "illegal use of registery index operand addressing method\nRegistery Index addr method is allows to use only registeries\n that are between the r10 - r15!");
+        break;
+    case illegalInputPassedAsOperandSrcOperand:
+        fprintf(stderr, "illegal operands input passed to source operand ");
+        break;
+
+    case illegalInputPassedAsOperandDesOperand:
+        fprintf(stderr, "illegal operands input passed to destination operand ");
+        break;
+    case desOperandTypeIsNotAllowed:
+        fprintf(stderr, "type of destination operand passed to operation is not accepted!");
+        break;
+
+    case srcOperandTypeIsNotAllowed:
+        fprintf(stderr, "type of source operand passed to operation is not accepted!");
+        break;
     case undefinedLabelDeclaretion:
         fprintf(stderr, "undefined Label Declaretion");
         break;
@@ -442,13 +465,7 @@ Bool yieldError(Error err)
     case illegalLabelNameUseOfSavedKeywords:
         fprintf(stderr, "illegal Label Name Use Of Saved Keyword.\n");
         break;
-    case desOperandTypeIsNotAllowed:
-        fprintf(stderr, "illegal input passed as destination operand!");
-        break;
 
-    case srcOperandTypeIsNotAllowed:
-        fprintf(stderr, "illegal input passed as source operand!");
-        break;
     case illegalOverrideOfLocalSymbolWithExternalSymbol:
         fprintf(stderr, "symbol already declared and defined locally,\nso it could not be re-declared as external variable.");
         break;
@@ -495,11 +512,6 @@ Bool yieldError(Error err)
         break;
     }
 
-    case illegalOperand:
-    {
-        fprintf(stderr, "illegal Operand!");
-        break;
-    }
     case operandTypeDoNotMatch:
     {
         fprintf(stderr, "Operand type does not fit to current operation");

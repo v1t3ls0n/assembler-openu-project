@@ -34,8 +34,6 @@ int handleSourceFiles(int argc, char *argv[])
         i++;
     }
 
-    closeOpenLogFiles();
-
     return True;
 }
 
@@ -83,9 +81,9 @@ void handleSingleFile(char *arg)
 
         if ((*globalState)() == firstRun)
         {
+
             printMacroTable();
             rewind(target);
-            /* First run: */
             parseAssemblyCode(target);
             if ((*globalState)() == secondRun)
             {
@@ -94,7 +92,6 @@ void handleSingleFile(char *arg)
                 allocMemoryImg();
                 printSymbolTable();
                 rewind(target);
-                /* Second Run: */
                 parseAssemblyCode(target);
                 if ((*globalState)() == exportFiles)
                 {
@@ -106,7 +103,7 @@ void handleSingleFile(char *arg)
                     printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
             else
-                printf("\nFirst Run Finished With Errors, will not enter second run!\n");
+                printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
         }
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
@@ -114,5 +111,7 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
+
+        closeOpenLogFiles();
     }
 }

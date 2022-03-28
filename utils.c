@@ -66,9 +66,32 @@ Bool isValidImmediateParamter(char *s)
             return False;
     return True;
 }
+Bool isIndexParameter(char *s)
+{
+    int len = strlen(s);
+    char *opening = 0, *closing = 0;
+    Bool result = True;
+    if (len < 5)
+        return False;
+    else if ((opening = strchr(s, '[')) == NULL || (closing = strchr(s, ']')) == NULL)
+        return False;
+    else if (closing < opening || (s[len - 1] != ']'))
+        return False;
+    else
+    {
+        opening++;
+        *closing = '\0';
+        if (!isRegistery(opening))
+            result = False;
+        *closing = ']';
+    }
+    return result;
+}
+
 Bool isValidIndexParameter(char *s)
 {
     int len = strlen(s);
+    Bool result = True;
     if (len < 6)
         return False;
 
@@ -76,15 +99,18 @@ Bool isValidIndexParameter(char *s)
         return False;
     else
     {
-        s = strchr(s, '[');
-        s++;
+        char *opening = 0;
+        opening = strchr(s, '[');
+        opening++;
+        s[len - 1] = '\0';
 
-        s[strlen(s) - 1] = 0;
-
-        if (isRegistery(s) && getRegisteryNumber(s) < 10)
-            return False;
+        if (isRegistery(opening) && getRegisteryNumber(opening) < 10)
+        {
+            result = False;
+        }
+        s[len - 1] = ']';
     }
-    return True;
+    return result;
 }
 
 Bool isComment(char *s)
@@ -173,7 +199,7 @@ Bool verifyLabelNaming(char *s)
         return False;
 
     /* maximum label name length is 31 characters */
-    if (strlen(s) > MAX_LABEL_LEN)
+    if (labelLength > MAX_LABEL_LEN || labelLength < 1)
         return False;
 
     if (isRegistery(s))
@@ -206,7 +232,9 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
         return yieldError(illegalLabelNameUseOfCharacters);
 
     /* maximum label name length is 31 characters */
-    else if (strlen(s) > MAX_LABEL_LEN)
+    else if (labelLength > MAX_LABEL_LEN)
+        return yieldError(illegalLabelNameLength);
+    else if (labelLength < 1)
         return yieldError(illegalLabelNameLength);
 
     else if (isRegistery(s))

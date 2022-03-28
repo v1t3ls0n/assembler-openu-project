@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ;this file will include errors
 .entry B 
 ;empty data instruction
@@ -77,3 +78,6 @@ P: .string     gfbgrbr"
 ;string instruction without " (opening and closing) 
 Q: .string uhuf   
 >>>>>>> 6a084274a8a6fd72d47f483c9ad30e63bf2556a8
+=======
+A:.data5 , 6 ,3
+>>>>>>> new-restored

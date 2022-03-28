@@ -39,7 +39,8 @@ typedef enum
     missinSpaceAfterInstruction,
     missingSpaceBetweenLabelDeclaretionAndInstruction,
     maxLineLengthExceeded,
-    illegalOperand,
+    illegalInputPassedAsOperandSrcOperand,
+    illegalInputPassedAsOperandDesOperand,
     none,
     noErrors,
     expectedNumber,
@@ -71,7 +72,8 @@ typedef enum
     extraOperandsPassed,
     emptyStringDeclatretion,
     emptyLabelDecleration,
-    undefinedLabelDeclaretion
+    undefinedLabelDeclaretion,
+    registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange
 
 } Error;
 

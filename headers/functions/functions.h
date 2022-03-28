@@ -152,6 +152,7 @@ char *numToBin(int num);
 int countConsecutiveCommas(char *s);
 int countLengthOfNonDigitToken(char *s);
 char *cloneString(char *s);
+char *splitToken(char *s);
 
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
@@ -211,6 +212,4 @@ Bool writeStringInstruction(char *s);
 Bool writeDataInstruction(char *s);
 void writeSingleExternalsFile(char *name, unsigned base, unsigned offset);
 
-/*  IN UTILS.C */
-
-Bool isLabelDeclaration(char *s);
+Bool isIndexParameter(char *s);
