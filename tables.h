@@ -35,11 +35,12 @@ Item *lookup(char *s, ItemType type);
    (symbols/macros tables acts as singly linked list within the hash table in those fcases)
    it returns a pointer to a typedef struct Item for the new Item added to the table;
 */
-
 Item *install(char *name, ItemType type);
+
 void initTables();
 void freeHashTable(ItemType type);
 void freeTableItem(Item *item);
+
 /*#####################################################################*/
 /*#####################################################################*/
 /*##########################Symbols functions#############################*/
@@ -64,6 +65,8 @@ Bool areEntriesExist();
 Bool areExternalsExist();
 void printSymbolTable();
 int printSymbolItem(Item *item);
+void writeEntriesToFile(FILE *fp);
+int writeSingleEntry(Item *item, FILE *fp, int count);
 
 /*#####################################################################*/
 /*#####################################################################*/
@@ -87,14 +90,5 @@ ExtListItem *findExtOpListItem(char *name);
 void resetExtList();
 void updateExtPositionData(char *name, unsigned base, unsigned offset);
 void addExtListItem(char *name);
-
-/*#####################################################################*/
-/*#####################################################################*/
-/*########################### Output to file functions #################*/
-/*#####################################################################*/
-/*#####################################################################*/
 void writeExternalsToFile(FILE *fp);
 void writeSingleExternal(FILE *fp, char *name, unsigned base, unsigned offset, ExtPositionData *next);
-
-void writeEntriesToFile(FILE *fp);
-int writeSingleEntry(Item *item, FILE *fp, int count);
