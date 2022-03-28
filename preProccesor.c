@@ -1,8 +1,8 @@
-#include "data.h"
+#include "preProccesor.h"
 void (*setState)() = &setGlobalState;
 State (*globalState)() = &getGlobalState;
 
-Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
+void parseMacros(char *line, char *token, FILE *src, FILE *target)
 {
     static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
@@ -14,13 +14,14 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     extern Item *addMacro(char *name, int start, int end);
     extern Item *updateMacro(char *name, int start, int end);
     extern Item *getMacro(char *s);
+
     if (!isReadingMacro)
     {
         if (!isMacroOpening(token))
             fprintf(target, "%s", line);
     }
     if (!isPossiblyUseOfMacro(token) && !isMacroOpening(token) && !isMacroClosing(token))
-        return True;
+        return;
     else
     {
         if (isMacroOpening(token))
@@ -74,7 +75,7 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
         }
     }
 
-    return True;
+    return;
 }
 
 void parseSourceFile(FILE *src, FILE *target)
