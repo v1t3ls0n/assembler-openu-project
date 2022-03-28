@@ -7,8 +7,8 @@ macro m1
  inc r6
  mov r3, W
 endm
-lea STR, r6
-inc r6
+lea STR, W
+inc W
 mov r3, W
 sub r1, r4
 bne END
