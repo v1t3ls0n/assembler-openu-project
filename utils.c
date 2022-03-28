@@ -82,10 +82,7 @@ Bool isIndexParameter(char *s)
         opening++;
         *closing = '\0';
         if (!isRegistery(opening))
-        {
-            printf("not registery!!!!!!!!!!!!!\n");
             result = False;
-        }
         *closing = ']';
     }
     return result;
@@ -202,7 +199,7 @@ Bool verifyLabelNaming(char *s)
         return False;
 
     /* maximum label name length is 31 characters */
-    if (strlen(s) > MAX_LABEL_LEN)
+    if (labelLength > MAX_LABEL_LEN || labelLength < 1)
         return False;
 
     if (isRegistery(s))
@@ -235,7 +232,9 @@ Bool verifyLabelNamingAndPrintErrors(char *s)
         return yieldError(illegalLabelNameUseOfCharacters);
 
     /* maximum label name length is 31 characters */
-    else if (strlen(s) > MAX_LABEL_LEN)
+    else if (labelLength > MAX_LABEL_LEN)
+        return yieldError(illegalLabelNameLength);
+    else if (labelLength < 1)
         return yieldError(illegalLabelNameLength);
 
     else if (isRegistery(s))
