@@ -1,16 +1,12 @@
 #include "data.h"
-
 void handleSingleFile(char *arg);
-
 int main(int argc, char *argv[])
 {
     handleSourceFiles(argc, argv);
     return 0;
 }
-
 int handleSourceFiles(int argc, char *argv[])
 {
-
     int filesCount = argc - 1;
     int i = 1;
     if (filesCount < 1)
@@ -18,13 +14,11 @@ int handleSourceFiles(int argc, char *argv[])
         fprintf(stderr, "\n\nYou did not passed any source files to the assembler!\n\n");
         exit(1);
     }
-
     while (--argc)
     {
         handleSingleFile(argv[i]);
         i++;
     }
-
     return 0;
 }
 
@@ -51,8 +45,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        free(fileName);
-        return;
+        /*         free(fileName);
+                return; */
     }
 
     fileName[strlen(fileName) - 1] = 'm';
@@ -64,8 +58,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
         fclose(src);
-        free(fileName);
-        return;
+        /*         free(fileName);
+                return; */
     }
 
     else
