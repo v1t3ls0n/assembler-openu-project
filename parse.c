@@ -1,28 +1,6 @@
 #include "data.h"
-#include <stdarg.h>
-
-extern Bool yieldError(Error err);
-extern Bool yieldWarning(Warning err);
-extern char *trimFromLeft(char *s);
-extern int countConsecutiveCommas(char *s);
-extern int countLengthOfNonDigitToken(char *s);
 static void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
-extern FILE *getSourceFilePointer();
 static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
-Bool verifyCommaSyntax(char *line);
-Bool handleSingleLine(char *line);
-Bool isLabelDeclarationStrict(char *s);
-
-extern char *splitToken(char *s);
-
-/* @ Function: countAndVerifyDataArguments
-   @ Arguments: the function get char * line which is the current line that we are about to parse the data arguments from.
-   @ Description: The function extracts the argument string of the .data instruction, than the function analyses\ parses the string.
-   If the function encounter errors or illegal arguments, it yields (prints) the relevant error message and keeps on parsing the rest of the line in order to find and report all the errors.
-   While the function parsing the arguments, ir also counts the number of .data elements that will take size in the data memory.
-   In the end of the function, if after parsing the line turns out to be valid, it increases the data counter with the size in memory that the current .data instruction will take.
-*/
-
 Bool countAndVerifyDataArguments(char *line)
 {
     Bool isValid = True;

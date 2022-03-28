@@ -1,18 +1,4 @@
 #include "data.h"
-char *splitToken(char *s)
-{
-    char *start = 0, *end;
-    char *nextToken;
-    s = trimFromLeft(s);
-    nextToken = (char *)calloc(strlen(s) + 2, sizeof(char *));
-    strcpy(nextToken, s);
-    start = nextToken;
-    end = start;
-    while (*end != '\0' && !isspace(*end))
-        end++;
-
-    return start;
-}
 
 char *cloneString(char *s)
 {
@@ -23,40 +9,12 @@ char *cloneString(char *s)
     strcpy(copy, s);
     return copy;
 }
-
 char *trimFromLeft(char *s)
 {
     while (isspace(*s) && *s != '\0')
         s++;
     return s;
 }
-
-char *trimFromRight(char *s)
-{
-    long offset = strlen(s) - 1;
-    char *start = s;
-    s += offset;
-    while (isspace(*s))
-        s--;
-    return start;
-}
-int countSpaceCharacters(char *s)
-{
-    int i = 0;
-    for (i = 0; isspace(*s); s++, i++)
-        ;
-    return i;
-}
-
-unsigned calcNumberCharactersLength(int num)
-{
-    unsigned count = 1;
-    while (num / 10)
-        count++;
-
-    return count;
-}
-
 char *decToHex(int num)
 {
     int i = num, size = 0;
@@ -67,70 +25,80 @@ char *decToHex(int num)
     sprintf(hex, "%05x", num);
     return hex;
 }
-
-char *hexToBin(char *hex)
+char *numToBin(int num)
 {
     int i = 0;
-    char *binaryStr = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
+    unsigned int result;
+    char *word, hex[6];
+    word = (char *)calloc(BINARY_WORD_SIZE + 1, sizeof(char *));
+    if (num < 0)
+    {
+        result = abs(num);
+        result = ~result;
+        result++;
+        sprintf(hex, "%05x", (int)(result & 0x4ffff));
+    }
+    else
+        sprintf(hex, "%05x", (int)num & 0xfffff);
 
-    while (hex[i] != '\0' && i < 5)
+    while (hex[i] != '\0')
     {
         switch (hex[i])
         {
 
         case '0':
-            strcat(binaryStr, " 0000");
+            strcat(word, "0000");
             break;
         case '1':
-            strcat(binaryStr, " 0001");
+            strcat(word, "0001");
             break;
         case '2':
-            strcat(binaryStr, " 0010");
+            strcat(word, "0010");
             break;
         case '3':
-            strcat(binaryStr, " 0011");
+            strcat(word, "0011");
             break;
         case '4':
-            strcat(binaryStr, " 0100");
+            strcat(word, "0100");
             break;
         case '5':
-            strcat(binaryStr, " 0101");
+            strcat(word, "0101");
             break;
         case '6':
-            strcat(binaryStr, " 0110");
+            strcat(word, "0110");
             break;
         case '7':
-            strcat(binaryStr, " 0111");
+            strcat(word, "0111");
             break;
         case '8':
-            strcat(binaryStr, " 1000");
+            strcat(word, "1000");
             break;
         case '9':
-            strcat(binaryStr, " 1001");
+            strcat(word, "1001");
             break;
         case 'A':
         case 'a':
-            strcat(binaryStr, " 1010");
+            strcat(word, "1010");
             break;
         case 'B':
         case 'b':
-            strcat(binaryStr, " 1011");
+            strcat(word, "1011");
             break;
         case 'C':
         case 'c':
-            strcat(binaryStr, " 1100");
+            strcat(word, "1100");
             break;
         case 'D':
         case 'd':
-            strcat(binaryStr, " 1101");
+            strcat(word, "1101");
             break;
         case 'E':
         case 'e':
-            strcat(binaryStr, " 1110");
+            strcat(word, "1110");
             break;
         case 'F':
         case 'f':
-            strcat(binaryStr, " 1111");
+            strcat(word, "1111");
             break;
         default:
             break;
@@ -139,32 +107,81 @@ char *hexToBin(char *hex)
         i++;
     }
 
-    strcat(binaryStr, "\0");
-    return binaryStr;
+    strcat(word, "\0");
+    return word;
 }
-int hex2int(char ch)
+HexWord *convertBinaryWordToHex(BinaryWord *word)
 {
-    if (ch >= '0' && ch <= '9')
-        return ch - '0';
-    if (ch >= 'A' && ch <= 'F')
-        return ch - 'A' + 10;
-    if (ch >= 'a' && ch <= 'f')
-        return ch - 'a' + 10;
-    return -1;
-}
+    int i = 0;
+    char hexDigits[4] = {0};
+    HexWord *newHex = (HexWord *)malloc(sizeof(HexWord));
+    for (i = BINARY_WORD_SIZE - 1; i >= 0; i--)
+    {
+        hexDigits[i % 4] = word->digit[i].on ? '1' : '0';
+        if (i % 4 == 0)
+        {
+            switch (i)
+            {
+            case 16:
+                newHex->_E = binaryStringToHexNumber(hexDigits);
+                break;
+            case 12:
+                newHex->_D = binaryStringToHexNumber(hexDigits);
+                break;
+            case 8:
+                newHex->_C = binaryStringToHexNumber(hexDigits);
+                break;
+            case 4:
+                newHex->_B = binaryStringToHexNumber(hexDigits);
+                break;
+            case 0:
+                newHex->_A = binaryStringToHexNumber(hexDigits);
+                break;
+            default:
+                break;
+            }
 
-int countConsecutiveCommas(char *s)
-{
-    int counter = 0;
-    for (; s && *s == ','; counter++, s++)
-        ;
-    return counter;
-}
+            memset(hexDigits, 0, 4);
+        }
+    }
 
-int countLengthOfNonDigitToken(char *s)
+    return newHex;
+}
+unsigned binaryStringToHexNumber(char binaryStr[4])
 {
-    int count = 0;
-    for (; !isdigit(*s) && *s != ','; s++, count++)
-        ;
-    return count;
+
+    if (!strcmp(binaryStr, "0000"))
+        return 0;
+    if (!strcmp(binaryStr, "0001"))
+        return 1;
+    if (!strcmp(binaryStr, "0010"))
+        return 2;
+    if (!strcmp(binaryStr, "0011"))
+        return 3;
+    if (!strcmp(binaryStr, "0100"))
+        return 4;
+    if (!strcmp(binaryStr, "0101"))
+        return 5;
+    if (!strcmp(binaryStr, "0110"))
+        return 6;
+    if (!strcmp(binaryStr, "0111"))
+        return 7;
+    if (!strcmp(binaryStr, "1000"))
+        return 8;
+    if (!strcmp(binaryStr, "1001"))
+        return 9;
+    if (!strcmp(binaryStr, "1010"))
+        return 0xA;
+    if (!strcmp(binaryStr, "1011"))
+        return 0xB;
+    if (!strcmp(binaryStr, "1100"))
+        return 0xC;
+    if (!strcmp(binaryStr, "1101"))
+        return 0xD;
+    if (!strcmp(binaryStr, "1110"))
+        return 0xE;
+    if (!strcmp(binaryStr, "1111"))
+        return 0xF;
+
+    return 0;
 }

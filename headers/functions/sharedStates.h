@@ -1,4 +1,3 @@
-#include "sharedStates.c"
 
 void setGlobalState(State newState);
 /* @ Function: setGlobalState

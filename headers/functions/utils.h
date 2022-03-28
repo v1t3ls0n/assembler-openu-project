@@ -1,4 +1,4 @@
-#include "utils.c"
+
 
 Bool isMacroOpening(char *s);
 /* @ Function: isMacroOpening
@@ -62,6 +62,13 @@ Bool isValidIndexParameter(char *s);
    Returns true if it is a valid index parameter, and false if it isn't.
 */
 
+Bool isIndexParameter(char *s);
+/* @ Function: isIndexParameter
+   @ Arguments: The function gets a char *s, the string it checks whether it is a index parameter or not.
+   @ Description:The function checks if char *s is a valid index parameter by checkin if it is a label and a register (any register, not strict to 10-15) in parenthesis afterwards
+   Returns true if it is a valid index parameter, and false if it isn't.
+*/
+
 Bool isComment(char *s);
 /* @ Function: isComment
    @ Arguments: The function gets a char *s, the string it checks whether it is a comment or not.
@@ -102,6 +109,9 @@ int getRegisteryNumber(char *s);
     @ Description: The function checks what is the number of the register by checking the number at the end of the string
     Returns the number of the register.
 */
+
+char *getInstructionName(char *s);
+
 char *getInstructionNameByType(int type);
 /* @ Function: getInstructionNameByType
    @ Arguments: The function gets int type- the type of instruction.

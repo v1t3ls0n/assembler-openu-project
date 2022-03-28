@@ -1,8 +1,6 @@
 #include "data.h"
-extern Bool yieldError(Error err);
-extern Bool yieldWarning(Warning err);
 
-extern Operation *getOperationByName(char *s);
+/* extern Operation *getOperationByName(char *s);
 extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
 extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
 extern Bool verifyLabelNaming(char *s);
@@ -10,19 +8,9 @@ extern void increaseDataCounter(int amount);
 extern void increaseInstructionCounter(int amount);
 extern unsigned getDC();
 extern unsigned getIC();
-extern Bool writeOperationBinary(char *operationName, char *args);
+extern Bool writeOperationBinary(char *operationName, char *args); */
 
 /* parse.c */
-extern Bool countAndVerifyDataArguments(char *line);
-extern Bool countAndVerifyStringArguments(char *line);
-
-extern void parseAssemblyCode(FILE *src);
-
-extern Bool writeStringInstruction(char *s);
-extern Bool writeDataInstruction(char *s);
-extern Bool verifyCommaSyntax(char *line);
-
-extern Bool isIndexParameter(char *s);
 
 Bool handleOperation(char *operationName, char *args)
 {

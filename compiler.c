@@ -1,25 +1,12 @@
 #include "data.h"
 
-extern void resetMemoryCounters();
-extern void initTables();
-extern void exportFilesMainHandler();
-extern void closeOpenLogFiles();
-extern void allocMemoryImg();
-extern void calcFinalAddrsCountersValues();
-extern void freeHashTable(ItemType type);
-void handleSingleFile(char *arg);
-
 int main(int argc, char *argv[])
 {
-
     handleSourceFiles(argc, argv);
-
     return 0;
 }
-
 int handleSourceFiles(int argc, char *argv[])
 {
-
     int filesCount = argc - 1;
     int i = 1;
     if (filesCount < 1)
@@ -27,22 +14,26 @@ int handleSourceFiles(int argc, char *argv[])
         fprintf(stderr, "\n\nYou did not passed any source files to the assembler!\n\n");
         exit(1);
     }
-
     while (--argc)
     {
         handleSingleFile(argv[i]);
         i++;
     }
-
     return 0;
 }
-
 void handleSingleFile(char *arg)
 {
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
     char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
+    extern void resetMemoryCounters();
+    extern void initTables();
+    extern void exportFilesMainHandler();
+    extern void closeOpenLogFiles();
+    extern void allocMemoryImg();
+    extern void calcFinalAddrsCountersValues();
+    extern void freeHashTable(ItemType type);
 
     strncpy(fileName, arg, strlen(arg));
     strcat(fileName, ".as");
@@ -65,8 +56,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         fclose(src);
-                free(fileName);
+        fclose(src);
+        /*         free(fileName);
                 return; */
     }
 

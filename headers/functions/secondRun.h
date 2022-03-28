@@ -1,4 +1,3 @@
-#include "secondRun.c"
 
 Bool writeOperationBinary(char *operationName, char *args);
 /* @ Function: writeOperationBinary

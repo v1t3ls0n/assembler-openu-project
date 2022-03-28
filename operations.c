@@ -18,7 +18,6 @@ static Operation operations[OP_SIZE] = {
     {0x4000, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
-
 Bool isOperationName(char *s)
 {
     return getOpIndex(s) != -1 ? True : False;

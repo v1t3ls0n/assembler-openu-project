@@ -1,37 +1,5 @@
-
 #include "data.h"
 
-extern void writeToCurrentExternalsFile(char *name, unsigned base, unsigned offset);
-
-/* from firstRun.c */
-extern Bool handleSingleLine(char *line);
-extern Bool handleFirstToken(char *token, char *line, Bool state);
-extern int getInstructionType(char *s);
-extern Bool isOperation(char *s);
-extern Bool isValidIndexParameter(char *s);
-extern Bool isRegistery(char *s);
-extern Bool isValidImmediateParamter(char *s);
-extern Bool isComment(char *s);
-
-/* from table.c: */
-extern int getSymbolBaseAddress(char *name);
-extern int getSymbolOffset(char *name);
-extern Bool isExternal(char *name);
-
-extern Bool isEntry(char *name);
-extern Bool isNonEmptyEntry(char *name);
-extern void updateExtPositionData(char *name, unsigned base, unsigned offset);
-/* from operation.c */
-extern Operation *getOperationByName(char *s);
-
-/* from memory.c */
-extern unsigned getDC();
-extern unsigned getIC();
-extern void addWord(int value, DataType type);
-extern void parseAssemblyCode(FILE *src);
-
-extern Bool parseLine(char *token, char *line);
-extern Bool handleSingleLine(char *line);
 void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
 Bool writeOperationBinary(char *operationName, char *args)
 {

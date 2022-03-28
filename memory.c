@@ -1,15 +1,15 @@
-
 #include "data.h"
-extern HexWord *convertBinaryWordToHex(BinaryWord *word);
-extern char *numToBin(int num);
 
-void covertBinaryMemoryImageToHexImageForObFile();
 static BinaryWord *binaryImg = NULL;
 static HexWord *hexImg = NULL;
 unsigned static IC = MEMORY_START;
 unsigned static DC = 0;
 unsigned static ICF = 0;
 unsigned static DCF = 0;
+
+extern HexWord *convertBinaryWordToHex(BinaryWord *word);
+extern char *numToBin(int num);
+extern unsigned binaryStringToHexNumber(char binaryStr[4]);
 
 unsigned getDC() { return DC; }
 unsigned getIC() { return IC; }

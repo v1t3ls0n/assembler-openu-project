@@ -1,10 +1,9 @@
 #include "data.h"
-
 static Item *symbols[HASHSIZE] = {0};
 static Item *macros[HASHSIZE] = {0};
-
 static unsigned entriesCount = 0;
 static unsigned externalCount = 0;
+
 static ExtListItem *extListHead = NULL;
 extern unsigned getICF();
 extern Bool verifyLabelNaming(char *s);
@@ -480,23 +479,24 @@ void freeHashTable(ItemType type)
     int i = 0;
     while (i < HASHSIZE)
     {
-        if (type == Macro ? (macros[i] != NULL) : (symbols[i] != NULL))
+
+        if (type == Symbol)
         {
-
-            free(type == Macro ? macros[i] : symbols[i]);
-            /* freeTableItem(type == Macro ? macros[i] : symbols[i]); */
+            if (symbols[i] != NULL)
+                freeTableItem(symbols[i]);
         }
-        i++;
-    }
-}
+        else
+        {
+            if (macros[i] != NULL)
+                freeTableItem(macros[i]);
+        }
 
-void freeMacrosTable()
-{
-    int i = 0;
-    while (i < HASHSIZE)
-    {
-        if (macros[i] != NULL)
-            freeTableItem(macros[i]);
+        /*         if (type == Macro ? (macros[i] != NULL) : (symbols[i] != NULL))
+                {
+
+                    freeTableItem(type == Macro ? macros[i] : symbols[i]);
+                } */
+
         i++;
     }
 }
@@ -505,7 +505,7 @@ void freeTableItem(Item *item)
 {
     if (item->next != NULL)
         freeTableItem(item->next);
-    printf("item->name:%s\n", item->name);
+    /*     printf("item->name:%s\n", item->name); */
     free(item);
     return;
 }
