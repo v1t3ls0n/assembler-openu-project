@@ -10,18 +10,23 @@ extern unsigned getICF();
 extern Bool verifyLabelNaming(char *s);
 
 void findAllExternals();
-void addExtListItem(Item *item);
+void addExtListItem(char *name);
 void resetExtList();
 ExtListItem *findExtOpListItem(char *name);
 void updateExtPositionData(char *name, unsigned base, unsigned offset);
-
+void freeTableItem(Item *item);
+void freeTablesMemory();
 ExtListItem *findExtOpListItem(char *name)
 {
+    extern ExtListItem *extListHead;
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
-        if (strcmp(name, p->name) == 0)
-            return p;
+        if (p->name)
+        {
+            if (strcmp(name, p->name) == 0)
+                return p;
+        }
         p = p->next;
     }
     return NULL;
@@ -32,12 +37,11 @@ void resetExtList()
     ExtListItem *np = extListHead, *next = NULL;
     ExtPositionData *pos, *nextPos;
     externalCount = 0;
-    entriesCount = 0;
+
     while (next != NULL)
     {
         next = np->next;
-        free(np->name);
-        nextPos = np->value;
+        nextPos = np->value.next;
         while (nextPos != NULL)
         {
             pos = nextPos;
@@ -46,27 +50,40 @@ void resetExtList()
         }
         free(np);
     }
+
+    extListHead = NULL;
 }
 
 void updateExtPositionData(char *name, unsigned base, unsigned offset)
 {
 
     ExtListItem *np = findExtOpListItem(name);
-    ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData *));
-    new->base = base;
-    new->offset = offset;
-    new->next = NULL;
-    new->next = np->value;
-    np->value = new;
+    /*     printf("line 62 in table inside update ext position data\nname:%s\nbase:%u\noffset:%u\nnp->name:%s\nnp->value.base:%d\n", name, base, offset, np->name, np->value.base);
+     */
+    if (np->value.base)
+    {
+        ExtPositionData *new = (ExtPositionData *)malloc(sizeof(ExtPositionData));
+        new->base = base;
+        new->offset = offset;
+        new->next = np->value.next;
+        np->value.next = new;
+    }
+    else
+    {
+        np->value.base = base;
+        np->value.offset = offset;
+    }
+
+    externalCount++;
 }
 
-void addExtListItem(Item *item)
+void addExtListItem(char *name)
 {
 
     ExtListItem *next;
-    next = (ExtListItem *)malloc(sizeof(ExtListItem *));
-    next->name = (char *)calloc(strlen(item->name), sizeof(char *));
-    strcpy(next->name, item->name);
+    next = (ExtListItem *)calloc(1, sizeof(ExtListItem));
+    strncpy(next->name, name, strlen(name));
+
     if (extListHead != NULL)
     {
         next->next = extListHead->next;
@@ -103,15 +120,15 @@ Item *install(char *name, ItemType type)
     unsigned hashval;
     Item *np;
     np = (Item *)malloc(sizeof(Item));
-    np->name = (char *)calloc(strlen(name) + 1, sizeof(char *));
-    if (np == NULL || np->name == NULL)
+
+    if (np == NULL)
     {
         yieldError(memoryAllocationFailure);
         return NULL;
     }
     else
     {
-        memcpy(np->name, name, strlen(name));
+        strcpy(np->name, name);
         if (type == Symbol)
         {
             np->val.s.attrs.code = 0;
@@ -129,7 +146,6 @@ Item *install(char *name, ItemType type)
         }
 
         hashval = hash(name);
-
         np->next = (type == Symbol ? symbols[hashval] : macros[hashval]);
         if (type == Symbol)
             symbols[hashval] = np;
@@ -372,10 +388,7 @@ void updateFinalValueOfSingleItem(Item *item)
     if (item->val.s.attrs.entry)
         entriesCount++;
     if (item->val.s.attrs.external)
-    {
-        externalCount++;
-        addExtListItem(item);
-    }
+        addExtListItem(item->name);
 
     if (item->val.s.attrs.data)
     {
@@ -405,18 +418,19 @@ void writeExternalsToFile(FILE *fp)
     ExtListItem *p = extListHead;
     while (p != NULL)
     {
-        writeSingleExternal(fp, p->name, p->value);
+        if (p->value.base)
+            writeSingleExternal(fp, p->name, p->value.base, p->value.offset, p->value.next);
         p = p->next;
     }
 }
 
-void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value)
+void writeSingleExternal(FILE *fp, char *name, unsigned base, unsigned offset, ExtPositionData *next)
 {
-    ExtPositionData *nextValue = value->next;
-    fprintf(fp, "%s BASE %u\n", name, value->base);
-    fprintf(fp, "%s OFFSET %u\n", name, value->offset);
-    if (nextValue != NULL && nextValue->base)
-        writeSingleExternal(fp, name, value->next);
+
+    fprintf(fp, "%s BASE %u\n", name, base);
+    fprintf(fp, "%s OFFSET %u\n", name, offset);
+    if (next != NULL)
+        writeSingleExternal(fp, name, next->base, next->offset, next->next);
 }
 
 void writeEntriesToFile(FILE *fp)
@@ -446,17 +460,54 @@ int writeSingleEntry(Item *item, FILE *fp, int count)
 
 void initTables()
 {
+    extern unsigned externalCount, entriesCount;
     int i = 0;
-
-    if (externalCount)
+    if (extListHead != NULL)
         resetExtList();
 
+    externalCount = entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
         macros[i] = NULL;
         i++;
     }
+}
+
+void freeHashTable(ItemType type)
+{
+
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (type == Macro ? (macros[i] != NULL) : (symbols[i] != NULL))
+        {
+
+            free(type == Macro ? macros[i] : symbols[i]);
+            /* freeTableItem(type == Macro ? macros[i] : symbols[i]); */
+        }
+        i++;
+    }
+}
+
+void freeMacrosTable()
+{
+    int i = 0;
+    while (i < HASHSIZE)
+    {
+        if (macros[i] != NULL)
+            freeTableItem(macros[i]);
+        i++;
+    }
+}
+
+void freeTableItem(Item *item)
+{
+    if (item->next != NULL)
+        freeTableItem(item->next);
+    printf("item->name:%s\n", item->name);
+    free(item);
+    return;
 }
 
 void printMacroTable()

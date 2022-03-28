@@ -5,9 +5,9 @@ static State globalState = startProgram;
 static char *path;
 static unsigned currentLineNumber = 1;
 
-void setGlobalState(State new)
+void setGlobalState(State newState)
 {
-    globalState = new;
+    globalState = newState;
 }
 
 State getGlobalState()

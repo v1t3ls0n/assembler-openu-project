@@ -80,4 +80,8 @@ int parseRegNumberFromIndexAddrOperand(char *s);
    @ Arguments: The function gets char *s, which is the operand from index addressing method it parses.
    @ Description: The function parses out the register's number from the char *s it gets.
    Returns the register's number from the token it got.
+<<<<<<< HEAD
 */
+=======
+*/
+>>>>>>> c8647e1b6947c8963043d64de94c61c8df9b7b5b

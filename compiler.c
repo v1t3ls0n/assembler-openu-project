@@ -6,7 +6,7 @@ extern void exportFilesMainHandler();
 extern void closeOpenLogFiles();
 extern void allocMemoryImg();
 extern void calcFinalAddrsCountersValues();
-
+extern void freeHashTable(ItemType type);
 void handleSingleFile(char *arg);
 
 int main(int argc, char *argv[])
@@ -34,7 +34,7 @@ int handleSourceFiles(int argc, char *argv[])
         i++;
     }
 
-    return True;
+    return 0;
 }
 
 void handleSingleFile(char *arg)
@@ -42,14 +42,12 @@ void handleSingleFile(char *arg)
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
-    char *fileName = (char *)calloc(strlen(arg), sizeof(char *));
+    char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
 
-    if (!fileName)
-        return;
-
-    strcpy(fileName, arg);
+    strncpy(fileName, arg, strlen(arg));
     strcat(fileName, ".as");
     (*setPath)(fileName);
+
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");
@@ -75,14 +73,15 @@ void handleSingleFile(char *arg)
     else
     {
         (*globalState)(parsingMacros);
-        resetMemoryCounters();
         initTables();
+        resetMemoryCounters();
         parseSourceFile(src, target);
+        printMacroTable();
+        freeHashTable(Macro);
 
         if ((*globalState)() == firstRun)
         {
 
-            printMacroTable();
             rewind(target);
             parseAssemblyCode(target);
             if ((*globalState)() == secondRun)
@@ -104,6 +103,8 @@ void handleSingleFile(char *arg)
             }
             else
                 printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
+
+            freeHashTable(Symbol);
         }
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
@@ -111,7 +112,6 @@ void handleSingleFile(char *arg)
         free(fileName);
         fclose(src);
         fclose(target);
-
         closeOpenLogFiles();
     }
 }

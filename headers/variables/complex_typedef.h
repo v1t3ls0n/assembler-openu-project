@@ -61,18 +61,18 @@ typedef struct
     int start;
     int end;
 } MacroData;
-typedef struct
+typedef struct ExtPositionData
 {
     unsigned base;
     unsigned offset;
-    void *next;
+    struct ExtPositionData *next;
 } ExtPositionData;
 
-typedef struct
+typedef struct ExtListItem
 {
-    char *name;
-    ExtPositionData *value;
-    void *next;
+    char name[MAX_LABEL_LEN];
+    ExtPositionData value;
+    struct ExtListItem *next;
 
 } ExtListItem;
 
@@ -85,20 +85,13 @@ typedef struct
     Attributes attrs;
 } SymbolData;
 
-typedef struct
+typedef struct Item
 {
-    char *name;
+    char name[MAX_LABEL_LEN];
     union
     {
         SymbolData s;
         MacroData m;
     } val;
-    void *next;
+    struct Item *next;
 } Item;
-
-typedef struct
-{
-    char first[MAX_LINE_LEN];
-    char second[MAX_LINE_LEN];
-
-} OperandsArgs;

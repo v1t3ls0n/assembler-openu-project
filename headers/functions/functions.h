@@ -1,7 +1,7 @@
 /* FUNCTIONS THAT ARE COMMENTED OUT MEANS THAT THEY ARE NOT SHARED ACROSS FILES */
 /*---------------------------------------------------------------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-/* --------------------------------------------In globalVariables.c -------------------------------------------------------*/
+/* --------------------------------------------In sharedStates.c -------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
 
 void setGlobalState(State new);
@@ -94,8 +94,10 @@ char *getOperationName(char *s);
 /*---------------------------------------------------------------------------------------------------------------*/
 /* --------------------------------------------In table.c --------------------------------------------------------*/
 /*---------------------------------------------------------------------------------------------------------------*/
-
+void resetTables();
+void freeMacrosTable();
 void printMacroTable();
+void freeHashTable(ItemType type);
 int printMacroItem(Item *item);
 unsigned hash(char *s);
 Item *lookup(char *s, ItemType type);
@@ -124,7 +126,7 @@ Bool isNonEmptyEntry(char *name);
 Bool areEntriesExist();
 Bool areExternalsExist();
 void writeExternalsToFile(FILE *fp);
-void writeSingleExternal(FILE *fp, char *name, ExtPositionData *value);
+void writeSingleExternal(FILE *fp, char *name, unsigned base, unsigned offset, ExtPositionData *next);
 void initExternalOperandsList();
 ExtListItem *findExtOpListItem(char *name);
 int findExtOpListItemIndex(char *name);

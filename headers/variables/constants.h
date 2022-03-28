@@ -5,10 +5,14 @@
 #define OP_SIZE 16
 #define RAM_MEMORY_SIZE 8192
 #define MAX_LABEL_LEN 31
-#define MAX_LINE_LEN 201
+#define MAX_LINE_LEN 320
 #define MAX_INSTRUCTION_NAME_LEN 8
 
-#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
+/*
+#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 16)
+*/
+
+#define HASHSIZE 64
 
 #define A 0x0004
 #define R 0x0002

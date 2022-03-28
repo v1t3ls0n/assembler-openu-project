@@ -41,5 +41,6 @@ O: .extern N
 ;illegal comma before first operand + illegal appearence of comma after the last parameter at lea
   lea , M   ,r1    ,
 O: .string "fnuu "  67*(+S4r)  ;/, e H B"
-;illegal appearence of comma after the last parameter + illegal comma before first operand + consecutive commas at cmp
+;illegal appearence of comma after the last parameter + illegal 
+;comma before first operand + consecutive commas at cmp
 cmp  ,#4   ,  , ,,L    , 

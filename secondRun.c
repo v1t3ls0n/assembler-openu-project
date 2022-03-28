@@ -20,7 +20,6 @@ extern Bool isExternal(char *name);
 
 extern Bool isEntry(char *name);
 extern Bool isNonEmptyEntry(char *name);
-extern Bool areExternalsExist();
 extern void updateExtPositionData(char *name, unsigned base, unsigned offset);
 /* from operation.c */
 extern Operation *getOperationByName(char *s);
