@@ -15,13 +15,10 @@ extern Bool writeOperationBinary(char *operationName, char *args);
 /* parse.c */
 extern Bool countAndVerifyDataArguments(char *line);
 extern Bool countAndVerifyStringArguments(char *line);
-
 extern void parseAssemblyCode(FILE *src);
-
 extern Bool writeStringInstruction(char *s);
 extern Bool writeDataInstruction(char *s);
 extern Bool verifyCommaSyntax(char *line);
-
 extern Bool isIndexParameter(char *s);
 
 Bool handleOperation(char *operationName, char *args)

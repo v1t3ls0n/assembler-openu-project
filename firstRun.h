@@ -1,5 +1,7 @@
 #include "firstRun.c"
 /*
+
+   General Overview:
    In FirstRun.c we are parsing and analysizing the assembly code we got after we extracted the macros from it
    we verify that the syntax is legal and that the use of the assembly language follows the rules of our
    operations and instructions (operands type match, instruction type match, comment type match, legal declaretion
@@ -15,11 +17,7 @@
    needed without wasting big random chuncks of memory upfront. If everything goes well, means that the  first Run end
    without errors, then we set the sharedState ((*globalState)()) to secondRun.
 
-
-
  */
-
-Bool handleOperation(char *operationName, char *args);
 
 /* @ Function: handleOperation
    @ Arguments: The function gets char *operationName which the name of the current operation and char * args which are the arguments of the operation.
@@ -30,8 +28,7 @@ Bool handleOperation(char *operationName, char *args);
    @ Arguments:
    @ Description:
    */
-Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
-
+Bool handleOperation(char *operationName, char *args);
 /* @ Function: handleOperation
  @ Arguments: This function gets the source and destination operands, the operation and the posible addresing method of each of the operands.
  @ Description: The function checks if the source and destination operands are valid, by checking if it has the right amount of operands, or the right addressing method.
@@ -39,9 +36,10 @@ Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions activ
   Returns true if the operands are valid, and false if they aren't.
  */
 
-Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);
+Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
 /* @ Function: validateOperandMatch
    @ Arguments: This function gets AddrMethodsOptions allowedAddrs- the allowed addressing methods for the source and destination operands, AddrMethodsOptions active[2]- an array that represent types of addressing methods for the operands,
     char *operand- the operands, and type- the type of the operand.
    @ Description: The function checks if the operand has the right addressing mrhod, returns true if it does, and false if it doesn't.
    */
+Bool validateOperandMatch(AddrMethodsOptions allowedAddrs, AddrMethodsOptions active[2], char *operand, int type);

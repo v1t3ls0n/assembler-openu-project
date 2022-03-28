@@ -2,23 +2,18 @@
 void (*setState)() = &setGlobalState;
 State (*globalState)() = &getGlobalState;
 
-extern Bool isPossiblyUseOfMacro(char *s);
-extern Bool isMacroOpening(char *s);
-extern Bool isMacroClosing(char *s);
-extern Bool isLegalMacroName(char *s);
-extern Item *addMacro(char *name, int start, int end);
-extern Item *updateMacro(char *name, int start, int end);
-extern Item *getMacro(char *s);
-
-char *getFirstToken(char *s);
-char *getNthToken(char *s, int n);
-
 Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 {
-
     static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
     static long start = 0, end = 0;
+    extern Bool isPossiblyUseOfMacro(char *s);
+    extern Bool isMacroOpening(char *s);
+    extern Bool isMacroClosing(char *s);
+    extern Bool isLegalMacroName(char *s);
+    extern Item *addMacro(char *name, int start, int end);
+    extern Item *updateMacro(char *name, int start, int end);
+    extern Item *getMacro(char *s);
     if (!isReadingMacro)
     {
         if (!isMacroOpening(token))
