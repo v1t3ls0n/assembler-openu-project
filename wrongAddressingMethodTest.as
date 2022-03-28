@@ -1,5 +1,4 @@
 ;this file will include errors- using of wrong addresing methods
-
 ;wrong addressing method for move
 mov #3, #-6
 LABEL1: .data 6, -17, 5   ,  2,3
@@ -11,7 +10,7 @@ sub LABEL2[r13]   ,   #1
 ;wrong addressing method for lea
 lea #52 , r3
 ;wrong addressing method for lea
-lea LABEL2 m #99
+lea LABEL2 , #99
 ;wrong addressing method for lea (for both operands)
 lea #4,#1
 ;wrong addressing method for clr
