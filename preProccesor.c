@@ -18,11 +18,11 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
 
     static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
-    static long start = 0, end = 0, current;
+    static long start = 0, end = 0;
     if (!isReadingMacro)
     {
-        fprintf(target, "%s", line);
-        current = ftell(target);
+        if (!isMacroOpening(token))
+            fprintf(target, "%s", line);
     }
     if (!isPossiblyUseOfMacro(token) && !isMacroOpening(token) && !isMacroClosing(token))
         return True;
@@ -30,21 +30,26 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
     {
         if (isMacroOpening(token))
         {
-            fseek(target, current - strlen(line), SEEK_SET);
-            fprintf(target, "%s", "\0");
             next = strtok(NULL, " \t\n\f\r");
             if (!*next)
-                return yieldError(macroDeclaretionWithoutDefiningMacroName);
+            {
+                yieldError(macroDeclaretionWithoutDefiningMacroName);
+                (*setState)(assemblyCodeFailedToCompile);
+            }
             if (!isLegalMacroName(next))
-                return yieldError(illegalMacroNameUseOfSavedKeywords);
-
+            {
+                yieldError(illegalMacroNameUseOfSavedKeywords);
+                (*setState)(assemblyCodeFailedToCompile);
+            }
             start = ftell(src);
             strcpy(macroName, next);
             isReadingMacro = True;
         }
         else if (isMacroClosing(token))
         {
+
             end = ftell(src) - strlen(line) + 1;
+
             addMacro(macroName, start, end);
             isReadingMacro = False;
             start = end = 0;
@@ -63,7 +68,11 @@ Bool parseMacros(char *line, char *token, FILE *src, FILE *target)
                 lastPosition = ftell(src);
                 fseek(src, p->val.m.start, SEEK_SET);
                 while (--toCopy && (c = fgetc(src)) != EOF)
+                {
+                    putchar(c);
                     fputc(c, target);
+                }
+                printf("\n");
 
                 fseek(src, lastPosition, SEEK_SET);
             }
@@ -83,33 +92,20 @@ void parseSourceFile(FILE *src, FILE *target)
 
     while (((c = fgetc(src)) != EOF))
     {
-        if (i >= MAX_LINE_LEN - 1 && !isspace(c))
-        {
-            memset(lineClone, 0, i);
-            memset(line, 0, i);
-            i = 0;
-        }
-        else
-            line[i++] = c;
+        line[i++] = c;
+
+        if (i >= MAX_LINE_LEN - 2 && !isspace(c))
+            c = '\n';
 
         if (c == '\n')
         {
-
             (*currentLineNumberPlusPlus)();
-
             if (i > 0)
             {
-
-                memcpy(lineClone, line, i);
+                strncpy(lineClone, line, i);
                 token = strtok(lineClone, " \t\n\f\r");
                 if (token != NULL)
-                {
-                    if (!parseMacros(line, token, src, target))
-                    {
-                        (*setState)(assemblyCodeFailedToCompile);
-                        return;
-                    }
-                }
+                    parseMacros(line, token, src, target);
 
                 memset(lineClone, 0, i);
                 memset(line, 0, i);
@@ -117,16 +113,15 @@ void parseSourceFile(FILE *src, FILE *target)
             }
         }
     }
+
     if (i > 0)
     {
-        memcpy(lineClone, line, MAX_LINE_LEN);
+        strcpy(lineClone, line);
         token = strtok(lineClone, " \t\n\f\r");
-        if (!parseMacros(line, token, src, target))
-        {
-            (*setState)(assemblyCodeFailedToCompile);
-            return;
-        }
+        if (token != NULL)
+            parseMacros(line, token, src, target);
     }
 
-    (*setState)(firstRun);
+    if ((*globalState)() != assemblyCodeFailedToCompile)
+        (*setState)(firstRun);
 }
