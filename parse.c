@@ -62,7 +62,7 @@ Bool countAndVerifyDataArguments(char *line)
 
 Bool verifyCommaSyntax(char *line)
 {
-    int commasCounter = 0, argsCounter = 0;
+    int commasCounter = 0;
     Bool insideToken = False;
     Bool isFirstToken = True;
     Bool isValid = True;
@@ -86,29 +86,22 @@ Bool verifyCommaSyntax(char *line)
     {
         if (insideToken)
         {
-            if (isFirstToken == True && commasCounter == 0)
-            {
-                commasCounter = 1;
-                isFirstToken = False;
-            }
 
             if (commasCounter > 1)
             {
-
                 isValid = yieldError(wrongCommasSyntaxExtra);
                 commasCounter = 1;
             }
-            else if (commasCounter < 1)
-            {
+            else if (commasCounter < 1 && !isFirstToken)
                 isValid = yieldError(wrongCommasSyntaxMissing);
-                commasCounter = 1;
-            }
-            if (s && isspace(*s))
-            {
-                insideToken = False;
-                commasCounter = 0;
-            }
-            else if (*s == ',')
+
+            if (isFirstToken == True)
+                isFirstToken = False;
+
+            while (*s != '\0' && !isspace(*s) && *s != ',')
+                s++;
+
+            if (*s == ',' || isspace(*s))
             {
                 insideToken = False;
                 commasCounter = 0;
@@ -117,9 +110,6 @@ Bool verifyCommaSyntax(char *line)
         }
         else
         {
-
-            argsCounter++;
-
             while (*s == ',' || isspace(*s))
             {
                 if (*s == ',')
@@ -127,27 +117,13 @@ Bool verifyCommaSyntax(char *line)
                 s++;
             }
 
-            if (s && (isprint(*s) && !isspace(*s)))
-            {
+            if (*s && (isprint(*s) && !isspace(*s)))
                 insideToken = True;
-            }
         }
 
         s++;
     }
 
-    s = strrchr(s, ',');
-    if (s != NULL && *s == ',')
-    {
-        s++;
-        commasCounter = 1;
-        while (s && *s != '\0')
-        {
-            if ((isprint(*s) && !isspace(*s)))
-                commasCounter = 0;
-            s++;
-        }
-    }
     if (commasCounter)
         isValid = yieldError(illegalApearenceOfCommaAfterLastParameter);
 
