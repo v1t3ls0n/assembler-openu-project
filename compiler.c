@@ -111,7 +111,7 @@ void handleSingleFile(char *arg)
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
 
         /* frees and closes all the files that have been in use */
-        free(fileName);
+        /*free(fileName);*/
         fclose(src);
         fclose(target);
         /*closeOpenLogFiles();*/
