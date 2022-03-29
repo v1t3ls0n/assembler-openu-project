@@ -32,7 +32,7 @@ void generateObFile()
     {
         writeMemoryImageToObFile(ob);
         fclose(ob);
-        /*free(fileName);*/
+        free(fileName);
     }
     else
         fileCreationFailure(fileName);
@@ -52,7 +52,7 @@ void createEntriesFile()
     {
         writeEntriesToFile(ent);
         fclose(ent);
-        /* free(fileName);*/
+        free(fileName);
     }
     else
         fileCreationFailure(fileName);
@@ -71,7 +71,7 @@ void createExternalsFile()
     {
         writeExternalsToFile(ext);
         fclose(ext);
-        /*free(fileName);*/
+        free(fileName);
     }
     else
         fileCreationFailure(fileName);

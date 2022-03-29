@@ -27,6 +27,8 @@ void handleSingleFile(char *arg)
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
+    void (*setState)() = &setGlobalState;
+
     char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
     extern void resetMemoryCounters();
     extern void initTables();
@@ -45,7 +47,7 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*free(fileName);*/
+        free(fileName);
         return;
     }
 
@@ -58,8 +60,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*fclose(src);
-        free(fileName);*/
+        fclose(src);
+        free(fileName);
         return;
     }
 
@@ -69,11 +71,11 @@ void handleSingleFile(char *arg)
 
         /* if there are no errors it starts the pre proccesing- parse all the macros,
          saves them in the macro table and prints it */
-
-        (*globalState)(parsingMacros);
+        (*setState)(parsingMacros);
         resetMemoryCounters();
         parseSourceFile(src, target);
         printMacroTable();
+        freeHashTable(Macro);
 
         /* moves on to the first run, looks for errors in the code, counts how much space in the
          memory the program needs and starts to parse the assembly code.
@@ -106,14 +108,15 @@ void handleSingleFile(char *arg)
             }
             else
                 printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
+            freeHashTable(Symbol);
         }
         else
-            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
+            printf("\nexpanding macros for %s source file\nfailed due to some code errors\nmoving on to the next file if exist\n\n", fileName);
 
         /* frees and closes all the files that have been in use */
-        /*free(fileName);*/
+        free(fileName);
         fclose(src);
         fclose(target);
-        /*closeOpenLogFiles();*/
+        closeOpenLogFiles();
     }
 }

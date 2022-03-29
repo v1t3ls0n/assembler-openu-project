@@ -118,6 +118,9 @@ void yieldErrorIntoFile(Error err)
 
     switch (err)
     {
+    case macroDeclaretionWithoutDefiningMacroName:
+        fprintf(errorsFile, "Macro declaration without defining macro name!");
+        break;
 
     case registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange:
         fprintf(errorsFile, "illegal use of registery index operand addressing method\nRegistery Index addr method is allows to use only registeries\n that are between the r10 - r15!");
@@ -408,6 +411,9 @@ Bool yieldError(Error err)
     switch (err)
     {
 
+    case macroDeclaretionWithoutDefiningMacroName:
+        fprintf(stderr, "Macro declaration without defining macro name!");
+        break;
     case registeryIndexOperandTypeIfOutOfAllowedRegisteriesRange:
         fprintf(stderr, "illegal use of registery index operand addressing method\nRegistery Index addr method is allows to use only registeries\n that are between the r10 - r15!");
         break;

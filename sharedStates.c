@@ -1,6 +1,5 @@
 #include "data.h"
 
-extern char *cloneString(char *s);
 static State globalState = startProgram;
 static char *path;
 static unsigned currentLineNumber = 1;
