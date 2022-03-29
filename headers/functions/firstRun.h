@@ -18,6 +18,7 @@
    much space we need for the instruction image. Doing so allows us to allocate just the required amount of memory
    needed without wasting big random chuncks of memory upfront. If everything goes well, means that the  first Run end
    without errors, then we set the sharedState ((*globalState)()) to secondRun.
+
    ##########################################################################################################
    ##########################################################################################################
    ##########################################################################################################
