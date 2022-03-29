@@ -166,7 +166,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
                         return addSymbol(labelName, 0, 0, 0, 0, 1) ? True : False;
                 }
 
-                free(labelName);
+                /*free(labelName);*/
             }
             else
             {

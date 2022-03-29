@@ -153,7 +153,7 @@ Item *install(char *name, ItemType type)
     else
     {
         printf("line 155\n");
-        free((Item *)np->next);
+        /*free((Item *)np->next);*/
     }
 
     if ((np->name = cloneString(name)) == NULL)
