@@ -27,8 +27,14 @@ void allocMemoryImg()
 {
     const int totalSize = DCF - MEMORY_START;
     int i, j;
-    binaryImg = (BinaryWord *)realloc(binaryImg, totalSize * sizeof(BinaryWord));
-    hexImg = (HexWord *)realloc(binaryImg, totalSize * sizeof(HexWord));
+
+    if (binaryImg != NULL)
+        free(binaryImg);
+    if (hexImg != NULL)
+        free(hexImg);
+
+    binaryImg = (BinaryWord *)malloc(totalSize * sizeof(BinaryWord));
+    hexImg = (HexWord *)malloc(totalSize * sizeof(HexWord));
     for (i = 0; i < totalSize; i++)
     {
         hexImg[i]._A = 0;
