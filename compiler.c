@@ -72,7 +72,6 @@ void handleSingleFile(char *arg)
         resetMemoryCounters();
         parseSourceFile(src, target);
         printMacroTable();
-        freeHashTable(Macro);
 
         /* moves on to the first run, looks for errors in the code, counts how much space in the
          memory the program needs and starts to parse the assembly code.
@@ -105,8 +104,6 @@ void handleSingleFile(char *arg)
             }
             else
                 printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
-
-            freeHashTable(Symbol);
         }
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);

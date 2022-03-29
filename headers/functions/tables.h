@@ -37,9 +37,9 @@ Item *lookup(char *s, ItemType type);
 */
 Item *install(char *name, ItemType type);
 
-void initTables();
+/* void initTables();
 void freeHashTable(ItemType type);
-void freeTableItem(Item *item);
+void freeTableItem(Item *item); */
 
 /*#####################################################################*/
 /*#####################################################################*/

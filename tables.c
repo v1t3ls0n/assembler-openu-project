@@ -31,6 +31,21 @@ ExtListItem *findExtOpListItem(char *name)
     return NULL;
 }
 
+void initTables()
+{
+    extern unsigned externalCount, entriesCount;
+    int i = 0;
+    if (extListHead != NULL)
+        resetExtList();
+
+    externalCount = entriesCount = 0;
+    while (i < HASHSIZE)
+    {
+        symbols[i] = NULL;
+        macros[i] = NULL;
+        i++;
+    }
+}
 void resetExtList()
 {
     ExtListItem *np = extListHead, *next = NULL;
@@ -116,32 +131,16 @@ Item *lookup(char *s, ItemType type)
 
 Item *install(char *name, ItemType type)
 {
-    unsigned hashval;
     Item *np;
-    np = (Item *)malloc(sizeof(Item));
+    unsigned hashval;
 
-    if (np == NULL)
+    if ((np = lookup(name, type == Symbol ? Symbol : Macro)) == NULL)
     {
-        yieldError(memoryAllocationFailure);
-        return NULL;
-    }
-    else
-    {
-        strcpy(np->name, name);
-        if (type == Symbol)
+        np = (Item *)malloc(sizeof(Item));
+        if (np == NULL || (np->name = cloneString(name)) == NULL)
         {
-            np->val.s.attrs.code = 0;
-            np->val.s.attrs.entry = 0;
-            np->val.s.attrs.external = 0;
-            np->val.s.attrs.data = 0;
-            np->val.s.base = 0;
-            np->val.s.value = 0;
-            np->val.s.offset = 0;
-        }
-        else if (type == Macro)
-        {
-            np->val.m.start = -1;
-            np->val.m.end = -1;
+            yieldError(memoryAllocationFailure);
+            return NULL;
         }
 
         hashval = hash(name);
@@ -151,38 +150,38 @@ Item *install(char *name, ItemType type)
         else
             macros[hashval] = np;
     }
+    else
+        free((Item *)np->next);
+
+    if ((np->name = cloneString(name)) == NULL)
+        return NULL;
 
     return np;
 }
 
 Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal)
 {
-    unsigned base;
-    unsigned offset;
+    unsigned base = 0;
+    unsigned offset = 0;
     Item *p;
-
     if (name[strlen(name) - 1] == ':')
         name[strlen(name) - 1] = '\0';
-
     if (!verifyLabelNamingAndPrintErrors(name))
         return False;
-    p = lookup(name, Symbol);
-    if (p != NULL)
-        return updateSymbol(p, value, isCode, isData, isEntry, isExternal);
-    else
-    {
-        p = install(name, Symbol);
-        offset = value % 16;
-        base = value - offset;
-        p->val.s.value = value;
-        p->val.s.base = base;
-        p->val.s.offset = offset;
-        p->val.s.attrs.code = isCode ? 1 : 0;
-        p->val.s.attrs.entry = isEntry ? 1 : 0;
-        p->val.s.attrs.external = isExternal ? 1 : 0;
-        p->val.s.attrs.data = isData ? 1 : 0;
-    }
 
+    p = install(name, Symbol);
+    if (p == NULL)
+        return False;
+
+    offset = value % 16;
+    base = value - offset;
+    p->val.s.value = value;
+    p->val.s.base = base;
+    p->val.s.offset = offset;
+    p->val.s.attrs.code = isCode;
+    p->val.s.attrs.entry = isEntry;
+    p->val.s.attrs.external = isExternal;
+    p->val.s.attrs.data = isData;
     return True;
 }
 
@@ -339,17 +338,15 @@ Item *getMacro(char *s)
 
 Item *addMacro(char *name, int start, int end)
 {
-    Item *macro = lookup(name, Macro);
+    Item *macro = install(name, Macro);
 
-    if (macro != NULL)
+    if (macro == NULL)
     {
         yieldError(illegalMacroNameAlreadyInUse);
         return NULL;
     }
     else
     {
-        macro = install(name, Macro);
-
         if (start != -1)
             macro->val.m.start = start;
         if (end != -1)
@@ -457,23 +454,7 @@ int writeSingleEntry(Item *item, FILE *fp, int count)
     return count;
 }
 
-void initTables()
-{
-    extern unsigned externalCount, entriesCount;
-    int i = 0;
-    if (extListHead != NULL)
-        resetExtList();
-
-    externalCount = entriesCount = 0;
-    while (i < HASHSIZE)
-    {
-        symbols[i] = NULL;
-        macros[i] = NULL;
-        i++;
-    }
-}
-
-void freeHashTable(ItemType type)
+/* void freeHashTable(ItemType type)
 {
 
     int i = 0;
@@ -488,16 +469,16 @@ void freeHashTable(ItemType type)
 
         i++;
     }
-}
+} */
 
-void freeTableItem(Item *item)
+/* void freeTableItem(Item *item)
 {
 
     if (item->next != NULL)
         freeTableItem(item->next);
     free(item->next);
     return;
-}
+} */
 
 void printMacroTable()
 {
