@@ -90,11 +90,13 @@ typedef enum
 
 typedef enum
 {
+    assemblyCodeFailedToCompile,
+    startProgram,
+    parsingMacros,
     firstRun,
     secondRun,
-    parsingMacros,
-    assemblyCodeFailedToCompile,
     exportFiles,
+    exitProgram
 } State;
 
 typedef enum

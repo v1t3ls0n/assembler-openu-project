@@ -1,20 +1,8 @@
 #include "data.h"
 
-/* extern Operation *getOperationByName(char *s);
-extern Bool addSymbol(char *name, unsigned value, unsigned isCode, unsigned isData, unsigned isEntry, unsigned isExternal);
-extern Bool isLabelNameAlreadyTaken(char *name, ItemType type);
-extern Bool verifyLabelNaming(char *s);
-extern void increaseDataCounter(int amount);
-extern void increaseInstructionCounter(int amount);
-extern unsigned getDC();
-extern unsigned getIC();
-extern Bool writeOperationBinary(char *operationName, char *args); */
-
-/* parse.c */
-
 Bool handleOperation(char *operationName, char *args)
 {
-    Operation *p = getOperationByName(operationName);
+    const Operation *p = getOperationByName(operationName);
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     char *first = 0;
     char *second = 0;
@@ -56,7 +44,7 @@ Bool handleOperation(char *operationName, char *args)
 
     return areOperandsLegal;
 }
-Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2])
+Bool parseOperands(char *src, char *des, const Operation *op, AddrMethodsOptions active[2])
 {
 
     int expectedOperandsCount = 0;

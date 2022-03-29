@@ -34,7 +34,7 @@ typedef struct
 } AddrMethodsOptions;
 
 /*Operation is a struct for holding all the operation table data*/
-typedef struct Operation
+typedef struct
 {
     unsigned int op;        /*op- is the binary value of the first sixteen bits in the first word for each operation*/
     unsigned int funct : 4; /*the function code of the operation*/
