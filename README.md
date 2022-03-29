@@ -15,7 +15,25 @@
 
        #### Our implimentation Overview in short: 
        #### Stages:
-            1.
+
+       1.Parsing the original .as file and replacing macros if existing using hash table to store the starting and ending 
+            index of each macro in file. if we found and error in the syntax of the macros we yield relevant error message
+            and will not continue to the first run.
+            
+        2.moving to first run in which we will only count the size of the data image and the instruction image and also
+          we will add all the symbols to the symbol table and will verify that there are no errors in code. if we found errors we
+         yield a print messages to stderr and error.log file which will be created in the root folder, we will parse all the content of the source code in first run anyway so if we encounter an error we yield print error message and continue to check and look for other errors.if even 1 error occured in first run we will not enter second run, we will not allocate any memory and will not write any binary data at all. in the first run we do not write or convert any argument to the resulted binary/hex image.
+         
+         3. 
+         if everything was valid in first run we allocate the exact amount of memory we need to write the image result, before  
+         we do that we first updating the address of each data symbol in the symbol table. then we reset the counters (IC/DC) and 
+           then we allocating the memory for the resulted hex/binary image. we are allocating the exact size and since we counted the size of each operation or instruction on the first run. after allocating memory we move to second run.
+
+         4. in the second run we writing the words of each line of code in binary format, we inserting the words to the write index
+         of the image array depending on the type of word (data/instruction) and we add each external operand appearence to the linked list of all the positions that external operands appeared. if we encouter label operand that is not within the symbol table and is not external we yield error message and continue checking the rest of the code in order to discover all errors of this type if this case happens we will finish second run but will not export any files.
+
+         5. exporting all the required files (.ob, .ext .ent) and moves to the next file or end program.
+
 
 
 
