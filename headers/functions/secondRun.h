@@ -1,4 +1,23 @@
 
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### secondRun.c General Overview: #######################################
+##########################################################################################################
+##########################################################################################################
+
+In the second run our assembler writes the words of each line of code in binary format, we inserting the words to
+the memory image in the correct position depending on the type of word (data/instruction) and we add each external
+operand appearence to the linked list of all the positions that external operands appeared. if we encouter label
+operand that is not within the symbol table and is not external we yield error message and continue checking the
+rest of the code in order to discover all errors of this type if this case happens we will finish second run but
+will not export any files.
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+*/
+
 Bool writeOperationBinary(char *operationName, char *args);
 /* @ Function: writeOperationBinary
    @ Arguments: The function gets char *operationName- the name of the operation and char *args - the arguments of the operation

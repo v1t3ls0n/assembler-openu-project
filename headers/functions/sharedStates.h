@@ -1,4 +1,28 @@
 
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### sharedStates.c/h General Overview: ##################################
+##########################################################################################################
+##########################################################################################################
+the file sharedStates.h/c exist for holding and safely sharing all the global states information about our
+program at current moment which are:
+
+1.The current state of our program (parsing macros/first run/etc...),the source file name which is currently
+being handled by the assembler.
+
+2.the current original source filename path.
+
+3.the current line we are on while parsing macros/first run/second run/error printing.
+
+The implementation for this is done by making a getters and setters functions to update static global variables
+that are defined in the file so they would be closed to its scope.
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+*/
+
 void setGlobalState(State newState);
 /* @ Function: setGlobalState
    @ Aruments: The function gets State new- the state the function will update

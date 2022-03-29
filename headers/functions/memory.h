@@ -1,4 +1,20 @@
 
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### memory.c/h General Overview: ########################################
+##########################################################################################################
+##########################################################################################################
+
+This memory purpose is for managing the memory of the resulted binary/hex image, it is used in the first
+run and the second run as well. in the first run functions in here used to increase and decrease the DC/IC
+counters and in the second run the function included here builds the memory image word by word.
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+*/
+
 void increaseDataCounter(int amount);
 /* @ Function: increaseDataCounter
    @ Arguments: The function gets int amount- the amount of addresses in the memory the data counter holds.
