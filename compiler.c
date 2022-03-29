@@ -45,8 +45,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        /*         free(fileName);
-                return; */
+        free(fileName);
+        return;
     }
 
     fileName[strlen(fileName) - 1] = 'm';
@@ -58,8 +58,8 @@ void handleSingleFile(char *arg)
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
         fclose(src);
-        /*         free(fileName);
-                return; */
+        free(fileName);
+        return;
     }
 
     else
