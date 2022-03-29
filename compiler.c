@@ -45,7 +45,7 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! source code file %s could not be opened\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        free(fileName);
+        /*free(fileName);*/
         return;
     }
 
@@ -58,57 +58,62 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
-        fclose(src);
-        free(fileName);
+        /*fclose(src);
+        free(fileName);*/
         return;
     }
-    /* if there are no errors it starts the pre proccesing- parse all the macros,
-    saves them in the macro table and prints it */
 
-    (*globalState)(parsingMacros);
-    resetMemoryCounters();
-    parseSourceFile(src, target);
-    printMacroTable();
-
-    /* moves on to the first run, looks for errors in the code, counts how much space in the
-     memory the program needs and starts to parse the assembly code.
-     */
-    if ((*globalState)() == firstRun)
+    else
     {
+        initTables();
 
-        rewind(target);
-        parseAssemblyCode(target);
-        /* if the first run ended with no errors, it moves on to the second run,
-        builds the memory image, prints the symbols table */
-        if ((*globalState)() == secondRun)
+        /* if there are no errors it starts the pre proccesing- parse all the macros,
+         saves them in the macro table and prints it */
+
+        (*globalState)(parsingMacros);
+        resetMemoryCounters();
+        parseSourceFile(src, target);
+        printMacroTable();
+
+        /* moves on to the first run, looks for errors in the code, counts how much space in the
+         memory the program needs and starts to parse the assembly code.
+         */
+        if ((*globalState)() == firstRun)
         {
-            calcFinalAddrsCountersValues();
-            updateFinalSymbolTableValues();
-            allocMemoryImg();
-            printSymbolTable();
+
             rewind(target);
             parseAssemblyCode(target);
-            /* if the second run ended with no errors, it moves to export file
-            and creates the additional files (.ob, .ent and .ext files) */
-            if ((*globalState)() == exportFiles)
+            /* if the first run ended with no errors, it moves on to the second run,
+            builds the memory image, prints the symbols table */
+            if ((*globalState)() == secondRun)
             {
-                fileName[strlen(fileName) - 3] = '\0';
-                (*setPath)(fileName);
-                exportFilesMainHandler();
+                calcFinalAddrsCountersValues();
+                updateFinalSymbolTableValues();
+                allocMemoryImg();
+                printSymbolTable();
+                rewind(target);
+                parseAssemblyCode(target);
+                /* if the second run ended with no errors, it moves to export file
+                and creates the additional files (.ob, .ent and .ext files) */
+                if ((*globalState)() == exportFiles)
+                {
+                    fileName[strlen(fileName) - 3] = '\0';
+                    (*setPath)(fileName);
+                    exportFilesMainHandler();
+                }
+                else
+                    printf("\nSecond Run Finished With Errors, files will not be exported!\n");
             }
             else
-                printf("\nSecond Run Finished With Errors, files will not be exported!\n");
+                printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
         }
         else
-            printf("\nFirst Run Finished With Errors, will no enter second run and files will not be exported!\n");
-    }
-    else
-        printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
+            printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
 
-    /* frees and closes all the files that have been in use */
-    free(fileName);
-    fclose(src);
-    fclose(target);
-    closeOpenLogFiles();
-    initTables();
+        /* frees and closes all the files that have been in use */
+        free(fileName);
+        fclose(src);
+        fclose(target);
+        /*closeOpenLogFiles();*/
+    }
 }
