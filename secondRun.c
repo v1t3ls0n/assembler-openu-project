@@ -1,9 +1,9 @@
 #include "data.h"
 
-void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
+void writeAdditionalOperandsWords(const Operation *op, AddrMethodsOptions active, char *value);
 Bool writeOperationBinary(char *operationName, char *args)
 {
-    Operation *op = getOperationByName(operationName);
+    const Operation *op = getOperationByName(operationName);
     char *first, *second;
     AddrMethodsOptions active[2] = {{0, 0, 0, 0}, {0, 0, 0, 0}};
     first = strtok(args, ", \t\n\f\r");
@@ -32,7 +32,7 @@ Bool writeOperationBinary(char *operationName, char *args)
     return True;
 }
 
-void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value)
+void writeAdditionalOperandsWords(const Operation *op, AddrMethodsOptions active, char *value)
 {
 
     if (active.index)
@@ -71,7 +71,7 @@ Bool writeStringInstruction(char *s)
     return True;
 }
 
-void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op)
+void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], const Operation *op)
 {
     unsigned secondWord = (A << 16) | (op->funct << 12);
     if (first && (active[0].reg || active[0].index))
@@ -86,7 +86,7 @@ void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Op
     addWord(secondWord, Code);
 }
 
-void writeFirstWord(Operation *op)
+void writeFirstWord(const Operation *op)
 {
     unsigned firstWord = (A << 16) | op->op;
     addWord(firstWord, Code);

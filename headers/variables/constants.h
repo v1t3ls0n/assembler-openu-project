@@ -5,15 +5,12 @@
 #define OP_SIZE 16
 #define RAM_MEMORY_SIZE 8192
 #define MAX_LABEL_LEN 31
-#define MAX_LINE_LEN 320
-#define MAX_INSTRUCTION_NAME_LEN 8
+#define MAX_LINE_LEN 81
 
-/*
-#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 16)
-*/
+/* Hash Table Hashsize (Result is currently 64)  */
+#define HASHSIZE ((RAM_MEMORY_SIZE / (MAX_LABEL_LEN + 1)) / 4)
 
-#define HASHSIZE 64
-
+/* Masks for creation of to binary word memory image */
 #define A 0x0004
 #define R 0x0002
 #define E 0x0001
@@ -43,9 +40,9 @@
 #define STRING ".string"
 #define ENTRY ".entry"
 #define EXTERNAL ".extern"
-
-#define _TYPE_DATA -11
-#define _TYPE_STRING -22
-#define _TYPE_ENTRY -33
-#define _TYPE_EXTERNAL -44
-#define _TYPE_CODE -55
+/* Given just random Numbers that will be different then 0*/
+#define _TYPE_DATA 11
+#define _TYPE_STRING 22
+#define _TYPE_ENTRY 33
+#define _TYPE_EXTERNAL 44
+#define _TYPE_CODE 55

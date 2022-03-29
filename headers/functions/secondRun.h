@@ -7,9 +7,9 @@ Bool writeOperationBinary(char *operationName, char *args);
    If there is an operand which is an undifined labl at the table of symbols, it returns false. Else it returns true.
 */
 
-void writeAdditionalOperandsWords(Operation *op, AddrMethodsOptions active, char *value);
+void writeAdditionalOperandsWords(const Operation *op, AddrMethodsOptions active, char *value);
 /* @ Function: writeAdditionalOperandsWords
-   @ Arguments: The function gets Operation *op- the operation, AddrMethodsOptions active- the allowed addresing methods for the operands,
+   @ Arguments: The function gets const Operation *op- the operation, AddrMethodsOptions active- the allowed addresing methods for the operands,
    and char * value- the operand which is about to be written in the memory.
    @ Description: The functiom checks the addressing method of the operations, then acording to the addressing method it writes value (the operand) in the memory.
     The function doesn't return value.
@@ -30,17 +30,17 @@ Bool writeStringInstruction(char *s);
    The function returns true.
 */
 
-void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], Operation *op);
+void writeSecondWord(char *first, char *second, AddrMethodsOptions active[2], const Operation *op);
 /* @ Function: writeSecondWord
-   @ Arguments: The function gets char *first and char *second - the first and second operands of the operation- Operation *op.
+   @ Arguments: The function gets char *first and char *second - the first and second operands of the operation- const Operation *op.
    It also gets AddrMethodsOptions active[2]- an array with the allowed addresing methods for the operands.
    @ Description: The function builds and writes in the memory the second word of each operation and its parameters, it checks what is the addressing method of first and second, what is the funct of the operation.
     The function doesn't return value.
 */
 
-void writeFirstWord(Operation *op);
+void writeFirstWord(const Operation *op);
 /* @ Function: writeFirstWord
-   @ Arguments: The function gets Operation *op- the operation it writes uts first word.
+   @ Arguments: The function gets const Operation *op- the operation it writes uts first word.
    @ Description: The function writes in the memory the first word of the operation and its parameter by writing the opcode of the operation into the memory.
     The function doesn't return value.
 */

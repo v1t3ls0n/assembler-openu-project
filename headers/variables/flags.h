@@ -90,23 +90,15 @@ typedef enum
 
 typedef enum
 {
+    assemblyCodeFailedToCompile,
+    startProgram,
+    parsingMacros,
     firstRun,
     secondRun,
-    parsingMacros,
-    writeFiles,
-    assemblyCodeFailedToCompile,
     exportFiles,
-    goToNextFileOrEndProgram,
-    stopProgram,
-    endProgram,
-    startProgram
+    exitProgram
 } State;
 
-typedef enum
-{
-    Binary,
-    Hexadecimal
-} EncodingFormat;
 typedef enum
 {
     False = 0,

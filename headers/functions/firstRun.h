@@ -42,7 +42,7 @@ Bool handleOperation(char *operationName, char *args);
   Returns true if the operands are valid, and false if they aren't.
  */
 
-Bool parseOperands(char *src, char *des, Operation *op, AddrMethodsOptions active[2]);
+Bool parseOperands(char *src, char *des, const Operation *op, AddrMethodsOptions active[2]);
 /* @ Function: validateOperandMatch
    @ Arguments: This function gets AddrMethodsOptions allowedAddrs- the allowed addressing methods for the source and destination operands, AddrMethodsOptions active[2]- an array that represent types of addressing methods for the operands,
     char *operand- the operands, and type- the type of the operand.

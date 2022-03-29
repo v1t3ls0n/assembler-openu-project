@@ -1,6 +1,6 @@
 #include "data.h"
 
-static Operation operations[OP_SIZE] = {
+static const Operation operations[OP_SIZE] = {
     {0x0001, 0, "mov", {1, 1, 1, 1}, {0, 1, 1, 1}},
     {0x0002, 0, "cmp", {1, 1, 1, 1}, {1, 1, 1, 1}},
     {0x0004, 10, "add", {1, 1, 1, 1}, {0, 1, 1, 1}},
@@ -18,12 +18,13 @@ static Operation operations[OP_SIZE] = {
     {0x4000, 0, "rts", {0, 0, 0, 0}, {0, 0, 0, 0}},
     {0x8000, 0, "stop", {0, 0, 0, 0}, {0, 0, 0, 0}},
 };
+
 Bool isOperationName(char *s)
 {
     return getOpIndex(s) != -1 ? True : False;
 }
 
-Operation *getOperationByName(char *s)
+const Operation *getOperationByName(char *s)
 {
     int i = getOpIndex(s);
 
@@ -33,12 +34,12 @@ Operation *getOperationByName(char *s)
     return NULL;
 }
 
-Operation *getOperationByIndex(unsigned int i)
+const Operation *getOperationByIndex(unsigned int i)
 {
     return i < OP_SIZE ? &operations[i] : NULL;
 }
 
-char *getOperationName(char *s)
+const char *getOperationName(char *s)
 {
     int i = 0;
     while (i < OP_SIZE)
