@@ -480,22 +480,11 @@ void freeHashTable(ItemType type)
     while (i < HASHSIZE)
     {
 
-        if (type == Symbol)
-        {
-            if (symbols[i] != NULL)
-                freeTableItem(symbols[i]);
-        }
-        else
-        {
-            if (macros[i] != NULL)
-                freeTableItem(macros[i]);
-        }
+        if (type == Symbol && symbols[i] != NULL)
+            freeTableItem(symbols[i]);
 
-        /*         if (type == Macro ? (macros[i] != NULL) : (symbols[i] != NULL))
-                {
-
-                    freeTableItem(type == Macro ? macros[i] : symbols[i]);
-                } */
+        else if (type == Macro && macros[i] != NULL)
+            freeTableItem(macros[i]);
 
         i++;
     }
@@ -503,10 +492,10 @@ void freeHashTable(ItemType type)
 
 void freeTableItem(Item *item)
 {
+
     if (item->next != NULL)
         freeTableItem(item->next);
-    /*     printf("item->name:%s\n", item->name); */
-    free(item);
+    free(item->next);
     return;
 }
 
