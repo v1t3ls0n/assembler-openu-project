@@ -113,7 +113,7 @@ typedef struct
 /*Item is the building block of the hash table data structure that both the symbols and macros tables are built with*/
 typedef struct Item
 {
-    char name[MAX_LABEL_LEN];
+    char *name;
     union
     {
         SymbolData s;
