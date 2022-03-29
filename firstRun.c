@@ -150,8 +150,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
         {
             if (nextTokens)
             {
-                char *labelName = (char *)calloc(strlen(nextTokens), sizeof(char *));
-                strcpy(labelName, nextTokens);
+                char *labelName = cloneString(nextTokens);
                 nextTokens = strtok(NULL, " \t\n\f\r");
                 if (nextTokens)
                 {
@@ -166,7 +165,7 @@ Bool handleInstruction(int type, char *firstToken, char *nextTokens, char *line)
                         return addSymbol(labelName, 0, 0, 0, 0, 1) ? True : False;
                 }
 
-                /*free(labelName);*/
+                free(labelName);
             }
             else
             {

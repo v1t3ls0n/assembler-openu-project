@@ -111,7 +111,6 @@ void calcFinalAddrsCountersValues()
     DCF = ICF + DC;
     DC = IC;
     IC = MEMORY_START;
-    printf("DC:%u IC:%u\nICF:%u DCF:%u\n", DC, IC, ICF, DCF);
 }
 
 void printMemoryImgInRequiredObjFileFormat()
