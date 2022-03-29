@@ -36,9 +36,9 @@ void initTables()
     extern unsigned externalCount, entriesCount;
     int i = 0;
     if (extListHead != NULL)
-        resetExtList();
+        /*  resetExtList(); */
 
-    externalCount = entriesCount = 0;
+        externalCount = entriesCount = 0;
     while (i < HASHSIZE)
     {
         symbols[i] = NULL;
@@ -60,9 +60,9 @@ void resetExtList()
         {
             pos = nextPos;
             nextPos = nextPos->next;
-            free(pos);
+            /*free(pos);*/
         }
-        free(np);
+        /*free(np);*/
     }
 
     extListHead = NULL;
@@ -151,7 +151,10 @@ Item *install(char *name, ItemType type)
             macros[hashval] = np;
     }
     else
+    {
+        printf("line 155\n");
         free((Item *)np->next);
+    }
 
     if ((np->name = cloneString(name)) == NULL)
         return NULL;
