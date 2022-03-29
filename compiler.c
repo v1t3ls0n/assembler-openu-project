@@ -19,7 +19,7 @@ int handleSourceFiles(int argc, char *argv[])
         handleSingleFile(argv[i]);
         i++;
     }
-    closeOpenLogFiles();
+
     return 0;
 }
 void handleSingleFile(char *arg)
@@ -58,9 +58,14 @@ void handleSingleFile(char *arg)
         fprintf(stderr, "\n######################################################################\n");
         fprintf(stderr, " FAILURE! expanded source code file %s could not be created\n", fileName);
         fprintf(stderr, "######################################################################\n\n");
+        /*
+
         fclose(src);
-        /*         free(fileName);
-                return; */
+
+        free(fileName);
+                return;
+
+                */
     }
     /* if there are no errors it starts the pre proccesing- parse all the macros,
     saves them in the macro table and prints it */
