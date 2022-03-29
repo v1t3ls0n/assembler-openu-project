@@ -36,10 +36,10 @@ void handleSingleFile(char *arg)
     extern void calcFinalAddrsCountersValues();
     extern void freeHashTable(ItemType type);
 
-    strncpy(fileName, arg, strlen(arg));
-    strcat(fileName, ".as");
+    strncpy(fileName, arg, strlen(arg)); /* sets the fileName to be arg */
+    strcat(fileName, ".as");             /* turns the files into .as files */
     (*setPath)(fileName);
-
+    /* if the file couldn't be opened it alerts it to the user */
     if ((src = fopen(fileName, "r")) == NULL)
     {
         fprintf(stderr, "\n######################################################################\n");
@@ -49,8 +49,9 @@ void handleSingleFile(char *arg)
                 return; */
     }
 
-    fileName[strlen(fileName) - 1] = 'm';
+    fileName[strlen(fileName) - 1] = 'm'; /* change the files to be .am files */
     (*setPath)(fileName);
+    /* if the expanded soure file couldn't be created it alerts it to the user */
     if ((target = fopen(fileName, "w+")) == NULL)
     {
 
@@ -61,6 +62,8 @@ void handleSingleFile(char *arg)
         /*         free(fileName);
                 return; */
     }
+    /* if there are no errors it starts the pre proccesing- parse all the macros,
+    saves them in the macro table and prints it */
 
     else
     {
@@ -71,11 +74,16 @@ void handleSingleFile(char *arg)
         printMacroTable();
         freeHashTable(Macro);
 
+        /* moves on to the first run, looks for errors in the code, counts how much space in the
+         memory the program needs and starts to parse the assembly code.
+         */
         if ((*globalState)() == firstRun)
         {
 
             rewind(target);
             parseAssemblyCode(target);
+            /* if the first run ended with no errors, it moves on to the second run,
+            builds the memory image, prints the symbols table */
             if ((*globalState)() == secondRun)
             {
                 calcFinalAddrsCountersValues();
@@ -84,6 +92,8 @@ void handleSingleFile(char *arg)
                 printSymbolTable();
                 rewind(target);
                 parseAssemblyCode(target);
+                /* if the second run ended with no errors, it moves to export file
+                and creates the additional files (.ob, .ent and .ext files) */
                 if ((*globalState)() == exportFiles)
                 {
                     fileName[strlen(fileName) - 3] = '\0';
@@ -101,8 +111,10 @@ void handleSingleFile(char *arg)
         else
             printf("\nfailed to create new .am (expanded source code) file for the %s source file\nmoving on to the next file if exist\n\n", fileName);
 
+        /* frees and closes all the files that have been in use */
         free(fileName);
         fclose(src);
         fclose(target);
+        closeOpenLogFiles();
     }
 }
