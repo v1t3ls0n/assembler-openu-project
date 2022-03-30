@@ -1,4 +1,20 @@
 
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### helpers.c/h General Overview: ########################################
+##########################################################################################################
+##########################################################################################################
+
+this file containing some helper functions that are used in other files for doing simple and independent small
+tasks like cloning a string, trimming white space, and also it contains helpers functions that are used for
+encoding numeric values in binary(2's complement)/hex string.
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+*/
+
 /* @ Function: char *cloneString(char *s)
    @ Arguments: The function gets char *s- the string it copies
    @ Description: The function gets a char *s, if it is equal to NULL, it returns empty string.

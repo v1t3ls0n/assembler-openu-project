@@ -1,4 +1,20 @@
 
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### preProccesor.c/h General Overview: ##################################
+##########################################################################################################
+##########################################################################################################
+
+The pre-proccessor is for parsing the original .as file and replacing macros if existing using hash table to
+store the starting and ending index of each macro in file. if we found an error in the syntax of the macros
+we yield relevant error message and will not continue to the first run.
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+*/
+
 /* @ Function: void parseSourceFile(FILE *src, FILE *target)
    @ Arguments: FILE *src, FILE *target. the *src FILE pointer
    is a file pointer to the original source code file (".as" file) and the *target FILE

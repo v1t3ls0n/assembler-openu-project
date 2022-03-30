@@ -1,11 +1,23 @@
 
-/*The file tables.c is responsible of all the tables, lists and data structures in the code.
+/*
+##########################################################################################################
+##########################################################################################################
+#################################### tables.c General Overview: ##########################################
+##########################################################################################################
+##########################################################################################################
+
+The file tables.c is responsible of all the tables, lists and data structures in the code.
 It handles the macros table, the symbols table and the external operands nested singly linked list
 Both the symbols and the macros able are using the same hash table data structure and main function\interface.
 The hashtable main functions are lookup hash and install for finding \ adding \ hashing items in the symbol table.
 Each type of table (symbol\macro\external operand) have additional helpers, getters and setters functions that are
 using the 3 hash table main functions (install\lookup\hash).
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
 */
+
 /*#####################################################################*/
 /*#####################################################################*/
 /*####################### Hash Table Functions ############################*/

@@ -2,6 +2,10 @@
 
 int main(int argc, char *argv[])
 {
+    /*
+    we are passing the command line arguments that are the files that passed to the assembler
+    to the handleSourceFiles function.
+     */
     handleSourceFiles(argc, argv);
     return 0;
 }
