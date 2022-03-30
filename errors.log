@@ -1,0 +1,572 @@
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 3
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 7
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 9
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 11
+type of source operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 13
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 13
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 13
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 15
+type of source operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 15
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 17
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 19
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 21
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 23
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 25
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 27
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 28
+symbol already declared and defined locally,
+so it could not be re-declared as external variable.
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 30
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 32
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 34
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 36
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongAddressingMethodTest.am on line number 38
+type of destination operand passed to operation is not accepted!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 3
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 5
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 7
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 9
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 11
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 13
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 16
+Illegal apearence of commas in line
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 18
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 20
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 22
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 24
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 26
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 28
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 29
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 29
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 31
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 32
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 32
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 34
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 35
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 35
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 37
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 38
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 38
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 40
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 41
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 41
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 44
+Illegal appearence of characters at beginning of the line
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 45
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 45
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 48
+Illegal appearence of characters at beginning of the line
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 49
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 49
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 53
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 53
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfCommas.am on line number 53
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 3
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 7
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 9
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 13
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 16
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 19
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 21
+Extra operands passed as paramters
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 24
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 26
+required source operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 26
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 28
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 30
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 32
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongNumOfOperands.am on line number 34
+required destination operand is missing
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 6
+missin Space between instruction and arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 6
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 8
+illegal Label Use Expected Operation Or Instruction
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 10
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 10
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 12
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 12
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 12
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 14
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 14
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 16
+Missing space between label declaretion and instruction name
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 16
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 18
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 18
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 20
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 20
+Number must be an integer!
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 22
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 22
+expected number but got letter instead, argument must be an integer number
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 22
+expected number but got letter instead, argument must be an integer number
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 24
+illegal token in beginning of current line,  not operation nor instruction or label decleration
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 25
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 25
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 25
+Illegal appearence of a comma after the last parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 27
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 27
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 27
+Extra commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 29
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 29
+Illegal appearence of a comma before the first parameter
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 29
+Missing Commas between arguments
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 31
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 31
+empty String Declatretion
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 33
+symbol already declared and defined locally,
+so it could not be re-declared as external variable.
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 35
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 35
+missin closing quotes of string variable
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 37
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 37
+expected opening quotes before string
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 39
+Label Name Already In Use
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 39
+expected opening quotes before string
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/wrongUseOfInstructions.am on line number 39
+missin closing quotes of string variable
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/shahar_1.am on line number 12
+operand is registered as .entry in table but is not defined in the file
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/shahar_1.am on line number 14
+operand is registered as .entry in table but is not defined in the file
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/shahar_1.am on line number 17
+operand is registered as .entry in table but is not defined in the file
+######################################################################
+
+######################################################################
+Error!! occured in ./___test_files/mixed/shahar_1.am on line number 19
+operand is registered as .entry in table but is not defined in the file
+######################################################################
