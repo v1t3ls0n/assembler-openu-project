@@ -81,7 +81,7 @@ void parseSourceFile(FILE *src, FILE *target)
     char lineClone[MAX_LINE_LEN] = {0};
     char *token, c;
     int i = 0;
-    static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
+    void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
     (*resetCurrentLineCounter)();
 
     while (((c = fgetc(src)) != EOF))
