@@ -86,6 +86,9 @@ void parseSourceFile(FILE *src, FILE *target)
         if (i >= MAX_LINE_LEN - 2 && !isspace(c))
             c = '\n';
 
+        if ((*globalState)() == assemblyCodeFailedToCompile)
+            return;
+
         if (c == '\n')
         {
             (*currentLineNumberPlusPlus)();
