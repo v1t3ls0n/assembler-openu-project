@@ -27,7 +27,7 @@ void parseMacros(char *line, char *token, FILE *src, FILE *target)
     {
         next = strtok(NULL, " \t\n\f\r");
 
-        if (!*next)
+        if (next == NULL)
         {
             yieldError(macroDeclaretionWithoutDefiningMacroName);
             (*setState)(assemblyCodeFailedToCompile);
