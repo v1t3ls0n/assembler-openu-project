@@ -32,7 +32,7 @@ void handleSingleFile(char *arg)
     FILE *src = NULL, *target = NULL;
     void (*setPath)(char *) = &setFileNamePath;
     State (*globalState)() = &getGlobalState;
-    void (*setState)() = &setGlobalState;
+    void (*setState)(State) = &setGlobalState;
 
     char *fileName = (char *)calloc(strlen(arg) + 4, sizeof(char *));
     extern void resetMemoryCounters();

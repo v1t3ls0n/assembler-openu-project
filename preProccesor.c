@@ -1,5 +1,5 @@
 #include "data.h"
-void (*setState)() = &setGlobalState;
+void (*setState)(State) = &setGlobalState;
 State (*globalState)() = &getGlobalState;
 
 void parseMacros(char *line, char *token, FILE *src, FILE *target)

@@ -252,7 +252,7 @@ Bool handleSingleLine(char *line)
 void parseAssemblyCode(FILE *src)
 {
     State (*globalState)() = &getGlobalState;
-    void (*setState)() = &setGlobalState;
+    void (*setState)(State) = &setGlobalState;
     int c = 0, i = 0;
     char line[MAX_LINE_LEN] = {0};
     Bool isValidCode = True;
