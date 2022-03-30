@@ -4,6 +4,7 @@ State (*globalState)() = &getGlobalState;
 
 void parseMacros(char *line, char *token, FILE *src, FILE *target)
 {
+    void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
     static char macroName[MAX_LABEL_LEN] = {0}, *next;
     static Bool isReadingMacro = False;
     static long start = 0, end = 0;
@@ -18,7 +19,10 @@ void parseMacros(char *line, char *token, FILE *src, FILE *target)
     if (!isReadingMacro)
     {
         if (!isMacroOpening(token))
+        {
             fprintf(target, "%s", line);
+            (*currentLineNumberPlusPlus)();
+        }
     }
     if (!isPossiblyUseOfMacro(token) && !isMacroOpening(token) && !isMacroClosing(token))
         return;
@@ -77,7 +81,8 @@ void parseSourceFile(FILE *src, FILE *target)
     char lineClone[MAX_LINE_LEN] = {0};
     char *token, c;
     int i = 0;
-    void (*currentLineNumberPlusPlus)() = &increaseCurrentLineNumber;
+    static void (*resetCurrentLineCounter)() = &resetCurrentLineNumber;
+    (*resetCurrentLineCounter)();
 
     while (((c = fgetc(src)) != EOF))
     {
@@ -91,7 +96,6 @@ void parseSourceFile(FILE *src, FILE *target)
 
         if (c == '\n')
         {
-            (*currentLineNumberPlusPlus)();
             if (i > 0)
             {
                 strncpy(lineClone, line, i);
