@@ -33,21 +33,22 @@ ExtListItem *findExtOpListItem(char *name)
 
 void resetExtList()
 {
-    ExtListItem *np = extListHead, *next = NULL;
+    ExtListItem *np = extListHead, *next;
     ExtPositionData *pos, *nextPos;
     externalCount = 0;
 
-    while (next != NULL)
+    while (np != NULL)
     {
         next = np->next;
         nextPos = np->value.next;
         while (nextPos != NULL)
         {
             pos = nextPos;
-            nextPos = nextPos->next;
+            nextPos = pos->next;
             free(pos);
         }
         free(np);
+        np = next;
     }
 
     extListHead = NULL;
