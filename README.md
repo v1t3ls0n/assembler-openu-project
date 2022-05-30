@@ -44,6 +44,7 @@ will not export any files.
 
  
 
+[university_project_specs_doc.pdf](https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_project_specs_doc.pdf)
 
 
 
