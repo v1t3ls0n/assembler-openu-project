@@ -2,8 +2,8 @@
 # Maman 14: Final Project (system programming lab Openu CS course) Done by 
 ## Guy Vitelson && Shahar Stav Torati For Danny Calfon (course instructor)
 ### Date: 28.03.2022
-[university explicit specification of the assembler implementation project:]
-(https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_project_specs_doc.pdf)
+#### University explicit specification for the project:
+https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_project_specs_doc.pdf
 
 
 ##### Task Summery: Create an assembler for fictional assembly language defined by openu course.
