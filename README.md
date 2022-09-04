@@ -30,9 +30,9 @@ we will add all the symbols to the symbol table and will verify that there are n
 yield a print messages to stderr and error.log file which will be created in the root folder, we will parse all the content of the source code in first run anyway so if we encounter an error we yield print error message and continue to check and look for other errors.if even 1 error occured in first run we will not enter second run, we will not allocate any memory and will not write any binary data at all. in the first run we do not write or convert any argument to the resulted binary/hex image.
  
 #### 3) In between first and second run:
-If everything was valid (else, *Next) in first run we allocate the exact amount of memory we need to write the image result, before
-we do that we first updating the address of each data symbol in the symbol table. then we reset the counters (IC/DC) and 
-then we allocating the memory for the resulted hex/binary image. we are allocating the exact size and since we counted the size of each operation or instruction on the first run. after allocating memory we move to second run.
+If first run ended successfully (else, *Next) the assembller will update the address of each data symbol in the symbol table, 
+then it will allocate the exact amount of memory it needs to write for the target image (binary of compiled code)
+then it will reset the counters (IC/DC) and continue to the second run. 
 
 #### 4) Second run:
 In the second run our assembler writes the words of each line of code in binary format, we inserting the words to
