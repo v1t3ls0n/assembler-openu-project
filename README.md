@@ -38,7 +38,7 @@ then it will allocate the exact amount of memory it needs to write for the targe
 then it will reset the counters (IC/DC) and continue to the second run. 
 
 #### 4) Second run:
-In the second run our assembler writes the words of each line of code in binary format, it is inserting he words (binary bits) to
+In the second run our assembler writes the words of each line of code in binary format, it is inserting the words (binary bits) to
 the memory image in the correct position depending on the type of word (data/instruction) and it adds each external
 operand that appeared to the correct spot in the external operands table. 
 
