@@ -44,8 +44,8 @@ operand that appeared to the correct spot in the external operands table.
 
 If the assembler encouter label operand that is not within the symbol table and is not external it yields an error message and then continues to check the
 rest of the code in order to discover all errors of this kind and report them (it is the only kind of error that can appear in second run stage since any other 
-type of error will be reported in the previous stages and will prevent the assembler entering second run) and in this case the assembler will finish second run but
-will not export any files. 
+type of error already been reported in the previous stages by now prevented the assembler from entering the second run stage) 
+and in this case the assembler will finish second run but will not export any files. 
 
  #### 5) Export (generate files):
  If second run finished without any error (else: Next) we will generate all of the required outputs (.ob, .ext .ent files).
