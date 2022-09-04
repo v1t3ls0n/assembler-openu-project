@@ -46,4 +46,4 @@ will not export any files.
  #### 5) Export (generate files):
  If second run finished without errors we will generate all of the required outputs (.ob, .ext .ent files) else we won't generate any output files for current source    file. then:
 
-The assembler moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one then it ends program.
+##### The assembler then moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one then it ends program.
