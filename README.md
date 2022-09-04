@@ -20,17 +20,20 @@ https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_pro
 #### Stages:
 
 #### 1) Macros stage:
-Parsing the original .as file and replacing macros if existing using hash table to store the starting and ending 
+Parsing the original source (.as) file and replacing macros if existing using hash table to store the starting and ending 
 index of each macro in file. if we found an error in the syntax of the macros we yield relevant error message
 and will not continue to the first run.
 
 #### 2) First Run:
-Moving to first run in which we will only count the size of the data image and the instruction image and also
-we will add all the symbols to the symbol table and will verify that there are no errors in code. if we found errors we
-yield a print messages to stderr and error.log file which will be created in the root folder, we will parse all the content of the source code in first run anyway so if we encounter an error we yield print error message and continue to check and look for other errors.if even 1 error occured in first run we will not enter second run, we will not allocate any memory and will not write any binary data at all. in the first run we do not write or convert any argument to the resulted binary/hex image.
+In the first run the assembler counts the size of the data image and the instruction image (without allocating any memory), 
+it adds all the symbols to the symbol table, and last but not least the assembler will verify that there are no errors in code before 
+it moves on  to step 3. If the assembler encounter any error in code it outputs error/warning message to stderr 
+and error.log (file which will be created in the root folder if any errors/warnings occurs). 
+
+In order to report on each of any error in the source code in the first run, the assember parses all the content of the source code regardless of any occurrence of an error. If any error (warnings do not count as errors) occurred, the assembler will not continue to stage 3 but it will go straight on to the *Next* stage.
  
 #### 3) In between first and second run:
-If first run ended successfully (else, *Next) the assembller will update the address of each data symbol in the symbol table, 
+If first run ended successfully (else: Next) the assembller will update the address of each data symbol in the symbol table, 
 then it will allocate the exact amount of memory it needs to write for the target image (binary of compiled code)
 then it will reset the counters (IC/DC) and continue to the second run. 
 
@@ -44,7 +47,7 @@ will not export any files.
 
 
  #### 5) Export (generate files):
- If second run finished without any error (else, *Next) we will generate all of the required outputs (.ob, .ext .ent files).
+ If second run finished without any error (else: Next) we will generate all of the required outputs (.ob, .ext .ent files).
 
 ##### Next:
 The assembler then moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one then it ends program.
