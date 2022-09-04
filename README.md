@@ -20,9 +20,10 @@ https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_pro
 #### Stages:
 
 #### 1) Macros stage:
-The assembler parses the original source (.as) file and replacing macros if existing using hash table to store the starting and ending 
-index of each macro in file. If it founds any error in the syntax of the macros it yield relevant error message
-and jumps straight to *Next*, else, it continues to the First Run stage.
+The assembler parses the original source (.as) file and generate the expanded (.am) source file that contains the same source code content, 
+the only difference it that the macros defined in the original source file (.as) are replaced with their content. In order to do so the assembler 
+uses a hash table (Macro Table) to store the macro name with its starting and ending indexes of its content.
+If it founds any error in the syntax of the macros  it yield relevant error message and jumps straight to *Next*, else, it continues to the First Run stage.
 
 #### 2) First Run:
 In the first run the assembler counts the size of the data image and the instruction image (without allocating any memory), 
