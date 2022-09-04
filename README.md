@@ -19,22 +19,22 @@ https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_pro
 #### Our implimentation Overview in short: 
 #### Stages:
 
-1. #### Macros stage:
+#### 1) Macros stage:
 Parsing the original .as file and replacing macros if existing using hash table to store the starting and ending 
 index of each macro in file. if we found an error in the syntax of the macros we yield relevant error message
 and will not continue to the first run.
 
-2.#### First Run:
+#### 2) First Run:
 Moving to first run in which we will only count the size of the data image and the instruction image and also
 we will add all the symbols to the symbol table and will verify that there are no errors in code. if we found errors we
 yield a print messages to stderr and error.log file which will be created in the root folder, we will parse all the content of the source code in first run anyway so if we encounter an error we yield print error message and continue to check and look for other errors.if even 1 error occured in first run we will not enter second run, we will not allocate any memory and will not write any binary data at all. in the first run we do not write or convert any argument to the resulted binary/hex image.
  
-3.#### In between first and second run:
+#### 3) In between first and second run:
 If everything was valid in first run we allocate the exact amount of memory we need to write the image result, before
 we do that we first updating the address of each data symbol in the symbol table. then we reset the counters (IC/DC) and 
 then we allocating the memory for the resulted hex/binary image. we are allocating the exact size and since we counted the size of each operation or instruction on the first run. after allocating memory we move to second run.
 
-4.#### Second run:
+#### 4) Second run:
 In the second run our assembler writes the words of each line of code in binary format, we inserting the words to
 the memory image in the correct position depending on the type of word (data/instruction) and we add each external
 operand appearence to the linked list of all the positions that external operands appeared. if we encouter label
@@ -42,7 +42,6 @@ operand that is not within the symbol table and is not external we yield error m
 rest of the code in order to discover all errors of this type if this case happens we will finish second run but
 will not export any files.
 
- 5.#### Exporting files: after second run
- Exporting all the required files (.ob, .ext .ent) and moves to the next file or end program.
 
-
+ #### 5) Export (generate files):
+ If second run finished without errors we will generate all of the required outputs (.ob, .ext .ent files) else we won't generate any output files for current source file. Then the assembler moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one, after that end program.
