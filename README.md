@@ -30,7 +30,7 @@ we will add all the symbols to the symbol table and will verify that there are n
 yield a print messages to stderr and error.log file which will be created in the root folder, we will parse all the content of the source code in first run anyway so if we encounter an error we yield print error message and continue to check and look for other errors.if even 1 error occured in first run we will not enter second run, we will not allocate any memory and will not write any binary data at all. in the first run we do not write or convert any argument to the resulted binary/hex image.
  
 #### 3) In between first and second run:
-If everything was valid in first run we allocate the exact amount of memory we need to write the image result, before
+If everything was valid (else, *Next) in first run we allocate the exact amount of memory we need to write the image result, before
 we do that we first updating the address of each data symbol in the symbol table. then we reset the counters (IC/DC) and 
 then we allocating the memory for the resulted hex/binary image. we are allocating the exact size and since we counted the size of each operation or instruction on the first run. after allocating memory we move to second run.
 
@@ -44,6 +44,7 @@ will not export any files.
 
 
  #### 5) Export (generate files):
- If second run finished without errors we will generate all of the required outputs (.ob, .ext .ent files) else we won't generate any output files for current source    file. then:
+ If second run finished without any error (else, *Next) we will generate all of the required outputs (.ob, .ext .ent files).
 
-##### The assembler then moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one then it ends program.
+##### Next:
+The assembler then moves on to handle the next source file (means that it will repeate over these 5 steps for each source file passed to it) untill the last one then it ends program.
