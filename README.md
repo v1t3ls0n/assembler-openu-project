@@ -6,7 +6,7 @@
 https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_project_specs_doc.pdf
 
 
-##### Task Summery: Create an assembler for fictional assembly language defined by openu course.
+##### Task Summery: Create an assembler for "made up" regular assembly language defined by openu course.
 ##### Implementation Overview and general approach:
 
 #### Objectives (Goals): ### 
