@@ -6,7 +6,7 @@
 https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_project_specs_doc.pdf
 
 
-##### Task Summary: Create an assembler for a generic assembly programming language defined by The Open University (of Israel) course.
+##### Task Summary: Create an assembler for an assembly programming language defined in The Open University (of Israel) System Programming Lab course final project.
 ##### Implementation Overview and General Approach:
 
 #### Objectives (Goals): ### 
