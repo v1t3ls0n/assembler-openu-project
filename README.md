@@ -10,7 +10,7 @@ https://github.com/v1t3ls0n/assembler-openu-project/files/8794964/university_pro
 ##### Implementation Overview and General Approach:
 
 #### Objectives (Goals): ### 
-1) memory efficiency: It was important for us to allocate the memory of the binary image output dynamically so that it would fit perfectly with the minimum memory use required for that image.
+1) memory efficiency: It was important for us to allocate the memory of the binary image output dynamically so that the memory use of the program would be efficient and that the memory allocation of the image the assembler generates would fit the minimum required for compiling source code.
 
 2) Separation of concern: we tried to split the program into independent components that will be responsible for well-defined tasks and that the sharing of data between files will be through some kind of encapsulation method such as state getters/setters and scoping global variables to be static so that they will be scoped to the single file that they belong to.
 
